@@ -1,2 +1,3 @@
 # Archivos del entorno de Python
 *.env
+*.lbcc_env
