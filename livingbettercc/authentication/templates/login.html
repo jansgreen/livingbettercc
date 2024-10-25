@@ -1,0 +1,37 @@
+{% extends 'frontend.html'%}
+{% block content %}
+    <form method="POST">
+        {% csrf_token %}
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-6 mb-3 mb-sm-0 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                                {{ form.username}}
+                                <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                                {{ form.password}}
+                                <small class="form-text text-muted">{{ form.password.help_text }}</small>
+
+                            </div>
+                        </div>
+                        <div class="row p-5">
+                            <div class="col-2">
+                                <button class="btn btn-primary mb-3 " type="submit">Login</button>
+                            </div>
+                            <div class="col-2">
+                                <a class="btn btn-outline-primary" href="{% url 'register' %}">Registrarse</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+{% endblock %}

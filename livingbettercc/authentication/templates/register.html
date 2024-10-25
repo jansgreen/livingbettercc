@@ -1,0 +1,46 @@
+
+{% extends 'frontend.html'%}
+
+{% block content %}
+
+<form  method="POST" action="{% url 'register'%}">
+    {% csrf_token %}
+    <div class="content">
+        <div class="row">
+            <div class="col-sm-6 mb-3 mb-sm-0 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                            {{ form.username}}
+                            <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                          </div>
+                          <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                            {{ form.email}}
+                            {{ form.email.help_text }}
+                            <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                          </div>
+                          <div class="mb-3">
+                            <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                            {{ form.password1}}
+                            <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+
+                          </div>
+                          <div class="mb-3">
+                            {{ form.password2.label}}
+                            {{ form.password2}}
+                          </div>
+                    </div>
+                    <div class="vstack gap-2 col-2 mx-auto">
+                        <button class="btn btn-success mb-3 " type="submit">Registrarse</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}

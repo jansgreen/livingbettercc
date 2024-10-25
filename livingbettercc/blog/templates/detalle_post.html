@@ -1,0 +1,16 @@
+
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="bg-body-tertiary border rounded-3 p-5">
+    <h2>{{ post.titulo }}</h2>
+    <br>
+
+    <p>{{ post.contenido| linebreaks }}</p> 
+</div>
+<p>Posicion: {{ post.posicion }} Categoria: {{ post.categoria }}</p>
+
+<a href="{% url 'actualizar_post' post.pk %}">Editar</a> |
+<a href="{% url 'eliminar_post' post.pk %}">Eliminar</a>
+
+{% endblock %}

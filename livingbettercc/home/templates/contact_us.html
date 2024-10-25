@@ -1,0 +1,36 @@
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="flex-column flex-md-row p-5 gap-4 py-md-5 align-items-center justify-content-center">
+        <h2>Contactanos</h2>
+        <form method="POST" action="{% url 'contactanos' %}" >
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="mensaje">Mensaje:</label>
+                <textarea class="form-control" id="mensaje" name="mensaje" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Enviar</button>
+            
+            <div class="footer-icons mt-3">
+                <a href="https://www.facebook.com" target="_blank" class="btn btn-outline-primary">
+                    <i class="fab fa-facebook"></i> Facebook
+                </a>
+                <a href="https://wa.me/" target="_blank" class="btn btn-outline-success">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </a>
+            </div>
+        </form>
+  </div>
+
+
+
+
+{% endblock %}

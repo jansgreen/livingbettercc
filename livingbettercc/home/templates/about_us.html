@@ -1,0 +1,75 @@
+{% extends 'Base_index.html' %}
+
+{%load static %}
+
+{% block content%}
+<div class="container-fluid">
+    <div class="row  mt-5">
+        <div class="row mb-5">
+            <h1 class="text-primary"> Living Better Community Center </h1>
+        <h4> Directiva</h4>
+        </div>
+
+        <div class="row">
+            <div class="col-4">
+              <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-4 border-end">
+                <nav class="nav nav-pills flex-column">
+                  <a class="nav-link" href="#item-1">ThD. CASAC Jose Miguiel Nuñez
+                    <h6>CEO</h6>
+                  </a>
+                  <nav class="nav nav-pills flex-column">
+                    <a class="nav-link ms-3 my-1" href="#item-1-1">Ingeniero Jose Manuel Luna
+                    <h6>Vice Presidente</h6>
+                    </a>
+                    <a class="nav-link ms-3 my-1" href="#item-1-2">Tec. Emilia Luna
+                        <h6>Secretaria</h6>
+
+                    </a>
+                  </nav>
+                  <a class="nav-link" href="#item-2"> Doctor Darwin Hanuel Acevedo <h6> Primel Vocal</h6>
+                  </a>
+                  <a class="nav-link" href="#item-3">Serafin Hernandez <h6>Segundo Vocal</h6>
+                 </a>
+                </nav>
+              </nav>
+            </div>
+          
+            <div class="col-8">
+              <div data-bs-spy="scroll" data-bs-target="#navbar-example3" data-bs-smooth-scroll="true" class="scrollspy-example-2" tabindex="0">
+                <div id="item-1">
+                  <h4>Item 1</h4>
+                  <p>...</p>
+                </div>
+                <div id="item-1-1">
+                  <h5>Item 1-1</h5>
+                  <p>...</p>
+                </div>
+                <div id="item-1-2">
+                  <h5>Item 1-2</h5>
+                  <p>...</p>
+                </div>
+                <div id="item-2">
+                  <h4>Item 2</h4>
+                  <p>...</p>
+                </div>
+                <div id="item-3">
+                  <h4>Item 3</h4>
+                  <p>...</p>
+                </div>
+                <div id="item-3-1">
+                  <h5>Item 3-1</h5>
+                  <p>...</p>
+                </div>
+                <div id="item-3-2">
+                  <h5>Item 3-2</h5>
+                  <p>...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+    </div>
+    {% include 'habilitadas.html'%}
+
+</div>
+{% endblock %}

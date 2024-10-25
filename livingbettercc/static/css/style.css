@@ -1,0 +1,93 @@
+#scrollable {
+    margin-top: 60px;
+    max-height: 350px; /* Ajusta la altura máxima según tus necesidades */
+    overflow-y: auto;
+}
+
+.post-excerpt {
+    position: relative;
+    max-height: 150px;  /* Ajusta según necesites */
+    overflow: hidden;
+}
+
+.post-excerpt p {
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+}
+
+.post-excerpt:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;  /* Altura del degradado */
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%);
+}
+
+.read-more {
+    display: block;
+    margin-top: 10px;
+    text-align: right;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.footer-icons {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-icons a {
+    text-decoration: none;
+}
+
+.footer-icons .btn {
+    display: flex;
+    align-items: center;
+}
+
+.footer-icons .btn i {
+    margin-right: 5px;
+}
+
+.seccion-derecha {
+  position: relative;
+  background: linear-gradient(to left, white 70%, #0d6efd 100%);
+  padding: 50px; /* Ajusta el padding según tu diseño */
+}
+
+.icono-decoracion img {
+  max-width: 100%;
+}
+
+.bienvenido-titulo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.color-titulo {
+  color: #0d6efd; /* Azul primario de Bootstrap */
+}
+
+/* Opción con un degradado más curvado usando radial-gradient */
+.seccion-derecha {
+  background: radial-gradient(circle at 30% 100%, white 70%, #0d6efd 70%);
+  padding: 50px;
+}
+
+

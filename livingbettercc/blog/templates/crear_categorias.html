@@ -1,0 +1,65 @@
+{% extends 'frontend.html'%}
+
+{% block content %}
+
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+    <div class="row justify-content-md-center mb-5 mt-5">
+        <h2>Crear Categoria</h2>
+
+        <div class="col-12 col-lg-6">
+            <form method="POST" action="{% url 'crear_categoria' %}" class="row g-3">
+                {% csrf_token %}
+                <div class="col-auto">
+                  <label for="staticEmail2">Crear</label>
+                  {{form.nombre.label}}
+        
+                </div>
+                <div class="col-auto">
+                    {{form.nombre}}
+                </div>
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary mb-3">Guardar</button>
+                </div>
+            </form>
+            <div class="row"><small> Las categorias es la forma como seran organizado los Post</small></div>
+
+        </div>
+        <div class="col-12 col-md-auto">
+            <ul class="row justify-content-center list-group ">
+                <li class="list-group-item list-group-item-primary ">Lista de Categorias</li>
+                {% if items %}
+                    {% for item in items %}
+                        <form class="row g-3" method="POST" action="{% url 'actualizar_categoria' item.id %}">
+                            {% csrf_token %}
+                            <div class="col col-lg-4 ">
+                              <label>{{item}}</label>
+                            </div>
+                            <div class="col col-lg-4">
+                              <input type="text" name="actualizar" class="form-control" id="inputEdit" placeholder="Nuevo Nombre de la Categoria">
+                            </div>
+                            <div class="col col-lg-4">
+                              <button type="submit" name="editar" class="btn btn-warning mb-3">Editar</button>
+                              <button type="submit" name="eliminar" class="btn btn-danger mb-3">Eliminar</button>
+
+                            </div>
+                        </form>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No hay Categorias Creadas </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

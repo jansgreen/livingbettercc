@@ -1,0 +1,9 @@
+{% extends 'frontend.html' %}
+{% block content %}
+<h1>Orden Confirmada</h1>
+<p>Gracias por su compra, {{ orden.usuario.username }}!</p>
+<p>Su orden ID es: {{ orden.id }}</p>
+<p>Total: {{ orden.total }}</p>
+<p>Dirección de envío: {{ orden.direccion_envio }}</p>
+<a href="{% url 'checkout' %}" class="btn bg-success"></a>
+{% endblock %}

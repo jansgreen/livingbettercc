@@ -1,0 +1,21 @@
+{% extends 'frontend.html' %}
+
+{% block content %}
+<h2>Invitar a un Grupo</h2>
+<form method="POST">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="email" class="form-label">Correo Electrónico</label>
+        <input type="email" name="email" class="form-control" id="email" required>
+    </div>
+    <div class="mb-3">
+        <label for="group" class="form-label">Grupo</label>
+        <select name="group" class="form-select" id="group" required>
+            {% for group in groups %}
+            <option value="{{ group.name }}">{{ group.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar Invitación</button>
+</form>
+{% endblock %}

@@ -1,0 +1,30 @@
+
+<footer class="bg-light text-center text-lg-start">
+    <div class="container p-4">
+        <div class="row">
+            <div class="col-lg-6 col-md-12 mb-4 mb-md-0">
+                <h5 class="text-uppercase">{{ footer.titulo }}</h5>
+                <p>{{ footer.mision }}</p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase">Enlaces</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="{{ footer.enlace_inicio }}" class="text-dark">Inicio</a></li>
+                    <li><a href="{{ footer.enlace_quienes_somos }}" class="text-dark">Quienes Somos</a></li>
+                    <li><a href="{{ footer.enlace_contacto }}" class="text-dark">Contactanos</a></li>
+                    <li><a href="{{ footer.enlace_galeria }}" class="text-dark">Galería</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <h5 class="text-uppercase">Contacta</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="mailto:{{ footer.email_contacto }}" class="text-dark">{{ footer.email_contacto }}</a></li>
+                    <li><a href="tel:{{ footer.telefono_contacto }}" class="text-dark">{{ footer.telefono_contacto }}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="text-center p-3 bg-dark text-light">
+        {{ footer.derechos_autor }}
+    </div>
+</footer>

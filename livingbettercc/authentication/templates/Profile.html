@@ -1,0 +1,307 @@
+{% extends 'frontend.html' %}
+{% load static %}
+{% block content %}
+  <div class="card">
+    <h5 class="card-header">
+      <img src="{{ user.profile.image.urls }}" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+      <strong>{{ user.username|capfirst }}</strong>
+    </h5>
+    {% if user.profle.first_name %}
+      <h2>{{ user.profle.first_name }} {{ user.profle.last_name }}</h2>
+    {% else %}
+      <h2>{{ User }}</h2>
+    {% endif %}
+      {% if profile %}
+        <form method="POST" action="{% url 'edit_profile' %}">
+          {% csrf_token %}
+          <div class="row">
+            <!--primera columna -->
+            <div class="col col-lg-3">
+            <!--Nombre de usuario -->
+              {% if request.user.first_name %}
+                <div class="m-lg-3">
+                  <span class="input-group-text">Nombre</span>
+                  <span class="input-group-text bg-light">{{ request.user.first_name }}</span>
+                </div>
+              {% else %}
+                <div class="m-lg-3">
+                  <span class="input-group-text">Nombres</span>
+                  {{form.first_name}}
+                  {{form.first_name.help_text}}
+                  <button type="submit" name="edit_first_name" class="btn btn-warning">Guardar</button>
+                </div>
+              {% endif %}
+              {% if request.user.last_name %}
+                <div class="m-lg-3">
+                    <span class="input-group-text">Apellidos</span>
+                    <span class="input-group-text bg-light">{{ request.user.last_name }}</span>
+                </div>
+              {% else %}
+                  <div class="m-lg-3">
+                    <span class="input-group-text">Apellidos</span>
+                      {{ form.last_name }}
+                      {{ form.last_name.help_text }}
+                      <button type="submit" name="edit_last_name" class="btn btn-warning">Guardar</button>
+                  </div>
+              {% endif %}
+              {% if profile.genero %}
+                <div class="m-lg-3">
+                    <span class="input-group-text">Género</span>
+                    <span class="input-group-text bg-light">{{ profile.genero|capfirst }}</span>
+                  </div>
+              {% else %}
+                  <div class="m-lg-3">
+                    <span class="input-group-text">Genero</span>
+
+                      {{ form.genero }}
+                      {{ form.genero.help_text }}
+                      <button type="submit" name="edit_genero" class="btn btn-warning">Guardar</button>
+                  </div>
+              {% endif %}
+              {% if profile.numero_identidad %}
+                <div class="m-lg-3">
+                    <span class="input-group-text">Número de Identidad</span>
+                    <span class="input-group-text bg-light">{{ profile.numero_identidad }}</span>
+                </div>
+              {% else %}
+                <div class="m-lg-3">
+                  <span class="input-group-text">Cedula de Identidad</span>
+
+                    {{ form.numero_identidad }}
+                    {{ form.numero_identidad.help_text }}
+                    <button type="submit" name="edit_numero_identidad" class="btn btn-warning">Guardar</button>
+                </div>
+              {% endif %}
+              {% if profile.fecha_nacimiento %}
+                  <div class="m-lg-3">
+                      <span class="input-group-text">Fecha de Nacimiento</span>
+                      <span class="input-group-text bg-light">{{ profile.fecha_nacimiento }}</span>
+                      <button type="submit" name="edit_numero_identidad" class="btn btn-warning">Guardar</button>
+                  </div>
+              {% else %}
+                  <div class="m-lg-3">
+                    <span class="input-group-text">Fecha de Nacimiento</span>
+
+                      {{ form.fecha_nacimiento }}
+                      {{ form.fecha_nacimiento.help_text }}
+                      <button type="submit" name="edit_fecha_nacimiento" class="btn btn-warning">Guardar</button>
+                  </div>
+              {% endif %}
+            </div>
+            <div class="col col-lg-3">
+              <div class="m-lg-3">
+                <span class="input-group-text">Foto de Perfil</span>
+                <img src="{{ profile.imagen.urls }}" width="300px" height="300px" class="mb-2 me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                {{ form.imagen }}
+                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+              </div>
+            {% if profile.telefono %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Teléfono</span>
+                <span class="input-group-text bg-light">{{ profile.telefono }}</span>
+              </div>
+            {% else %}
+              <div class="m-lg-3">
+                {{ form.telefono }}
+                {{ form.telefono.help_text }}
+                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+              </div>
+            {% endif %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Grupos</span>
+                {% if request.user.groups.all %}
+                    {% for group in request.user.groups.all %}
+                        <span class="input-group-text bg-light">{{ group }}</span>
+                    {% endfor %}
+                {% endif %}
+                <div id="emailHelp" class="form-text">Solo el administrador puede agregarte o quitarte de los grupos.</div>
+              </div>
+            </div>
+            <div class="col col-lg-5">
+              {% if profile.calle_y_casa and  profile.sector_o_barrio and profile.municipio and profile.provincia and profile.codigo_postal %}
+                <div class="m-lg-3">
+                  <span class="input-group-text">Calle y Casa</span>
+                  {{ profile.calle_y_casa }}
+                </div>
+                <div class="m-lg-3">
+                  <span class="input-group-text">Sector o Barrio</span>
+                  {{ profile.sector_o_barrio }}
+                </div>
+              {% else %}
+              <span class="input-group-text">Calle y Casa</span>
+              {{ form.calle_y_casa }}
+              <span class="input-group-text">Barrio o Sector</span>
+                {{ form.sector_o_barrio }}
+                {{ form.municipio }}
+                {{ form.provincia }}
+                {{ form.codigo_postal }}
+                <div class="row">
+                  {% include 'provincia_municipios.html'%}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+        </form>     
+
+      
+      
+      {% elif form %}
+        <form method="post" action="{% url 'ProfileFunction' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Nombres</label>
+            {{ form.first_name }}
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Apellidos</label>
+            {{ form.last_name }}
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Fecha Nacimiento</label>
+            {{ form.fecha_nacimiento}}
+          </div>
+
+          <hr class="m-5">
+
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Genero</label>
+            {{ form.genero }}
+          </div>
+
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Cedula Identidad</label>
+            {{ form.numero_identidad }}
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Phone Number</label>
+            {{ form.telefono }}
+          </div>
+
+          <hr class="m-5">
+
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Foto de Perfil</label>
+            {{ form.imagen }}
+          </div>
+          <div class="mb-3">
+            <!-- Desglosamos las provincias -->
+            <div class="row">
+              <div class="input-groug">
+                <label class="form-label">Calle y Numero de casa</label>
+                {{ form.calle_y_casa }}
+              </div>
+              <div class="input-groug">
+                <label class="form-label">Sector o Barrio</label>
+                {{ form.sector_o_barrio }}
+              </div>
+              <div class="input-groug">{{ form.provincia }}
+                {{ form.municipio }}
+                {{ form.codigo_postal }}
+              </div>
+              {% include 'provincia_municipios.html'%}
+
+            </div>
+            <!-- fin -->
+          </div>
+          <hr class="m-5">
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Profession</label>
+            {{ form.profession }}
+          </div>
+          <button type="submit" class="btn btn-success">guardar</button>
+        </form>
+      {% endif %}
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    const provincias = {
+      'Distrito Nacional': ['Santo Domingo'],
+      Azua: ['Azua de Compostela', 'Estebanía', 'Guayabal', 'Las Charcas', 'Las Yayas de Viajama', 'Padre Las Casas', 'Peralta', 'Sabana Yegua', 'Tábara Arriba'],
+      Bahoruco: ['Neiba', 'Galván', 'Los Ríos', 'Tamayo', 'Villa Jaragua'],
+      Barahona: ['Santa Cruz de Barahona', 'Cabral', 'El Peñón', 'Enriquillo', 'Fundación', 'Jaquimeyes', 'La Ciénaga', 'Las Salinas', 'Paraíso', 'Polo'],
+      Dajabón: ['Dajabón', 'El Pino', 'Loma de Cabrera', 'Partido', 'Restauración'],
+      Duarte: ['San Francisco de Macorís', 'Arenoso', 'Castillo', 'Eugenio María de Hostos', 'Las Guáranas', 'Pimentel', 'Villa Riva'],
+      'Elías Piña': ['Comendador', 'Bánica', 'El Llano', 'Hondo Valle', 'Pedro Santana'],
+      'El Seibo': ['Santa Cruz de El Seibo', 'Miches', 'Pedro Sánchez'],
+      Espaillat: ['Moca', 'Cayetano Germosén', 'Gaspar Hernández', 'Jamao al Norte'],
+      'Hato Mayor': ['Hato Mayor del Rey', 'El Valle', 'Sabana de la Mar'],
+      'Hermanas Mirabal': ['Salcedo', 'Tenares', 'Villa Tapia'],
+      Independencia: ['Jimaní', 'Cristóbal', 'Duvergé', 'La Descubierta', 'Mella', 'Postrer Río'],
+      'La Altagracia': ['Higüey', 'Bávaro', 'Miches'],
+      'La Romana': ['La Romana', 'Guaymate', 'Villa Hermosa'],
+      'La Vega': ['Concepción de La Vega', 'Bonao', 'Jima Abajo', 'Mamá Tingó'],
+      'María Trinidad Sánchez': ['Nagua', 'Arenoso', 'El Factor', 'Río San Juan'],
+      'Monseñor Nouel': ['Bonao', 'Maimón', 'Piedra Blanca'],
+      'Monte Cristi': ['Monte Cristi', 'Castañuela', 'Guayubín', 'Las Matas de Santa Cruz', 'Pepillo Salcedo', 'Villa Vásquez'],
+      'Monte Plata': ['Monte Plata', 'Bayaguana', 'Don Juan', 'Peralvillo', 'Sabana Grande de Boyá', 'Yamasá'],
+      Pedernales: ['Pedernales', 'Oviedo', 'Bahía de las Águilas']
+    }
+    
+    const zipCodes = {
+      Azua: '71000',
+      Bahoruco: '81000',
+      Barahona: '81000',
+      Dajabón: '63000',
+      'Distrito Nacional': '10100',
+      Duarte: '31000',
+      'El Seibo': '24000',
+      Espaillat: '57000',
+      'Hato Mayor': '25000',
+      'Hermanas Mirabal': '33000',
+      Independencia: '75000',
+      'La Altagracia': '23000',
+      'La Romana': '22000',
+      'La Vega': '41000',
+      'María Trinidad Sánchez': '33000',
+      'Monseñor Nouel': '41000',
+      'Monte Cristi': '61000',
+      MontesPlata: '92000',
+      Pedernales: '71000',
+      Peravia: '94000',
+      PuertoPlata: '57000',
+      Samaná: '32000',
+      SanCristóbal: '91000',
+      SanJosédeOcoa: '91000',
+      SanJuan: '57000',
+      SanPedrodeMacorís: '21000',
+      SánchezRamírez: '41000',
+      Santiago: '51000',
+      SantiagoRodríguez: '65000',
+      SantoDomingo: '10205'
+    }
+    
+    const provinciaSelect = document.getElementById('provincia')
+    const municipiosSelect = document.getElementById('municipios')
+    const zip = document.getElementById('zip')
+    
+    provinciaSelect.addEventListener('change', function () {
+      const provincia = provinciaSelect.value
+      if (provincia) {
+        const municipios = provincias[provincia]
+        const options = municipios.map((municipio) => `<option>${municipio}</option>`).join('')
+        municipiosSelect.innerHTML = options
+        municipiosSelect.disabled = false
+    
+        const zip_code = zipCodes[provincia]
+        console.log(zip_code)
+        zip.innerHTML = `<option>${zip_code}</option>`
+        zip.disabled = false
+      }
+      if (provincia) {
+        const zip_code = zipCodes[provincia]
+        const options = zip_code.map((zipC) => `<option>${zipC}</option>`).join('')
+        zip.innerHTML = options
+        zip.disabled = false
+      } else {
+        municipiosSelect.innerHTML = '<option value="">--</option>'
+        municipiosSelect.disabled = true
+        zip.innerHTML = '<option value="">--</option>'
+        zip.disabled = true
+      }
+    })
+  </script>
+
+{% endblock %}

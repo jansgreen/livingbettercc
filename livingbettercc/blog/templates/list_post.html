@@ -1,0 +1,14 @@
+{% extends "frontend.html" %}
+{%load static %}
+
+{% block content %}
+
+    <h2>Listado de Posts</h2>
+    <ul>
+        {% for post in posts %}
+            <li><a href="{% url 'detalle_post' post.pk %}">{{ post.titulo }}</a></li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn-success" href="{% url 'crear_post' %}">Crear nuevo post</a>
+
+{% endblock %}

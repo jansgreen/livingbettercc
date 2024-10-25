@@ -1,0 +1,14 @@
+<aside id="scrollable" class="col-md-3" data-bs-spy="scroll" data-bs-target="#simple-list-example" data-bs-offset="0" data-bs-smooth-scroll="true" class="scrollspy-example" tabindex="0">
+    <div class="list-group">
+        {% for menu in menus %}
+            <a class="list-group-item list-group-item-action list-group-item-primary" href="{{ menu.url }}">{{ menu.nombre }}</a>
+            {% if menu.submenus %}
+                <div class="ml-3">
+                    {% for submenu in menu.submenus %}
+                        <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">{{ submenu.nombre }}</a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}    
+    </div>
+</aside>
