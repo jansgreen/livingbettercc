@@ -1,1 +1,1 @@
-web: gunicorn livingBetterCC.wsgi --log-file -
+web: gunicorn livingbettercc.wsgi --log-file -
