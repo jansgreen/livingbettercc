@@ -30,8 +30,15 @@ def obtener_menus(request):
             'url': '#',
             'submenus': [
                 {'nombre': 'Listar Usuarios', 'url': '/groups/user_list/'},
-                {'nombre': 'Ver Grupos', 'url': '/groups/groups/'}, 
-                {'nombre': 'Ver Grupos', 'url': '/groups/invite/'}, 
+                {'nombre': 'Ver Grupos', 'url': '/groups/group_list/'}, 
+                {'nombre': 'Invitar', 'url': '/groups/invite/'}, 
+            ]
+        },
+        {
+            'nombre': 'Metadata', 
+            'url': '#',
+            'submenus': [
+                {'nombre': 'Listar Usuarios', 'url': '/metadata/create/'},
             ]
         },
     ]

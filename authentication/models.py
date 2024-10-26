@@ -18,7 +18,8 @@ class Profile(models.Model):
     numero_identidad = models.CharField(max_length=20, blank=True, null=True)
     fecha_nacimiento = models.DateField(blank=True, null=True)
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
-    profession = models.CharField(max_length=100, blank=True, null=True)
+    profesion = models.CharField(max_length=100, blank=True, null=True)
+    puesto = models.CharField(max_length=100, blank=True, null=True)
     imagen = models.ImageField(upload_to='Profile/', default='profiles/default.jpg')
 
     def __str__(self):

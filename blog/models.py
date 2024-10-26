@@ -1,5 +1,7 @@
 from django.db import models
 from ckeditor.fields import RichTextField
+from django.contrib.auth.models import User
+
 
 class PostStatus(models.Model):
     BORRADOR = 'borrador'
@@ -27,6 +29,7 @@ class Posicion(models.Model):
         return self.nombre
 
 class Post(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True) # Cambiado a ForeignKey
     titulo = models.CharField(max_length=200)
     contenido = RichTextField()
     excerpt = models.TextField(blank=True, null=True)  # Campo opcional para el extracto

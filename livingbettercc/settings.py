@@ -17,6 +17,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
 
+
+
+
 if os.getenv("DJANGO_ENV") == "heroku":
     ALLOWED_HOSTS = [os.getenv("HOSTS"),]
 else:
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
     'groups',
     'checkout',
     'page',
+    'metadata',
 ]
 
 MIDDLEWARE = [
@@ -75,6 +79,7 @@ TEMPLATES = [
                 'home.context_processors.context_processor.bootstrap_js',
                 'blog.context_processors.context_processor.obtener_menus',
                 'page.context_processors.context_processor.footer_context',
+                'metadata.context_processors.context_processor.metadata_context',
 
             ],
         },

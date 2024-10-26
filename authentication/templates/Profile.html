@@ -1,6 +1,18 @@
 {% extends 'frontend.html' %}
 {% load static %}
 {% block content %}
+
+  {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="card">
     <h5 class="card-header">
       <img src="{{ user.profile.image.urls }}" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
@@ -102,11 +114,38 @@
               </div>
             {% else %}
               <div class="m-lg-3">
+                <span class="input-group-text">Telefono</span>
                 {{ form.telefono }}
-                {{ form.telefono.help_text }}
                 <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
               </div>
             {% endif %}
+
+            {% if profile.profesion %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Profesion</span>
+                <span class="input-group-text bg-light">{{ profile.profesion }}</span>
+              </div>
+            {% else %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Profesion</span>
+                {{ form.profesion }}
+                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+              </div>
+            {% endif %}           
+
+            {% if profile.puesto %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Puesto</span>
+                <span class="input-group-text bg-light">{{ profile.puesto }}</span>
+              </div>
+            {% else %}
+              <div class="m-lg-3">
+                <span class="input-group-text">Puesto</span>
+                {{ form.puesto }}
+                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+              </div>
+            {% endif %} 
+
               <div class="m-lg-3">
                 <span class="input-group-text">Grupos</span>
                 {% if request.user.groups.all %}
@@ -213,6 +252,7 @@
         </form>
       {% endif %}
   </div>
+
 {% endblock %}
 
 {% block extra_js %}

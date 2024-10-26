@@ -1,14 +1,17 @@
 {% extends 'frontend.html' %}
+{% load static %}
 {% block content %}
 
 <div class="container">
     <div class="row">
         <div class="col-2">
-            <form method="POST" action="{% url 'crear_post_Bio'%}">
+            {% if es_directiva %}
+            <form method="POST" action="{% url 'crear_post_Bio' %}">
                 {% csrf_token %}
-    
-                <button type="submit" name="PostUser" class="btn btn-success">Crear Biografia</button>
+                <button type="submit" name="PostUser" class="btn btn-success">Crear Biografía</button>
             </form>
+            {% endif %}
+            </div>
         </div>
     </div>
     <div class="row">
@@ -32,6 +35,7 @@
                 <div class="row ">
                     {% for post in posts %}
                     <a href="{% url 'BioUser' post.id %}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                        <img src="{{ user.profile.image.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
                         <img src="https://github.com/twbs.png" alt="twbs" width="32" height="32" class="rounded-circle flex-shrink-0">
                         <div class="d-flex gap-2 w-100 justify-content-between">
                         <div>

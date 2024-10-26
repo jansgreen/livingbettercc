@@ -91,10 +91,11 @@ class CustomAuthenticationForm(AuthenticationForm):
         fields = ('username', 'password')
 
 class Profileforms(forms.ModelForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre', help_text='* NOTA: Escribe tus nonombresmbre tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.'
-)
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido', help_text='* NOTA: Procura escribir tu apellidos tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.'
-)
+    first_name = forms.CharField(max_length=30, required=True, label='Nombre', help_text='* NOTA: Escribe tus nonombresmbre tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.')
+    last_name = forms.CharField(max_length=30, required=True, label='Apellido', help_text='* NOTA: Procura escribir tu apellidos tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.')
+    puesto = forms.CharField(max_length=30, required=True, label='puesto', help_text='Que roll desempeña en LBCC')
+    profesion = forms.CharField(max_length=30, required=True, label='profesion', help_text='Profesion Academica')
+
 
     fecha_nacimiento = forms.DateField(
         required=True, 
@@ -131,7 +132,9 @@ class Profileforms(forms.ModelForm):
             'imagen': 'Foto de perfil',
             'fecha_nacimiento': 'Fecha de Nacimiento',
             'genero': 'Genero',
-            'profession': 'Profession',
+            'profesion': 'Grado Academico',
+            'puesto': 'Tu roll en Living Better CC',
+
         }
 
         for field in self.fields:

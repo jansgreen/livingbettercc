@@ -23,6 +23,7 @@ class ProfileAdmin(admin.ModelAdmin):
     'fecha_nacimiento', 
     'genero', 
     'profession',
+    'puesto',
         )
     
     list_display = (
@@ -37,7 +38,9 @@ class ProfileAdmin(admin.ModelAdmin):
     'imagen', 
     'fecha_nacimiento', 
     'genero', 
-    'profession',
+    'profesion',
+    'puesto',
+
     )
 
 # Registra los modelos en el admin

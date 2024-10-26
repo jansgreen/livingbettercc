@@ -4,7 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Better Community Center</title>
+    {% if meta_title %}
+    <title>{{ meta_title }}</title>
+    <meta name="description" content="{{ meta_description }}">
+    <meta name="keywords" content="{{ meta_keywords }}">
+    <meta name="robots" content="index, follow">
+    {% endif %}
+
     <link href="{{BOOTSTRAP_CSS}}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'bootstrap/bootstrap-icons/font/bootstrap-icons.css' %}">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">

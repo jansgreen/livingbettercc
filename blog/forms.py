@@ -4,8 +4,13 @@ from .models import Post, Categoria, Posicion
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
+        exclude = ['user']  # Excluir el campo 'user'
         fields = ['titulo', 'contenido', 'categoria', 'posicion', 'estatus']
+        widgets = {
+            'categoria': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo numeros'}),
+            'posicion': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Solo numeros'})
 
+        }
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         for field in self.fields.values():

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
 from .forms import RegisterForm, LoginForm, Profileforms, Profile
 from django.contrib import messages
@@ -65,9 +65,6 @@ def ProfileFunction(request):
         form = Profileforms(instance=profile)  # Pasa la instancia existente si está en modo GET
 
     return render(request, 'profile.html', {'form': form, 'profile': profile})
-
-from django.shortcuts import redirect, get_object_or_404
-from django.contrib import messages
 
 def edit_profile(request):
     # Obtén el perfil del usuario actual o redirige si no existe

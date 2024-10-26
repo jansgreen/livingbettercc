@@ -1,30 +1,72 @@
 from django.contrib import messages
-
-# Create your views here.
-
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Categoria, Posicion
 from .forms import PostForm, CategoriaForm, PosicionForm
-
+from authentication.forms import Profileforms
+from authentication.models import Profile
 import traceback
 
-def crear_post_Bio(request):
-        categorias, catCreada = Categoria.objects.get_or_create(nombre="Biografia")
-        num = 1
-        while Posicion.objects.filter(nombre=f'biografia-{num}').exists():
-            num += 1
-        position, posCreada = Posicion.objects.get_or_create(nombre=f'biografia-{num}')
+# Crear
+def crear_post(request):
+    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto :
+        messages.warning(request, f"{request.user} Por favor completa tu Perfil antes de crear un post")
+        return redirect ('ProfileFunction')
+    
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        post = form.save(commit=False)
+        categorias_valor = request.POST.get('categoria')
+        posicion_valor = request.POST.get('posicion')
+
+        if request.POST.get('profesion'):
+            profile, created = Profile.objects.get_or_create(user=request.user)
+            profile.profesion = request.POST.get('profesion')
+            profile.puesto = request.POST.get('first_name')
+            post.fields['titulo'].initial = request.POST.get('first_name'), request.POST.get('last_name')
+            profile.profesion = request.POST.get('last_name')
+            profile.puesto = request.POST.get('puesto')  # Si 'puesto' es otro campo de Profile
+            profile.save()  # No olvides guardar los cambios en profile
+
+        if categorias_valor:
+            post.fields['categoria'].initial = categorias_valor
+
+        if posicion_valor:
+            post.fields['posicion'].initial = posicion_valor
+
+        post.user = request.user
+        if post.is_valid():
+            post.save()
+            return redirect('listar_posts')
+        
+        else:
+            print(form.errors)  # Esto es útil para depuración
+    else:
         form = PostForm()
-        context = {
-            'form':form,
-            'Uposition': position.nombre,
-            'UpositionId': position.id,
-            'Ucategorias':categorias.nombre,
-            'UcategoriasId':categorias.id,
-            'posCreada': posCreada,
-            'catCreada': catCreada,
-            }
-        return render(request, 'crear_post.html', context)
+    context = {
+        'form':form
+    }
+    return render(request, 'crear_post.html', context)
+
+def crear_post_Bio(request):
+    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto :
+        messages.warning(request, f"{request.user} Por favor completa tu Perfil")
+        return redirect ('ProfileFunction')
+    categorias, catCreada = Categoria.objects.get_or_create(nombre="Biografia")
+    num = 1
+    while Posicion.objects.filter(nombre=f'biografia-{num}').exists():
+        num += 1
+    position, posCreada = Posicion.objects.get_or_create(nombre=f'biografia-{num}')
+    form = PostForm()
+    context = {
+        'form':form,
+        'Uposition': position.nombre,
+        'UpositionId': position.id,
+        'Ucategorias':categorias.nombre,
+        'UcategoriasId':categorias.id,
+        'posCreada': posCreada,
+        'catCreada': catCreada,
+        }
+    return render(request, 'crear_post.html', context)
 
 # elimina y actualiza posicion
 def actualizar_posicion(request, pk):
@@ -118,37 +160,6 @@ def actualizar_categoria(request, pk):
                 return redirect('crear_categoria')
     return redirect('crear_categoria')
 
-# Crear
-def crear_post(request):
-    if request.method == "POST":
-        if request.POST.get('posicion') and request.POST.get('categoria'):
-            form = PostForm(request.POST)
-            categorias_valor = request.POST.get('categoria')
-            posicion_valor = request.POST.get('posicion')
-
-            
-            if categorias_valor:
-                form.fields['categoria'].initial = categorias_valor
-            if posicion_valor:
-                form.fields['posicion'].initial = posicion_valor
-
-            if form.is_valid():
-                form.save()
-                return redirect('listar_posts')
-            else:
-                print(form.errors)  # Esto es útil para depuración
-        else:
-            if form.is_valid():
-                form.save()
-            else:
-                print(form.errors)
-
-    else:
-        form = PostForm()
-    context = {
-        'form':form
-    }
-    return render(request, 'crear_post.html', context)
 
 # Leer
 def listar_posts(request):

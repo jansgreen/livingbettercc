@@ -10,9 +10,11 @@ from page.models import Footer
 
 
 def BioUser(request, pk):
+    es_directiva = request.user.groups.filter(name='directivas').exists() if request.user.is_authenticated else False
     posts = Post.objects.filter(posicion__nombre__startswith='biografia-')
     biografia = Post.objects.filter(pk=pk)
     context = {
+        'es_directiva':es_directiva,
         'biografia': biografia,
         'posts': posts,
 
@@ -32,8 +34,10 @@ def home(request):
     return render(request, 'index.html', context)
 
 def aboutUs(request):
+    es_directiva = request.user.groups.filter(name='directivas').exists() if request.user.is_authenticated else False
     post = Post.objects.filter(posicion__nombre__startswith='biografia-')
     context = {
+        'es_directiva': es_directiva,
         'Qpages': True,
         'posts': post,
     }

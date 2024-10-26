@@ -3,6 +3,14 @@ from django.contrib.auth.models import Group, User
 from .forms import GroupForm, PermissionForm, GroupFormCreate, InviteForm
 from django.core.mail import send_mail
 from django.contrib.auth.decorators import user_passes_test
+from django.views import View
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.urls import reverse
+from django.template.loader import render_to_string
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.decorators import login_required
 
 def add_and_remove_group_to_user(request, user_id):
     if request.method == "POST":
@@ -70,34 +78,52 @@ def user_list(request):
     form = GroupForm()
     return render(request, 'user_list.html', {'users': users, 'form': form})
 
-from django.shortcuts import render, redirect
-from django.core.mail import send_mail
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import Group
-from .forms import InviteForm
+class InviteFriendView(View):
+    form_class = InviteForm
+    template_name = 'invite_friend.html'
 
-def invite_to_register(request):
-    if request.method == 'POST':
-        form = InviteForm(request.POST)
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            group_name = form.cleaned_data['group'].name
-            group = Group.objects.get(name=group_name)
-           
-            # Crear el enlace de registro con un token único (puedes mejorar esto con un sistema de tokens)
-            register_url = f'http://tu_dominio.com/register/?email={email}&group={group}'
-            
-            # Crear el mensaje de invitación
-            subject = 'Invitación para Registrarse'
-            message = f'Has sido invitado a registrarte en nuestra plataforma y unirte al grupo "{group}". Por favor, sigue el enlace para registrarte: {register_url}'
-            from_email = 'tu_email@gmail.com'
-           
-            # Enviar correo electrónico
-            send_mail(subject, message, from_email, [email])
-           
-            return redirect('invite_to_register')
-    else:
-        form = InviteForm()
-    
-    groups = Group.objects.all()
-    return render(request, 'invite_to_register.html', {'form': form, 'groups': groups})
+            group = form.cleaned_data['group']
+
+            # Generar el token para el enlace único
+            token = default_token_generator.make_token(User(email=email))
+            uid = urlsafe_base64_encode(force_bytes(email))
+
+            # Construir el enlace de invitación
+            current_site = get_current_site(request)
+            invite_url = reverse('accept_invite', kwargs={'uidb64': uid, 'token': token, 'group_id': group.id})
+            full_invite_url = f"http://{current_site.domain}{invite_url}"
+
+            # Enviar el email
+            subject = "¡Te han invitado a unirte a nuestro sitio!"
+            message = render_to_string('invite_email.html', {
+                'user': request.user,
+                'invite_url': full_invite_url,
+                'group_name': group.name
+            })
+            send_mail(subject, message, 'admin@example.com', [email])
+
+            return redirect('invite_success')  # Redirigir a una página de éxito
+        return render(request, self.template_name, {'form': form})
+
+
+@login_required
+def accept_invite(request, uidb64, token, group_id):
+    # Obtener el grupo
+    group = get_object_or_404(Group, id=group_id)
+
+    # Si el token es válido y el usuario está autenticado
+    if default_token_generator.check_token(request.user, token):
+        request.user.groups.add(group)  # Asigna el grupo al usuario
+        return redirect('success_page')  # Redirige a la página de éxito
+
+    # Redirige a login si el token no es válido o el usuario no está autenticado
+    return redirect('login')
+

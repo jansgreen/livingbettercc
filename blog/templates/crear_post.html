@@ -3,6 +3,17 @@
 
 {% block content %}
 
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="container text-center">
         <div class="row">
         <div class="col-md-12">
@@ -13,8 +24,24 @@
                 <div class="container text-center">
                     <div class="row">
                         <div class="col-sm">
-                            {{ form.titulo.label }}
+                            {% if Ucategorias == "Biografia" %}
+                                {% if user.Profle.first_name or user.profle.last_name %}
+                                <h2>{{ user.Profle.first_name }}{{ user.profle.last_name }}</h2>
+                                {% else%}
+                                <label for="exampleInputEmail1" class="form-label">Nombres</label>
+                                <input type="text" class="form-control" name="firtname" id="firtname" aria-describedby="emailHelp" placeholder="Escribe tus nombres como esta en tu documnetos">
+                                <label for="exampleInputEmail1" class="form-label">Apellidos</label>
+                                <input type="email" class="form-control" name="firtname" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Escribe tus apellidos como esta en tu documnetos">
+                                <label for="exampleInputEmail1" class="form-label">Profecion</label>
+                                {{ user.Profle.profesion }}
+                                <label for="exampleInputEmail1" class="form-label">Puesto</label>
+                                {{ user.Profle.puesto }}
+                                {% endif %}
+                            {% else%}
+                            {{ form.titulo.label  }}
                             {{ form.titulo }}
+                            {% endif %}
+
                         </div>
                         <div class="col-sm">
                             {{ form.categoria.label }}
@@ -43,7 +70,6 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                {{ form.contenido.label }}
                 {{ form.contenido }}
                 </div>
                 <button type="submit" class="btn btn-primary">Guardar</button>

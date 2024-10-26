@@ -1,0 +1,9 @@
+{% extends 'frontend.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>¡Metadatos guardados con éxito!</h2>
+    <p>Los metadatos se han guardado correctamente.</p>
+    <a href="{% url 'create_metadata' %}" class="btn btn-primary">Crear más metadatos</a>
+</div>
+{% endblock %}
