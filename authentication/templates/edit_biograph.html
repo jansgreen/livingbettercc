@@ -1,0 +1,38 @@
+<!-- edit_biography.html -->
+{% extends "frontend.html" %}
+{% load static %}
+{% block content %}
+<div class="row justify-content-md-center">
+    <h2>Tu Biografia</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                <h5>{{ request.user.first_name}} {{request.user.last_name}}</h5>
+                <p>Profesion: <strong>{{ request.user.profile.profesion }}</strong></p>
+                <p>Puesto en LBCC <strong>{{ request.user.profile.puesto }}</strong></p>
+            </div>
+           
+            <div class="col-md-4">
+                <picture>
+                    <img src="{{ user.profile.image.urls }}" width="128" height="128"  alt="" class="img-thumbnail" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                </picture>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                {{ form.biography.label }}
+                {{ form.biography }}
+                {{ form.biography.help_text }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-2">
+                <button type="submit" class="btn btn-success" >Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

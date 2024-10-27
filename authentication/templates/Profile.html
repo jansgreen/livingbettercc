@@ -23,7 +23,7 @@
     {% else %}
       <h2>{{ User }}</h2>
     {% endif %}
-      {% if profile %}
+      {% if user.profile %}
         <form method="POST" action="{% url 'edit_profile' %}">
           {% csrf_token %}
           <div class="row">
@@ -40,7 +40,7 @@
                   <span class="input-group-text">Nombres</span>
                   {{form.first_name}}
                   {{form.first_name.help_text}}
-                  <button type="submit" name="edit_first_name" class="btn btn-warning">Guardar</button>
+                  <button type="submit" name="action" value="edit_first_name" class="btn btn-warning">Guardar</button>
                 </div>
               {% endif %}
               {% if request.user.last_name %}
@@ -53,7 +53,7 @@
                     <span class="input-group-text">Apellidos</span>
                       {{ form.last_name }}
                       {{ form.last_name.help_text }}
-                      <button type="submit" name="edit_last_name" class="btn btn-warning">Guardar</button>
+                      <button type="submit"  name="action" value="edit_last_name" class="btn btn-warning">Guardar</button>
                   </div>
               {% endif %}
               {% if profile.genero %}
@@ -64,10 +64,8 @@
               {% else %}
                   <div class="m-lg-3">
                     <span class="input-group-text">Genero</span>
-
                       {{ form.genero }}
-                      {{ form.genero.help_text }}
-                      <button type="submit" name="edit_genero" class="btn btn-warning">Guardar</button>
+                      <button type="submit"  name="action" value="edit_genero" class="btn btn-warning">Guardar</button>
                   </div>
               {% endif %}
               {% if profile.numero_identidad %}
@@ -81,22 +79,19 @@
 
                     {{ form.numero_identidad }}
                     {{ form.numero_identidad.help_text }}
-                    <button type="submit" name="edit_numero_identidad" class="btn btn-warning">Guardar</button>
+                    <button type="submit"  name="action" value="edit_numero_identidad" class="btn btn-warning">Guardar</button>
                 </div>
               {% endif %}
               {% if profile.fecha_nacimiento %}
                   <div class="m-lg-3">
                       <span class="input-group-text">Fecha de Nacimiento</span>
                       <span class="input-group-text bg-light">{{ profile.fecha_nacimiento }}</span>
-                      <button type="submit" name="edit_numero_identidad" class="btn btn-warning">Guardar</button>
                   </div>
               {% else %}
                   <div class="m-lg-3">
                     <span class="input-group-text">Fecha de Nacimiento</span>
-
                       {{ form.fecha_nacimiento }}
-                      {{ form.fecha_nacimiento.help_text }}
-                      <button type="submit" name="edit_fecha_nacimiento" class="btn btn-warning">Guardar</button>
+                      <button type="submit"  name="action" value="edit_fecha_nacimiento" class="btn btn-warning">Guardar</button>
                   </div>
               {% endif %}
             </div>
@@ -105,7 +100,7 @@
                 <span class="input-group-text">Foto de Perfil</span>
                 <img src="{{ profile.imagen.urls }}" width="300px" height="300px" class="mb-2 me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
                 {{ form.imagen }}
-                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+                <button type="submit"  name="action" value="edit_telefono" class="btn btn-warning">Guardar</button>
               </div>
             {% if profile.telefono %}
               <div class="m-lg-3">
@@ -116,7 +111,7 @@
               <div class="m-lg-3">
                 <span class="input-group-text">Telefono</span>
                 {{ form.telefono }}
-                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+                <button type="submit" name="action" value="edit_telefono" class="btn btn-warning">Guardar</button>
               </div>
             {% endif %}
 
@@ -129,7 +124,7 @@
               <div class="m-lg-3">
                 <span class="input-group-text">Profesion</span>
                 {{ form.profesion }}
-                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+                <button type="submit" name="action" value="edit_profesion" class="btn btn-warning">Guardar</button>
               </div>
             {% endif %}           
 
@@ -142,7 +137,7 @@
               <div class="m-lg-3">
                 <span class="input-group-text">Puesto</span>
                 {{ form.puesto }}
-                <button type="submit" name="edit_telefono" class="btn btn-warning">Guardar</button>
+                <button type="submit"  name="action" value="edit_puesto" class="btn btn-warning">Guardar</button>
               </div>
             {% endif %} 
 
@@ -166,6 +161,18 @@
                   <span class="input-group-text">Sector o Barrio</span>
                   {{ profile.sector_o_barrio }}
                 </div>
+                <div class="m-lg-3">
+                  <span class="input-group-text">Municipio</span>
+                  {{ profile.municipio }}
+                </div>
+                <div class="m-lg-3">
+                  <span class="input-group-text">Provincia</span>
+                  {{ profile.provincia }}
+                </div>
+                <div class="m-lg-3">
+                  <span class="input-group-text">Codigo Postal</span>
+                  {{ profile.codigo_postal }}
+                </div>
               {% else %}
               <span class="input-group-text">Calle y Casa</span>
               {{ form.calle_y_casa }}
@@ -180,75 +187,89 @@
               {% endif %}
             </div>
           </div>
-          
         </form>     
-
-      
-      
+     
       {% elif form %}
-        <form method="post" action="{% url 'ProfileFunction' %}">
+        <form method="POST" class="m-3" action="{% url 'ProfileFunction' %}">
           {% csrf_token %}
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Nombres</label>
-            {{ form.first_name }}
-          </div>
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Apellidos</label>
-            {{ form.last_name }}
-          </div>
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Fecha Nacimiento</label>
-            {{ form.fecha_nacimiento}}
-          </div>
-
-          <hr class="m-5">
-
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Genero</label>
-            {{ form.genero }}
-          </div>
-
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Cedula Identidad</label>
-            {{ form.numero_identidad }}
-          </div>
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Phone Number</label>
-            {{ form.telefono }}
-          </div>
-
-          <hr class="m-5">
-
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Foto de Perfil</label>
-            {{ form.imagen }}
-          </div>
-          <div class="mb-3">
-            <!-- Desglosamos las provincias -->
+          <div class="container ">
             <div class="row">
-              <div class="input-groug">
-                <label class="form-label">Calle y Numero de casa</label>
-                {{ form.calle_y_casa }}
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Nombres:</label>
+                {% if request.user.first_name %}
+                {{request.user.first_name}}
+                {% else %}
+                <input type="text" class="form-control" name="firstname">
+                <small id="firstnameHelp" class="form-text"> NOTA: Procura escribir tu nombre tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.</small>
+                {% endif %}
               </div>
-              <div class="input-groug">
-                <label class="form-label">Sector o Barrio</label>
-                {{ form.sector_o_barrio }}
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Apellidos: </label>
+                {% if request.user.last_name %}
+                {{request.user.last_name}}
+                {% else %}
+                <input type="text" class="form-control" name="lastname">
+                <small id="lastnameHelp" class="form-text"> NOTA: Procura escribir tu apellidos tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.</small>
+                {% endif %}
               </div>
-              <div class="input-groug">{{ form.provincia }}
-                {{ form.municipio }}
-                {{ form.codigo_postal }}
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Fecha Nacimiento</label>
+                {{ form.fecha_nacimiento}}
               </div>
-              {% include 'provincia_municipios.html'%}
-
             </div>
-            <!-- fin -->
           </div>
-          <hr class="m-5">
-          <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Profession</label>
-            {{ form.profession }}
+          <div class="row">
+            <hr class="m-5">
+            <div class="col-md-3">
+              <label for="exampleInputEmail1" class="form-label">Genero</label>
+              {{ form.genero }}
+            </div>
+            <div class="col-md-3">
+              <label for="exampleInputEmail1" class="form-label">Cedula Identidad</label>
+              {{ form.numero_identidad }}
+            </div>
+            <div class="col-md-3">
+              <label for="exampleInputEmail1" class="form-label">Phone Number</label>
+              {{ form.telefono }}
+            </div>
+            <div class="col-md-3">
+              <label for="exampleInputEmail1" class="form-label">Profesion</label>
+              {{ form.profesion }}
+            </div>
           </div>
-          <button type="submit" class="btn btn-success">guardar</button>
+          <div class="row">
+            <hr class="m-5">
+            <div class="col-md-4">
+              <label for="exampleInputEmail1" class="form-label">Posicion</label>
+              {{ form.puesto }}
+            </div>
+            <div class="col-md-4">
+              <label for="exampleInputEmail1" class="form-label">Foto de Perfil</label>
+              {{ form.imagen }}
+            </div>
+            <div class="col-md-4">
+              <!-- Desglosamos las provincias -->
+              <div class="row">
+                <div class="input-groug">
+                  <label class="form-label">Calle y Numero de casa</label>
+                  {{ form.calle_y_casa }}
+                </div>
+                <div class="input-groug">
+                  <label class="form-label">Sector o Barrio</label>
+                  {{ form.sector_o_barrio }}
+                </div>
+                <div class="input-groug">{{ form.provincia }}
+                  {{ form.municipio }}
+                  {{ form.codigo_postal }}
+                </div>
+                {% include 'provincia_municipios.html'%}
+
+              </div>
+              <!-- fin -->
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success">Guardar</button>
+        </div>
         </form>
       {% endif %}
   </div>

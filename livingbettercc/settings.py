@@ -21,7 +21,7 @@ DEBUG = os.getenv('DEBUG')
 
 
 if os.getenv("DJANGO_ENV") == "heroku":
-    ALLOWED_HOSTS = [os.getenv("HOSTS"),]
+    ALLOWED_HOSTS = os.getenv("HOSTS", "").split(",")
 else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 

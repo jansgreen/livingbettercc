@@ -1,4 +1,4 @@
-from .views import home, aboutUs, contactanos, BioUser
+from .views import home, aboutUs, contactanos, BioUser, leerBio
 from django.urls import path, include
 
 
@@ -8,6 +8,8 @@ urlpatterns = [
     path('aboutUs/', aboutUs, name='aboutUs'),
     path('contactanos/', contactanos, name='contactanos'),
     path('BioUser/<int:pk>', BioUser, name='BioUser'),
+    path('leerBio/<int:pk>', leerBio, name='leerBio'),
+
 
 
 ]

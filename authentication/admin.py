@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile
+from .models import Profile, Biography
 
 class ProfileAdmin(admin.ModelAdmin):
     model = Profile
@@ -42,6 +42,11 @@ class ProfileAdmin(admin.ModelAdmin):
     'puesto',
 
     )
+
+
+@admin.register(Biography)
+class BiographyAdmin(admin.ModelAdmin):
+    list_display = ('user',)
 
 # Registra los modelos en el admin
 admin.site.register(Profile, ProfileAdmin)

@@ -1,0 +1,25 @@
+{% load static %}
+
+<div class="d-flex flex-column p-4 gap-4 py-md-5 align-items-center justify-content-center">
+    <div class="row"><h2>Directiva</h2></div>
+    <div class="row">
+        {% for integrantes in biography %}
+            <a href="{% url 'leerBio' integrantes.user.id %}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <img src="{{ integrantes.user.profile.image.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0">{{ integrantes.user.first_name | capfirst }} {{ integrantes.user.last_name | capfirst }}</h6>
+                        <small>{{ integrantes.user.profile.profesion }} / LBCC </small>
+                        <small>{{ integrantes.user.profile.puesto }}</small>
+                        <p class="mb-0 opacity-75">{{ integrantes.excerpt |capfirst }} Leer más...</p>
+                    </div>
+                    <small class="opacity-50 text-nowrap">Leer</small>
+                </div>
+            </a>
+        {% endfor %}
+        {% if is_directivas_member %}
+            <small><a href="{% url 'edit_biography' %}">Crear Biografia</a></small>
+        {% endif %}
+
+    </div>
+</div>

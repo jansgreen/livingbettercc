@@ -6,44 +6,55 @@ from authentication.forms import Profileforms
 from authentication.models import Profile
 import traceback
 
-# Crear
 def crear_post(request):
-    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto :
-        messages.warning(request, f"{request.user} Por favor completa tu Perfil antes de crear un post")
-        return redirect ('ProfileFunction')
+    # Verifica si el usuario pertenece al grupo 'directivas' y no ha llenado su perfil
+    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto:
+        messages.warning(request, f"{request.user} Por favor completa tu perfil antes de crear un post.")
+        return redirect('ProfileFunction')
     
     if request.method == "POST":
         form = PostForm(request.POST)
-        post = form.save(commit=False)
-        categorias_valor = request.POST.get('categoria')
-        posicion_valor = request.POST.get('posicion')
 
-        if request.POST.get('profesion'):
-            profile, created = Profile.objects.get_or_create(user=request.user)
-            profile.profesion = request.POST.get('profesion')
-            profile.puesto = request.POST.get('first_name')
-            post.fields['titulo'].initial = request.POST.get('first_name'), request.POST.get('last_name')
-            profile.profesion = request.POST.get('last_name')
-            profile.puesto = request.POST.get('puesto')  # Si 'puesto' es otro campo de Profile
-            profile.save()  # No olvides guardar los cambios en profile
-
-        if categorias_valor:
-            post.fields['categoria'].initial = categorias_valor
-
-        if posicion_valor:
-            post.fields['posicion'].initial = posicion_valor
-
-        post.user = request.user
-        if post.is_valid():
-            post.save()
-            return redirect('listar_posts')
+        # Si la acción es 'PostUser', guardar el nombre y apellido en el campo título del formulario antes de validarlo
+        if request.POST.get('action') == 'PostUser':
+            form.data = form.data.copy()  # Crear una copia mutable de los datos del formulario
+            form.data['titulo'] = f"{request.user.first_name} {request.user.last_name}"  # Establecer el título
         
+        # Validación del formulario
+        if form.is_valid():
+            post = form.save(commit=False)
+            
+            categoria_id = request.POST.get('categoria')
+            if categoria_id:
+                categoria_instance = get_object_or_404(Categoria, pk=categoria_id)
+                post.categoria = categoria_instance
+
+            posicion_id = request.POST.get('posicion')
+            if posicion_id:
+                posicion_instance = get_object_or_404(Posicion, pk=posicion_id)
+                post.posicion = posicion_instance
+
+            # Actualizar el perfil si es necesario
+            profile, created = Profile.objects.get_or_create(user=request.user)
+            if request.POST.get('profesion'):
+                profile.profesion = request.POST.get('profesion')
+
+            if request.POST.get('puesto'):
+                profile.puesto = request.POST.get('puesto')
+            profile.save()  # Guarda los cambios en el perfil
+            
+            post.save()  # Guarda el post
+            return redirect('listar_posts')
+
         else:
-            print(form.errors)  # Esto es útil para depuración
+            print(form.errors)
+            messages.warning(request, f'Errores en el formulario: {form.errors}')
+
     else:
         form = PostForm()
+    
     context = {
-        'form':form
+        'form': form
     }
     return render(request, 'crear_post.html', context)
 
@@ -159,7 +170,6 @@ def actualizar_categoria(request, pk):
                 messages.info(request, 'Se elimino exitosamente')
                 return redirect('crear_categoria')
     return redirect('crear_categoria')
-
 
 # Leer
 def listar_posts(request):

@@ -1,9 +1,10 @@
-from blog.models import Post
-from django.shortcuts import render, redirect
+from blog.models import Post, Categoria
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail
 from page.models import Footer
+from authentication.models import Biography
 
 
 # Create your views here.
@@ -34,14 +35,28 @@ def home(request):
     return render(request, 'index.html', context)
 
 def aboutUs(request):
-    es_directiva = request.user.groups.filter(name='directivas').exists() if request.user.is_authenticated else False
-    post = Post.objects.filter(posicion__nombre__startswith='biografia-')
-    context = {
-        'es_directiva': es_directiva,
-        'Qpages': True,
-        'posts': post,
+    biography = Biography.objects.all()
+    categoria_biografia = Categoria.objects.get(nombre="Biografia")
+    categoria_quienes_somos = Categoria.objects.get(nombre="About")
+    posts = Post.objects.filter(categoria=categoria_quienes_somos)
+    directivas = Post.objects.filter(categoria=categoria_biografia) 
+    is_directivas_member = request.user.groups.filter(name="directivas").exists()
+    context={
+        'biography':biography,
+        'posts':posts,
+        'is_directivas_member':is_directivas_member,
+        'directivas': directivas,
     }
     return render(request, 'quienes_somos.html', context)
+
+def leerBio(request, pk):
+    biography = Biography.objects.filter(user=pk) 
+    is_directivas_member = request.user.groups.filter(name="directivas").exists()
+    context={
+        'biography':biography,
+        'is_directivas_member':is_directivas_member,
+    }
+    return render(request, 'leer_bio.html', context)
 
 def contactanos(request):
     if request.method == 'POST':

@@ -1,7 +1,7 @@
 from django import forms
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Profile
+from .models import Profile, Biography
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
@@ -18,8 +18,6 @@ class RegisterForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
-
-# forms.py
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
@@ -91,10 +89,8 @@ class CustomAuthenticationForm(AuthenticationForm):
         fields = ('username', 'password')
 
 class Profileforms(forms.ModelForm):
-    first_name = forms.CharField(max_length=30, required=True, label='Nombre', help_text='* NOTA: Escribe tus nonombresmbre tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.')
-    last_name = forms.CharField(max_length=30, required=True, label='Apellido', help_text='* NOTA: Procura escribir tu apellidos tal como esta en tus documentos, una vez que lo hayas guardado no podrá editarlo.')
-    puesto = forms.CharField(max_length=30, required=True, label='puesto', help_text='Que roll desempeña en LBCC')
-    profesion = forms.CharField(max_length=30, required=True, label='profesion', help_text='Profesion Academica')
+    puesto = forms.CharField(max_length=30, required=False, label='puesto', help_text='Que roll desempeña en LBCC')
+    profesion = forms.CharField(max_length=30, required=False, label='profesion', help_text='Profesion Academica')
 
 
     fecha_nacimiento = forms.DateField(
@@ -138,7 +134,7 @@ class Profileforms(forms.ModelForm):
         }
 
         for field in self.fields:
-            if field not in ['profession','imagen','numero_identidad', ]:
+            if field not in ['profesion','imagen','numero_identidad', ]:
                 if self.fields[field].required:
                     placeholder = f'{placeholders[field]} *'
 
@@ -170,14 +166,30 @@ class Profileforms(forms.ModelForm):
             self.fields[field].widget.attrs['aria-label'] = 'Sizing example input'
             self.fields[field].widget.attrs['aria-describedby'] = 'inputGroup-sizing-sm'
             self.fields[field].label = False
-    
-    def save(self, commit=True):
-        profile = super().save(commit=False)
-        user = self.cleaned_data.get('user')
-        user.first_name = self.cleaned_data.get('first_name')
-        user.last_name = self.cleaned_data.get('last_name')
 
-        if commit:
-            user.save()
-            profile.save()
-        return profile
+class BiographyForm(forms.ModelForm):
+    
+    class Meta:
+        model = Biography
+        fields = ['biography']
+    
+    def __init__(self, *args, **kwargs):
+        """
+        Add placeholders and classes, remove auto-generated
+        labels and set autofocus on first field
+        """
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields:
+            self.fields[field].widget.attrs['placeholder'] = "Introduce una breve biografía."
+            self.fields[field].help_text = (
+                "Estructura sugerida:\n"
+                "1. Introducción: Nombre, fecha de nacimiento y contribuciones.\n"
+                "2. Infancia y educación: Primeros años y educación.\n"
+                "3. Carrera y logros: Trayectoria y logros.\n"
+                "4. Vida personal: Relaciones y su influencia.\n"
+                "5. Contribuciones y legado: Impacto en la sociedad.\n"
+                "6. Conclusión: Resumen y reflexión.\n"
+                "7. Referencias: Fuentes utilizadas.")
+
+            self.fields[field].widget.attrs['class'] = 'form-control'

@@ -8,7 +8,7 @@ def listar_categorias(request):
     categorias = CategoriaProducto.objects.all()
     return render(request, 'listar_categorias.html', {'categorias': categorias})
 
-def crear_categoria(request):
+def crear_categoria_producto(request):
     if request.method == 'POST':
         form = CategoriaProductoForm(request.POST)
         if form.is_valid():

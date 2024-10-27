@@ -1,0 +1,32 @@
+{% extends 'frontend.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <div class="row ">
+            <div class="col-md-7">
+                {% if biography %}
+                    {% for bio in biography%}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <picture>
+                                    <img src="{{ bio.user.profile.image.urls }}" alt="" width="128" height="128" class="img-fluid " alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                                </picture>
+                            </div>
+                            <div class="col-md-4">
+                                <h4>{{bio.user.first_name |capfirst}} {{bio.user.first_name |capfirst}}</h4>
+                            </div>
+                        </div>
+                        {{bio.biography |capfirst|striptags|linebreaks}}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                {% include 'directivas.html'%}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
