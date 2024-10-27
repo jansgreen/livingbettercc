@@ -1,12 +1,10 @@
 {% extends 'frontend.html' %}
-
 {% block content %}
-<div class="container mt-5">
-    <h2>Crear Metadatos</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Guardar Metadatos</button>
-    </form>
-</div>
+<!-- metadata/create_metadata.html y metadata/edit_metadata.html -->
+<h2>{% if metadata %}Editar Metadatos{% else %}Crear Metadatos{% endif %}</h2>
+<form method="POST" action="{% url 'create_metadata'%}" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{% if metadata %}Actualizar{% else %}Crear{% endif %}</button>
+</form>
 {% endblock %}

@@ -4,11 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% if meta_title %}
-    <title>{{ meta_title }}</title>
-    <meta name="description" content="{{ meta_description }}">
-    <meta name="keywords" content="{{ meta_keywords }}">
-    <meta name="robots" content="index, follow">
+    <meta charset="UTF-8">
+    {% if page_type == 'homepage' %}
+        <meta name="title" content="{{ meta_title }}">
+        <meta name="description" content="{{ meta_description }}">
+        <meta name="keywords" content="{{ meta_keywords }}">
+        {% if meta_search_image %}
+            <meta property="og:image" content="{{ meta_search_image }}">
+        {% endif %}
+        {% if meta_icon %}
+            <link rel="icon" href="{{ meta_icon }}" type="image/png">
+        {% endif %}
+        <title>{{ meta_title }}</title>
+    {% elif page_type == 'blog' %}
+        <meta name="title" content="{{ meta_blog_title }}">
+        <meta name="description" content="{{ meta_blog_description }}">
+        <meta name="keywords" content="{{ meta_blog_keywords }}">
+        {% if meta_blog_search_image %}
+            <meta property="og:image" content="{{ meta_blog_search_image }}">
+        {% endif %}
+        <title>{{ meta_blog_title }}</title>
+    {% else %}
+        <!-- Metadatos genéricos o por defecto -->
+        <meta name="title" content="Título por defecto">
+        <meta name="description" content="Descripción por defecto">
+        <meta name="keywords" content="palabras, clave, por, defecto">
+        <title>Título por defecto</title>
     {% endif %}
 
     <link href="{{BOOTSTRAP_CSS}}" rel="stylesheet">

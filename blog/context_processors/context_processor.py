@@ -1,4 +1,5 @@
 def obtener_menus(request):
+
     menus = [
 
         {
@@ -35,10 +36,12 @@ def obtener_menus(request):
             ]
         },
         {
-            'nombre': 'Metadata', 
+            'nombre': 'metadata', 
             'url': '#',
             'submenus': [
-                {'nombre': 'Listar Usuarios', 'url': '/metadata/create/'},
+                {'nombre': 'Crear Metadata', 'url': '/metadata/create/'}, 
+                {'nombre': 'Listar Metadata', 'url': '/metadata/metadata/'}, 
+
             ]
         },
     ]

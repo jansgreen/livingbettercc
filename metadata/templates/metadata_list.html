@@ -1,0 +1,44 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lista de Metadatos</h2>
+    <div class="d-flex align-items-start">
+        <!-- Pestañas de metadatos -->
+        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            {% for metadata in metadata_list %}
+                <button class="nav-link {% if forloop.first %}active{% endif %}" 
+                        id="v-pills-{{ metadata.id }}-tab" 
+                        data-bs-toggle="pill" 
+                        data-bs-target="#v-pills-{{ metadata.id }}" 
+                        type="button" 
+                        role="tab" 
+                        aria-controls="v-pills-{{ metadata.id }}" 
+                        aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                    {{ metadata.id }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Contenido de cada pestaña -->
+        <div class="tab-content" id="v-pills-tabContent">
+            {% for metadata in metadata_list %}
+                <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" 
+                     id="v-pills-{{ metadata.id }}" 
+                     role="tabpanel" 
+                     aria-labelledby="v-pills-{{ metadata.id }}-tab" 
+                     tabindex="0">
+                    <h3>{{ metadata.title }}</h3>
+                    <p><strong>Descripción:</strong> {{ metadata.description }}</p>
+                    <p><strong>Palabras clave:</strong> {{ metadata.keywords }}</p>
+                    <p><strong>Categoría:</strong> {{ metadata.get_category_display }}</p>
+                    <div class="mt-3">
+                        <a href="{% url 'edit_metadata' metadata.id %}" class="btn btn-primary me-2">Editar</a>
+                        <a href="{% url 'delete_metadata' metadata.id %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este metadato?');">Eliminar</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

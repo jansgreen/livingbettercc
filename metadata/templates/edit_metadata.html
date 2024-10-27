@@ -1,0 +1,13 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Metadato</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{% url 'metadata_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
