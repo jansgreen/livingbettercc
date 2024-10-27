@@ -19,25 +19,17 @@ def crear_categoria_producto(request):
     return render(request, 'crear_categoria.html', {'form': form})
 
 def lista_productos(request):
+    is_directivas_member = request.user.groups.filter(name="directivas").exists()
+
     # Obtén el carrito, pero verifica si el usuario está autenticado
     if request.user.is_authenticated:
         carrito, created = Carrito.objects.get_or_create(usuario=request.user)
     else:
-        # Si el usuario no está autenticado, puedes asignar None o un carrito vacío
         carrito = None  # O podrías usar Carrito() para un carrito vacío sin usuario
-
     productos = Producto.objects.all()
 
-    if productos:
-        # Aquí podrías incluir alguna lógica para el carrito si hay productos
-        pass
-    else:
-        # Aquí podrías agregar un mensaje para indicar que no hay productos
-        context = {
-            'mensaje': 'No hay productos disponibles.',
-        }
-
     context = {
+       'is_directivas_member':is_directivas_member,
         'carrito': carrito,
         'productos': productos,
     }

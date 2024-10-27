@@ -1,38 +1,16 @@
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4">
-        {% for post_1 in posts_1 %}
-          {% if post_1.posicion.nombre == 'Column-1' %}
-            <!-- Aquí colocas el HTML para mostrar el post -->
-            <h2>{{ post_1.titulo | capfirst }}</h2>
-            <!--Aqui mostrara imagenes -->
-            <p>{{ post_1.excerpt | capfirst }}...</p>
-            <a href="{% url 'detalle_post' post_1.pk %}" class="read-more">Leer más</a>
-          {% endif %}
-        {% endfor %}
-      </div>
-      <div class="col-md-4">
-        {% for post_2 in posts_2 %}
-          {% if post_2.posicion.nombre == 'Column-2' %}
+{% for column in columns %}
+    <div class="col-12 col-md-4"> <!-- Puedes ajustar el número de columnas según tu diseño -->
+        {% for content in column.contents.all %}
+            {% if content.tab == 'home' %}
 
-            <h2>{{ post_2.titulo | capfirst }}</h2>
-            <!--Aqui mostrara imagenes -->
-            <p>{{ post_2.excerpt | capfirst }}...</p>
-            <a href="{% url 'detalle_post' post_2.pk %}" class="read-more">Leer más</a>
-
-          {% endif %}
+                <div class="content-item">
+                    <h4>{{ content.title |capfirst}}</h4>
+                    <p>{{ content.excerpt|safe }}... Leer Mas</p>  <!-- Usar 'safe' si el contenido tiene HTML -->
+                    <p><strong>Etiquetas:</strong> {{ content.tags }}</p>
+                </div>
+            {% endif %}
         {% endfor %}
-      </div>
-      <div class="col-md-4">
-        {% for post_3 in posts_3 %}
-          {% if post_3.posicion.nombre == 'Column-3' %}
-            <h2>{{ post_3.titulo | capfirst }}</h2>
-            <!--Aqui mostrara imagenes -->
-            <p>{{ post_3.excerpt | capfirst }}...</p>
-            <a href="{% url 'detalle_post' post_3.pk %}" class="read-more">Leer más</a>
-          {% endif %}
-        {% endfor %}
-      </div>
     </div>
-  </div>
+{% endfor %}
+

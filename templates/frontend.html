@@ -35,7 +35,7 @@
             {% include 'section.html'%}
             {% include 'aside.html'%}
             <!-- Contenido -->
-            <main class="col-md-9">
+            <main class="{% if request.user.is_authenticated %}col-md-9 {% else %} col-md-12{% endif %}">
                 {% block content %}
 
                 {% endblock %}

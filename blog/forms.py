@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post, Categoria, Posicion
 
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -45,4 +46,3 @@ class PosicionForm(forms.ModelForm):
         # Aplicar patrón específico: column-X
         nombre_transformado = f'column-{nombre}'
         return nombre_transformado
-

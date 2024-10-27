@@ -2,7 +2,9 @@
 {% load static %}
 {% block content %}
   <h2>Productos</h2>
-  <a href="{% url 'crear_producto' %}" class="btn btn-primary">Añadir Producto</a>
+  {% if is_directivas_member %}
+    <a href="{% url 'crear_producto' %}" class="btn btn-primary">Añadir Producto</a>
+  {% endif %}
   <div class="row">
     {% if productos %}
       {% for producto in productos %}

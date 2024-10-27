@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail
-from page.models import Footer
+from page.models import Footer, Column
 from authentication.models import Biography
 
 
@@ -23,27 +23,21 @@ def BioUser(request, pk):
     return render(request, 'quienes_somos.html', context)
 
 def home(request):
-    post_1 = Post.objects.filter(posicion__nombre='Column-1')
-    posts_2 = Post.objects.filter(posicion__nombre='Column-2')
-    posts_3 = Post.objects.filter(posicion__nombre='Column-3')
-
+    columns = Column.objects.prefetch_related('contents').all()  # Utiliza prefetch_related para optimizar las consultas
     context = {
-        'posts_1': post_1,
-        'posts_2': posts_2,
-        'posts_3': posts_3,
+        'columns': columns,
     }
     return render(request, 'index.html', context)
 
 def aboutUs(request):
     biography = Biography.objects.all()
     categoria_biografia = Categoria.objects.get(nombre="Biografia")
-    categoria_quienes_somos = Categoria.objects.get(nombre="About")
-    posts = Post.objects.filter(categoria=categoria_quienes_somos)
+    columns = Column.objects.prefetch_related('contents').all()  # Utiliza prefetch_related para optimizar las consultas
     directivas = Post.objects.filter(categoria=categoria_biografia) 
     is_directivas_member = request.user.groups.filter(name="directivas").exists()
     context={
         'biography':biography,
-        'posts':posts,
+        'columns':columns,
         'is_directivas_member':is_directivas_member,
         'directivas': directivas,
     }
@@ -53,6 +47,7 @@ def leerBio(request, pk):
     biography = Biography.objects.filter(user=pk) 
     is_directivas_member = request.user.groups.filter(name="directivas").exists()
     context={
+        'singlePage': True,
         'biography':biography,
         'is_directivas_member':is_directivas_member,
     }

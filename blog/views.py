@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Categoria, Posicion
 from .forms import PostForm, CategoriaForm, PosicionForm
+
 from authentication.forms import Profileforms
 from authentication.models import Profile
 import traceback
