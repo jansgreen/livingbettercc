@@ -49,3 +49,17 @@ class PageContent(models.Model):
     def __str__(self):
         return self.title
 
+class CategoryImages(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class ImagenPage(models.Model):
+    category = models.ForeignKey(CategoryImages, related_name='CategoryImages', on_delete=models.CASCADE, default=None)
+    imagen = models.ImageField(upload_to='pageImg/')
+    details =  models.CharField(max_length=100, blank=True, default=None)
+
+    def __str__(self):
+        return f'{self.habilidad.nombre} - Imagen'
+

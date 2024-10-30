@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group, User
 from .forms import GroupForm, PermissionForm, GroupFormCreate, InviteForm
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
 from django.contrib.auth.decorators import user_passes_test
 from django.views import View
 from django.contrib.sites.shortcuts import get_current_site
@@ -11,6 +11,10 @@ from django.urls import reverse
 from django.template.loader import render_to_string
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.contrib import messages
+
+
 
 def add_and_remove_group_to_user(request, user_id):
     if request.method == "POST":
@@ -101,16 +105,26 @@ class InviteFriendView(View):
             invite_url = reverse('accept_invite', kwargs={'uidb64': uid, 'token': token, 'group_id': group.id})
             full_invite_url = f"http://{current_site.domain}{invite_url}"
 
-            # Enviar el email
+            # Preparar y enviar el email en texto plano
             subject = "¡Te han invitado a unirte a nuestro sitio!"
-            message = render_to_string('invite_email.html', {
-                'user': request.user,
-                'invite_url': full_invite_url,
-                'group_name': group.name
-            })
-            send_mail(subject, message, 'admin@example.com', [email])
+            message_text = (
+                f"Hola,\n\n"
+                f"Has sido invitado a unirte al grupo '{group.name}' en nuestro sitio.\n"
+                f"Para aceptar la invitación, haz clic en el siguiente enlace:\n\n"
+                f"{full_invite_url}\n\n"
+                f"Si no puedes hacer clic en el enlace, cópialo y pégalo en tu navegador."
+            )
+            email_message = EmailMessage(
+                subject=subject,
+                body=message_text,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[email]
+            )
+            email_message.send(fail_silently=False)
 
-            return redirect('invite_success')  # Redirigir a una página de éxito
+            messages.success(request, 'Tu invitación se ha enviado exitosamente.')
+            return redirect('invite_success')
+        
         return render(request, self.template_name, {'form': form})
 
 
@@ -126,4 +140,8 @@ def accept_invite(request, uidb64, token, group_id):
 
     # Redirige a login si el token no es válido o el usuario no está autenticado
     return redirect('login')
+
+def invite_success(request):
+    """Vista que muestra un mensaje de éxito después de enviar la invitación."""
+    return render(request, 'invite_success.html', {'message': 'Tu invitación se ha enviado exitosamente.'})
 

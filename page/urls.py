@@ -15,6 +15,12 @@ urlpatterns = [
     path('manage-page-content/', views.manage_page_content, name='manage_page_content'),
     path('edit-page-content/<int:content_id>/', views.edit_page_content, name='edit_page_content'),
     path('delete-page-content/<int:content_id>/', views.delete_page_content, name='delete_page_content'),    
-    # Agrega las rutas para editar y eliminar PageContent
+    # Agrega las rutas para editar y eliminar categorias de imagenes
+    path('image/category/list', views.img_category_list, name='img_category_list'),  # Listar habilidades
+    path('image/category/agregar/', views.img_category_create, name='img_category_create'),  # Crear habilidad
+    path('image/category/<int:pk>/editar/', views.img_category_update, name='img_category_update'),  # Editar habilidad
+    path('image/category/<int:pk>/eliminar/', views.img_category_delete, name='img_category_delete'),  # Eliminar habilidad
 
+    path('image/<int:img_id>/agregar/', views.imagen_create, name='imagen_create'),  # Crear imagen
+    path('image/<int:img_id>/eliminar/', views.imagen_delete, name='imagen_delete'),  # Eliminar imagen
 ]

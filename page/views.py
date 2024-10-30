@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Footer, Column, PageContent
-from .forms import FooterForm, PageContentForm, ColumnForm, PageContentForm
+from .models import Footer, Column, PageContent, CategoryImages, ImagenPage
+from .forms import FooterForm, PageContentForm, ColumnForm, PageContentForm, ImagenPageForm, CategoryImgForm
+from django.contrib import messages
 
 def is_admin_or_editor(user):
     return user.is_superuser or user.groups.filter(name__in=['Admin', 'Editor']).exists()
@@ -106,3 +107,76 @@ def delete_page_content(request, content_id):
         return redirect('page_content_list')  # Redirige a la lista de contenidos de página
 
     return render(request, 'delete_page_content.html', {'content': content})
+
+@user_passes_test(is_admin_or_editor)
+def img_category_list(request):
+    forms = ImagenPageForm()
+    categories = CategoryImages.objects.all()
+    img_list = ImagenPage.objects.all()
+    if request.method =="POST":
+        forms = ImagenPageForm(request.POST, request.FILES)
+        if forms.is_valid():
+            forms.save()
+            messages.success(request, 'Su imagen se ha subido exitosamente')
+        else:
+            messages.warning(request, f'{forms.errors}, Fallo la subida de imagen')
+    context = {
+        'forms': forms,
+        'categories': categories,
+        'img_list': img_list,
+        }
+    return render(request, 'img_category_list.html', context)
+
+@user_passes_test(is_admin_or_editor)
+def img_category_create(request):
+    if request.method == 'POST':
+        form = CategoryImgForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('img_category_list')  # Cambia esto según tu URL de listado de habilidades
+    else:
+        form = CategoryImgForm()
+    return render(request, 'page_img_form.html', {'form': form})
+
+@user_passes_test(is_admin_or_editor)
+def img_category_update(request, pk):
+    page_img = get_object_or_404(CategoryImages, pk=pk)
+    if request.method == 'POST':
+        form = CategoryImgForm(request.POST, instance=page_img)
+        if form.is_valid():
+            form.save()
+            return redirect('img_category_list')
+    else:
+        form = CategoryImgForm(instance=page_img)
+    return render(request, 'page_img_form.html', {'form': form})
+
+@user_passes_test(is_admin_or_editor)
+def img_category_delete(request, pk):
+    page_img = get_object_or_404(CategoryImages, pk=pk)
+    if request.method == 'POST':
+        page_img.delete()
+        return redirect('img_category_list')
+    return render(request, 'page_img_confirm_delete.html', {'page_img': page_img})
+
+@user_passes_test(is_admin_or_editor)
+def imagen_create(request, img_id):
+    category = get_object_or_404(CategoryImages, pk=img_id)
+    if request.method == 'POST':
+        form = ImagenPageForm(request.POST, request.FILES)
+        if form.is_valid():
+            imagen = form.save(commit=False)
+            imagen.category = category
+            imagen.save()
+            return redirect('img_category_list')
+    else:
+        form = ImagenPageForm()
+    return render(request, 'imagen_form.html', {'form': form, 'habilidad': habilidad})
+
+@user_passes_test(is_admin_or_editor)
+def imagen_delete(request, img_id):
+    imagen = get_object_or_404(ImagenPage, pk=img_id)
+    if request.method == 'POST':
+        imagen.delete()
+        messages.success(request, 'Se elimino exitosamente')
+        return redirect('img_category_list')
+    return render(request, 'imagen_confirm_delete.html', {'imagen': imagen})

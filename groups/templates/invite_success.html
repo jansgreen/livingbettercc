@@ -1,0 +1,8 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+<div class="alert alert-success mt-4">
+    {{ message }}
+</div>
+<a href="{% url 'invite_friend' %}" class="btn btn-primary mt-3">Volver</a>
+{% endblock %}

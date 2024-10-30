@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Categoria, Posicion
 from .forms import PostForm, CategoriaForm, PosicionForm
-
 from authentication.forms import Profileforms
 from authentication.models import Profile
 import traceback
@@ -177,6 +176,7 @@ def listar_posts(request):
     posts = Post.objects.all()
     return render(request, 'list_post.html', {'posts': posts})
 
+#detalles
 def detalle_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     return render(request, 'detalle_post.html', {'post': post})
@@ -200,4 +200,11 @@ def eliminar_post(request, pk):
         post.delete()
         return redirect('listar_posts')
     return render(request, 'eliminar_post.html', {'post': post})
+
+def blog_single_page(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    context = {
+        'post':post,
+    }
+    return render(request, 'single_page.html', context)
 

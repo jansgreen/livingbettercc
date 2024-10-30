@@ -10,9 +10,7 @@
                         <div class="row">
                             {% if content.tab == 'about' %}
                                 <h3>{{content.title |capfirst}}</h3>
-                                <p>{{content.excerpt |capfirst|striptags|linebreaks}}<a href="#">... Leer mas</a>
-                                </p>
-
+                                <p>{{content.excerpt |capfirst|striptags}}... </p><a href="{% url 'single_page' content.id%}">Leer Mas</a>
                             {% endif %}
                         </div>
 

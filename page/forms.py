@@ -1,5 +1,5 @@
 from django import forms
-from .models import Footer, PageContent, Column
+from .models import Footer, PageContent, Column, CategoryImages, ImagenPage
 
 class FooterForm(forms.ModelForm):
     class Meta:
@@ -20,7 +20,6 @@ class PageContentForm(forms.ModelForm):
             'tags': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-
 class ColumnForm(forms.ModelForm):
     class Meta:
         model = Column
@@ -28,3 +27,13 @@ class ColumnForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la columna'}),
         }
+
+class CategoryImgForm(forms.ModelForm):
+    class Meta:
+        model = CategoryImages
+        fields = ['nombre']
+
+class ImagenPageForm(forms.ModelForm):
+    class Meta:
+        model = ImagenPage
+        fields = ['category', 'imagen', 'details']

@@ -12,5 +12,7 @@ urlpatterns = [
     path('actualizar/categoria/<int:pk>', views.actualizar_categoria, name='actualizar_categoria'),
     path('actualizar/posicion/<int:pk>', views.actualizar_posicion, name='actualizar_posicion'),
     path('posiciones/nueva/', views.crear_posicion, name='crear_posicion'),
+    path('blog_single_page/<int:pk>/', views.blog_single_page, name='blog_single_page'),
+
     
     ]

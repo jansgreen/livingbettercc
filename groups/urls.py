@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import group_list, group_create, \
     group_update, user_list, add_and_remove_group_to_user, add_and_remove_permission_to_groups,\
-    InviteFriendView, accept_invite
+    InviteFriendView, accept_invite, invite_success
 
 urlpatterns = [
     path('user_list/', user_list, name='user_list'),
@@ -14,4 +14,6 @@ urlpatterns = [
 
     path('invite/', InviteFriendView.as_view(), name='invite_friend'),
     path('accept-invite/<uidb64>/<token>/<int:group_id>/', accept_invite, name='accept_invite'),
+    path('invite_success/', invite_success, name='invite_success'), 
+
 ]

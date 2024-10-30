@@ -1,0 +1,26 @@
+{% load static %}
+{% if actividades %}
+    <h2 class="pb-2 border-bottom mt-5">Actividades</h2>
+    <div id="carouselExampleControls" class="carousel slide bg-dark mt-5" data-bs-ride="carousel">
+        <div class="carousel-inner justify-content-center">
+            {% for act in actividades %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <picture>
+                        <img src="{{ act.imagen.url }}" alt="{{ act.category.nombre }}" class="d-block mx-auto" 
+                             onerror="this.onerror=null; this.src='{% static 'path/to/default/image.jpg' %}'"/>
+                    </picture>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+{% endif %}

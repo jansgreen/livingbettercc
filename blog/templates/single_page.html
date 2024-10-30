@@ -1,0 +1,12 @@
+
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="bg-body-tertiary border rounded-3 p-5">
+    <h2>{{ post.titulo }}</h2>
+    <br>
+    <p>{{ post.contenido|capfirst |linebreaks }}</p> 
+</div>
+<small>Categoria: {{ post.categoria }}</small>
+
+{% endblock %}

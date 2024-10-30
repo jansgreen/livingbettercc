@@ -4,11 +4,11 @@
         {% for content in column.contents.all %}
             {% if content.tab == 'home' %}
 
-                <div class="content-item">
+                <div class="content-item mb-5">
                     <h4>{{ content.title |capfirst}}</h4>
-                    <p>{{ content.excerpt|safe }}... Leer Mas</p>  <!-- Usar 'safe' si el contenido tiene HTML -->
-                    <p><strong>Etiquetas:</strong> {{ content.tags }}</p>
+                    <p>{{ content.excerpt|safe }}... <a href="{% url 'single_page' content.id%}" >Leer Mas</a></p>  <!-- Usar 'safe' si el contenido tiene HTML -->
                 </div>
+                
             {% endif %}
         {% endfor %}
     </div>

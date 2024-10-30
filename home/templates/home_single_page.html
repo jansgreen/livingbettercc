@@ -1,0 +1,15 @@
+
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="col-12 col-md-9">
+    {% for contenido in post %}
+    <h2>{{ contenido.title }}</h2>
+    <br>
+    <p>{{ contenido.content|capfirst |linebreaks }}</p> 
+    <small>Categoria: {{ contenido }}</small>
+
+    {% endfor %}
+</div>
+
+{% endblock %}

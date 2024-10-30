@@ -173,8 +173,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'jansgreen@gmail.com'
-EMAIL_HOST_PASSWORD = 'tu_contraseña'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_FROM_USER = os.getenv('EMAIL_HOST_FROM_USE')
+EMAIL_HOST_CC = os.getenv('EMAIL_HOST_CC', '').split(',')
+EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 
 # En settings.py
 LOGIN_REDIRECT_URL = 'catalog'
