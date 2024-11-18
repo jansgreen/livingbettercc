@@ -1,0 +1,39 @@
+{% extends "frontend.html" %}
+{% block content %}
+<table class="table">
+    <thead>
+        <tr>
+            <th><a class="btn btn-success" href="{% url 'crear_categoria' %}">Crear Pestaña</a></th>
+        </tr>
+        <tr>
+            <th>Categoría</th>
+            <th>Slug</th>
+            <th>Columnas</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for categoria in categorias %}
+        <tr>
+            <td>{{ categoria.name }}
+            <td><small> slug: {{ categoria.slug }}</small> <a href="{% url 'delete_pageCategorias' categoria.pk %}" class-"btn btn-danger"> Eliminar</a></td>
+            <td>
+                {% if categoria.columns.all %}
+                <ul>
+                    {% for columna in categoria.columns.all %}
+                    <li>{{ columna.num }} - {{ columna.description }}</li>
+                    <a href="{% url 'delete_columna' columna.num %}" class-"btn btn-danger">Eliminar</a>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No columna agregada</p>
+                {% endif %}
+
+                <a class="btn btn-success" href="{% url 'crear_columna' %}">Crear Columna</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

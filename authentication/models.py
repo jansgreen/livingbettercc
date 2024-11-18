@@ -2,6 +2,7 @@ import os
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from ckeditor.fields import RichTextField
 
 class Profile(models.Model):
     GENERO_CHOICES = [
@@ -45,15 +46,15 @@ class ProfileImage(models.Model):
 
 class Biography(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    biography = models.TextField()
+    biography = RichTextField(verbose_name="Biografia")
     excerpt = models.TextField(blank=True, null=True)  # Campo opcional para el extracto
 
 
-    def save(self, *args, **kwargs):
-        # Generar automáticamente el excerpt si no se proporciona
-        if not self.excerpt:
-            self.excerpt = self.biography[:100]  # Los primeros 150 caracteres del contenido
-        super(Biography, self).save(*args, **kwargs)
+    def summary(self, char_limit=100):
+        if len(self.content) <= char_limit:
+            return self.content
+        end = self.content.rfind(' ', 0, char_limit)
+        return self.content[:end] + '...'
 
     def __str__(self):
-        return f"{self.user.username}'s Biography"
+        return self.user

@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Footer, Column, PageContent, CategoryImages, ImagenPage
-from .forms import FooterForm, PageContentForm, ColumnForm, PageContentForm, ImagenPageForm, CategoryImgForm
+from .models import Footer, Column, PageContent, CategoryImages, ImagenPage, pageCategory
+from .forms import FooterForm, PageContentForm, ColumnForm, PageContentForm, ImagenPageForm, CategoryImgForm, pageCategoryForm
 from django.contrib import messages
+from django.shortcuts import render, redirect
+
 
 def is_admin_or_editor(user):
     return user.is_superuser or user.groups.filter(name__in=['Admin', 'Editor']).exists()
@@ -25,7 +27,8 @@ def agregar_footer(request):
 @user_passes_test(is_admin_or_editor)
 def create_page_content(request):
     if request.method == 'POST':
-        form = PageContentForm(request.POST)
+        form = PageContentForm(request.POST, request.FILES)
+        print(request.FILES.get('cover_image'))
         if form.is_valid():
             page_content = form.save(commit=False)
             page_content.author = request.user  # Asignar el autor actual
@@ -180,3 +183,37 @@ def imagen_delete(request, img_id):
         messages.success(request, 'Se elimino exitosamente')
         return redirect('img_category_list')
     return render(request, 'imagen_confirm_delete.html', {'imagen': imagen})
+
+def crear_columna(request):
+    if request.method == 'POST':
+        form = ColumnForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_categorias_y_columnas')  # Cambia la URL de redirección si es necesario
+    else:
+        form = ColumnForm()
+    return render(request, 'crear_columna.html', {'form': form})
+
+def crear_categoria(request):
+    if request.method == 'POST':
+        form = pageCategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('listar_categorias')  # Cambia la URL de redirección si es necesario
+    else:
+        form = pageCategoryForm()
+    return render(request, 'crear_categoria.html', {'form': form})
+
+def listar_categorias_y_columnas(request):
+    categorias = pageCategory.objects.prefetch_related('columns').all()
+    return render(request, 'listar_categorias_y_columnas.html', {'categorias': categorias})
+
+def delete_columna(request, pk):
+    col = Column.objects.get(num=pk)
+    col.delete()
+    return redirect(listar_categorias_y_columnas)
+
+def delete_pageCategorias(request, pk):
+    categorias = pageCategory.objects.get(pk=pk)
+    categorias.delete()
+    return redirect(listar_categorias_y_columnas)

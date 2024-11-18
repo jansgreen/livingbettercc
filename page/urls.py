@@ -23,4 +23,11 @@ urlpatterns = [
 
     path('image/<int:img_id>/agregar/', views.imagen_create, name='imagen_create'),  # Crear imagen
     path('image/<int:img_id>/eliminar/', views.imagen_delete, name='imagen_delete'),  # Eliminar imagen
+
+    path('listar_categorias_y_columnas/', views.listar_categorias_y_columnas, name='listar_categorias_y_columnas'),
+    path('crear_categoria/', views.crear_categoria, name='crear_categoria'),
+    path('crear_columna/', views.crear_columna, name='crear_columna'), 
+    path('delete_columna/<int:pk>/', views.delete_columna, name='delete_columna'),
+    path('delete_pageCategorias/<int:pk>/', views.delete_pageCategorias, name='delete_pageCategorias'),
+
 ]

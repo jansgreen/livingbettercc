@@ -1,0 +1,12 @@
+{% extends 'frontend.html' %}
+{% load static %}
+{% block content %}
+    <h2>{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Post</h2>
+    <form action={% if form.instance.pk %}"{% url 'post_update' form.instance.pk %}" {% else %}"{% url 'post_create'%}"{% endif %}  method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.media }}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+    <a href="{% url 'post_list' %}" class="btn btn-secondary">Volver a la lista</a>
+{% endblock %}

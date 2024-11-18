@@ -128,7 +128,6 @@ class InviteFriendView(View):
         return render(request, self.template_name, {'form': form})
 
 
-@login_required
 def accept_invite(request, uidb64, token, group_id):
     # Obtener el grupo
     group = get_object_or_404(Group, id=group_id)

@@ -8,9 +8,23 @@
         {% csrf_token %}
         <div class="row">
             <div class="col-md-4">
-                <h5>{{ request.user.first_name}} {{request.user.last_name}}</h5>
-                <p>Profesion: <strong>{{ request.user.profile.profesion }}</strong></p>
-                <p>Puesto en LBCC <strong>{{ request.user.profile.puesto }}</strong></p>
+                {% if request.user.first_name and request.user.last_name %}
+                    <h5>{{ request.user.first_name}} {{request.user.last_name}}</h5>
+                {% else %}
+                    <h5>Ingrese sus nombres y apellidos en su <a href="{% url 'ProfileFunction'%}">Perfil</a></h5>
+                {% endif %}
+
+                {% if request.user.profile.profesion %}
+                <p>{{request.user.profile.profesion}}</p>
+                {% else %}
+                <h5>Ingrese su Profesion en su <a href="{% url 'ProfileFunction'%}">Perfil</a></h5>
+                {% endif %}
+
+                {% if request.user.profile.profesion %}
+                <p>{{request.user.profile.profesion}}</p>
+                {% else %}
+                <h5>Ingrese el roll que ejerce en LBCC en su <a href="{% url 'ProfileFunction'%}">Perfil</a></h5>
+                {% endif %}
             </div>
            
             <div class="col-md-4">
@@ -22,6 +36,7 @@
         
         <div class="row">
             <div class="col">
+                {{ form.media }}
                 {{ form.biography.label }}
                 {{ form.biography }}
                 {{ form.biography.help_text }}

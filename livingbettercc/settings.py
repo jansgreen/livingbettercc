@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'checkout',
     'page',
     'metadata',
+    'gallery',
 ]
 
 MIDDLEWARE = [
@@ -77,9 +78,15 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'home.context_processors.context_processor.bootstrap_css',
                 'home.context_processors.context_processor.bootstrap_js',
-                'blog.context_processors.context_processor.obtener_menus',
+                'home.context_processors.context_processor.obtener_navbar',
+                'blog.context_processors.context_processor.obtener_menu_blog',
+                'catalog.context_processors.context_processor.obtener_menu_Catálogo',
+                'groups.context_processors.context_processor.obtener_menu_groups',
+                'page.context_processors.context_processor.obtener_menu_setting',
                 'page.context_processors.context_processor.footer_context',
                 'metadata.context_processors.context_processor.metadata_context',
+                'metadata.context_processors.context_processor.obtener_menu_metadata',
+                'authentication.context_processors.context_processor.obtener_menu_auth',
 
             ],
         },
@@ -187,4 +194,19 @@ LOGOUT_REDIRECT_URL = 'home'
 PAYPAL_CLIENT_ID = 'tu_client_id'
 PAYPAL_CLIENT_SECRET = 'tu_client_secret'
 PAYPAL_MODE = 'sandbox'  # Cambia a 'live' para producción
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+            ['NumberedList', 'BulletedList'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Link', 'Unlink'],
+            ['RemoveFormat', 'Source'],
+        ],
+    },
+}
 

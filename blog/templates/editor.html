@@ -1,0 +1,12 @@
+{% extends 'backend/backend.html' %}
+{% load static %}
+{%block content %}
+    <title>Editor de CKEditor</title>
+    {{ form.media }}  <!-- Incluye los archivos necesarios para CKEditor -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Renderiza el formulario con el campo de CKEditor -->
+        <button type="submit">Guardar</button>
+    </form>
+{% endblock %}
+

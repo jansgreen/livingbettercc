@@ -1,11 +1,11 @@
-from .views import home, aboutUs, contactanos, BioUser, leerBio, single_page
+from .views import home, quienes_somos, contactanos, BioUser, leerBio, single_page
 from django.urls import path, include
 
 
 
 urlpatterns = [
     path('', home, name='home'),
-    path('aboutUs/', aboutUs, name='aboutUs'),
+    path('quienes_somos/', quienes_somos, name='quienes_somos'),
     path('contactanos/', contactanos, name='contactanos'),
     path('BioUser/<int:pk>', BioUser, name='BioUser'),
     path('leerBio/<int:pk>', leerBio, name='leerBio'),

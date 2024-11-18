@@ -1,0 +1,23 @@
+{% extends 'frontend.html' %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <h1>Galería de Imágenes</h1>
+    <a href="{% url 'image_create' %}" class="btn btn-primary mb-3">Agregar Imagen</a>
+    {% for image in images %}
+    <div class="card" style="width: 18rem;">
+        <img src="{{image.image_file.url}}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-name">{{ image.name |capfirst }}</h5>
+            <p class="card-text">Url: {{image.image_file.url}}</p>
+
+            <a href="{% url 'image_update' image.pk %}" class="btn btn-sm btn-warning">Editar</a>
+            <form action="{% url 'image_delete' image.pk %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+            </form>                  
+        </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,18 +1,17 @@
-from django.urls import path
 from . import views
+from django.urls import path
 
 urlpatterns = [
-    path('', views.listar_posts, name='listar_posts'),
-    path('<int:pk>/', views.detalle_post, name='detalle_post'),
-    path('bio/nuevo/', views.crear_post_Bio, name='crear_post_Bio'),
-    path('post/nuevo/', views.crear_post, name='crear_post'),
-    path('<int:pk>/editar/', views.actualizar_post, name='actualizar_post'),
-    path('<int:pk>/eliminar/', views.eliminar_post, name='eliminar_post'),
-    path('categorias/nueva/', views.crear_categoria, name='crear_categoria'),
-    path('actualizar/categoria/<int:pk>', views.actualizar_categoria, name='actualizar_categoria'),
-    path('actualizar/posicion/<int:pk>', views.actualizar_posicion, name='actualizar_posicion'),
-    path('posiciones/nueva/', views.crear_posicion, name='crear_posicion'),
-    path('blog_single_page/<int:pk>/', views.blog_single_page, name='blog_single_page'),
+    path('', views.post_list, name='post_list'),
+    path('post_create/', views.post_create, name='post_create'),
+    path('post_update/<int:pk>/', views.post_update, name='post_update'),
+    path('delete/<int:pk>/', views.post_delete, name='post_delete'),
+    path('categories/', views.CategoryListView.as_view(), name='category_list'),
+    path('categories/new/', views.CategoryCreateView.as_view(), name='category_create'),
+    path('categories/<int:pk>/edit/', views.CategoryUpdateView.as_view(), name='category_edit'),
+    path('categories/<int:pk>/delete/', views.CategoryDeleteView.as_view(), name='category_delete'),
+    path('archive/<int:year>/<int:month>/', views.archive_posts, name='archive_posts'),
+    path('post_detail/<int:pk>/', views.post_detail, name='post_detail'),
 
-    
-    ]
+
+]

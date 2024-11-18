@@ -1,11 +1,12 @@
-from blog.models import Post, Categoria
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
-from page.models import Footer, Column, ImagenPage, PageContent
-from authentication.models import Biography
+from page.models import Footer, Column, ImagenPage, PageContent, pageCategory
+from authentication.models import Biography, Profile
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 
 
@@ -23,29 +24,20 @@ def home(request):
 
 def BioUser(request, pk):
     es_directiva = request.user.groups.filter(name='directivas').exists() if request.user.is_authenticated else False
-    posts = Post.objects.filter(posicion__nombre__startswith='biografia-')
-    biografia = Post.objects.filter(pk=pk)
+    return render(request, 'quienes_somos.html')
+
+def quienes_somos(request):
+    # Buscar la categoría con el slug 'quienes_somos'
+    category = pageCategory.objects.filter(slug='quienes_somos').first()
+    posts = PageContent.objects.filter(category=category)
+
+    # Contexto para el template
     context = {
-        'es_directiva':es_directiva,
-        'biografia': biografia,
         'posts': posts,
-
     }
+
     return render(request, 'quienes_somos.html', context)
 
-def aboutUs(request):
-    biography = Biography.objects.all()
-    categoria_biografia = Categoria.objects.get(nombre="Biografia")
-    columns = Column.objects.prefetch_related('contents').all()  # Utiliza prefetch_related para optimizar las consultas
-    directivas = Post.objects.filter(categoria=categoria_biografia) 
-    is_directivas_member = request.user.groups.filter(name="directivas").exists()
-    context={
-        'biography':biography,
-        'columns':columns,
-        'is_directivas_member':is_directivas_member,
-        'directivas': directivas,
-    }
-    return render(request, 'quienes_somos.html', context)
 
 def leerBio(request, pk):
     biography = Biography.objects.filter(user=pk) 

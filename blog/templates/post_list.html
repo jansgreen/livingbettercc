@@ -1,0 +1,14 @@
+{% extends 'frontend.html' %}
+
+{% block content %}
+    <h2>Lista de Posts</h2>
+    <a href="{% url 'post_create' %}" class="btn btn-primary">Crear Nuevo Post</a>
+    <ul>
+        {% for post in posts %}
+            <li>
+                <a href="{% url 'post_update' post.pk %}">{{ post.title }}</a> - {{ post.category.name }}
+                <a href="{% url 'post_delete' post.pk %}" class="text-danger">Eliminar</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

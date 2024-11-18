@@ -1,210 +1,86 @@
-from django.contrib import messages
+
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post, Categoria, Posicion
-from .forms import PostForm, CategoriaForm, PosicionForm
-from authentication.forms import Profileforms
-from authentication.models import Profile
-import traceback
+from django.urls import reverse_lazy
+from .models import blogPost, blogCategory
+from .forms import blogPostForm, blogCategoryForm
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.db.models import Count
+from gallery.models import Image
 
-def crear_post(request):
-    # Verifica si el usuario pertenece al grupo 'directivas' y no ha llenado su perfil
-    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto:
-        messages.warning(request, f"{request.user} Por favor completa tu perfil antes de crear un post.")
-        return redirect('ProfileFunction')
-    
-    if request.method == "POST":
-        form = PostForm(request.POST)
-
-        # Si la acción es 'PostUser', guardar el nombre y apellido en el campo título del formulario antes de validarlo
-        if request.POST.get('action') == 'PostUser':
-            form.data = form.data.copy()  # Crear una copia mutable de los datos del formulario
-            form.data['titulo'] = f"{request.user.first_name} {request.user.last_name}"  # Establecer el título
-        
-        # Validación del formulario
-        if form.is_valid():
-            post = form.save(commit=False)
-            
-            categoria_id = request.POST.get('categoria')
-            if categoria_id:
-                categoria_instance = get_object_or_404(Categoria, pk=categoria_id)
-                post.categoria = categoria_instance
-
-            posicion_id = request.POST.get('posicion')
-            if posicion_id:
-                posicion_instance = get_object_or_404(Posicion, pk=posicion_id)
-                post.posicion = posicion_instance
-
-            # Actualizar el perfil si es necesario
-            profile, created = Profile.objects.get_or_create(user=request.user)
-            if request.POST.get('profesion'):
-                profile.profesion = request.POST.get('profesion')
-
-            if request.POST.get('puesto'):
-                profile.puesto = request.POST.get('puesto')
-            profile.save()  # Guarda los cambios en el perfil
-            
-            post.save()  # Guarda el post
-            return redirect('listar_posts')
-
-        else:
-            print(form.errors)
-            messages.warning(request, f'Errores en el formulario: {form.errors}')
-
-    else:
-        form = PostForm()
+def home(request):
+    form = blogPost.objects.all()
+    # Obtener los años y meses de los posts
+    archives = blogPost.objects.annotate(year=Count('created_at__year'), month=Count('created_at__month')) \
+        .values('created_at__year', 'created_at__month') \
+        .order_by('-created_at__year', '-created_at__month')
     
     context = {
-        'form': form
+        'form': form, 
+        'archives': archives
+
     }
-    return render(request, 'crear_post.html', context)
 
-def crear_post_Bio(request):
-    if request.user.groups.filter(name='directivas').exists() and not request.user.profile.puesto :
-        messages.warning(request, f"{request.user} Por favor completa tu Perfil")
-        return redirect ('ProfileFunction')
-    categorias, catCreada = Categoria.objects.get_or_create(nombre="Biografia")
-    num = 1
-    while Posicion.objects.filter(nombre=f'biografia-{num}').exists():
-        num += 1
-    position, posCreada = Posicion.objects.get_or_create(nombre=f'biografia-{num}')
-    form = PostForm()
-    context = {
-        'form':form,
-        'Uposition': position.nombre,
-        'UpositionId': position.id,
-        'Ucategorias':categorias.nombre,
-        'UcategoriasId':categorias.id,
-        'posCreada': posCreada,
-        'catCreada': catCreada,
-        }
-    return render(request, 'crear_post.html', context)
+    return render(request, 'index.html', context)
 
-# elimina y actualiza posicion
-def actualizar_posicion(request, pk):
-    if pk:
-        posicion = get_object_or_404(Posicion, pk=pk)
-    else:
-        posicion = None
+def post_list(request):
+    posts = blogPost.objects.all()
+    return render(request, 'post_list.html', {'posts': posts})
+
+def post_create(request):
     if request.method == 'POST':
-        if 'editar' in request.POST:
-            numero = request.POST.get('actualizar')
-            nuevo_nombre = f'column-{numero}'
-            
-            # Verificar si el nombre ya existe
-            if Posicion.objects.filter(nombre=nuevo_nombre).exists():
-                messages.info(request, 'Esta posición ya existe')
-            else:
-                posicion.nombre = nuevo_nombre
-                posicion.save()  # Guardar el objeto directamente
-                messages.info(request, 'Fue actualizado exitosamente')
-                return redirect('crear_posicion')
-        elif 'eliminar' in request.POST:
-            if posicion:
-                posicion.delete()
-                messages.warning(request, 'Fue eliminado exitosamente')
-                return redirect('crear_posicion')
-    return redirect('crear_posicion')
-
-# Crear Posición
-def crear_posicion(request):
-    if request.method == 'POST':
-        form = PosicionForm(request.POST)
-        if form.is_valid():
-            categoria = form.save(commit=False)
-            categoria.nombre = categoria.nombre.capitalize()
-            categoria.save()
-            messages.success(request, f'{categoria.nombre} Fue guardado exitosamente')
-        else:
-            messages.error(request, form.errors)
-
-    form = PosicionForm()
-    items = Posicion.objects.all()
-    context = {
-        'form': form,
-        'items': items,
-        }
-    return render(request, 'crear_posicion.html', context)
-
-# Crear Categoría
-def crear_categoria(request):
-    if request.method == 'POST':
-        form = CategoriaForm(request.POST)
+        form = blogPostForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Fue creado con exito')
-        else:
-            print(form.errors)
-            messages.error(request, f'{form.errors}, Fue creado con exito')
-
-    form = CategoriaForm()
-    items = Categoria.objects.all()
-    context = {
-        'form': form,
-        'items': items,
-        }
-    return render(request, 'crear_categorias.html', context)
-
-# elimina y actualiza categoria
-def actualizar_categoria(request, pk):
-    if pk:
-        categoria = get_object_or_404(Categoria, pk=pk)
+            return redirect('post_list')
     else:
-        categoria = None
+        form = blogPostForm()
+    return render(request, 'post_form.html', {'form': form})
+
+def post_update(request, pk):
+    post = get_object_or_404(blogPost, pk=pk)
     if request.method == 'POST':
-        if 'editar' in request.POST:
-            nuevo = request.POST.get('actualizar')
-            nuevo_capitalizado = nuevo.capitalize()  # Capitaliza el número
-            
-            # Verificar si el nombre ya existe
-            if Categoria.objects.filter(nombre=nuevo_capitalizado).exists():
-                categoria.save()
-                messages.warning(request, f'{categoria.nombre} Esta posición ya existe.')
-            else:
-                categoria.nombre = nuevo_capitalizado
-                categoria.save()  # Guardar el objeto directamente
-                messages.info(request, f'{categoria.nombre} Se actualizo exitosamente')
-                return redirect('crear_categoria')
-        elif 'eliminar' in request.POST:
-            if categoria:
-                categoria.delete()
-                messages.info(request, 'Se elimino exitosamente')
-                return redirect('crear_categoria')
-    return redirect('crear_categoria')
-
-# Leer
-def listar_posts(request):
-    posts = Post.objects.all()
-    return render(request, 'list_post.html', {'posts': posts})
-
-#detalles
-def detalle_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    return render(request, 'detalle_post.html', {'post': post})
-
-# Actualizar
-def actualizar_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
+        form =blogPostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
-            return redirect('detalle_post', pk=post.pk)
+            return redirect('post_list')
     else:
-        form = PostForm(instance=post)
-    return render(request, 'actualizar_post.html', {'form': form})
+        form = blogPostForm(instance=post)
+    gallery_images = Image.objects.all()  # Obtener todas las imágenes de la galería
+    return render(request, 'post_form.html', {'form': form, 'gallery_images':gallery_images})
 
-# Eliminar
-def eliminar_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    if request.method == "POST":
+def post_detail(request, pk):
+    post = get_object_or_404(blogPost, pk=pk)
+    return render(request, 'post_detail.html', {'post': post})
+
+def post_delete(request, pk):
+    post = get_object_or_404(blogPost, pk=pk)
+    if request.method == 'POST':
         post.delete()
-        return redirect('listar_posts')
-    return render(request, 'eliminar_post.html', {'post': post})
+        return redirect('post_list')
+    return render(request, 'post_confirm_delete.html', {'post': post})
 
-def blog_single_page(request, pk):
-    post = get_object_or_404(Post, pk=pk)
-    context = {
-        'post':post,
-    }
-    return render(request, 'single_page.html', context)
+class CategoryListView(ListView):
+    model = blogCategory
+    template_name = 'category_list.html'
+    context_object_name = 'categories'
 
+class CategoryCreateView(CreateView):
+    model = blogCategory
+    form_class = blogCategoryForm
+    template_name = 'category_form.html'
+    success_url = reverse_lazy('category_list')
+
+class CategoryUpdateView(UpdateView):
+    model = blogCategory
+    form_class = blogCategoryForm
+    template_name = 'category_form.html'
+    success_url = reverse_lazy('category_list')
+
+class CategoryDeleteView(DeleteView):
+    model = blogCategory
+    template_name = 'category_confirm_delete.html'
+    success_url = reverse_lazy('category_list')
+
+def archive_posts(request, year, month):
+    posts = blogPost.objects.filter(created_at__year=year, created_at__month=month)
+    return render(request, 'index.html', {'posts': posts, 'year': year, 'month': month})

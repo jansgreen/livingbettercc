@@ -6,8 +6,8 @@ class FooterAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'email_contacto', 'telefono_contacto')
 
 class PageContentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'created_at', 'status', 'column', 'tab')
-    list_filter = ('status', 'author', 'column', 'tab')
+    list_display = ('title', 'author', 'created_at', 'status', 'category', 'cover_image')
+    list_filter = ('status', 'author', 'category', 'cover_image')
     search_fields = ('title', 'content', 'tags')
     prepopulated_fields = {'excerpt': ('content',)}
     ordering = ('-created_at',)
@@ -15,7 +15,7 @@ class PageContentAdmin(admin.ModelAdmin):
     
     fieldsets = (
         (None, {
-            'fields': ('title', 'content', 'author', 'column', 'tab', 'tags', 'status', 'excerpt')
+            'fields': ('title', 'content', 'author', 'category', 'cover_image', 'tags', 'status', 'excerpt')
         }),
         # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
     )

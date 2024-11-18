@@ -1,22 +1,19 @@
 {% extends 'frontend.html' %}
 {% load static %}
 {% block content %}
-
     <div class="row justify-content-md-center">
             <div class="col col-md-7">
-                {% for column in columns %}
-                    {% for content in column.contents.all %}
-
+                {% for items in posts %}
+                    <h2>{{items.category}}</h2>
                         <div class="row">
-                            {% if content.tab == 'about' %}
-                                <h3>{{content.title |capfirst}}</h3>
-                                <p>{{content.excerpt |capfirst|striptags}}... </p><a href="{% url 'single_page' content.id%}">Leer Mas</a>
+
+                            {% if items %}
+                                <img src="{{ items}}" alt="" class="me-2"/>
+
+                                <h3>{{items.title |capfirst}}</h3>
+                                <p>{{items.summary |capfirst|striptags}} </p><a href="">Leer Mas</a>
                             {% endif %}
                         </div>
-
-
-
-                    {% endfor %}
                 {% endfor %}
             </div>
             <div class="col col-md-4">

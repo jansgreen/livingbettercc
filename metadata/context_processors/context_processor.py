@@ -18,3 +18,18 @@ def metadata_context(request):
         
         'page_type': 'homepage' if request.path == '/' else 'blog' if 'blog' in request.path else 'other',
     }
+
+def obtener_menu_metadata(request):
+    return {
+        'menu_metadata': [
+            {
+            'nombre': 'Metadata', 
+            'url': '#',
+            'submenus': [
+                {'nombre': 'Crear Metadata', 'url': '/metadata/create/'}, 
+                {'nombre': 'Listar Metadata', 'url': '/metadata/metadata/'}, 
+
+            ]
+            }
+        ]
+    }
