@@ -1,5 +1,5 @@
 {% extends 'frontend.html' %}
-{%load static %}
+{% load static %}
 {% block content %}
 
 <div class="container-fluid">
@@ -12,12 +12,26 @@
     <hr class="mb-5 border opacity-80 desg-hr">
 
     <div class="row justify-content-md-center">
-      {% include 'columnamainhome.html'%}
+    {% for post in posts %}
+        {% if "Home" in  post.category.name and post.position.column == 1%}
+        <div class="col-12 col-md-4"> <!-- Puedes ajustar el número de columnas según tu diseño -->
+          <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+            <h3>{{post.title}}</h3>
+            <img src="{{post.cover_image.url}}" alt="" width="300" class="rounded img-fluid border border-light-subtle" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+            {% if "Nuestro Valores" in post.title %}
+            <p>{{post.content|safe}}</p>
+            {% else %}
+            <p>{{post.summary|safe}}</p>
+            {% endif %}
+            </a>
+          <small>{{post.updated_at}}</small>
+        </div>
+        {% endif %}
+    {% endfor %}
     </div>
     
     <div class="row">
       {% include 'actividades.html'%}
-
     </div>
     <div class="row">
       {% include 'habilitadas.html'%}

@@ -1,7 +1,7 @@
 # your_project/context_processors.py
 from django.conf import settings
 from blog.models import blogPost
-from page.models import pageCategory
+from page.models import PageCategory
 
 def bootstrap_css(request):
     return {'BOOTSTRAP_CSS': settings.BOOTSTRAP_CSS}
@@ -12,17 +12,18 @@ def bootstrap_js(request):
 def obtener_navbar(request):
     options = []
     blog = blogPost.objects.all().exists()
-    page = pageCategory.objects.all().exists()
+    page = PageCategory.objects.all().exists()
 
     if blog:
         options.append({'nombre': 'Blog', 'url': '/Blog/check/'})
     if page:
-        categories = pageCategory.objects.all()
+        categories = PageCategory.objects.all()
         
         for category in categories:
-            # Capitalizar el nombre de la categoría antes de agregarlo
             capitalized_name = category.name.capitalize()
-            options.append({'nombre': capitalized_name, 'url': f'/{category.slug}/'})
+            # Capitalizar el nombre de la categoría antes de agregarlo
+            if category.name != 'Home':
+                options.append({'nombre': capitalized_name, 'url': f'/{category.slug}/'})
     
     # Retornar el menú sin envolver las opciones
     return {

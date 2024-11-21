@@ -1,32 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
+from django.utils.text import slugify
 
-class pageCategory(models.Model):
+class PageCategory(models.Model):
     name = models.CharField(max_length=100)  # Nombre de la categoría
     description = models.TextField(blank=True, help_text="Categoría de la página")
-    slug = models.SlugField(unique=True, blank=True, null=True)  # Nuevo campo para almacenar el valor modificado
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Convertir el nombre a minúsculas y reemplazar los espacios por guiones
-        if self.name:
-            self.slug = self.name.lower().replace(" ", "_")  # Asigna el valor convertido al campo 'slug'
-        super().save(*args, **kwargs)
+        # Si el slug está vacío, genera uno basado en el campo name
+        if not self.slug and self.name:
+            self.slug = slugify(self.name.replace(" ", "_").lower())  # Sustituye espacios por "_"
+        super().save(*args, **kwargs)  # Llama al método save del padre
 
     def __str__(self):
         return self.name
 
-    
-class Column(models.Model):
-    num = models.IntegerField(default=None)  # Número de la columna
-    category = models.ForeignKey(pageCategory, on_delete=models.CASCADE, related_name="columns", default=None, null=True )
-    description = models.TextField(
-        blank=True, 
-        help_text="Descripción opcional de la columna"
-    )
+class PagePosition(models.Model):
+    category = models.ForeignKey(PageCategory, on_delete=models.CASCADE, related_name='positions')  # Relaciona la posición con la categoría
+    row = models.IntegerField(blank=True, default=None)
+    column = models.IntegerField(blank=True, default=None)  # Número de la columna
+    description = models.TextField(blank=True, help_text="Descripción opcional de la columna")
 
     def __str__(self):
-        return f"{self.num} (Categoría: {self.category.name})"
+        return f"Posición en {self.category.name} - Fila: {self.row}, Columna: {self.column}"
 
 class PageContent(models.Model):
     title = models.CharField(max_length=255)
@@ -40,7 +38,8 @@ class PageContent(models.Model):
         choices=[('draft', 'Draft'), ('published', 'Published'), ('pending', 'Pending')],
         default='draft'
     )
-    category = models.ForeignKey(pageCategory, on_delete=models.CASCADE, related_name='catgory_page', default=None)  # Relación con Column
+    category = models.ForeignKey(PageCategory, on_delete=models.CASCADE, related_name='content', default=None)  # Relación con Column
+    position = models.ForeignKey(PagePosition, on_delete=models.CASCADE, related_name='content_positions', default=None)  # Relación con Column
     cover_image = models.ImageField(upload_to='pageContentImages/', blank=True, null=True)
     tags = models.CharField(max_length=100, blank=True, help_text="Etiquetas separadas por comas")
 
@@ -48,7 +47,7 @@ class PageContent(models.Model):
         if len(self.content) == char_limit:
             return self.content
         end = self.content.rfind(' ', 0, char_limit)
-        return self.content[:end] + '...'
+        return self.content[:end] + '... Leer Mas'
 
     def save(self, *args, **kwargs):
         # Asignar el valor de excerpt utilizando la función summary
@@ -59,19 +58,13 @@ class PageContent(models.Model):
     def __str__(self):
         return self.title
 
-class CategoryImages(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-class ImagenPage(models.Model):
-    category = models.ForeignKey(CategoryImages, related_name='CategoryImages', on_delete=models.CASCADE, default=None)
+class carouselPage(models.Model):
+    name = models.CharField(max_length=255)
     imagen = models.ImageField(upload_to='pageImg/')
     details =  models.CharField(max_length=100, blank=True, default=None)
 
     def __str__(self):
-        return f'{self.habilidad.nombre} - Imagen'
+        return self.name
     
 
 class Footer(models.Model):

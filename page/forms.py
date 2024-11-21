@@ -1,5 +1,5 @@
 from django import forms
-from .models import Footer, PageContent, Column, CategoryImages, ImagenPage, pageCategory
+from .models import Footer, PageContent, PagePosition, carouselPage, PageCategory
 
 class FooterForm(forms.ModelForm):
     class Meta:
@@ -10,46 +10,50 @@ class FooterForm(forms.ModelForm):
 class PageContentForm(forms.ModelForm):
     class Meta:
         model = PageContent
-        fields = ['title', 'content', 'category', 'tags', 'cover_image']
+        fields = ['title', 'content', 'category', 'position', 'tags', 'cover_image']
         widgets = {
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'cover_image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'tags': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
+            'position': forms.Select(attrs={'class': 'form-control'}),
 
         }
 
 
 
-class ColumnForm(forms.ModelForm):
+class PagePositionForm(forms.ModelForm):
     class Meta:
-        model = Column
-        fields = ['category', 'num', 'description']
+        model = PagePosition
+        fields = ['category', 'row', 'column', 'description']
         widgets = {
             'category': forms.Select(attrs={'class': 'form-control'}),
-            'num': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la columna'}),
+            'row': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'numero de la fila'}),
+            'column': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'numero de la columna'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción opcional'}),
         }
 
 
-class pageCategoryForm(forms.ModelForm):
+class PageCategoryForm(forms.ModelForm):
     class Meta:
-        model = pageCategory
+        model = PageCategory
         fields = ['name', 'description', 'slug']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la categoría'}),
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la Pestaña'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción opcional'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'No es obligatirio'}),
+
         }
 
 
 
-class CategoryImgForm(forms.ModelForm):
+class carouselPageForm(forms.ModelForm):
     class Meta:
-        model = CategoryImages
-        fields = ['nombre']
+        model = carouselPage
+        fields = ['name', 'imagen', 'details']
 
-class ImagenPageForm(forms.ModelForm):
-    class Meta:
-        model = ImagenPage
-        fields = ['category', 'imagen', 'details']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})

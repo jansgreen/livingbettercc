@@ -1,16 +1,7 @@
 
-{% for column in columns %}
+{% for post in posts %}
     <div class="col-12 col-md-4"> <!-- Puedes ajustar el número de columnas según tu diseño -->
-        {% for content in column.contents.all %}
-            {% if content.tab == 'home' %}
-
-                <div class="content-item mb-5">
-                    <h4>{{ content.title |capfirst}}</h4>
-                    <p>{{ content.excerpt|safe }}... <a href="{% url 'single_page' content.id%}" >Leer Mas</a></p>  <!-- Usar 'safe' si el contenido tiene HTML -->
-                </div>
-                
-            {% endif %}
-        {% endfor %}
+        {{post}}
     </div>
 {% endfor %}
 

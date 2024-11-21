@@ -3,12 +3,12 @@
 <table class="table">
     <thead>
         <tr>
-            <th><a class="btn btn-success" href="{% url 'crear_categoria' %}">Crear Pestaña</a></th>
+            <th><a class="btn btn-success" href="{% url 'crear_PageCategory' %}">Crear Pestaña</a></th>
         </tr>
         <tr>
             <th>Categoría</th>
             <th>Slug</th>
-            <th>Columnas</th>
+            <th>Pagina Posicion</th>
 
         </tr>
     </thead>
@@ -18,18 +18,18 @@
             <td>{{ categoria.name }}
             <td><small> slug: {{ categoria.slug }}</small> <a href="{% url 'delete_pageCategorias' categoria.pk %}" class-"btn btn-danger"> Eliminar</a></td>
             <td>
-                {% if categoria.columns.all %}
+                {% if categoria.positions.all %}
                 <ul>
-                    {% for columna in categoria.columns.all %}
-                    <li>{{ columna.num }} - {{ columna.description }}</li>
-                    <a href="{% url 'delete_columna' columna.num %}" class-"btn btn-danger">Eliminar</a>
+                    {% for position in categoria.positions.all %}
+                    <li>Linea:{{ position.row }}, Columna:{{ position.column }} - {{ position.description }}</li>
+                    <a href="{% url 'delete_PagePosition' position.column %}" class-"btn btn-danger">Eliminar</a>
                     {% endfor %}
                 </ul>
                 {% else %}
                 <p>No columna agregada</p>
                 {% endif %}
 
-                <a class="btn btn-success" href="{% url 'crear_columna' %}">Crear Columna</a>
+                <a class="btn btn-success" href="{% url 'crear_PagePosition' %}">Crear Posicion</a>
             </td>
         </tr>
         {% endfor %}

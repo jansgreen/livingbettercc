@@ -18,9 +18,9 @@ def obtener_menu_setting(request):
                 'submenus': [
                 {'nombre': 'Crear Metadata', 'url': '/metadata/create/'}, 
                 {'nombre': 'Listar Metadata', 'url': '/metadata/metadata/'},
-                {'nombre': 'Listar Columna', 'url': '/page/listar_categorias_y_columnas/'},
-                {'nombre': 'Crear Columna', 'url': '/page/crear_columna/'},
-                {'nombre': 'Crear Pestaña', 'url': '/page/crear_categoria/'},
+                {'nombre': 'Carousel', 'url': '/page/carouselPageFunction/'},
+                {'nombre': 'Crear Pestaña', 'url': '/page/crear_PageCategory/'},
+                {'nombre': 'Listar Pestaña y Posiciones', 'url': '/page/listar_categorias_y_PagePosition/'},
                 {'nombre': 'Crear Contenido de la Pestaña', 'url': '/page/create_page_content/'},
                 {'nombre': 'Listar Contenido de la Pestaña', 'url': '/page/page-content-list/'},
 

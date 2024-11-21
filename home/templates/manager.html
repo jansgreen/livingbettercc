@@ -1,0 +1,38 @@
+{% load static %}
+
+<div class="d-flex flex-column p-4 gap-4 py-md-5 align-items-center justify-content-center">
+    {% for manager in managers %}
+    <li>
+        <strong>{{ manager.get_full_name|default:manager.username }}</strong> <!-- Nombre completo o username -->
+        <p>Correo: {{ manager.email }}</p>
+        <p>Grupo: {{ manager.groups.all.0.name }}</p> <!-- Si el usuario pertenece a un solo grupo -->
+        <p>Perfil: {{ manager.profile.bio|default:"No disponible" }}</p> <!-- Ejemplo de acceso al perfil -->
+    </li>
+{% endfor %}
+    <div class="row">
+        {% for manager in managers %}
+            {% if manager.profile %}
+            <div class="row"><h2>Directivas</h2></div>
+
+            <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <img src="{{ manager.profile.image.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0">{{ manager.user.first_name | capfirst }} {{ manager.user.last_name | capfirst }}</h6>
+                        <small>{{ manager.profile.profesion }} / LBCC </small>
+                        <small>{{ manager.profile.puesto }}</small>
+                        <small>{{ manager.profile.email }}</small>
+
+                        <p class="mb-0 opacity-75">{{ manager.excerpt |capfirst }} Leer más...</p>
+                    </div>
+                    <small class="opacity-50 text-nowrap">Leer</small>
+                </div>
+            </a>
+            {% endif %}
+        {% endfor %}
+        {% if is_directivas_member %}
+            <small><a href="{% url 'edit_biography' %}">Crear Biografia</a></small>
+        {% endif %}
+
+    </div>
+</div>

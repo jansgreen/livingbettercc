@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Footer, Column, PageContent, CategoryImages, ImagenPage, pageCategory
-from .forms import FooterForm, PageContentForm, ColumnForm, PageContentForm, ImagenPageForm, CategoryImgForm, pageCategoryForm
+from .models import Footer, PagePosition, PageContent, PageCategory, carouselPage
+from .forms import FooterForm, PageContentForm, PagePositionForm, PageContentForm, PageCategoryForm, carouselPageForm
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
@@ -28,7 +28,7 @@ def agregar_footer(request):
 def create_page_content(request):
     if request.method == 'POST':
         form = PageContentForm(request.POST, request.FILES)
-        print(request.FILES.get('cover_image'))
+        print(request.FILES)
         if form.is_valid():
             page_content = form.save(commit=False)
             page_content.author = request.user  # Asignar el autor actual
@@ -40,39 +40,39 @@ def create_page_content(request):
     return render(request, 'create_page_content.html', {'form': form})
 
 @user_passes_test(is_admin_or_editor)
-def manage_columns(request):
+def manage_PagePosition(request):
     if request.method == 'POST':
-        form = ColumnForm(request.POST)
+        form = PagePositionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('manage_columns')  # Redirige a la misma vista
+            return redirect('manage_PagePositions')  # Redirige a la misma vista
     else:
-        form = ColumnForm()
+        form = PagePositionForm()
 
-    columns = Column.objects.all()  # Obtener todas las columnas
-    return render(request, 'manage_columns.html', {'form': form, 'columns': columns})
+    PagePositions = PagePosition.objects.all()  # Obtener todas las PagePositionas
+    return render(request, 'manage_PagePositions.html', {'form': form, 'PagePositions': PagePositions})
 
 @user_passes_test(is_admin_or_editor)
-def edit_column(request, column_id):
-    column = Column.objects.get(id=column_id)
+def edit_PagePosition(request, PagePosition_id):
+    PagePosition = PagePosition.objects.get(id=PagePosition_id)
     if request.method == 'POST':
-        form = ColumnForm(request.POST, instance=column)
+        form = PagePositionForm(request.POST, instance=PagePosition)
         if form.is_valid():
             form.save()
-            return redirect('manage_columns')  # Redirigir después de editar
+            return redirect('manage_PagePositions')  # Redirigir después de editar
     else:
-        form = ColumnForm(instance=column)
+        form = PagePositionForm(instance=PagePosition)
 
-    return render(request, 'edit_column.html', {'form': form, 'column': column})
+    return render(request, 'edit_PagePosition.html', {'form': form, 'PagePosition': PagePosition})
 
 @user_passes_test(is_admin_or_editor)
-def delete_column(request, column_id):
-    column = Column.objects.get(id=column_id)
+def delete_PagePosition(request, PagePosition_id):
+    PagePosition = PagePosition.objects.get(id=PagePosition_id)
     if request.method == 'POST':
-        column.delete()
-        return redirect('manage_columns')  # Redirigir después de eliminar
+        PagePosition.delete()
+        return redirect('manage_PagePositions')  # Redirigir después de eliminar
 
-    return render(request, 'delete_column.html', {'column': column})
+    return render(request, 'delete_PagePosition.html', {'PagePosition': PagePosition})
 
 @user_passes_test(is_admin_or_editor)
 def manage_page_content(request):
@@ -111,109 +111,55 @@ def delete_page_content(request, content_id):
 
     return render(request, 'delete_page_content.html', {'content': content})
 
-@user_passes_test(is_admin_or_editor)
-def img_category_list(request):
-    forms = ImagenPageForm()
-    categories = CategoryImages.objects.all()
-    img_list = ImagenPage.objects.all()
-    if request.method =="POST":
-        forms = ImagenPageForm(request.POST, request.FILES)
-        if forms.is_valid():
-            forms.save()
-            messages.success(request, 'Su imagen se ha subido exitosamente')
-        else:
-            messages.warning(request, f'{forms.errors}, Fallo la subida de imagen')
-    context = {
-        'forms': forms,
-        'categories': categories,
-        'img_list': img_list,
-        }
-    return render(request, 'img_category_list.html', context)
-
-@user_passes_test(is_admin_or_editor)
-def img_category_create(request):
+def crear_PagePosition(request):
     if request.method == 'POST':
-        form = CategoryImgForm(request.POST)
+        form = PagePositionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('img_category_list')  # Cambia esto según tu URL de listado de habilidades
+            return redirect('listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
     else:
-        form = CategoryImgForm()
-    return render(request, 'page_img_form.html', {'form': form})
+        form = PagePositionForm()
+    return render(request, 'crear_PagePosition.html', {'form': form})
 
-@user_passes_test(is_admin_or_editor)
-def img_category_update(request, pk):
-    page_img = get_object_or_404(CategoryImages, pk=pk)
+def crear_PageCategory(request):
     if request.method == 'POST':
-        form = CategoryImgForm(request.POST, instance=page_img)
+        form = PageCategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('img_category_list')
+            return redirect('listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
     else:
-        form = CategoryImgForm(instance=page_img)
-    return render(request, 'page_img_form.html', {'form': form})
+        form = PageCategoryForm()
+    return render(request, 'crear_PageCategory.html', {'form': form})
 
-@user_passes_test(is_admin_or_editor)
-def img_category_delete(request, pk):
-    page_img = get_object_or_404(CategoryImages, pk=pk)
-    if request.method == 'POST':
-        page_img.delete()
-        return redirect('img_category_list')
-    return render(request, 'page_img_confirm_delete.html', {'page_img': page_img})
+def listar_categorias_y_PagePosition(request):
+    categorias = PageCategory.objects.all()
+    return render(request, 'listar_categorias_y_PagePosition.html', {'categorias': categorias})
 
-@user_passes_test(is_admin_or_editor)
-def imagen_create(request, img_id):
-    category = get_object_or_404(CategoryImages, pk=img_id)
-    if request.method == 'POST':
-        form = ImagenPageForm(request.POST, request.FILES)
-        if form.is_valid():
-            imagen = form.save(commit=False)
-            imagen.category = category
-            imagen.save()
-            return redirect('img_category_list')
-    else:
-        form = ImagenPageForm()
-    return render(request, 'imagen_form.html', {'form': form, 'habilidad': habilidad})
-
-@user_passes_test(is_admin_or_editor)
-def imagen_delete(request, img_id):
-    imagen = get_object_or_404(ImagenPage, pk=img_id)
-    if request.method == 'POST':
-        imagen.delete()
-        messages.success(request, 'Se elimino exitosamente')
-        return redirect('img_category_list')
-    return render(request, 'imagen_confirm_delete.html', {'imagen': imagen})
-
-def crear_columna(request):
-    if request.method == 'POST':
-        form = ColumnForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('listar_categorias_y_columnas')  # Cambia la URL de redirección si es necesario
-    else:
-        form = ColumnForm()
-    return render(request, 'crear_columna.html', {'form': form})
-
-def crear_categoria(request):
-    if request.method == 'POST':
-        form = pageCategoryForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('listar_categorias')  # Cambia la URL de redirección si es necesario
-    else:
-        form = pageCategoryForm()
-    return render(request, 'crear_categoria.html', {'form': form})
-
-def listar_categorias_y_columnas(request):
-    categorias = pageCategory.objects.prefetch_related('columns').all()
-    return render(request, 'listar_categorias_y_columnas.html', {'categorias': categorias})
-
-def delete_columna(request, pk):
-    col = Column.objects.get(num=pk)
+def delete_PagePosition(request, pk):
+    col = PagePosition.objects.get(num=pk)
     col.delete()
-    return redirect(listar_categorias_y_columnas)
+    return redirect(listar_categorias_y_PagePosition)
 
 def delete_pageCategorias(request, pk):
-    categorias = pageCategory.objects.get(pk=pk)
+    categorias = PageCategory.objects.get(pk=pk)
     categorias.delete()
-    return redirect(listar_categorias_y_columnas)
+    return redirect(listar_categorias_y_PagePosition)
+
+def carouselPageFunction(request):
+    if request.method == "POST":
+        form = carouselPageForm(request.POST, request.FILES)
+        if form.is_valid:
+            form.save()
+        return redirect('carouselPageFunction')
+    form = carouselPageForm()
+    image = carouselPage.objects.all()
+    context = {
+        'form':form,
+        'image': image,
+    }
+    return render(request, 'img_list.html', context)
+
+def imagen_delete(request, img_id):
+    image = carouselPage.objects.get(id=img_id)
+    image.delete()
+    return redirect(carouselPageFunction)

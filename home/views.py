@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
-from page.models import Footer, Column, ImagenPage, PageContent, pageCategory
+from page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
+
 from authentication.models import Biography, Profile
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -12,13 +13,12 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 def home(request):
-    habilidades = ImagenPage.objects.filter(category__nombre__in=["Ministerio de Educacion", "Ministerio de Salud"])
-    actividades = ImagenPage.objects.filter(category__nombre__in=["Actividades",])
-    columns = Column.objects.prefetch_related('contents').all()  # Utiliza prefetch_related para optimizar las consultas
+    posts = PageContent.objects.all()
+    actividades = carouselPage.objects.all()
+    # Contexto para el template
     context = {
+        'posts': posts,
         'actividades': actividades,
-        'habilidades':habilidades,
-        'columns': columns,
     }
     return render(request, 'index.html', context)
 
@@ -28,11 +28,13 @@ def BioUser(request, pk):
 
 def quienes_somos(request):
     # Buscar la categoría con el slug 'quienes_somos'
-    category = pageCategory.objects.filter(slug='quienes_somos').first()
+    managers = User.objects.filter(groups__name='manager').select_related('profile')
+    category = PageCategory.objects.filter(slug='quienes_somos').first()
     posts = PageContent.objects.filter(category=category)
 
     # Contexto para el template
     context = {
+        'managers':managers,
         'posts': posts,
     }
 

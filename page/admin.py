@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Footer, PageContent, ImagenPage, CategoryImages
+from .models import Footer, PageContent, carouselPage
 
 @admin.register(Footer)
 class FooterAdmin(admin.ModelAdmin):
@@ -21,13 +21,17 @@ class PageContentAdmin(admin.ModelAdmin):
     )
 
 
-class ImagenPageInline(admin.TabularInline):
-    model = ImagenPage
-    extra = 1  # Número de formularios vacíos que se mostrarán
+class carouselPageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'imagen', 'details')
+    ordering = ('-name',)
+    
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'imagen', 'details')
+        }),
+        # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
+    )
 
-class CategoryImagesAdmin(admin.ModelAdmin):
-    inlines = [ImagenPageInline]
-
-admin.site.register(CategoryImages, CategoryImagesAdmin)
+admin.site.register(carouselPage, carouselPageAdmin)
 admin.site.register(PageContent, PageContentAdmin)
 
