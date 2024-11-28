@@ -1,0 +1,142 @@
+{% extends 'frontend.html' %}
+{% load static %}
+{% block content %}
+
+  {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+      <h2> {{user|capfirst}} Ahora tu direccion</h2>
+    </div>
+    <div class="card-body">
+      <p>Email: {{user.email}}</p>
+      <img src="{{ user.profile.image.urls }}" alt="" width="300" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+        {% for data in profile %}
+          <p>{{data.direccion}}</p>
+        {% endfor %}
+      <form method="POST" class="mt-5" action="{% url 'direccion' %}" enctype="multipart/form-data" id="myForm">
+        {% csrf_token %}
+          <!-- Recorre todos los campos del formulario -->
+          {% for field in form %}
+          <div class="row">
+            {% if field.label != "Municipio" and field.label != "Provincia" and field.label != "Codigo postal" %}
+            {{field.label}}
+            {% endif %}            
+            {{field}}
+          </div>
+          {% endfor %}
+          <div class="row mb-5">
+            {% include 'provincia_municipios.html'%}
+          </div>
+        <button type="submit" class="btn btn-success" id="addFieldsButton">Guardar</button>
+      </form>
+    </div>
+    <div class="card-footer text-body-secondary">
+      <div class="progress" role="progressbar" aria-label="Animated striped example" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 75%"></div>
+      </div>
+    </div>
+  </div>
+
+   
+{% endblock %}
+
+{% block extra_js %}
+  <script>
+    const provincias = {
+      'Distrito Nacional': ['Santo Domingo'],
+      Azua: ['Azua de Compostela', 'Estebanía', 'Guayabal', 'Las Charcas', 'Las Yayas de Viajama', 'Padre Las Casas', 'Peralta', 'Sabana Yegua', 'Tábara Arriba'],
+      Bahoruco: ['Neiba', 'Galván', 'Los Ríos', 'Tamayo', 'Villa Jaragua'],
+      Barahona: ['Santa Cruz de Barahona', 'Cabral', 'El Peñón', 'Enriquillo', 'Fundación', 'Jaquimeyes', 'La Ciénaga', 'Las Salinas', 'Paraíso', 'Polo'],
+      Dajabón: ['Dajabón', 'El Pino', 'Loma de Cabrera', 'Partido', 'Restauración'],
+      Duarte: ['San Francisco de Macorís', 'Arenoso', 'Castillo', 'Eugenio María de Hostos', 'Las Guáranas', 'Pimentel', 'Villa Riva'],
+      'Elías Piña': ['Comendador', 'Bánica', 'El Llano', 'Hondo Valle', 'Pedro Santana'],
+      'El Seibo': ['Santa Cruz de El Seibo', 'Miches', 'Pedro Sánchez'],
+      Espaillat: ['Moca', 'Cayetano Germosén', 'Gaspar Hernández', 'Jamao al Norte'],
+      'Hato Mayor': ['Hato Mayor del Rey', 'El Valle', 'Sabana de la Mar'],
+      'Hermanas Mirabal': ['Salcedo', 'Tenares', 'Villa Tapia'],
+      Independencia: ['Jimaní', 'Cristóbal', 'Duvergé', 'La Descubierta', 'Mella', 'Postrer Río'],
+      'La Altagracia': ['Higüey', 'Bávaro', 'Miches'],
+      'La Romana': ['La Romana', 'Guaymate', 'Villa Hermosa'],
+      'La Vega': ['Concepción de La Vega', 'Bonao', 'Jima Abajo', 'Mamá Tingó'],
+      'María Trinidad Sánchez': ['Nagua', 'Arenoso', 'El Factor', 'Río San Juan'],
+      'Monseñor Nouel': ['Bonao', 'Maimón', 'Piedra Blanca'],
+      'Monte Cristi': ['Monte Cristi', 'Castañuela', 'Guayubín', 'Las Matas de Santa Cruz', 'Pepillo Salcedo', 'Villa Vásquez'],
+      'Monte Plata': ['Monte Plata', 'Bayaguana', 'Don Juan', 'Peralvillo', 'Sabana Grande de Boyá', 'Yamasá'],
+      Pedernales: ['Pedernales', 'Oviedo', 'Bahía de las Águilas']
+    }
+    
+    const zipCodes = {
+      Azua: '71000',
+      Bahoruco: '81000',
+      Barahona: '81000',
+      Dajabón: '63000',
+      'Distrito Nacional': '10100',
+      Duarte: '31000',
+      'El Seibo': '24000',
+      Espaillat: '57000',
+      'Hato Mayor': '25000',
+      'Hermanas Mirabal': '33000',
+      Independencia: '75000',
+      'La Altagracia': '23000',
+      'La Romana': '22000',
+      'La Vega': '41000',
+      'María Trinidad Sánchez': '33000',
+      'Monseñor Nouel': '41000',
+      'Monte Cristi': '61000',
+      MontesPlata: '92000',
+      Pedernales: '71000',
+      Peravia: '94000',
+      PuertoPlata: '57000',
+      Samaná: '32000',
+      SanCristóbal: '91000',
+      SanJosédeOcoa: '91000',
+      SanJuan: '57000',
+      SanPedrodeMacorís: '21000',
+      SánchezRamírez: '41000',
+      Santiago: '51000',
+      SantiagoRodríguez: '65000',
+      SantoDomingo: '10205'
+    }
+    
+    const provinciaSelect = document.getElementById('provincia')
+    const municipiosSelect = document.getElementById('municipios')
+    const zip = document.getElementById('codigo_postal')
+    
+    provinciaSelect.addEventListener('change', function () {
+      const provincia = provinciaSelect.value
+      if (provincia) {
+        const municipios = provincias[provincia]
+        const options = municipios.map((municipio) => `<option>${municipio}</option>`).join('')
+        municipiosSelect.innerHTML = options
+        municipiosSelect.disabled = false
+    
+        const zip_code = zipCodes[provincia]
+        console.log(zip_code)
+        zip.innerHTML = `<option>${zip_code}</option>`
+        zip.disabled = false
+      }
+      if (provincia) {
+        const zip_code = zipCodes[provincia]
+        const options = zip_code.map((zipC) => `<option>${zipC}</option>`).join('')
+        zip.innerHTML = options
+        zip.disabled = false
+      } else {
+        municipiosSelect.innerHTML = '<option value="">--</option>'
+        municipiosSelect.disabled = true
+        zip.innerHTML = '<option value="">--</option>'
+        zip.disabled = true
+      }
+    })
+  </script>
+
+{% endblock %}

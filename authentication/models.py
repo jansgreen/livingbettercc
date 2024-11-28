@@ -4,28 +4,35 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
 
+
 class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     GENERO_CHOICES = [
             ('M', 'Masculino'),
             ('F', 'Femenino'),
             ]
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
+    fecha_nacimiento = models.DateField(blank=True, null=True)
     telefono = models.CharField(max_length=10)
+    numero_identidad = models.CharField(max_length=11, blank=True, null=True)
+    profesion = models.CharField(max_length=140, blank=True, null=True)
+    roll = models.CharField(max_length=100, blank=True, null=True)
+    imagen = models.ImageField(upload_to='Profile/', default='profiles/default.jpg')
+    direccion = models.ForeignKey('Direccion', on_delete=models.SET_NULL, null=True, blank=True, related_name='Direcciones')
+
+    def __str__(self):
+        return self.user.username
+
+class Direccion(models.Model):
     calle_y_casa = models.CharField(max_length=120, blank=True, null=True)
     sector_o_barrio = models.CharField(max_length=120, blank=True, null=True)
     municipio = models.CharField(max_length=120, blank=True, null=True)
     provincia = models.CharField(max_length=120, blank=True, null=True)
     codigo_postal = models.IntegerField(blank=True, null=True)
-    numero_identidad = models.CharField(max_length=11, blank=True, null=True)
-    fecha_nacimiento = models.DateField(blank=True, null=True)
-    genero = models.CharField(max_length=1, choices=GENERO_CHOICES, blank=True, null=True)
-    profesion = models.CharField(max_length=140, blank=True, null=True)
-    puesto = models.CharField(max_length=100, blank=True, null=True)
-    imagen = models.ImageField(upload_to='Profile/', default='profiles/default.jpg')
 
     def __str__(self):
-        return self.user.username
-  
+        return f"{self.calle_y_casa}, {self.sector_o_barrio}, {self.municipio}, {self.provincia}"
+
 def profile_image_upload_path(instance, filename):
     product_name = instance.product.nombre
     ext = filename.split('.')[-1] 

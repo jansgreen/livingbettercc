@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Profile, Biography
+from .models import Profile, Biography, Direccion
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
@@ -89,83 +89,86 @@ class CustomAuthenticationForm(AuthenticationForm):
         fields = ('username', 'password')
 
 class Profileforms(forms.ModelForm):
-    puesto = forms.CharField(max_length=30, required=False, label='puesto', help_text='Que roll desempeña en LBCC')
-    profesion = forms.CharField(max_length=30, required=False, label='profesion', help_text='Profesion Academica')
-
-
-    fecha_nacimiento = forms.DateField(
-        required=True, 
-        widget=forms.DateInput(attrs={
-            'type': 'date', 
-            'class': 'form-control',  # Clase para estilo Bootstrap
-            'placeholder': 'Fecha de Nacimiento'
-        }),
-        label='Fecha de Nacimiento'
+    # Campos adicionales o modificados
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        label='Nombres',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombre y segundo nombre'
+        })
     )
-
+    last_name = forms.CharField(
+        max_length=30,
+        required=False,
+        label='Apellido',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Apellido'
+        })
+    )
+    
     class Meta:
         model = Profile
-        exclude = (
-            'user',
-            )
-            
-    def __init__(self, *args, **kwargs):
-        """
-        Add placeholders and classes, remove auto-generated
-        labels and set autofocus on first field
-        """
-        super().__init__(*args, **kwargs)
-        placeholders = {
-            'first_name': 'Primer Nombre y Segundo Nombre',
-            'last_name': 'Primer apellido y Segundo apellido',
-            'telefono': 'Tu numero de telefono',
-            'calle_y_casa': 'Escribe el nombre de la calle y el numero de tu casa',
-            'sector_o_barrio': 'Escribe el Barrio o el sector',
-            'municipio': 'Tu Municipio',
-            'provincia': 'Tu Probincia',
-            'codigo_postal': 'Tu codigo postal',
-            'numero_identidad': 'Cedula de Identidad', 
-            'imagen': 'Foto de perfil',
-            'fecha_nacimiento': 'Fecha de Nacimiento',
-            'genero': 'Genero',
-            'profesion': 'Grado Academico',
-            'puesto': 'Tu roll en Living Better CC',
-
+        fields = [
+            'first_name',
+            'last_name',
+            'imagen',
+            'genero',
+            'fecha_nacimiento',
+            'telefono',
+            'numero_identidad',
+            'profesion',
+            'roll',
+        ]
+        widgets = {
+            'fecha_nacimiento': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+            }),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_identidad': forms.TextInput(attrs={'class': 'form-control'}),
+            'profesion': forms.TextInput(attrs={'class': 'form-control'}),
+            'puesto': forms.TextInput(attrs={'class': 'form-control'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Permite pasar el usuario al formulario
+        super().__init__(*args, **kwargs)
+        if user:
+            # Inicializar los campos first_name y last_name desde el usuario
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+        
         for field in self.fields:
-            if field not in ['profesion','imagen','numero_identidad', ]:
-                if self.fields[field].required:
-                    placeholder = f'{placeholders[field]} *'
+            self.fields[field].widget.attrs['class'] = 'form-control'
 
-            elif field== 'genero':
-                self.fields[field].widgets = {'genero': forms.Select(choices=Profile.GENERO_CHOICES),}
-                self.fields['genero'].widget.attrs['placeholder'] = 'Selecciona tu género'
-                self.fields['genero'].widget.attrs['class'] = 'form-control'
-            
-            elif field == 'imagen':
-                # Aplicar clase específica para el campo de imagen
-                self.fields['imagen'].widget.attrs['class'] = 'form-control-file'
 
-            elif field == 'fecha_nacimiento':
-                # Asegura que el campo de fecha tenga el widget correcto
-                self.fields[field].widget.attrs['class'] = 'form-control'
-                self.fields[field].widget.attrs['type'] = 'date'
+    def save(self, commit=True):
+        # Guardar cambios en el modelo Profile y User
+        profile = super().save(commit=False)
+        user = profile.user  # Obtener el usuario relacionado
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        if commit:
+            user.save()  # Guardar cambios en User
+            profile.save()  # Guardar cambios en Profile
+        return profile
 
-            else:
-                placeholder = f'{placeholders[field]} (Opcional)'
-                self.fields[field].widget.attrs['placeholder'] = placeholder
-
-            if field in [ 'provincia','municipio', 'codigo_postal']:
-                self.fields[field].widget.attrs['class'] = 'visually-hidden-focusable'
-                self.fields[field].widget.attrs['value'] = 'N/A'
-
-            else:
-                self.fields[field].widget.attrs['class'] = 'form-control mb-3'
-            self.fields[field].widget.attrs['placeholder'] = placeholder
-            self.fields[field].widget.attrs['aria-label'] = 'Sizing example input'
-            self.fields[field].widget.attrs['aria-describedby'] = 'inputGroup-sizing-sm'
-            self.fields[field].label = False
+class DireccionForm(forms.ModelForm):
+    class Meta:
+        model = Direccion
+        fields = ['calle_y_casa', 'sector_o_barrio', 'municipio', 'provincia', 'codigo_postal']
+        widgets = {
+            'calle_y_casa': forms.TextInput(attrs={'class': 'form-control'}),
+            'sector_o_barrio': forms.TextInput(attrs={'class': 'form-control'}),
+            'municipio': forms.HiddenInput(attrs={'class': 'form-control'}),
+            'provincia': forms.HiddenInput(attrs={'class': 'form-control'}),
+            'codigo_postal': forms.HiddenInput(attrs={'class': 'form-control'}),
+        }
 
 class BiographyForm(forms.ModelForm):
     

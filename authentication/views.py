@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate
-from .forms import RegisterForm, LoginForm, Profileforms, Profile, BiographyForm
+from .forms import RegisterForm, LoginForm, Profileforms, BiographyForm, DireccionForm
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import Biography
+from .models import Biography, Profile, Direccion
 from django.contrib.auth.decorators import login_required
 
 
@@ -48,31 +48,67 @@ def custom_logout_view(request):
     return redirect('home')  # Redirige a 'home' o a la página que desees después 
 
 def ProfileFunction(request):
-    user = request.user
-    
-    # Verifica si el perfil ya existe, si no, crea uno nuevo
-    profile, created = Profile.objects.get_or_create(user=user)
+    current_user = request.user
+    profile= Profile.objects.get(user=current_user)
 
     if request.method == 'POST':
-        form = Profileforms(request.POST, request.FILES, instance=profile)
-        user = request.user
-        user.first_name = request.POST.get('firstname')
-        user.last_name = request.POST.get('lastname')
-
-        if form.is_valid():
-            form = form.save(commit=False)
-            form.user = user
-            form.provincia = request.POST.get('provincia')
-            form.municipio = request.POST.get('municipios')
-            form.codigo_postal = request.POST.get('zip')
-            form.save()  # Guarda la instancia del perfil
-            user.save()
-            messages.success(request, f'{request.user} tu perfil ha sido guardado')
-            return redirect('ProfileFunction')  # Cambia esto por tu URL de éxito
+        forms = Profileforms(request.POST, request.FILES, instance=profile)
+        if forms.is_valid():
+            # Guardar campos ocultos desde el JavaScript
+            forms.save()  # Guarda y retorna la instancia
+            messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
+                        
+            return redirect('direccion')
         else:
-            messages.success(request, f'{form.errors} tu perfil ha sido guardado')
-    form = Profileforms(instance=profile)  # Pasa la instancia existente si está en modo GET
-    return render(request, 'profile.html', {'form': form, 'profile': profile})
+            messages.error(request, 'Por favor, corrige los errores en el formulario.')
+    else:
+        forms = Profileforms()
+        context = {
+                'forms': forms, 
+                'profile': profile, 
+                   }  
+
+    return render(request, 'profile.html', context)
+
+def direccion(request):
+    user = request.user
+    profile = Profile.objects.get(user=user)
+
+    if request.method == 'POST':
+        form = DireccionForm(request.POST)
+        if form.is_valid():
+            # Guardar o actualizar la dirección
+            direccion = form.save()
+            profile.direccion = direccion  # Asignar la dirección al perfil
+            profile.save()  # Guardar el perfil con la dirección asignada
+
+            messages.success(request, 'Dirección asignada exitosamente.')
+            return redirect('ProfileFunction')  # Redirigir al perfil del usuario
+    else:
+        form = DireccionForm(instance=profile.direccion)
+
+    return render(request, 'direccion.html', {'form': form})
+
+
+
+def actualizar_direccion(request, direccion_id):
+    profile = Profile.objects.filter(direccion=direccion_id)
+
+    if request.method == 'POST':
+        form = DireccionForm(request.POST)
+        if form.is_valid():
+            form.save()  # Guardar los cambios en la dirección
+            messages.success(request, 'Dirección actualizada exitosamente.')
+            return redirect('profileFunction')
+    form = DireccionForm()
+    return render(request, 'direccion.html', {'form': form, 'profile': profile})
+
+def eliminar_direccion(request, direccion_id):
+    direccion = get_object_or_404(Direccion, id=direccion_id)
+    direccion.delete()
+    messages.success(request, 'Dirección eliminada exitosamente.')
+    return redirect('ProfileFunction')  # Redirige al perfil del usuario o a la lista de direcciones
+
 
 def edit_profile(request):
     # Obtén el perfil del usuario actual o redirige si no existe
