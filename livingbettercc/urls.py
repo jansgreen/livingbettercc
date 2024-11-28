@@ -26,8 +26,7 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('auth/', include('authentication.urls')),  # Incluir URLs de la app de usuarios
     path('groups/', include('groups.urls')),
-    path('catalog/', include('catalog.urls')),
-    path('checkout/', include('checkout.urls')),
+    path('shop/', include('shop.urls')),
     path('page/', include('page.urls')),
     path('metadata/', include('metadata.urls')),
 

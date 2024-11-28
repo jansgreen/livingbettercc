@@ -1,0 +1,29 @@
+{% extends 'frontend.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="mb-4">Productos</h1>
+<div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for product in products %}
+    <div class="col">
+        <div class="card  text-center">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name |capfirst}}</h5>
+                {% if product.image %}
+                <div><img src="{{ product.image.url }}" width="300" class="img-flued rounded mb-3" alt="{{ product.name }}" 
+                     onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"></div>
+                {% endif %}
+                <p class="card-text">{{ product.summary|safe }}</p>
+                <p class="card-text"><strong>Precio:</strong> ${{ product.price }}</p>
+                <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
+            </div>
+            <div class="card-footer text-end">
+                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary"><i class="bi bi-cart4 text-light"></i></a>
+                <a href="{% url 'product_update' product.id %}" class="btn btn-warning">Actualizar</a>
+                <a href="{% url 'product_delete' product.id %}" class="btn btn-danger">Eliminar</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

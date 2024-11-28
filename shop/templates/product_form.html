@@ -1,0 +1,19 @@
+{% extends 'frontend.html' %}
+{% load static %}
+
+{% block content %}
+<h1>{% if form.instance.id %}Actualizar{% else %}Crear{% endif %} Producto</h1>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{form.media}}
+    {% for forms in form %}
+        <div class="row g-3">
+            <div class="col-auto">
+                <label for="{{forms.id_for_label}}" class="form-label">{{forms.label}}</label>
+                <div>{{forms}}</div>
+            </div>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+{% endblock %}

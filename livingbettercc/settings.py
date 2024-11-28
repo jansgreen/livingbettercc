@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home',
-    'catalog',
     'classroom',
     'payments',
     'ckeditor',
@@ -43,7 +42,7 @@ INSTALLED_APPS = [
     'blog',
     'authentication',
     'groups',
-    'checkout',
+    'shop',
     'page',
     'metadata',
     'gallery',
@@ -80,13 +79,14 @@ TEMPLATES = [
                 'home.context_processors.context_processor.bootstrap_js',
                 'home.context_processors.context_processor.obtener_navbar',
                 'blog.context_processors.context_processor.obtener_menu_blog',
-                'catalog.context_processors.context_processor.obtener_menu_Catálogo',
                 'groups.context_processors.context_processor.obtener_menu_groups',
                 'page.context_processors.context_processor.obtener_menu_setting',
                 'page.context_processors.context_processor.footer_context',
                 'metadata.context_processors.context_processor.metadata_context',
                 'metadata.context_processors.context_processor.obtener_menu_metadata',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
+                'shop.context_processors.context_processor.obtener_menu_shop',
+                'shop.context_processors.context_processor.obtener_menu_cart',
 
             ],
         },
@@ -187,8 +187,8 @@ EMAIL_HOST_CC = os.getenv('EMAIL_HOST_CC', '').split(',')
 EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 
 # En settings.py
-LOGIN_REDIRECT_URL = 'catalog'
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'shop'
+LOGOUT_REDIRECT_URL = 'shop'
 
 
 PAYPAL_CLIENT_ID = 'tu_client_id'
