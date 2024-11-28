@@ -89,8 +89,6 @@ def direccion(request):
 
     return render(request, 'direccion.html', {'form': form})
 
-
-
 def actualizar_direccion(request, direccion_id):
     profile = Profile.objects.filter(direccion=direccion_id)
 
@@ -108,7 +106,6 @@ def eliminar_direccion(request, direccion_id):
     direccion.delete()
     messages.success(request, 'Dirección eliminada exitosamente.')
     return redirect('ProfileFunction')  # Redirige al perfil del usuario o a la lista de direcciones
-
 
 def edit_profile(request):
     # Obtén el perfil del usuario actual o redirige si no existe
@@ -181,8 +178,17 @@ def edit_biography(request):
             biography.user = request.user
             biography.save()
             messages.success(request, f'{request.user} Tu Biografia se creo exitosamente!')
-            return redirect('aboutUs')  # Cambia esto a la URL a la que quieras redirigir después de guardar
+            return redirect('quienes_somos')  # Cambia esto a la URL a la que quieras redirigir después de guardar
     else:
         form = BiographyForm(instance=biography)
 
     return render(request, 'edit_biograph.html', {'form': form})
+
+def leerBio(request, pk):
+    managers = User.objects.filter(groups__name='manager').select_related('profile')
+    articles = Biography.objects.filter(pk=pk)
+    context={
+        'articles':articles,
+        'managers':managers,
+    }
+    return render(request, 'leer_bio.html', context)

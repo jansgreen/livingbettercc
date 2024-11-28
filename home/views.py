@@ -22,12 +22,9 @@ def home(request):
     }
     return render(request, 'index.html', context)
 
-def BioUser(request, pk):
-    es_directiva = request.user.groups.filter(name='directivas').exists() if request.user.is_authenticated else False
-    return render(request, 'quienes_somos.html')
-
 def quienes_somos(request):
     # Buscar la categoría con el slug 'quienes_somos'
+    user = request.user
     managers = User.objects.filter(groups__name='manager').select_related('profile')
     category = PageCategory.objects.filter(slug='quienes_somos').first()
     posts = PageContent.objects.filter(category=category)
@@ -36,20 +33,10 @@ def quienes_somos(request):
     context = {
         'managers':managers,
         'posts': posts,
+        'user':user,
     }
 
     return render(request, 'quienes_somos.html', context)
-
-
-def leerBio(request, pk):
-    biography = Biography.objects.filter(user=pk) 
-    is_directivas_member = request.user.groups.filter(name="directivas").exists()
-    context={
-        'singlePage': True,
-        'biography':biography,
-        'is_directivas_member':is_directivas_member,
-    }
-    return render(request, 'leer_bio.html', context)
 
 def contactanos(request):
     if request.method == 'POST':
@@ -87,8 +74,11 @@ def contactanos(request):
     return render(request, 'contact_us.html', context)
 
 def single_page(request, pk):
-    post = [getPost for getPost in PageContent.objects.filter(pk=pk)]
-    context = {
-        'post':post,
-    }
-    return render(request, 'home_single_page.html', context)
+    article = get_object_or_404(PageContent, pk=pk)
+    related_articles = PageContent.objects.filter(category=article.category).exclude(pk=article.pk)[:3]
+    
+    # Renderizar el template con el contexto
+    return render(request, 'leerpageweb.html', {
+        'article': article,
+        'related_articles': related_articles,
+    })

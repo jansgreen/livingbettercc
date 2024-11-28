@@ -52,16 +52,14 @@ class ProfileImage(models.Model):
         unique_together = ('product', 'image') 
 
 class Biography(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     biography = RichTextField(verbose_name="Biografia")
-    excerpt = models.TextField(blank=True, null=True)  # Campo opcional para el extracto
-
 
     def summary(self, char_limit=100):
         if len(self.content) <= char_limit:
             return self.content
         end = self.content.rfind(' ', 0, char_limit)
-        return self.content[:end] + '...'
+        return self.content[:end] + '... leer mas'
 
     def __str__(self):
-        return self.user
+        return self.user.username

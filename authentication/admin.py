@@ -35,7 +35,10 @@ class DireccionAdmin(admin.ModelAdmin):
 
 @admin.register(Biography)
 class BiographyAdmin(admin.ModelAdmin):
-    list_display = ('user','excerpt',)
+    readonly_fields = (
+        'user',
+        )
+    list_display = ('user',)
 
 # Registra los modelos en el admin
 

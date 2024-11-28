@@ -6,13 +6,12 @@
     <div class="row justify-content-md-center">
         <div class="row ">
             <div class="col-md-7">
-                {% if biography %}
-                    {% for bio in biography%}
+                    {% for bio in articles %}
                         <div class="row">
                             <div class="col-md-6">
                                 <h3>{{bio.user.first_name |capfirst}} {{bio.user.last_name |capfirst}}</h3>
                                 <h6>{{bio.user.profile.profesion |capfirst}}</h6>
-                                <h6>{{bio.user.profile.puesto |capfirst}} en Living Better Community Center</h6>
+                                <h6>{{bio.user.profile.roll |capfirst}} en Living Better Community Center</h6>
 
                             </div>
                             <div class="col-md-4">
@@ -22,12 +21,11 @@
 
                             </div>
                         </div>
-                        {{bio.biography |capfirst|striptags|linebreaks}}
+                        {{bio.biography|safe}}
                     {% endfor %}
-                {% endif %}
             </div>
             <div class="col-md-4">
-                {% include 'directivas.html'%}
+                {% include 'manager.html' %}
             </div>
         </div>
     </div>

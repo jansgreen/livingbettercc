@@ -65,8 +65,7 @@ class carouselPage(models.Model):
 
     def __str__(self):
         return self.name
-    
-
+ 
 class Footer(models.Model):
     titulo = models.CharField(max_length=100, default="#")
     mision = models.TextField()

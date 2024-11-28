@@ -15,7 +15,7 @@
     {% for post in posts %}
         {% if "Home" in  post.category.name and post.position.column == 1%}
         <div class="col-12 col-md-4"> <!-- Puedes ajustar el número de columnas según tu diseño -->
-          <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+          <a href="{% url 'single_page' post.id %}" class="list-group-item list-group-item-action" aria-current="true">
             <h3>{{post.title}}</h3>
             <img src="{{post.cover_image.url}}" alt="" width="300" class="rounded img-fluid border border-light-subtle" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
             {% if "Nuestro Valores" in post.title %}

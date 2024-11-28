@@ -1,0 +1,83 @@
+{% extends 'frontend.html' %}
+{% load static %}
+
+{% block content %}
+<article class="container py-4">
+    <!-- Header Section -->
+    <header class="mb-4">
+        <h1 class="display-4">{{ article.title }}</h1>
+        <p class="text-muted">Por {{ article.author }} | {{ article.published_date }}</p>
+    </header>
+
+    <!-- Featured Image -->
+    {% if article.featured_image %}
+        <div class="mb-4 text-center">
+            <img src="{{ article.featured_image.url }}" alt="{{ article.title }}" class="img-fluid rounded">
+        </div>
+    {% endif %}
+
+    <!-- Article Content -->
+    <section class="mb-5">
+        {{ article.content|safe }}
+    </section>
+
+    <!-- Author Biography -->
+    <aside class="mt-5 p-4 bg-light rounded">
+        <div class="d-flex align-items-center">
+            <img src="{{ article.author.profile_image.url }}" alt="{{ article.author }}" class="rounded-circle me-3" style="width: 60px; height: 60px;">
+            <div>
+                <h5>{{ article.author }}</h5>
+                <p class="text-muted">{{ article.author.bio }}</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Related Articles Section -->
+    <section class="mt-5">
+        <h2 class="h4 mb-4">Artículos relacionados</h2>
+        <div class="row">
+            {% for related in related_articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if related.featured_image %}
+                            <img src="{{ related.featured_image.url }}" class="card-img-top" alt="{{ related.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ related.title }}</h5>
+                            <p class="card-text">{{ related.summary }}</p>
+                            <a href="{{ related.get_absolute_url }}" class="btn btn-primary">Leer más</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Comments Section -->
+    <section class="mt-5">
+        <h2 class="h4 mb-4">Comentarios</h2>
+        <div class="mb-4">
+            {% if user.is_authenticated %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="comment" class="form-control" rows="4" placeholder="Escribe tu comentario..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'login' %}">Inicia sesión</a> para dejar un comentario.</p>
+            {% endif %}
+        </div>
+
+        {% for comment in article.comments.all %}
+            <div class="mb-3 border rounded p-3">
+                <p class="mb-1"><strong>{{ comment.user }}</strong> <span class="text-muted">{{ comment.created_at }}</span></p>
+                <p>{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p class="text-muted">No hay comentarios aún.</p>
+        {% endfor %}
+    </section>
+</article>
+{% endblock %}

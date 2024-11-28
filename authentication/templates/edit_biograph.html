@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row justify-content-md-center">
     <h2>Tu Biografia</h2>
-    <form method="POST">
+    <form method="POST" action="{% url 'edit_biography' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="row">
             <div class="col-md-4">
@@ -20,10 +20,10 @@
                 <h5>Ingrese su Profesion en su <a href="{% url 'ProfileFunction'%}">Perfil</a></h5>
                 {% endif %}
 
-                {% if request.user.profile.profesion %}
-                <p>{{request.user.profile.profesion}}</p>
+                {% if request.user.profile.roll %}
+                <p>Roll en LBCC {{request.user.profile.roll |capfirst}}</p>
                 {% else %}
-                <h5>Ingrese el roll que ejerce en LBCC en su <a href="{% url 'ProfileFunction'%}">Perfil</a></h5>
+                <p>Ingrese el roll que ejerce en LBCC en su <a href="{% url 'ProfileFunction'%}">Perfil</a></p>
                 {% endif %}
             </div>
            
@@ -37,9 +37,8 @@
         <div class="row">
             <div class="col">
                 {{ form.media }}
-                {{ form.biography.label }}
                 {{ form.biography }}
-                {{ form.biography.help_text }}
+                <p>{{ form.biography.help_text }}</p>
             </div>
         </div>
 

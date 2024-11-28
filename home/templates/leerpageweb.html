@@ -1,0 +1,45 @@
+{% extends 'frontend.html' %}
+{% load static %}
+
+{% block content %}
+<article class="container py-4">
+    <!-- Header Section -->
+    <header class="mb-4">
+        <h1 class="display-4">{{ article.title }}</h1>
+    </header>
+    <!-- Featured Image -->
+    {% if article.cover_image %}
+        <div class="mb-4 text-center">
+            <img src="{{article.cover_image.url}}" alt="" class="img-fluid me-2"/>
+        </div>
+    {% endif %}
+
+    <!-- Article Content -->
+    <section class="mb-5">
+        {{ article.content|safe }}
+    </section>
+
+    <!-- Related Articles Section -->
+    <section class="mt-5">
+        <h2 class="h4 mb-4">Artículos relacionados</h2>
+        <div class="row">
+            {% for related in related_articles %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if related.cover_image %}
+                            <img src="{{ related.cover_image.url }}" class="card-img-top" alt="{{ related.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ related.title }}</h5>
+                            <p class="card-text">{{ related.summary|safe}}</p>
+                            <p>{{ related.get_absolute_url}}</p>
+                            <a href="{% url 'single_page' related.id %}" class="btn btn-primary">Leer más</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</article>
+{% endblock %}
