@@ -7,7 +7,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.db.models import Count
 from gallery.models import Image
 
-def home(request):
+def blog(request):
     form = blogPost.objects.all()
     # Obtener los años y meses de los posts
     archives = blogPost.objects.annotate(year=Count('created_at__year'), month=Count('created_at__month')) \
@@ -20,7 +20,7 @@ def home(request):
 
     }
 
-    return render(request, 'index.html', context)
+    return render(request, 'blog_index.html', context)
 
 def post_list(request):
     posts = blogPost.objects.all()

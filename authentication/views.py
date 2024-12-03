@@ -15,7 +15,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('blog')  # Redirigir a la página principal
+            return redirect('shop')  # Redirigir a la página principal
         else:
             print(form.errors)
             messages.debug(request, f'{form.errors}')

@@ -7,16 +7,16 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        {% for menu in menu_home %}
         <ul class="navbar-nav ml-auto">
+        {% for menu in menu_home %}
             <li class="nav-item">
                 <a class="nav-link" href="{{menu.url}}">{{menu.nombre}}</a>
             </li>
+        {% endfor %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'contactanos'%}">Contactanos</a>
             </li>
         </ul>
-        {% endfor %}
         <ul class="navbar-nav ms-auto">
 
             {% if cart.itemcart_set.all %}

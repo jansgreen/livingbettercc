@@ -1,27 +1,21 @@
 def obtener_menu_auth(request):
-    # Verificar si el usuario pertenece al grupo 'manager'
-    user_in_manager_group = (
-        request.user.is_authenticated and 
-        request.user.groups.filter(name='manager').exists()
-    )
+        if request.user.is_authenticated:
+            user_in_manager_group = (request.user.is_authenticated and request.user.groups.filter(name='manager').exists())
+            menu = [
+                {
+                    'nombre': 'Profile',
+                    'url': '#',
+                    'submenus': []
+                }
+            ]
+            
+            if user_in_manager_group:
+                menu[0]['submenus'].append({'nombre': 'Crear Biografia', 'url': '/auth/edit_biography/'})
 
-    # Construir submenús condicionalmente
-    submenus = [
-        {'nombre': 'Ver', 'url': '/auth/ProfileFunction/'},
-
-    ]
-
-    if user_in_manager_group:
-        submenus.append({'nombre': 'Crear Biografia', 'url': '/auth/edit_biography/'})
-
-
-    # Retornar el menú
-    return {
-        'menu_auth': [
-            {
-                'nombre': 'Profile',
-                'url': '#',  # Aquí puedes usar # porque no es un enlace directo.
-                'submenus': submenus,
-            }
-        ]
-    }
+            if request.user.is_authenticated and request.user.has_perm('auth.can_create_posts'):
+                menu[0]['submenus'].append({'nombre': 'Perfil', 'url': '/auth/ProfileFunction/'})
+                menu[0]['submenus'].append({'nombre': 'Editar Perfil', 'url': '/auth/edit_profile/'})
+            return {'menu_auth': menu}
+        else:
+            menu = None
+            return {'menu_auth': menu}

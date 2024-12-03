@@ -27,7 +27,6 @@ def obtener_menu_cart(request):
         ]
     }
 
-
 def obtener_menu_shop(request):
     menu = [
         {
@@ -37,17 +36,12 @@ def obtener_menu_shop(request):
         }
     ]
     
-    # Agregar "Lista de Post" para usuarios con el permiso "can_view_posts"
-    if request.user.is_authenticated and request.user.has_perm('shop.can_view_posts'):
-        menu[0]['submenus'].append({'nombre': 'Shop', 'url': '/shop/ '})
+    menu[0]['submenus'].append({'nombre': 'Shop', 'url': '/shop/ '})
     
     # Agregar "Crear Post" para usuarios con el permiso "can_create_posts"
     if request.user.is_authenticated and request.user.has_perm('shop.can_create_shop'):
         menu[0]['submenus'].append({'nombre': 'Crear Producto', 'url': '/shop/create/'})
     
-    if request.user.is_authenticated and request.user.has_perm('shop.can_view_cart'):
-        menu[0]['submenus'].append({'nombre': 'ver Carrito', 'url': '/shop/cart/'}) 
-
     if request.user.is_authenticated and request.user.has_perm('shop.can_view_category'):
         menu[0]['submenus'].append({'nombre': 'Categoria', 'url': '/shop/categories/'}) 
     return {'menu_shop': menu}

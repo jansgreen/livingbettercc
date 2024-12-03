@@ -9,22 +9,28 @@ def footer_context(request):
         'footer': footer
     }
 
-def obtener_menu_setting(request):
-    return {
-        'menu_setting': [
-            {
-                'nombre': 'Setting', 
-                'url': '#',  # Aquí puedes usar # porque no es un enlace directo.
-                'submenus': [
-                {'nombre': 'Crear Metadata', 'url': '/metadata/create/'}, 
-                {'nombre': 'Listar Metadata', 'url': '/metadata/metadata/'},
-                {'nombre': 'Carousel', 'url': '/page/carouselPageFunction/'},
-                {'nombre': 'Crear Pestaña', 'url': '/page/crear_PageCategory/'},
-                {'nombre': 'Listar Pestaña y Posiciones', 'url': '/page/listar_categorias_y_PagePosition/'},
-                {'nombre': 'Crear Contenido de la Pestaña', 'url': '/page/create_page_content/'},
-                {'nombre': 'Listar Contenido de la Pestaña', 'url': '/page/page-content-list/'},
 
-                ]
-            }
-        ]
-    }
+def obtener_menu_setting(request):
+        if request.user.is_authenticated:
+            user_in_manager_group = (request.user.is_authenticated and request.user.groups.filter(name='admin').exists() or request.user.groups.filter(name='Superusuario').exists() )
+            menu = [
+                {
+                    'nombre': 'Setting',
+                    'url': '#',
+                    'submenus': []
+                }
+            ]
+            
+            if user_in_manager_group:
+                menu[0]['submenus'].append({'nombre': 'Crear Metadata', 'url': '/metadata/create/'})
+                menu[0]['submenus'].append({'nombre': 'Listar Metadata', 'url': '/metadata/metadata/'})
+                menu[0]['submenus'].append({'nombre': 'Carousel', 'url': '/page/carouselPageFunction/'})
+                menu[0]['submenus'].append({'nombre': 'Crear Pestaña', 'url': '/page/crear_PageCategory/'})
+                menu[0]['submenus'].append({'nombre': 'Crear Contenido de la Pestaña', 'url': '/page/create_page_content/'})
+                menu[0]['submenus'].append({'nombre': 'Invitar a usua', 'url': '/groups/invite/'})
+                menu[0]['submenus'].append({'nombre': 'Listar Contenido de la Pestaña', 'url': '/page/page-content-list/'})
+
+            return {'menu_setting': menu}
+        else:
+            menu = None
+            return {'menu_setting': menu}

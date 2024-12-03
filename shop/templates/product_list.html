@@ -13,7 +13,7 @@
                 <div><img src="{{ product.image.url }}" width="300" class="img-flued rounded mb-3" alt="{{ product.name }}" 
                      onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"></div>
                 {% endif %}
-                <p class="card-text">{{ product.summary|safe }}</p>
+                <p class="card-text">Leer Resumen</p>
                 <p class="card-text"><strong>Precio:</strong> ${{ product.price }}</p>
                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
             </div>

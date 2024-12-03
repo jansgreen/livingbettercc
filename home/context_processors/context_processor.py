@@ -22,7 +22,7 @@ def obtener_navbar(request):
         for category in categories:
             capitalized_name = category.name.capitalize()
             # Capitalizar el nombre de la categoría antes de agregarlo
-            if category.name != 'Home' and category.name != 'Contactanos':
+            if capitalized_name != 'Home' and capitalized_name != 'Contactanos':
                 options.append({'nombre': capitalized_name, 'url': f'/{category.slug}/'})
     
     # Retornar el menú sin envolver las opciones

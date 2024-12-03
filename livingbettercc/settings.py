@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'classroom',
-    'payments',
     'ckeditor',
     'ckeditor_uploader',
     'blog',
@@ -46,6 +45,10 @@ INSTALLED_APPS = [
     'page',
     'metadata',
     'gallery',
+    'paypal.standard.ipn',
+    'payment',
+    'cart',
+
 ]
 
 MIDDLEWARE = [
@@ -210,3 +213,6 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+# paypal
+PAYPAL_TEST = True
+PAYPAL_RECEIVER_EMAIL = 'livingbettecommunitycenter@gmail.com'
