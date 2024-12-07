@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'paypal.standard.ipn',
     'payment',
     'cart',
+    'store',
 
 ]
 
@@ -89,7 +90,7 @@ TEMPLATES = [
                 'metadata.context_processors.context_processor.obtener_menu_metadata',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'shop.context_processors.context_processor.obtener_menu_shop',
-                'shop.context_processors.context_processor.obtener_menu_cart',
+                'cart.context_processors.context_processor.obtener_menu_cart',
 
             ],
         },

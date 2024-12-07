@@ -17,8 +17,10 @@
                 <p class="card-text"><strong>Precio:</strong> ${{ product.price }}</p>
                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
             </div>
-            <div class="card-footer text-end">
-                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary"><i class="bi bi-cart4 text-light"></i></a>
+            <div class="card-footer text-end"> checkout
+                <a href="#" class="btn btn-primary"><i class="bi bi-cart4 text-light"></i></a>
+                <a href="{% url 'product' product.id %}" class="btn btn-primary">Pay Now</i></a>
+
                 <a href="{% url 'product_update' product.id %}" class="btn btn-warning">Actualizar</a>
                 <a href="{% url 'product_delete' product.id %}" class="btn btn-danger">Eliminar</a>
             </div>

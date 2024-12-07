@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'frontend.html' %}
 
 
 {% block content %}
@@ -27,7 +27,7 @@
         <center>
         <h5 class="card-title">{{ product.name }}</h5>
         <br/>
-        <p class="card-text justified">{{ product.description }}</p>
+        <p class="card-text justified">{{ product.description |safe }}</p>
         
         {% if product.is_sale %}
         <div class="d-flex justify-content-center small text-warning mb-2">
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <br/><br/>
-        <a href="{% url 'home'%}" class="btn btn-secondary">Home</a>
+        <a href="{% url 'product_list' %}" class="btn btn-warning">Tienda</a>
         <button type="button" data-index="{{product.id}}" class="btn btn-secondary update-cart">Update</button>
         <button type="button" data-index="{{product.id}}" class="btn btn-danger delete-product">Remove</button>
         
@@ -98,71 +98,69 @@
 
 
 
+{% block extra_js%}
+  <script>
+    // Update Cart
+    $(document).on('click', '.update-cart', function(e){
+        e.preventDefault();
+        // grab the product id
+        var productid = $(this).data('index');
 
-<script>
-// Update Cart
-$(document).on('click', '.update-cart', function(e){
-    e.preventDefault();
-    // grab the product id
-    var productid = $(this).data('index');
+        $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_update' %}',
+        data: {
+          product_id: $(this).data('index'),
+          product_qty: $('#select' + productid + ' option:selected').text(),
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          action: 'post'
+        },
+        success: function(json){
+            //console.log(json)
+            //document.getElementById("cart_quantity").textContent = json.qty
+            location.reload();
+        },
 
-    $.ajax({
-    type: 'POST',
-    url: '{% url 'cart_update' %}',
-    data: {
-      product_id: $(this).data('index'),
-      product_qty: $('#select' + productid + ' option:selected').text(),
-      csrfmiddlewaretoken: '{{ csrf_token }}',
-      action: 'post'
-    },
-    success: function(json){
-        //console.log(json)
-        //document.getElementById("cart_quantity").textContent = json.qty
-        location.reload();
-    },
+        error: function(xhr, errmsg, err){
 
-    error: function(xhr, errmsg, err){
-
-    }
-
-
-    });
-
-})
-
-// Delete Item From Cart
-$(document).on('click', '.delete-product', function(e){
-    e.preventDefault();
-    // grab the product id
-    //var productid = $(this).data('index');
-
-    $.ajax({
-    type: 'POST',
-    url: '{% url 'cart_delete' %}',
-    data: {
-      product_id: $(this).data('index'),
-      csrfmiddlewaretoken: '{{ csrf_token }}',
-      action: 'post'
-    },
-    success: function(json){
-        //console.log(json)
-        //document.getElementById("cart_quantity").textContent = json.qty
-        location.reload();
-    },
-
-    error: function(xhr, errmsg, err){
-
-    }
+        }
 
 
-    });
+        });
 
-})
+    })
+
+    // Delete Item From Cart
+    $(document).on('click', '.delete-product', function(e){
+        e.preventDefault();
+        // grab the product id
+        //var productid = $(this).data('index');
+
+        $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_delete' %}',
+        data: {
+          product_id: $(this).data('index'),
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          action: 'post'
+        },
+        success: function(json){
+            //console.log(json)
+            //document.getElementById("cart_quantity").textContent = json.qty
+            location.reload();
+        },
+
+        error: function(xhr, errmsg, err){
+
+        }
 
 
+        });
 
+    })
 
-</script>
+  </script>
+{% endblock %}
 
 
 {% endblock %}

@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import Product, Order, Category
+from .models import Product, Category
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -24,16 +24,3 @@ class CategoryForm(forms.ModelForm):
         
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
-
-class OrderForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ['full_name', 'email', 'address']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control'
-    
-

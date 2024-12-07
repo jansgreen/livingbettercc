@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .cart import Cart
-from store.models import Product
+from shop.models import Product
 from django.http import JsonResponse
 from django.contrib import messages
 
@@ -11,8 +11,6 @@ def cart_summary(request):
 	quantities = cart.get_quants
 	totals = cart.cart_total()
 	return render(request, "cart_summary.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals})
-
-
 
 
 def cart_add(request):
@@ -26,9 +24,9 @@ def cart_add(request):
 
 		# lookup product in DB
 		product = get_object_or_404(Product, id=product_id)
-		
+	
 		# Save to session
-		cart.add(product=product, quantity=product_qty)
+		cart.add(product_id, product_qty)
 
 		# Get Cart Quantity
 		cart_quantity = cart.__len__()
@@ -51,7 +49,6 @@ def cart_delete(request):
 		#return redirect('cart_summary')
 		messages.success(request, ("Item Deleted From Shopping Cart..."))
 		return response
-
 
 def cart_update(request):
 	cart = Cart(request)

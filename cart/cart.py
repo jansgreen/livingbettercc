@@ -1,4 +1,5 @@
-from store.models import Product, Profile
+from shop.models import Product
+from authentication.models import Profile
 
 class Cart():
 	def __init__(self, request):
@@ -19,6 +20,7 @@ class Cart():
 	def db_add(self, product, quantity):
 		product_id = str(product)
 		product_qty = str(quantity)
+		print(product_qty, product_id)
 		# Logic
 		if product_id in self.cart:
 			pass
@@ -38,10 +40,7 @@ class Cart():
 			# Save carty to the Profile Model
 			current_user.update(old_cart=str(carty))
 
-
-	def add(self, product, quantity):
-		product_id = str(product.id)
-		product_qty = str(quantity)
+	def add(self, product_id, product_qty):
 		# Logic
 		if product_id in self.cart:
 			pass
@@ -60,6 +59,9 @@ class Cart():
 			carty = carty.replace("\'", "\"")
 			# Save carty to the Profile Model
 			current_user.update(old_cart=str(carty))
+			
+		thing = self.cart
+		return thing
 
 	def cart_total(self):
 		# Get product IDS
@@ -81,11 +83,7 @@ class Cart():
 					else:
 						total = total + (product.price * value)
 
-
-
 		return total
-
-
 
 	def __len__(self):
 		return len(self.cart)

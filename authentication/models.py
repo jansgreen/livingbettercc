@@ -19,6 +19,7 @@ class Profile(models.Model):
     roll = models.CharField(max_length=100, blank=True, null=True)
     imagen = models.ImageField(upload_to='Profile/', default='profiles/default.jpg')
     direccion = models.ForeignKey('Direccion', on_delete=models.SET_NULL, null=True, blank=True, related_name='Direcciones')
+    old_cart = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

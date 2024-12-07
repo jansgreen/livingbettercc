@@ -4,7 +4,7 @@ from payment.forms import ShippingForm, PaymentForm
 from payment.models import ShippingAddress, Order, OrderItem
 from django.contrib.auth.models import User
 from django.contrib import messages
-from store.models import Product, Profile
+from authentication.models import Profile
 import datetime
 
 # Import Some Paypal Stuff
@@ -46,8 +46,6 @@ def orders(request, pk):
 	else:
 		messages.success(request, "Access Denied")
 		return redirect('home')
-
-
 
 def not_shipped_dash(request):
 	if request.user.is_authenticated and request.user.is_superuser:
@@ -156,9 +154,6 @@ def process_order(request):
 
 			messages.success(request, "Order Placed!")
 			return redirect('home')
-
-			
-
 		else:
 			# not logged in
 			# Create Order
@@ -192,93 +187,96 @@ def process_order(request):
 				if key == "session_key":
 					# Delete the key
 					del request.session[key]
+					messages.success(request, "Order Placed!")
+					return redirect('home')
 
+				else:
+					messages.success(request, "Access Denied")
+					return redirect('home')
 
-
-			messages.success(request, "Order Placed!")
-			return redirect('home')
-
-
-	else:
-		messages.success(request, "Access Denied")
-		return redirect('home')
+from django.contrib import messages
+from django.shortcuts import redirect, render
+from paypal.standard.forms import PayPalPaymentsForm
+import uuid
 
 def billing_info(request):
-	if request.POST:
-		# Get the cart
-		cart = Cart(request)
-		cart_products = cart.get_prods
-		quantities = cart.get_quants
-		totals = cart.cart_total()
+    if request.method == "POST":
+        # Obtén el carrito
+        cart = Cart(request)
+        cart_products = cart.get_prods()
+        quantities = cart.get_quants()
+        totals = cart.cart_total()
 
-		# Create a session with Shipping Info
-		my_shipping = request.POST
-		request.session['my_shipping'] = my_shipping
+        # Guarda la información de envío en la sesión
+        shipping_info = {
+            key: value for key, value in request.POST.items()
+            if key in ['name', 'address', 'city', 'state', 'zip_code', 'country']
+        }
+        request.session['my_shipping'] = shipping_info
 
-		# Get the host
-		host = request.get_host()
-		# Create Paypal Form Dictionary
-		paypal_dict = {
-			'business': settings.PAYPAL_RECEIVER_EMAIL,
-			'amount': totals,
-			'item_name': 'Book Order',
-			'no_shipping': '2',
-			'invoice': str(uuid.uuid4()),
-			'currency_code': 'USD', # EUR for Euros
-			'notify_url': 'https://{}{}'.format(host, reverse("paypal-ipn")),
-			'return_url': 'https://{}{}'.format(host, reverse("payment_success")),
-			'cancel_return': 'https://{}{}'.format(host, reverse("payment_failed")),
-		}
+        # Crea el diccionario para PayPal
+        host = request.get_host()
+        paypal_dict = {
+            'business': settings.PAYPAL_RECEIVER_EMAIL,
+            'amount': totals,
+            'item_name': 'Book Order',
+            'no_shipping': '2',
+            'invoice': str(uuid.uuid4()),
+            'currency_code': 'USD',  # Cambia a EUR si necesitas Euros
+            'notify_url': f'https://{host}{reverse("paypal-ipn")}',
+            'return_url': f'https://{host}{reverse("payment_success")}',
+            'cancel_return': f'https://{host}{reverse("payment_failed")}',
+        }
 
-		# Create acutal paypal button
-		paypal_form = PayPalPaymentsForm(initial=paypal_dict)
+        # Crea el botón de PayPal
+        paypal_form = PayPalPaymentsForm(initial=paypal_dict)
 
+        # Crea el formulario de pago (billing)
+        billing_form = PaymentForm()
 
-		# Check to see if user is logged in
-		if request.user.is_authenticated:
-			# Get The Billing Form
-			billing_form = PaymentForm()
-			return render(request, "payment/billing_info.html", {"paypal_form":paypal_form, "cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_info":request.POST, "billing_form":billing_form})
+        # Renderiza el template
+        context = {
+            "paypal_form": paypal_form,
+            "cart_products": cart_products,
+            "quantities": quantities,
+            "totals": totals,
+            "shipping_info": shipping_info,
+            "billing_form": billing_form,
+        }
+        return render(request, "payment/billing_info.html", context)
 
-		else:
-			# Not logged in
-			# Get The Billing Form
-			billing_form = PaymentForm()
-			return render(request, "payment/billing_info.html", {"paypal_form":paypal_form, "cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_info":request.POST, "billing_form":billing_form})
-
-
-		
-		shipping_form = request.POST
-		return render(request, "payment/billing_info.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form})	
-	else:
-		messages.success(request, "Access Denied")
-		return redirect('home')
-
+    # Si no es POST, deniega el acceso
+    messages.error(request, "Acceso denegado. Por favor, completa el formulario de envío.")
+    return redirect('home')
 
 def checkout(request):
-	# Get the cart
-	cart = Cart(request)
-	cart_products = cart.get_prods
-	quantities = cart.get_quants
-	totals = cart.cart_total()
+    # Obtén el carrito
+    cart = Cart(request)
+    cart_products = cart.get_prods()
+    quantities = cart.get_quants()
+    totals = cart.cart_total()
 
-	if request.user.is_authenticated:
-		# Checkout as logged in user
-		# Shipping User
-		shipping_user = ShippingAddress.objects.get(user__id=request.user.id)
-		# Shipping Form
-		shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
-		return render(request, "payment/checkout.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form })
-	else:
-		# Checkout as guest
-		shipping_form = ShippingForm(request.POST or None)
-		return render(request, "payment/checkout.html", {"cart_products":cart_products, "quantities":quantities, "totals":totals, "shipping_form":shipping_form})
+    # Lógica para usuario autenticado
+    if request.user.is_authenticated:
+        # Verifica si existe una dirección de envío o crea una
+        shipping_user, created = ShippingAddress.objects.get_or_create(user=request.user)
+        # Inicializa el formulario con los datos del usuario o la nueva instancia
+        shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
+    else:
+        # Lógica para usuarios no autenticados
+        shipping_form = ShippingForm(request.POST or None)
 
-	
+    # Renderiza el template con los datos
+    context = {
+        "cart_products": cart_products,
+        "quantities": quantities,
+        "totals": totals,
+        "shipping_form": shipping_form,
+    }
+    return render(request, "payment/checkout.html", context)
 
 def payment_success(request):
 	return render(request, "payment/payment_success.html", {})
-
 
 def payment_failed(request):
 	return render(request, "payment/payment_failed.html", {})

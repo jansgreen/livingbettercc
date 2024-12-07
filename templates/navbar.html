@@ -8,42 +8,29 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-        {% for menu in menu_home %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{menu.url}}">{{menu.nombre}}</a>
-            </li>
-        {% endfor %}
+            {% if menu_home %}
+                {% for  menu in menu_home %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ menu.url }}">
+                            {{ menu.nombre }}
+                        </a>
+                    </li>
+                {% endfor %}
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'contactanos'%}">Contactanos</a>
             </li>
         </ul>
         <ul class="navbar-nav ms-auto">
 
-            {% if cart.itemcart_set.all %}
-                <il class="nav-item me-3">
-                    <a href="{% url 'view_cart'%}">
-                        <i class="bi bi-cart4 text-light"><span class="badge text-bg-primary rounded-pill">
-                            {% for item in cart.itemcart_set.all %}
-                                {{item.cantidad }}
-                            {% endfor %}
-                        </span>
-                        </i>
-                    </a>
-                </il>
-            {%endif %}
-
-            {% for menu in menu_cart %}
-                <div class="accordion-item">
-                <il class="nav-item me-3">
-                    <a href="{% url 'view_cart' %}">
-                        <i class="bi bi-cart4 text-light"><span class="badge text-bg-primary rounded-pill">
-                                {{menu.cantidad }}
-                        </span>
-                        </i>
-                    </a>
-                </il>
-                </div>
-            {% endfor %}
+            {% if cart_length %}
+            <li>
+                <a class="text-decoration-none text-white me-3" href="{{ menu_cart }}">
+                    <i class="bi bi-cart4">{{ cart_length }}</i>
+                </a>
+            </li>
+            {% endif %}
+            
 
                 {% if user.is_authenticated %}
                     <li class="nav-item me-3">

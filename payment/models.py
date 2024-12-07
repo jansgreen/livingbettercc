@@ -38,7 +38,7 @@ post_save.connect(create_shipping, sender=User)
 # Create Order Model
 class Order(models.Model):
 	# Foreign Key
-	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='payment_orders')
 	full_name = models.CharField(max_length=250)
 	email = models.EmailField(max_length=250)
 	shipping_address = models.TextField(max_length=15000)

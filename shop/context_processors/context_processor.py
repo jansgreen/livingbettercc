@@ -1,32 +1,5 @@
 from shop.models import Cart, CartItem
 
-def obtener_menu_cart(request):
-    # Iniciar cantidad en 0
-    cantidad = 0
-
-    # Verificar si el usuario tiene un carrito activo
-    if request.user.is_authenticated:
-        cart = Cart.objects.filter(id=request.session.get('cart_id')).first()
-        if cart:
-            cantidad = CartItem.objects.filter(cart=cart).count()
-
-    # Construir submenús condicionalmente
-    submenus = [
-        {'nombre': 'Cart', 'url': '/shop/cart/'},
-    ]
-
-    # Retornar el menú con la cantidad
-    return {
-        'menu_cart': [
-            {
-                'nombre': 'Cart',
-                'url': '#',  # Aquí puedes usar # porque no es un enlace directo.
-                'submenus': submenus,
-                'cantidad': cantidad,  # Incluye la cantidad en el contexto
-            }
-        ]
-    }
-
 def obtener_menu_shop(request):
     menu = [
         {
