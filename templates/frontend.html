@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
+
     {% if page_type == 'homepage' %}
         <meta name="title" content="{{ meta_title }}">
         <meta name="description" content="{{ meta_description }}">
@@ -35,7 +36,9 @@
     <link href="{{BOOTSTRAP_CSS}}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'bootstrap/bootstrap-icons/font/bootstrap-icons.css' %}">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    
+    <!-- Bootstrap CSS -->
+<!-- Bootstrap Bundle (incluye Popper.js) -->
+
     <style>
         body {
             padding-top: 56px;
@@ -79,7 +82,7 @@
      {% include 'footer.html'%}
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 {% block extra_js %}
 {% endblock %}
 <script src="{% static 'js/javascripts.js' %}"></script>

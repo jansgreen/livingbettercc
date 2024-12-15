@@ -249,22 +249,29 @@ def billing_info(request):
     messages.error(request, "Acceso denegado. Por favor, completa el formulario de envío.")
     return redirect('home')
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.urls import reverse
+
 def checkout(request):
+    # Redirige a login si el usuario no está autenticado
+    if not request.user.is_authenticated:
+        # Guarda el carrito en la sesión para recuperarlo después del login
+        request.session['cart_data'] = request.session.get('cart', {})
+        # Redirige a la página de login con el parámetro `next`
+        login_url = f"{reverse('login')}?next={request.path}"
+        return redirect(login_url)
+
     # Obtén el carrito
     cart = Cart(request)
     cart_products = cart.get_prods()
     quantities = cart.get_quants()
     totals = cart.cart_total()
 
-    # Lógica para usuario autenticado
-    if request.user.is_authenticated:
-        # Verifica si existe una dirección de envío o crea una
-        shipping_user, created = ShippingAddress.objects.get_or_create(user=request.user)
-        # Inicializa el formulario con los datos del usuario o la nueva instancia
-        shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
-    else:
-        # Lógica para usuarios no autenticados
-        shipping_form = ShippingForm(request.POST or None)
+    # Verifica si existe una dirección de envío o crea una
+    shipping_user, created = ShippingAddress.objects.get_or_create(user=request.user)
+    # Inicializa el formulario con los datos del usuario o la nueva instancia
+    shipping_form = ShippingForm(request.POST or None, instance=shipping_user)
 
     # Renderiza el template con los datos
     context = {
