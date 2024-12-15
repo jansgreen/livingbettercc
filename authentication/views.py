@@ -70,7 +70,7 @@ def ProfileFunction(request):
             'forms': forms, 
         }
 
-    return render(request, 'profile.html', context)
+    return render(request, 'Profile.html', context)
 
 def direccion(request):
     user = request.user
