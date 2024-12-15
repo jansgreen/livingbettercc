@@ -49,7 +49,7 @@ def custom_logout_view(request):
 
 def ProfileFunction(request):
     current_user = request.user
-    profile= Profile.objects.get(user=current_user)
+    profile= Profile.objects.filter(user=current_user).exists()
 
     if request.method == 'POST':
         forms = Profileforms(request.POST, request.FILES, instance=profile)
@@ -57,16 +57,18 @@ def ProfileFunction(request):
             # Guardar campos ocultos desde el JavaScript
             forms.save()  # Guarda y retorna la instancia
             messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
-                        
             return redirect('direccion')
         else:
             messages.error(request, 'Por favor, corrige los errores en el formulario.')
-    else:
-        forms = Profileforms()
+    elif profile:
         context = {
-                'forms': forms, 
                 'profile': profile, 
-                   }  
+                    }
+    else: 
+        forms = Profileforms()
+        context={
+            'forms': forms, 
+        }
 
     return render(request, 'profile.html', context)
 

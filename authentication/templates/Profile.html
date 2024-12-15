@@ -8,37 +8,38 @@
     </div>
     <div class="card-body">
       <p>Email: {{user.email}}</p>
-      <img src="{{ user.profile.image.urls }}" alt="" width="300" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
-      <div class="mb-3">
-        <p class="form-label">Nombres: {{ profile.user.first_name|capfirst}}</p>
-      </div>
-      <div class="mb-3">
-        <p class="form-label">Apellidos: {{ profile.user.last_name|capfirst}}</p>
-        <p class="form-label">Genero: {{ profile.genero|capfirst}}</p>
-        <p class="form-label">Fecha de Nacimiento: {{ profile.fecha_nacimiento|capfirst}}</p>
-        <p class="form-label">Telefono: {{ profile.telefono|capfirst}}</p>
-        <p class="form-label">Numero Identidad: {{ profile.numero_identidad|capfirst}}</p>
-        <p class="form-label">Profesion: {{ profile.profesion|capfirst}}</p>
-        <p class="form-label">Roll en Living Better: {{ profile.roll|capfirst}}</p>
-        {% if Register not in  profile.user.groups.all%}
-          {% for group in profile.user.groups.all%}
-          <p>Nivel de Acceso: {{group|capfirst}}</p>
-          {% endfor %}
-        {% endif %}
-        <div class="card p-3 bg-ligth">
-        <p class="form-label">Direccion: {{profile.user.direccion}}</p>
-        {% if profile.direccion %}
-        <p>{{profile.direccion}}</p>
-        <a href="{% url 'eliminar_direccion' profile.direccion.id %}"> Eliminar Direccion</a>
-        <a href="{% url 'actualizar_direccion' profile.direccion.id %}"> Cambiar Direccion</a>
-        {% else %}
-        <a href="{% url 'direccion' %}"> Crear Direccion</a>
-        {% endif %}
+      {% if profile %}
+        <img src="{{ user.profile.image.urls }}" alt="" width="300" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+        <div class="mb-3">
+          <p class="form-label">Nombres: {{ profile.user.first_name|capfirst}}</p>
         </div>
+        <div class="mb-3">
+          <p class="form-label">Apellidos: {{ profile.user.last_name|capfirst}}</p>
+          <p class="form-label">Genero: {{ profile.genero|capfirst}}</p>
+          <p class="form-label">Fecha de Nacimiento: {{ profile.fecha_nacimiento|capfirst}}</p>
+          <p class="form-label">Telefono: {{ profile.telefono|capfirst}}</p>
+          <p class="form-label">Numero Identidad: {{ profile.numero_identidad|capfirst}}</p>
+          <p class="form-label">Profesion: {{ profile.profesion|capfirst}}</p>
+          <p class="form-label">Roll en Living Better: {{ profile.roll|capfirst}}</p>
+          {% if Register not in  profile.user.groups.all%}
+            {% for group in profile.user.groups.all%}
+            <p>Nivel de Acceso: {{group|capfirst}}</p>
+            {% endfor %}
+          {% endif %}
+          <div class="card p-3 bg-ligth">
+          <p class="form-label">Direccion: {{profile.user.direccion}}</p>
+          {% if profile.direccion %}
+          <p>{{profile.direccion}}</p>
+          <a href="{% url 'eliminar_direccion' profile.direccion.id %}"> Eliminar Direccion</a>
+          <a href="{% url 'actualizar_direccion' profile.direccion.id %}"> Cambiar Direccion</a>
+          {% else %}
+          <a href="{% url 'direccion' %}"> Crear Direccion</a>
+          {% endif %}
+          </div>
 
 
-      </div>
-      {% if not profile %}
+        </div>
+      {% else %}
       <form method="POST" action="{% url 'ProfileFunction' %}" enctype="multipart/form-data" id="myForm">
         {% csrf_token %}
           <!-- Recorre todos los campos del formulario -->
