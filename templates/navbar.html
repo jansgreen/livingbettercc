@@ -36,7 +36,7 @@
                     <li class="nav-item me-3">
                         <div class="dropdown">
                             <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="{{ user.profile.image.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                            <img src="{{ user.profile.imagen.url }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
                             <strong>{{ user.username | capfirst }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">

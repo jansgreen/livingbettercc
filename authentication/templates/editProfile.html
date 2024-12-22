@@ -18,6 +18,7 @@
                             {% if field.name not in "user genero numero_identidad first_name last_name fecha_nacimiento" %}
                             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                             {{field}}
+                            
                             {% endif %}
 
                         </div>

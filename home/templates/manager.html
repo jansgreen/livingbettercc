@@ -4,15 +4,16 @@
         {% if user in managers.all %}
         <a href="{% url 'edit_biography'%}" class="btn btn-primary m-3">Crear Biografia</a>
         {% endif %}
+        <div class="row"><h2>Directivas</h2></div>
 
         {% for manager in managers %}
             {% if manager.profile %}
-            <div class="row"><h2>Directivas</h2></div>
 
             <a href="{% url 'leerBio' manager.id %}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-                <img src="{{ manager.profile.image.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                <img src="{{ manager.profile.imagen.url}}" alt="" width="32" height="32" class="rounded-circle me-2" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
                 <div class="d-flex gap-2 w-100 justify-content-between">
                     <div>
+                        {{ manager.profile.imagen.url }}
                         <h6 class="mb-0">{{ manager.first_name | capfirst }} {{ manager.last_name | capfirst }}</h6>
                         <small>{{ manager.profile.profesion }}. </small>
                         <small>{{ manager.profile.roll |capfirst }}/ LBCC </small>

@@ -125,10 +125,14 @@ def edit_profile(request):
         return redirect('some_error_page')
 
     forms_Address = DireccionForm()
-    forms = Profileforms()
+    forms = Profileforms(instance=profile)  # Pasar el perfil actual para inicializar el formulario
 
     if request.method == "POST":
+        # Procesar datos de los formularios
+        forms = Profileforms(request.POST, request.FILES, instance=profile, user=request.user)
         datas = request.POST
+        files = request.FILES  # Archivos enviados, incluidas imágenes
+
         for action, info in datas.items():
             if info:  # Validar que la información no esté vacía
                 if action in ['calle_y_casa', 'sector_o_barrio', 'provincia', 'municipio', 'zip']:
@@ -145,7 +149,12 @@ def edit_profile(request):
                     # Actualiza campos del perfil directamente
                     if hasattr(profile, action):
                         setattr(profile, action, info)
-                        profile.save()
+
+        # Procesar y guardar la imagen, si se subió
+        print(files['imagen'])
+        if 'imagen' in files:  # Suponiendo que el campo del formulario se llama 'image'
+            profile.imagen = files['imagen']
+            profile.save()
 
         # Mensaje de éxito
         messages.success(request, 'Perfil actualizado exitosamente.')
@@ -157,7 +166,6 @@ def edit_profile(request):
         'profile': profile,
     }
     return render(request, 'editProfile.html', context)
-
 
 @login_required
 def edit_biography(request):
@@ -181,7 +189,7 @@ def edit_biography(request):
 
 def leerBio(request, pk):
     managers = User.objects.filter(groups__name='manager').select_related('profile')
-    articles = Biography.objects.filter(pk=pk)
+    articles = Biography.objects.filter(user=pk)
     context={
         'articles':articles,
         'managers':managers,
