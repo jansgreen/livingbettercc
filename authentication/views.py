@@ -48,28 +48,35 @@ def custom_logout_view(request):
     return redirect('home')  # Redirige a 'home' o a la página que desees después 
 
 def ProfileFunction(request):
-    current_user = request.user
-    profile= Profile.objects.filter(user=current_user).exists()
+    try:
+        # Obtener el perfil del usuario si existe
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        profile = None  # Si no existe, dejamos profile como None
 
     if request.method == 'POST':
-        forms = Profileforms(request.POST, request.FILES, instance=profile)
+        # Si el perfil existe, se pasa como instancia al formulario; de lo contrario, se crea uno nuevo
+        forms = Profileforms(request.POST, request.FILES, instance=profile, user=request.user)
         if forms.is_valid():
-            # Guardar campos ocultos desde el JavaScript
-            forms.save()  # Guarda y retorna la instancia
+            user = request.user
+            user.first_name = forms.cleaned_data.get('first_name', user.first_name)
+            user.last_name = forms.cleaned_data.get('last_name', user.last_name)
+            user.save()
+            profile = forms.save(commit=False)
+            profile.user = request.user  # Aseguramos que el perfil esté relacionado con el usuario
+            profile.save()  # Guarda y retorna la instancia
             messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
             return redirect('direccion')
         else:
             messages.error(request, 'Por favor, corrige los errores en el formulario.')
-    elif profile:
-        context = {
-                'profile': profile, 
-                    }
-    else: 
-        forms = Profileforms()
-        context={
-            'forms': forms, 
-        }
+    else:
+        # Si no es POST, inicializa el formulario con la instancia existente o vacío
+        forms = Profileforms(instance=profile, user=request.user)
 
+    # Renderizar el formulario en el contexto
+    context = {
+        'profile': profile,
+        'forms': forms}
     return render(request, 'Profile.html', context)
 
 def direccion(request):
@@ -111,60 +118,46 @@ def eliminar_direccion(request, direccion_id):
 
 def edit_profile(request):
     # Obtén el perfil del usuario actual o redirige si no existe
-    profile = get_object_or_404(Profile, user=request.user)
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        messages.error(request, "No se encontró el perfil del usuario.")
+        return redirect('some_error_page')
+
+    forms_Address = DireccionForm()
+    forms = Profileforms()
 
     if request.method == "POST":
-        action = request.POST.get('action', '')
-        # Mapeo de acciones a campos de perfil
-        actions_map = {
-            'edit_first_name': 'first_name',
-            'edit_last_name': 'last_name',
-            'edit_telefono': 'telefono',
-            'edit_profesion': 'profesion',
-            'edit_puesto': 'puesto',
-            'edit_image': 'Foto de perfil',
-            'edit_numero_identidad': 'numero_identidad',
-            'edit_direccion': [
-                'calle_y_casa', 
-                'sector_o_barrio', 
-                'provincia', 
-                'municipio', 
-                'zip',
-            ]
-        }
+        datas = request.POST
+        for action, info in datas.items():
+            if info:  # Validar que la información no esté vacía
+                if action in ['calle_y_casa', 'sector_o_barrio', 'provincia', 'municipio', 'zip']:
+                    # Actualiza múltiples campos de dirección (asegúrate de tener un campo 'direccion')
+                    if hasattr(profile, 'direccion'):
+                        direccion = getattr(profile, 'direccion', None)
+                        if direccion:  # Si la dirección existe
+                            setattr(direccion, action, info)
+                            direccion.save()
+                        else:
+                            messages.error(request, "No se encontró la dirección asociada al perfil.")
+                            return redirect('some_error_page')
+                else:
+                    # Actualiza campos del perfil directamente
+                    if hasattr(profile, action):
+                        setattr(profile, action, info)
+                        profile.save()
 
-        # Actualizar el perfil basado en la acción
-        if action in actions_map:
-
-            if action == 'edit_direccion':
-                # Actualiza múltiples campos para dirección
-                profile.calle_y_casa = request.POST.get('calle_y_casa', profile.calle_y_casa)
-                profile.sector_o_barrio = request.POST.get('sector_o_barrio', profile.sector_o_barrio)
-                profile.provincia = request.POST.get('provincia', profile.provincia)
-                profile.municipio = request.POST.get('municipio', profile.municipio)
-                profile.codigo_postal = request.POST.get('zip', profile.codigo_postal)
-            elif  action =='edit_first_name':
-                user = request.user
-                user.first_name = request.POST.get('firstname')
-                user.save()
-            elif  action =='edit_last_name':
-                user = request.user
-                user.last_name = request.POST.get('lastname')                
-                user.save()
-
-            else:
-                # Actualiza un solo campo
-                setattr(profile, actions_map[action], request.POST.get(actions_map[action], getattr(profile, actions_map[action])))
-
-            # Guardar los cambios en el perfil
-                profile.save()
-
-            # Mensaje de éxito
-            messages.success(request, 'Perfil actualizado exitosamente.')
+        # Mensaje de éxito
+        messages.success(request, 'Perfil actualizado exitosamente.')
         return redirect('ProfileFunction')
-    
-    else:
-        print("not paso el metodo")
+
+    context = {
+        'forms': forms,
+        'forms_Address': forms_Address,
+        'profile': profile,
+    }
+    return render(request, 'editProfile.html', context)
+
 
 @login_required
 def edit_biography(request):

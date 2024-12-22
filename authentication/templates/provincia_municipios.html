@@ -1,6 +1,26 @@
+
+
+{% if forms_Address %}
+  {% for field in forms_Address %}
+    {% if field.name == "calle_y_casa" or field.name == "sector_o_barrio"%}
+      <div class="mb-3">
+        <label for="{{field.label}}" class="form-label">{{field.label}}</label>
+        <input type="text" class="form-control" name="{{field.name}}" id="{{field.name}}">
+      </div>
+    {% else %}
+      <div class="col-md-4">
+        <label for="{{field.name.for_or_id}}" class="form-label">{{field.label}}</label>
+        <select class="form-select" {% if field.name|lower == "codigo_postal"%} id="{{field.name|lower}}" {% else %} id="{{field.name|lower|add:'s'}}" {% endif %} required="" {% if field.name|lower == "codigo_postal"%} name="{{field.name|lower}}"   {% else %}  name="{{field.name|lower|add:'s'}}" {% endif %} >
+          <option value="">...</option>
+        </select>
+        <div class="invalid-feedback">Selecciona tu Municipio.</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+{% else%}
 <div class="col-md-4">
   <label for="provincias" class="form-label">Provincias</label>
-  <select class="form-select" id="provincia" required="" name="provincia">
+  <select class="form-select" id="provincias" required="" name="provincias">
     <option value="Distrito Nacional">Distrito Nacional</option>
     <option value="Azua">Azua</option>
     <option value="Bahoruco">Bahoruco</option>
@@ -37,7 +57,7 @@
 </div>
 
 <div class="col-md-4">
-  <label for="state" class="form-label">Municipio</label>
+  <label for="municipios" class="form-label">Municipio</label>
   <select class="form-select" id="municipios" required="" name="municipios">
     <option value="">...</option>
   </select>
@@ -45,9 +65,133 @@
 </div>
 
 <div class="col-md-4">
-  <label for="state" class="form-label">Codigo Postal</label>
+  <label for="codigo_postal" class="form-label">Codigo Postal</label>
   <select class="form-select" id="codigo_postal" required="" name="codigo_postal">
     <option value="">...</option>
   </select>
   <div class="invalid-feedback">Este es tu codigo postal.</div>
 </div>
+{% endif %}
+
+{% block extra_js%}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const provinciasSelect = document.getElementById("provincias");
+    if (provinciasSelect) {
+      // Provincias a agregar al select
+      const provincias = [
+        "Distrito Nacional", "Azua", "Bahoruco", "Barahona", "Dajabón", "Duarte", 
+        "Elías Piña", "El Seibo", "Espaillat", "Hato Mayor", "Hermanas Mirabal", 
+        "Independencia", "La Altagracia", "La Romana", "La Vega", "María Trinidad Sánchez", 
+        "Monseñor Nouel", "Monte Cristi", "Monte Plata", "Pedernales", "Peravia", 
+        "Puerto Plata", "Samaná", "San Cristóbal", "San José de Ocoa", "San Juan", 
+        "San Pedro de Macorís", "Sánchez Ramírez", "Santiago", "Santiago Rodríguez", 
+        "Valverde"
+      ];
+
+      // Vaciar las opciones actuales (si las hay)
+      provinciasSelect.innerHTML = "<option value=''>...</option>";  // Reinicia las opciones
+
+      // Agregar las opciones de provincias
+      provincias.forEach(function(provincia) {
+        const option = document.createElement("option");
+        option.value = provincia;
+        option.textContent = provincia;
+        provinciasSelect.appendChild(option);
+      });
+    }
+  });
+</script>
+
+<script>const provincias = {
+  "Distrito Nacional": ["Santo Domingo"],
+  "Azua": ["Azua de Compostela", "Estebanía", "Guayabal", "Las Charcas", "Las Yayas de Viajama", "Padre Las Casas", "Peralta", "Sabana Yegua", "Tábara Arriba"],
+  "Bahoruco": ["Neiba", "Galván", "Los Ríos", "Tamayo", "Villa Jaragua"],
+  "Barahona": ["Santa Cruz de Barahona", "Cabral", "El Peñón", "Enriquillo", "Fundación", "Jaquimeyes", "La Ciénaga", "Las Salinas", "Paraíso", "Polo"],
+  "Dajabón": ["Dajabón", "El Pino", "Loma de Cabrera", "Partido", "Restauración"],
+  "Duarte": ["San Francisco de Macorís", "Arenoso", "Castillo", "Eugenio María de Hostos", "Las Guáranas", "Pimentel", "Villa Riva"],
+  "Elías Piña": ["Comendador", "Bánica", "El Llano", "Hondo Valle", "Pedro Santana", "Juan Santiago"],
+  "El Seibo": ["Santa Cruz de El Seibo", "Miches", "Pedro Sánchez"],
+  "Espaillat": ["Moca", "Cayetano Germosén", "Gaspar Hernández", "Jamao al Norte"],
+  "Hato Mayor": ["Hato Mayor del Rey", "El Valle", "Sabana de la Mar"],
+  "Hermanas Mirabal": ["Salcedo", "Tenares", "Villa Tapia"],
+  "Independencia": ["Jimaní", "Cristóbal", "Duvergé", "La Descubierta", "Mella", "Postrer Río"],
+  "La Altagracia": ["Higüey", "San Rafael del Yuma"],
+  "La Romana": ["La Romana", "Guaymate", "Villa Hermosa"],
+  "La Vega": ["Concepción de La Vega", "Jarabacoa", "Constanza", "Jima Abajo"],
+  "María Trinidad Sánchez": ["Nagua", "Cabrera", "El Factor", "Río San Juan"],
+  "Monseñor Nouel": ["Bonao", "Maimón", "Piedra Blanca"],
+  "Monte Cristi": ["San Fernando de Monte Cristi", "Castañuelas", "Guayubín", "Las Matas de Santa Cruz", "Pepillo Salcedo", "Villa Vásquez"],
+  "Monte Plata": ["Monte Plata", "Bayaguana", "Don Juan", "Peralvillo", "Sabana Grande de Boyá", "Yamasá"],
+  "Pedernales": ["Pedernales", "Oviedo"],
+  "Peravia": ["Baní", "Nizao", "Matanzas"],
+  "Puerto Plata": ["Puerto Plata", "Altamira", "Guananico", "Imbert", "Los Hidalgos", "Luperón", "Sosúa", "Villa Isabela"],
+  "Samaná": ["Santa Bárbara de Samaná", "Las Terrenas", "Sánchez"],
+  "San Cristóbal": ["San Cristóbal", "Bajos de Haina", "Cambita Garabitos", "Los Cacaos", "Sabana Grande de Palenque", "San Gregorio de Nigua", "Villa Altagracia", "Yaguate"],
+  "San José de Ocoa": ["San José de Ocoa", "Rancho Arriba", "Sabana Larga"],
+  "San Juan": ["San Juan de la Maguana", "Bohechío", "El Cercado", "Juan de Herrera", "Las Matas de Farfán", "Vallejuelo"],
+  "San Pedro de Macorís": ["San Pedro de Macorís", "Consuelo", "Guayacanes", "Quisqueya", "Ramón Santana", "San José de los Llanos"],
+  "Sánchez Ramírez": ["Cotuí", "Cevicos", "Fantino", "La Mata"],
+  "Santiago": ["Santiago de los Caballeros", "Baitoa", "Jánico", "Licey al Medio", "Puñal", "San José de las Matas", "Tamboril", "Villa Bisonó (Navarrete)"],
+  "Santiago Rodríguez": ["Sabaneta", "Los Almácigos", "Monción"],
+  "Santo Domingo": ["Santo Domingo Este", "Santo Domingo Norte", "Santo Domingo Oeste", "Boca Chica", "Los Alcarrizos", "Pedro Brand", "San Antonio de Guerra"],
+  "Valverde": ["Mao", "Esperanza", "Laguna Salada"]
+}
+  
+
+const zipCodes = {
+  Azua: "71000",
+  Bahoruco: "81000",
+  Barahona: "81000",
+  Dajabón: "63000",
+  "Distrito Nacional": "10100",
+  Duarte: "31000",
+  "El Seibo": "24000",
+  Espaillat: "57000",
+  "Hato Mayor": "25000",
+  "Hermanas Mirabal": "33000",
+  Independencia: "75000",
+  "La Altagracia": "23000",
+  "La Romana": "22000",
+  "La Vega": "41000",
+  "María Trinidad Sánchez": "33000",
+  "Monseñor Nouel": "41000",
+  "Monte Cristi": "",
+}
+
+
+const provinciaSelect = document.getElementById('provincias');
+const municipiosSelect = document.getElementById('municipios');
+const zip = document.getElementById('codigo_postal');
+
+provinciaSelect.addEventListener('change', function() {
+const provincia = provinciaSelect.value;
+if (provincia) {
+  const municipios = provincias[provincia];
+  const options = municipios.map(municipio => `<option>${municipio}</option>`).join('');
+  municipiosSelect.innerHTML = options;
+  municipiosSelect.disabled = false;
+
+  const zip_code = zipCodes[provincia];
+  console.log(zip_code);
+  zip.innerHTML =  `<option>${zip_code}</option>`;
+  zip.disabled = false;
+  
+
+}if(provincia){
+  const zip_code = zipCodes[provincia];
+  const options = zip_code.map(zipC => `<option>${zipC}</option>`).join('');
+  zip.innerHTML = options;
+  zip.disabled = false
+
+} else {
+  municipiosSelect.innerHTML = '<option value="">--</option>';
+  municipiosSelect.disabled = true;
+  zip.innerHTML = '<option value="">--</option>';
+  zip.disabled = true
+}
+
+
+});
+</script>
+{% endblock %}

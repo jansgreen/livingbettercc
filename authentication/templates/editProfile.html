@@ -1,0 +1,37 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+    <div class="container py-5">
+        <h2 class="mb-4">Editar Perfil</h2>
+        <div class="card shadow">
+            <div class="card-body">
+                <form method="POST" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h3> {{request.user|capfirst}}</h3>
+                    <h6 >{{request.user.first_name}} {{ request.user.last_name }}</h6>
+                    <h6 >Genero: {{request.user.profile.genero}}</h6>
+                    <h6> Numero de Identidad: {{ request.user.profile.numero_identidad }}</h6>
+                    <h6> Fecha de Nacimiento : {{ request.user.profile.fecha_nacimiento }}</h6>
+
+                    {% for field in forms %}
+                        <div class="form-group mb-3">
+                            {% if field.name not in "user genero numero_identidad first_name last_name fecha_nacimiento" %}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{field}}
+                            {% endif %}
+
+                        </div>
+                    {% endfor %}
+
+                    <h4 class="mt-4">Dirección</h4>
+                    {% include 'provincia_municipios.html' %}
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

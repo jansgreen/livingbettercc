@@ -147,28 +147,27 @@ class Profileforms(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control'
 
-    def save(self, commit=True):
-        # Guardar cambios en el modelo Profile y User
-        profile = super().save(commit=False)
-        user = profile.user  # Obtener el usuario relacionado
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        if commit:
-            user.save()  # Guardar cambios en User
-            profile.save()  # Guardar cambios en Profile
-        return profile
-
 class DireccionForm(forms.ModelForm):
     class Meta:
         model = Direccion
-        fields = ['calle_y_casa', 'sector_o_barrio', 'municipio', 'provincia', 'codigo_postal']
+        fields = ['calle_y_casa', 'sector_o_barrio', 'provincia', 'municipio', 'codigo_postal']
         widgets = {
             'calle_y_casa': forms.TextInput(attrs={'class': 'form-control'}),
             'sector_o_barrio': forms.TextInput(attrs={'class': 'form-control'}),
-            'municipio': forms.HiddenInput(attrs={'class': 'form-control'}),
-            'provincia': forms.HiddenInput(attrs={'class': 'form-control'}),
-            'codigo_postal': forms.HiddenInput(attrs={'class': 'form-control'}),
+            'provincia': forms.TextInput(attrs={'class': 'form-control'}),
+            'municipio': forms.TextInput(attrs={'class': 'form-control'}, ),
+            'codigo_postal': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            # Añade el atributo `name` y `value` dinámicamente
+            field.widget.attrs.update({
+                'name': 'action',
+                'value': f'edit_{field_name}',
+                'class': 'form-control',  # Si usas Bootstrap o similar
+            })
 
 class BiographyForm(forms.ModelForm):
     
