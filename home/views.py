@@ -25,18 +25,25 @@ def home(request):
 def quienes_somos(request):
     # Buscar la categoría con el slug 'quienes_somos'
     user = request.user
+    # Filtrar usuarios con el grupo 'manager' y obtener su perfil
     managers = User.objects.filter(groups__name='manager').select_related('profile')
+
+    # Ordenar los managers colocando a los que tienen el roll 'CEO' primero
+    managers = sorted(managers, key=lambda x: x.profile.roll != 'CEO')
+
+    # Obtener la categoría y los posts relacionados
     category = PageCategory.objects.filter(slug='quienes_somos').first()
     posts = PageContent.objects.filter(category=category)
 
     # Contexto para el template
     context = {
-        'managers':managers,
+        'managers': managers,
         'posts': posts,
-        'user':user,
+        'user': user,
     }
 
     return render(request, 'quienes_somos.html', context)
+
 
 def contactanos(request):
     if request.method == 'POST':

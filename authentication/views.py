@@ -189,6 +189,7 @@ def edit_biography(request):
 
 def leerBio(request, pk):
     managers = User.objects.filter(groups__name='manager').select_related('profile')
+    managers = sorted(managers, key=lambda x: x.profile.roll != 'CEO')
     articles = Biography.objects.filter(user=pk)
     context={
         'articles':articles,
