@@ -4,29 +4,23 @@
 
 <div class="container">
     <div class="row justify-content-md-center">
-        <div class="row ">
-            <div class="col-md-7">
-                    {% for bio in articles %}
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h3>{{bio.user.first_name |capfirst}} {{bio.user.last_name |capfirst}}</h3>
-                                <h6>{{bio.user.profile.profesion |capfirst}}</h6>
-                                <h6>{{bio.user.profile.roll |capfirst}} en Living Better Community Center</h6>
-
-                            </div>
-                            <div class="col-md-4">
-                                <picture>
-                                    <img src="{{ bio.user.profile.imagen.url }}" alt="" width="128" height="128" class="img-fluid " alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
-                                </picture>
-
-                            </div>
-                        </div>
-                        {{bio.biography|safe}}
-                    {% endfor %}
-            </div>
-            <div class="col-md-4">
-                {% include 'manager.html' %}
-            </div>
+        <div class="col-md-7">
+            {% for bio in articles %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>{{bio.user.first_name |capfirst}} {{bio.user.last_name |capfirst}}</h3>
+                        <h6>{{bio.user.profile.profesion |capfirst}}</h6>
+                        <h6>{{bio.user.profile.roll |capfirst}} en Living Better Community Center</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <img src="{{ bio.user.profile.imagen.url }}" width="128" height="128" class="img-fluid " alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
+                    </div>
+                </div>
+                {{bio.biography|safe}}
+            {% endfor %}
+        </div>
+        <div class="col-md-4">
+            {% include 'manager.html' %}
         </div>
     </div>
 </div>
