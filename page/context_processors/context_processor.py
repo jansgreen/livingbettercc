@@ -27,7 +27,6 @@ def obtener_menu_setting(request):
                 menu[0]['submenus'].append({'nombre': 'Carousel', 'url': '/page/carouselPageFunction/'})
                 menu[0]['submenus'].append({'nombre': 'Crear Pestaña', 'url': '/page/crear_PageCategory/'})
                 menu[0]['submenus'].append({'nombre': 'Crear Contenido de la Pestaña', 'url': '/page/create_page_content/'})
-                menu[0]['submenus'].append({'nombre': 'Invitar a usua', 'url': '/groups/invite/'})
                 menu[0]['submenus'].append({'nombre': 'Listar Contenido de la Pestaña', 'url': '/page/page-content-list/'})
 
             return {'menu_setting': menu}

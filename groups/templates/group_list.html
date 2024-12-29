@@ -9,7 +9,7 @@
                 <label for="{{ form_0.id_for_label }}" class="visually-hidden">Group {{ form_0.label }}</label>
             </div>
             <div class="col-12 col-md-4">
-                {{ form_0.name }}
+                {{ form_0.name |capfirst}}
             </div>
             <div class="col-12 col-md-4">
                 <button type="submit" name="action" value="add" class="btn btn-success">Crear Grupo</button>
