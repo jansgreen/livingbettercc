@@ -3,77 +3,46 @@
 
 {% block content %}
 
-        <!-- Header-->
-        <header class="bg-dark py-5">
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Checkout</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Review Your Order...</p>
-                </div>
+<div class="row">
+  <div class="col-sm-6 mb-3 mb-sm-0">
+    <div class="card">
+      <div class="card-header">
+        Billing Info
+      </div>
+      <div class="card-body">
+        <form method="POST" action="{% url 'process_payment' %}">
+          {% csrf_token %}
+          {{ shipping_form.as_p }}
+
+          <hr>
+          <h5>Payment Details</h5>
+          <div class="mb-3">
+            <label for="card_number" class="form-label">Card Number</label>
+            <input type="text" name="card_number" id="card_number" class="form-control" required>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label for="exp_date" class="form-label">Expiration Date</label>
+              <input type="text" name="exp_date" id="exp_date" class="form-control" placeholder="MM/YY" required>
             </div>
-        </header>
-        <br/>
-        <div class="container">
-            <div class="row">
-                
-                    <div class="col-md-6 offset-md-3">
-          <div class="card">
-          <div class="card-header">
-            Order Summary
+            <div class="col">
+              <label for="cvv" class="form-label">CVV</label>
+              <input type="text" name="cvv" id="cvv" class="form-control" required>
+            </div>
           </div>
-          <div class="card-body">
-            {% for product in cart_products %}
-                {{ product.name }}: 
-                    {% if product.is_sale %}
-                        ${{ product.sale_price }}
-                    {% else %}
-                        ${{ product.price }}
-                {% endif %}
-
-                <br/>
-                <small>Quantity: 
-                {% for key, value in quantities.items %}
-                    {% if key == product.id|slugify %}
-                        {{ value }}
-                    {% endif %}
-                {% endfor %}</small>
-                <br/><br/>
-
-            {% endfor %}
-            Total:  ${{ totals }}
-            <br/><br/>
-            <a href="{% url 'cart_summary' %}" class="btn btn-sm btn-outline-secondary">Update Items</a>
+          <div class="mb-3">
+            <label for="card_name" class="form-label">Name on Card</label>
+            <input type="text" name="card_name" id="card_name" class="form-control" required>
           </div>
-        </div>
-<br/><br/>
-<div class="card">
-  <div class="card-header">
-    Shipping Info
-  </div>
-  <div class="card-body">
-    <form method="POST" action="{% url 'billing_info' %}">
-        {% csrf_token %}
-    {{ shipping_form.as_p }}
 
+          <button type="submit" class="btn btn-secondary">
+            Pay ${{ totals }}
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
-<br/>
-
-<button type="submit" class="btn btn-secondary">
-        Continue To Billing
-</button>
-
-</form>
-<br/><br/>
-
-
-            </div>
-        </div>
-    </div>
-
-
-
-
 
 
 {% endblock %}

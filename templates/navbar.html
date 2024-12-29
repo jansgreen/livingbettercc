@@ -23,10 +23,10 @@
         </ul>
         <ul class="navbar-nav ms-auto">
 
-            {% if cart_length %}
+            {% if menu_cart %}
             <li>
                 <a class="text-decoration-none text-white me-3" href="{{ menu_cart }}">
-                    <i class="bi bi-cart4">{{ cart_length }}</i>
+                    <i class="bi bi-cart4 text-warning">{{ cart_length }}</i>
                 </a>
             </li>
             {% endif %}

@@ -16,6 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
+SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
 
 
@@ -59,7 +60,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', 
 ]
 
 ROOT_URLCONF = 'livingbettercc.urls'

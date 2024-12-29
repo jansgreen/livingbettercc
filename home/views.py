@@ -8,6 +8,9 @@ from authentication.models import Biography, Profile
 from django.conf import settings
 from django.contrib.auth.models import User
 
+#para borrar 
+from shop.cart import Cart
+
 
 
 

@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from authentication.models import Profile
 import datetime
+from .models import BillingInfo, Order  # Asegúrate de tener un modelo BillingInfo
+from .cardnet import process_payment  # Una función que envía los datos a CardNet
 
 # Import Some Paypal Stuff
 from django.urls import reverse
@@ -194,14 +196,9 @@ def process_order(request):
 					messages.success(request, "Access Denied")
 					return redirect('home')
 
-from django.contrib import messages
-from django.shortcuts import redirect, render
-from paypal.standard.forms import PayPalPaymentsForm
-import uuid
-
 def billing_info(request):
     if request.method == "POST":
-        # Obtén el carrito
+        # Obtén el carrito 
         cart = Cart(request)
         cart_products = cart.get_prods()
         quantities = cart.get_quants()
@@ -214,6 +211,19 @@ def billing_info(request):
         }
         request.session['my_shipping'] = shipping_info
 
+        # Guarda la información de facturación en la base de datos
+        billing_info = BillingInfo(
+            user=request.user,
+            name=shipping_info['name'],
+            address=shipping_info['address'],
+            city=shipping_info['city'],
+            state=shipping_info['state'],
+            zip_code=shipping_info['zip_code'],
+            country=shipping_info['country'],
+            total=totals
+        )
+        billing_info.save()
+
         # Crea el diccionario para PayPal
         host = request.get_host()
         paypal_dict = {
@@ -222,36 +232,22 @@ def billing_info(request):
             'item_name': 'Book Order',
             'no_shipping': '2',
             'invoice': str(uuid.uuid4()),
-            'currency_code': 'USD',  # Cambia a EUR si necesitas Euros
-            'notify_url': f'https://{host}{reverse("paypal-ipn")}',
-            'return_url': f'https://{host}{reverse("payment_success")}',
-            'cancel_return': f'https://{host}{reverse("payment_failed")}',
+            'currency_code': 'USD',
+            'notify_url': f'http://{host}/paypal-ipn/',
+            'return_url': f'http://{host}/payment/done/',
+            'cancel_return': f'http://{host}/payment/canceled/',
         }
 
-        # Crea el botón de PayPal
-        paypal_form = PayPalPaymentsForm(initial=paypal_dict)
-
-        # Crea el formulario de pago (billing)
-        billing_form = PaymentForm()
-
-        # Renderiza el template
+        form = PayPalPaymentsForm(initial=paypal_dict)
         context = {
-            "paypal_form": paypal_form,
-            "cart_products": cart_products,
-            "quantities": quantities,
-            "totals": totals,
-            "shipping_info": shipping_info,
-            "billing_form": billing_form,
+            'form': form,
+            'cart_products': cart_products,
+            'quantities': quantities,
+            'totals': totals,
         }
-        return render(request, "payment/billing_info.html", context)
+        return render(request, 'payment/process_payment.html', context)
 
-    # Si no es POST, deniega el acceso
-    messages.error(request, "Acceso denegado. Por favor, completa el formulario de envío.")
-    return redirect('home')
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
-from django.urls import reverse
+    return render(request, 'payment/billing_info.html')
 
 def checkout(request):
     # Redirige a login si el usuario no está autenticado
@@ -287,3 +283,48 @@ def payment_success(request):
 
 def payment_failed(request):
 	return render(request, "payment/payment_failed.html", {})
+
+
+def process_payment(request):
+    if request.method == 'POST':
+        # Recuperar datos del formulario
+        card_number = request.POST.get('card_number')
+        exp_date = request.POST.get('exp_date')
+        cvv = request.POST.get('cvv')
+        card_name = request.POST.get('card_name')
+
+        # Obtener el total del carrito
+        cart = Cart(request)
+        total = cart.cart_total()
+
+        # Enviar datos a CardNet
+        payment_response = process_payment(
+            card_number=card_number,
+            exp_date=exp_date,
+            cvv=cvv,
+            card_name=card_name,
+            amount=total
+			
+        )
+
+        if payment_response.get('success'):
+            # Crear la orden y guardar el estado de "Pagado"
+            order = Order.objects.create(
+                user=request.user,
+                total_amount=total,
+                status='PAID'
+            )
+            # Limpia el carrito
+            cart.clear()
+            return redirect('payment_success')  # Vista de éxito
+        else:
+            # Manejo de errores
+            error_message = payment_response.get('message', 'Payment failed')
+            return render(request, 'payment/checkout.html', {
+                'error_message': error_message,
+                'cart_products': cart.get_prods(),
+                'quantities': cart.get_quants(),
+                'totals': total,
+            })
+
+    return redirect('checkout')
