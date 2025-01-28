@@ -40,6 +40,7 @@
                             <strong>{{ user.username | capfirst }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                              <li><a class="nav-link text-light" href="{% url 'evidence_google' %}">Evidencias Trimestrales</a></li>
                               <li><a class="nav-link text-light" href="{% url 'logout' %}">Logout</a></li>
                             </ul>
                         </div>

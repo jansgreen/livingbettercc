@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'payment',
     'cart',
     'store',
+    'docs',
 
 ]
 
@@ -88,7 +89,6 @@ TEMPLATES = [
                 'page.context_processors.context_processor.obtener_menu_setting',
                 'page.context_processors.context_processor.footer_context',
                 'metadata.context_processors.context_processor.metadata_context',
-                'metadata.context_processors.context_processor.obtener_menu_metadata',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',

@@ -70,7 +70,7 @@ def contactanos(request):
                 email_message.cc.append(cc_email)
     
     # Enviar el correo
-            email_message.send(fail_silently=False)
+            email_message.send(fail_silently=True)
             messages.success(request, 'Mensaje enviado exitosamente.')
             return redirect('contactanos')
         else:
