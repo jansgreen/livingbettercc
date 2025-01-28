@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import ImplementationEvidenceForm
 from django.contrib.auth.decorators import login_required
-from .models import ImplementationEvidence
 
 
 

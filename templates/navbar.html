@@ -17,9 +17,129 @@
                     </li>
                 {% endfor %}
             {% endif %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'contactanos'%}">Contactanos</a>
-            </li>
+            <!--Menu adaptado-->
+            <div class="accordion" id="accordionExample">
+                {% for menu in menu_shop %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.id }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#{{ menu.id }}">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for menu in menu_blog %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for menu in menu_groups %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for menu in menu_metadata %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for menu in menu_auth %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% for menu in menu_setting %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                                {{ menu.nombre }}
+                            </button>
+                        </h2>
+                        {% if menu.submenus %}
+                            <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                <ul class="list-group">
+                                    {% for submenu in menu.submenus %}
+                                        <li>
+                                            <a class="list-group-item list-group-item-action" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
         </ul>
         <ul class="navbar-nav ms-auto">
 
@@ -30,8 +150,6 @@
                 </a>
             </li>
             {% endif %}
-            
-
                 {% if user.is_authenticated %}
                     <li class="nav-item me-3">
                         <div class="dropdown">
@@ -40,9 +158,10 @@
                             <strong>{{ user.username | capfirst }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                              <li><a class="nav-link text-light" href="{% url 'evidence_google' %}">Evidencias Trimestrales</a></li>
+                              <li><a class="nav-link text-light" href="{% url 'evidence_google' %}">Evidencias Trimestrales</a></li>                            
                               <li><a class="nav-link text-light" href="{% url 'logout' %}">Logout</a></li>
                             </ul>
+
                         </div>
                     </li>
                 {% else %}

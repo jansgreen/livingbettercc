@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Footer, PageContent, carouselPage
+from .models import Footer, PageContent, carouselPage, PageCategory
 
 @admin.register(Footer)
 class FooterAdmin(admin.ModelAdmin):
@@ -20,7 +20,6 @@ class PageContentAdmin(admin.ModelAdmin):
         # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
     )
 
-
 class carouselPageAdmin(admin.ModelAdmin):
     list_display = ('name', 'imagen', 'details')
     ordering = ('-name',)
@@ -32,6 +31,10 @@ class carouselPageAdmin(admin.ModelAdmin):
         # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
     )
 
+class PageCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description', 'slug')
+
+admin.site.register(PageCategory, PageCategoryAdmin)
 admin.site.register(carouselPage, carouselPageAdmin)
 admin.site.register(PageContent, PageContentAdmin)
 
