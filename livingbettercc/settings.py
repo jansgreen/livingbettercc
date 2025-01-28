@@ -92,6 +92,8 @@ TEMPLATES = [
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',
+                'docs.context_processors.context_processor.obtener_menu_docs',
+
 
             ],
         },
