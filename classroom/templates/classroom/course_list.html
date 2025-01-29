@@ -1,0 +1,21 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+  <h1>Course List</h1>
+  <ul>
+    {% for course in cursos %}
+      <li>
+        <h2>{{ course.title }}</h2>
+        <p>{{ course.description }}</p>
+        {% if user.is_superuser %}
+          <a href="{% url 'course_edit' course.id %}">Edit</a>
+          <a href="{% url 'course_delete' course.id %}">Delete</a>
+        {% endif %}
+        <a href="{% url 'course_detail' course.id %}">Read</a>
+        {% if not user.is_superuser %}
+          <a href="{% url 'course_enroll' course.id %}">Enroll</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

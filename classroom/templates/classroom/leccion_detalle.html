@@ -1,0 +1,12 @@
+
+    {% extends "frontend.html" %}
+    {% block content %}
+    <h1>{{ leccion.titulo }}</h1>
+    <h2>Materiales</h2>
+    <ul>
+        {% for material in materiales %}
+            <li>{{ material.nombre }}</li>
+        {% endfor %}
+    </ul>
+    {% endblock %}
+

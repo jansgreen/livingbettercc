@@ -1,0 +1,10 @@
+{% extends "frontend.html" %}
+    {% block content %}
+    <h1>{{ curso.nombre }}</h1>
+    <h2>Modulos</h2>
+    <ul>
+        {% for modulo in modulos %}
+            <li>{{ modulo.nombre }}</li>
+        {% endfor %}
+    </ul>
+    {% endblock %}

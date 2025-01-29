@@ -11,7 +11,7 @@ def obtener_menu_docs(request):
             
             if user_in_manager_group:
                 menu[0]['submenus'].append({'nombre': 'Formulario Evidencias', 'url': '/docs/evidences/evidence_google/'})
-            return {'menu_setting': menu}
+            return {'menu_docs': menu}
         else:
             menu = None
-            return {'menu_setting': menu}
+            return {'menu_docs': menu}

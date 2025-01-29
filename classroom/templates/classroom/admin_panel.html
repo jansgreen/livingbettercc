@@ -1,0 +1,12 @@
+{% extends "frontend.html" %}
+    {% block content %}
+    <h1>Admin Panel</h1>
+    <h2>Cursos</h2>
+    <ul>
+        {% for curso in cursos %}
+            <li>{{ curso.nombre }}</li>
+        {% endfor %}
+    </ul>
+    {% endblock %}
+</body>
+</html>
