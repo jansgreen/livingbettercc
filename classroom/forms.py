@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Module
+from .models import Course, Module, Lesson, Material
 
 class CourseForm(forms.ModelForm):
     class Meta:
@@ -16,3 +16,13 @@ class ModuleForm(forms.ModelForm):
     class Meta:
         model = Module
         fields = ['title', 'description', 'course']
+
+class LessonForm(forms.ModelForm):
+    class Meta:
+        model = Lesson
+        fields = ['title', 'content', 'module']
+
+class MaterialForm(forms.ModelForm):
+    class Meta:
+        model = Material
+        fields = ['file', 'type', 'lesson']

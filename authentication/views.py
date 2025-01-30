@@ -7,6 +7,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import Biography, Profile, Direccion
 from django.contrib.auth.decorators import login_required
+from allauth.socialaccount.models import SocialAccount
+from django.contrib.auth.models import User
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from django.http import HttpResponse
 
 
 def register(request):

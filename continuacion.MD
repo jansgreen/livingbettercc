@@ -1,0 +1,1 @@
+me quede en la autenticacion para el estudiante, solo hace falta hacer pruebas con google y hacer pip freeze

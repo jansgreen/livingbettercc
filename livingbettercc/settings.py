@@ -18,8 +18,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG')
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
+# Permitir HTTP solo en desarrollo
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-
+GOOGLE_OAUTH2_CLIENT_SECRETS_JSON = os.path.join(BASE_DIR, "client_secret.json")
+GOOGLE_OAUTH2_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
+GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
 if os.getenv("DJANGO_ENV") == "heroku":
     ALLOWED_HOSTS = os.getenv("HOSTS", "").split(",")
@@ -51,8 +56,35 @@ INSTALLED_APPS = [
     'cart',
     'store',
     'docs',
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    'googleauth',
+    'social_django',
 
 ]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["openid", "profile", "email", "https://www.googleapis.com/auth/youtube.force-ssl"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+}
+
+SITE_ID = 1 
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid'
+]
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -62,6 +94,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware', 
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'livingbettercc.urls'
@@ -195,8 +228,8 @@ EMAIL_HOST_CC = os.getenv('EMAIL_HOST_CC', '').split(',')
 EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 
 # En settings.py
-LOGIN_REDIRECT_URL = 'shop'
-LOGOUT_REDIRECT_URL = 'shop'
+LOGIN_REDIRECT_URL = '/shop/'
+LOGOUT_REDIRECT_URL = '/shop/'
 
 
 PAYPAL_CLIENT_ID = 'tu_client_id'

@@ -8,14 +8,14 @@
         <h2>{{ course.title }}</h2>
         <p>{{ course.description }}</p>
         {% if user.is_superuser %}
-          <a href="{% url 'course_edit' course.id %}">Edit</a>
-          <a href="{% url 'course_delete' course.id %}">Delete</a>
+          {% if course.id %}<a href="{% url 'course_edit' course.id %}">Edit</a> {% endif %}
+          {% if course.id %}<a href="{% url 'course_delete' course.id %}">Delete</a>{% endif %}
         {% endif %}
-        <a href="{% url 'course_detail' course.id %}">Read</a>
+        {% if course.id %}<a href="{% url 'course_detail'%}">Read</a>{% endif %}
         {% if not user.is_superuser %}
-          <a href="{% url 'course_enroll' course.id %}">Enroll</a>
         {% endif %}
       </li>
     {% endfor %}
   </ul>
+  <a class="btn btn-primary" href="{% url 'google_login' %}"><strong>Login with Google</strong></a>
 {% endblock %}

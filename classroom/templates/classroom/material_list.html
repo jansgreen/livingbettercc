@@ -1,0 +1,11 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+  <h2>Materials</h2>
+  <ul>
+    {% for material in materials %}
+      <li><a href="{% url 'material_detail' material.pk %}">{{ material.type }} - {{ material.file.name }}</a></li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'material_create' %}">Create new material</a>
+{% endblock %}

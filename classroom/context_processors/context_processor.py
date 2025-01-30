@@ -14,10 +14,14 @@ def obtener_menu_classroom(request):
         if user_in_manager_group:
             menu[0]['submenus'].append({'nombre': 'Admin Panel', 'url':'/classroom/curso/admin/'})
             menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url':'/classroom/curso/create/'})
-            menu[0]['submenus'].append({'nombre': 'Actualizar Curso', 'url': '/classroom/curso/create/<int:pk>/'})
-            menu[0]['submenus'].append({'nombre': 'Eliminar Curso', 'url': '/classroom/curso/delete//<int:pk>/'})
             menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': '/classroom/curso/list'})
-        
+            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'url': '/classroom/modules/new/'})
+            menu[0]['submenus'].append({'nombre': 'Modulos', 'url': '/classroom/modules/'})
+            menu[0]['submenus'].append({'nombre': 'Lession', 'url': '/classroom/lessons/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Lession', 'url': '/classroom/lessons/create/'})
+            menu[0]['submenus'].append({'nombre': 'Material', 'url': '/classroom/materials/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Material', 'url': '/classroom/materials/create/'})
+
         return {'menu_classroom': menu}
     else:
         return {'menu_classroom': None}

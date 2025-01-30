@@ -34,6 +34,8 @@ urlpatterns = [
     path('store/', include('store.urls')),
     path('docs/', include('docs.urls')),
     path('classroom/', include('classroom.urls')),
+    path('google/auth/', include('googleauth.urls')),  # Maneja el login de Google
+    path('auth/', include('social_django.urls', namespace='social')),  # Include URLs for social authentication
 
 ] 
 if settings.DEBUG:

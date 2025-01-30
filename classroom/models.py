@@ -28,7 +28,7 @@ class Lesson(models.Model):
         return self.title
 
 class Material(models.Model):
-    file = models.FileField(upload_to='materials/')
+    file = models.FileField(upload_to='materials/') 
     type = models.CharField(max_length=50)
     lesson = models.ForeignKey(Lesson, related_name='materials', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
