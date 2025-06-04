@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from django.http import HttpResponse
+from django.contrib.auth.models import Group, Permission
+
 
 
 def register(request):
@@ -201,3 +203,29 @@ def leerBio(request, pk):
         'managers':managers,
     }
     return render(request, 'leer_bio.html', context)
+
+
+
+from .decorators import student_required, client_required, staff_required
+
+@student_required
+def student_dashboard(request):
+    # lógica de cursos y libros comprados
+    pass
+
+@client_required
+def client_dashboard(request):
+    # lógica de libros comprados
+    pass
+
+@staff_required
+def staff_dashboard(request):
+    # lógica administrativa (uso de permisos Django)
+    pass
+
+
+
+# Crear grupos: Editor, Manager, etc.
+editor_group = Group.objects.create(name='Editor')
+permission = Permission.objects.get(codename='change_book')
+editor_group.permissions.add(permission)

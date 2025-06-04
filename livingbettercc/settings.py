@@ -48,13 +48,11 @@ INSTALLED_APPS = [
     'authentication',
     'groups',
     'shop',
+    'shop.checkout',
     'page',
     'metadata',
     'gallery',
-    'paypal.standard.ipn',
-    'payment',
     'cart',
-    'store',
     'docs',
     "allauth",
     "allauth.account",
@@ -254,3 +252,4 @@ CKEDITOR_CONFIGS = {
 # paypal
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = 'livingbettecommunitycenter@gmail.com'
+AUTH_USER_MODEL = 'users.CustomUser'

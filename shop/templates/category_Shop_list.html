@@ -10,6 +10,7 @@
             <tr>
                 <th>Name</th>
                 <th>Slug</th>
+                <th>Subcategories</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -19,16 +20,66 @@
                 <td>{{ category.name }}</td>
                 <td>{{ category.slug }}</td>
                 <td>
-                    <a href="{% url 'category_update' category.pk %}" class="btn btn-warning">Edit</a>
+                    {% if category.subcategories %}
+                    <ul>
+                        {% for subcategory in category.subcategories.all %}
+                        <li>{{ subcategory.name | capfirst}}</li>
+                        {% endfor %}
+                    <ul>
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-info" onclick="showSubcategoryInput({{ category.pk }})">Add Subcategory</button>
+                    <button class="btn btn-warning" onclick="showEditcategoryInput({{ category.pk }})">Edit</button>
                     <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No categories available.</td>
+            <tr id="editcategory-input-{{ category.pk }}" style="display: none;">
+                <td colspan="4">
+                    <form method="POST" action="{% url 'category_update' category.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="category" value="{{ category.pk }}">
+                        <div class="input-group">
+                            <input type="text" name="name" class="form-control" placeholder="Category Name" required>
+                            <input type="text" name="slug" class="form-control" placeholder="Category Slug" required>
+                            <input type="text" name="description" class="form-control" placeholder="Category Description">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+            <tr id="subcategory-input-{{ category.pk }}" style="display: none;">
+                <td colspan="4">
+                    <form method="POST" action="{% url 'subcategory_create' category.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="category" value="{{ category.pk }}">
+                        <div class="input-group">
+                            <input type="text" name="name" class="form-control" placeholder="Subcategory Name" required>
+                            <input type="text" name="slug" class="form-control" placeholder="Subcategory Slug" required>
+                            <input type="text" name="description" class="form-control" placeholder="Subcategory Description">
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
+            <tr>
+                <td colspan="4">No categories available.</td>
+            </tr>
         </tbody>
     </table>
 </div>
+{% block extra_js %}
+<script>
+    function showSubcategoryInput(categoryId) {
+        const inputRow = document.getElementById(`subcategory-input-${categoryId}`);
+        inputRow.style.display = inputRow.style.display === 'none' ? '' : 'none';
+    }
+    function showEditcategoryInput(categoryId) {
+        const inputRow = document.getElementById(`editcategory-input-${categoryId}`);
+        inputRow.style.display = inputRow.style.display === 'none' ? '' : 'none';
+    }
+</script>
+{% endblock %}
+
 {% endblock %}

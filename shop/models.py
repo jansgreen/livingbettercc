@@ -2,13 +2,26 @@ from django.db import models
 from ckeditor.fields import RichTextField
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     slug = models.SlugField(unique=True)
 
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
+
+    def __str__(self):
+        return self.name
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    slug = models.SlugField(unique=True)
+    category = models.ForeignKey(Category, related_name='subcategories', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "Subcategory"
+        verbose_name_plural = "Subcategories"
 
     def __str__(self):
         return self.name

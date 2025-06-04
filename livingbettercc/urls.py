@@ -30,8 +30,6 @@ urlpatterns = [
     path('page/', include('page.urls')),
     path('metadata/', include('metadata.urls')),
     path('cart/', include('cart.urls')),
-    path('payment/', include('payment.urls')),
-    path('store/', include('store.urls')),
     path('docs/', include('docs.urls')),
     path('classroom/', include('classroom.urls')),
     path('google/auth/', include('googleauth.urls')),  # Maneja el login de Google

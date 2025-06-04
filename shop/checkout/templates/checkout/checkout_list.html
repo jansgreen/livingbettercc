@@ -1,0 +1,33 @@
+{% extends "frontend.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Checkout</h1>
+<table class="table table-light table-striped-columns">
+    <thead>
+        <tr>
+            <th scope="col">Product</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>
+                {% if product.image %}
+                <img src="{{ product.image.url }}" width="50" class="img-fluid rounded" alt="{{ product.name }}"
+                     onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
+                {% else %}
+                <img src="{% static 'Profile/default.webp' %}" width="50" class="img-fluid rounded" alt="{{ product.name }}">
+                {% endif %}
+            <td>{{ product.name }}</td>
+            <td>{{ quantities }}</td>
+            <td>${{ product.price|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<p>Total: ${{ total|floatformat:2 }}</p>
+{% endblock %}

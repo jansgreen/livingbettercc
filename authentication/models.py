@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
+from django.contrib.auth.models import AbstractUser
 
 
 class Profile(models.Model):
@@ -64,4 +65,22 @@ class Biography(models.Model):
 
     def __str__(self):
         return self.user.username
+
+# users/models.py
+
+class CustomUser(AbstractUser):
+    USER_TYPE_CHOICES = [
+        ('student', 'Estudiante'),
+        ('client', 'Cliente'),
+        ('staff', 'Staff'),
+    ]
+    user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    enrolled_courses = models.ManyToManyField('courses.Course', blank=True)
+
+class ClientProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    purchase_history = models.ManyToManyField('store.Book', blank=True)
 
