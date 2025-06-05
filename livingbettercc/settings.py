@@ -252,4 +252,3 @@ CKEDITOR_CONFIGS = {
 # paypal
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = 'livingbettecommunitycenter@gmail.com'
-AUTH_USER_MODEL = 'users.CustomUser'

@@ -1,0 +1,10 @@
+{% extends 'frontend.html' %}
+
+{% block content %}
+<h2>Profile Detail</h2>
+<p><strong>Name:</strong> {{ profile.name }}</p>
+<p><strong>Email:</strong> {{ profile.email }}</p>
+<p><strong>Phone:</strong> {{ profile.phone }}</p>
+<!-- Add more fields as needed -->
+<a href="{% url 'profile_list' %}">Back to Profile List</a>
+{% endblock %}

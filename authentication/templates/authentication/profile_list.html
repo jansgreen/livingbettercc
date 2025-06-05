@@ -1,0 +1,14 @@
+{% extends 'frontend.html' %}
+
+{% block content %}
+<h2>Profile List</h2>
+<ul>
+    {% for profile in profiles %}
+    <li>
+        {{ profile }} - 
+        <a href="{% url 'profile_update' profile.pk %}">Edit</a> | 
+        <a href="{% url 'profile_delete' profile.pk %}">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

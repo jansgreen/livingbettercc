@@ -1,15 +1,3 @@
-from ..cart import Cart
-
-def obtener_menu_cart(request):
-    cart = Cart(request)
-    cart_length = len(cart)
-    print(cart_length)
-    menu_cart = '/cart/'
-    return {
-        'cart_length': cart_length,
-        'menu_cart': menu_cart
-    }
-
 def obtener_menu_shop(request):
     menu = [
         {

@@ -7,7 +7,7 @@ def obtener_menu_cart(request):
     cart_length = sum(cart.cart.values())
 
     # Define la URL para ver el carrito
-    menu_cart = '/cart/'  # Cambia esto a la URL que tienes definida en tus rutas
+    menu_cart = 'checkout/checkout_list/'  # Cambia esto a la URL que tienes definida en tus rutas
 
     return {
         'cart_length': cart_length,

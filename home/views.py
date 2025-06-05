@@ -4,7 +4,6 @@ from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
 from page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
 
-from authentication.models import Biography, Profile
 from django.conf import settings
 from django.contrib.auth.models import User
 

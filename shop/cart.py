@@ -1,5 +1,5 @@
 from shop.models import Product
-from authentication.models import Profile
+from authentication.models import Profiles as Profile
 
 class Cart():
     def __init__(self, request):
