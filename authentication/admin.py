@@ -19,9 +19,9 @@ class StudentsAdmin(admin.ModelAdmin):
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'street', 'neighborhood', 'city', 'province', 'postal_code')
-    search_fields = ('user__username', 'street', 'neighborhood', 'city', 'province')
-    list_filter = ('city', 'province')
+    list_display = ('user', 'street', 'neighborhood', 'city', 'state', 'zip_code')
+    search_fields = ('user__username', 'street', 'neighborhood', 'city', 'state')
+    list_filter = ('city', 'state')
 
 @admin.register(Profiles)    
 class ProfileAdmin(admin.ModelAdmin):

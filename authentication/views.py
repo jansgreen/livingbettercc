@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .forms import ProfileForm
+from .forms import ProfileForm, CustomerForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
 
@@ -70,29 +70,28 @@ def profile_view(request, pk):
 
 @csrf_exempt
 def customer_view(request):
+    form = CustomerForm()
     if request.method == 'POST':
-        try:
-            username = request.POST.get('username')
-            first_name = request.POST.get('firstName')
-            last_name = request.POST.get('lastName')
-            email = request.POST.get('email')
-            phone = request.POST.get('phone')
-            address = request.POST.get('address')
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            customer = form.save(commit=False)
+            customer.user = request.user
+            customer.save()
+            return redirect('checkout_complete')  # Redirect after successful submission
+    context = {
+        'form': form,
+    }
+    return render(request, 'authentication/customers.html', context)
 
-            # Create or update the customer record
-            customer, created = Customer.objects.update_or_create(
-                username=username,
-                defaults={
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'email': email,
-                    'phone': phone,
-                    'address': address,
-                }
-            )
 
-            return JsonResponse({'success': True, 'message': 'Customer information saved successfully.'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+def customer_view(request):
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)  # Autenticamos al usuario automáticamente
+            return redirect('shop:checkout')  # O la siguiente etapa
     else:
-        return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=405)
+        form = CustomerForm()
+    return render(request, 'authentication/customers.html', {'form': form})
