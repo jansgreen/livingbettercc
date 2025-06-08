@@ -6,6 +6,11 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import ProfileForm, CustomerForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
+from authentication.models.address import Address
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth import get_backends
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -70,28 +75,37 @@ def profile_view(request, pk):
 
 @csrf_exempt
 def customer_view(request):
-    form = CustomerForm()
     if request.method == 'POST':
         form = CustomerForm(request.POST)
         if form.is_valid():
-            customer = form.save(commit=False)
-            customer.user = request.user
-            customer.save()
-            return redirect('checkout_complete')  # Redirect after successful submission
-    context = {
-        'form': form,
-    }
-    return render(request, 'authentication/customers.html', context)
+            # Check if the user already exists
+            username = form.cleaned_data.get('username')
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'El usuario ya existe. Por favor, elige otro nombre de usuario.')
+                return redirect('login')  # Redirect to the same page or another appropriate page
+            
+            # Save the user
+            user = form.save(commit=False)
+            user.save()
 
+            # Save the address
+            Address.objects.create(
+                user=user,
+                street=request.POST.get('street'),
+                neighborhood=request.POST.get('neighborhood'),
+                city=request.POST.get('city'),
+                state=request.POST.get('state'),
+                zip_code=request.POST.get('zip_code'),
+            )
 
-
-def customer_view(request):
-    if request.method == 'POST':
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            auth_login(request, user)  # Autenticamos al usuario automáticamente
-            return redirect('shop:checkout')  # O la siguiente etapa
+            # Authenticate and log in the user
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            auth_login(request, user)
+            return redirect('product_list')  # Redirect to the next stage
+        else:
+            messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
+            return redirect('shop:checkout')  # Redirect to the next stage
     else:
         form = CustomerForm()
     return render(request, 'authentication/customers.html', {'form': form})

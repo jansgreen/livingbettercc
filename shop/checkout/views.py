@@ -13,7 +13,7 @@ def checkout_list(request):
 
     context = {
         'products': products,
-        'quantities': quantities,
+        'quantities': quantitie,
         'total': total,
     }
     return render(request, 'checkout/checkout_list.html', context)

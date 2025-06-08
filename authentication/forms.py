@@ -39,7 +39,7 @@ class CustomerForm(forms.ModelForm):
         model = Customers
         fields = ['username', 'password', 'email', 'first_name', 'last_name']
 
-    def save(self, commit=True, **address_data):
+    def save(self, commit=True):
         user = User.objects.create_user(
             username=self.cleaned_data['username'],
             password=self.cleaned_data['password'],
@@ -47,18 +47,9 @@ class CustomerForm(forms.ModelForm):
             first_name=self.cleaned_data['first_name'],
             last_name=self.cleaned_data['last_name'],
         )
-        Address.objects.create(
-            user=user,
-            street=address_data.get('street'),
-            neighborhood=address_data.get('neighborhood'),
-            city=address_data.get('city'),
-            state=address_data.get('state'),
-            zip_code=address_data.get('zip_code'),
-        )
-        customer = Customers.objects.create(user=user)
+        # Address creation is handled in the view
+        Customers.objects.create(user=user)
         return user
-
-
 
 
 class StudentForm(forms.ModelForm):

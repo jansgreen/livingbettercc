@@ -4,6 +4,11 @@ from authentication.models.students import Students
 from authentication.models.address import Address
 from authentication.models.profiles import Profiles
 from authentication.models.customers import Customers
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+
+# Unregister the default User model
+
 
 @admin.register(Staffs)
 class StaffsAdmin(admin.ModelAdmin):
