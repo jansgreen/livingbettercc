@@ -1,0 +1,16 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<h6 class="border-bottom pb-2 mb-0">Categoria Menu List</h6>
+
+<a href="{% url 'categoria_menu_create' %}">Create New Categoria</a>
+<ul>
+    {% for categoria in categorias %}
+    <li>
+        {{ categoria.name }} 
+        <a href="{% url 'categoria_menu_update' categoria.pk %}">Edit</a>
+        <a href="{% url 'categoria_menu_delete' categoria.pk %}">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,4 +1,4 @@
-from metadata.models import MetaData
+from dashboard.metadata.models import MetaData
 
 def metadata_context(request):
     try:

@@ -149,3 +149,7 @@ def subcategory_create(request, category_id):
                 'category': category,
             })
     return redirect('category_list')
+
+
+def thanks(request):
+    return render(request, 'thanks.html')

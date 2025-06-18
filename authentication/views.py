@@ -102,7 +102,7 @@ def customer_view(request):
             backend = get_backends()[0]
             user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
             auth_login(request, user)
-            return redirect('product_list')  # Redirect to the next stage
+            return redirect('checkout_list')  # Redirect to the next stage
         else:
             messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
             return redirect('shop:checkout')  # Redirect to the next stage

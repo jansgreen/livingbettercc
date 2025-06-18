@@ -2,7 +2,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('', views.product_list, name='product_list'),
+    path('product_list/', views.product_list, name='product_list'),
     path('create/', views.product_create, name='product_create'),
     path('product_update/<int:pk>/', views.product_update, name='product_update'),
     path('product_delete/<int:pk>/', views.product_delete, name='product_delete'),
@@ -23,4 +23,5 @@ urlpatterns = [
 
     # Checkout
     path('checkout/', include('shop.checkout.urls')),
+    path('thanks/', views.thanks, name="thanks"),
 ]

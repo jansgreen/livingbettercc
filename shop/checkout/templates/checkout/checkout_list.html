@@ -32,7 +32,20 @@
 <p>Total: ${{ total|floatformat:2 }}</p>
 
 {% if user.is_authenticated %}
-    <a href="{% url 'login' %}" class="btn btn-warning">Login</a>
+    <div class="py-5 text-center">
+        <h1 class="h2">¡Gracias por tu apoyo!</h1>
+        <p class="lead">
+        Cada vez que eliges uno de nuestros libros, no solo estás invirtiendo en conocimiento, también estás colaborando directamente con la misión de Living Better Community Center: construir una comunidad más fuerte, saludable y con oportunidades para todos.
+        Tu compra es más que un libro... es un paso hacia una vida mejor para muchos. 💚
+        </p>
+   
+        <a href="https://a.co/d/f9eTjyk" target="_blank" style="text-decoration:none;">
+            <button style="background-color:#ff9900; color:white; padding:10px 20px; border:none; border-radius:5px;">
+              Comprar en Amazon
+            </button>
+          </a>
+          
+    </div>
 {% else %}
     <a href="{% url 'customer_form' %}" class="btn btn-warning">Complete Checkout</a>
 {% endif %}

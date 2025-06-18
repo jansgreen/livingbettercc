@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'shop',
     'shop.checkout',
     'page',
-    'metadata',
     'gallery',
     'cart',
     'docs',
@@ -60,7 +59,8 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     'googleauth',
     'social_django',
-
+    'dashboard',
+    'dashboard.metadata',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -119,12 +119,14 @@ TEMPLATES = [
                 'groups.context_processors.context_processor.obtener_menu_groups',
                 'page.context_processors.context_processor.obtener_menu_setting',
                 'page.context_processors.context_processor.footer_context',
-                'metadata.context_processors.context_processor.metadata_context',
+                'dashboard.metadata.context_processors.context_processor.metadata_context',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',
                 'classroom.context_processors.context_processor.obtener_menu_classroom',
                 'docs.context_processors.context_processor.obtener_menu_docs',
+                'dashboard.context_processors.context_processor.navbar_menu',
+                'dashboard.context_processors.context_processor.navbar_menuitems',
 
 
             ],

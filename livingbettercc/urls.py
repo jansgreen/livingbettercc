@@ -25,10 +25,10 @@ urlpatterns = [
     path('', include('home.urls')),
     path('blog/', include('blog.urls')),
     path('auth/', include('authentication.urls')),  # Incluir URLs de la app de usuarios
+    path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
     path('groups/', include('groups.urls')),
     path('shop/', include('shop.urls')),
     path('page/', include('page.urls')),
-    path('metadata/', include('metadata.urls')),
     path('cart/', include('cart.urls')),
     path('docs/', include('docs.urls')),
     path('classroom/', include('classroom.urls')),

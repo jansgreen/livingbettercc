@@ -12,7 +12,7 @@ def footer_context(request):
 
 def obtener_menu_setting(request):
         if request.user.is_authenticated:
-            user_in_manager_group = (request.user.is_authenticated and request.user.groups.filter(name='admin').exists() or request.user.groups.filter(name='Superusuario').exists() )
+            user_in_manager_group = (request.user.is_authenticated and request.user.groups.filter(name='admin').exists() or request.user.groups.filter(name='superuser').exists() )
             menu = [
                 {
                     'nombre': 'Setting',

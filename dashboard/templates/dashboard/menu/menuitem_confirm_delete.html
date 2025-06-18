@@ -1,0 +1,11 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<h1>Delete Menu Item</h1>
+<p>Are you sure you want to delete "{{ item.nombre }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+</form>
+<a href="{% url 'menuitem_list' %}">Cancel</a>
+{% endblock %}

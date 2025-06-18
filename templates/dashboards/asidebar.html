@@ -1,8 +1,8 @@
 <aside class="accordion accordion-dark bg-dark text-white" id="accordionExample" data-bs-spy="scroll" data-bs-target="#simple-list-example" data-bs-offset="0" data-bs-smooth-scroll="true" tabindex="0">
     {% for menu in menu_shop %}
-        <div class="accordion-item bg-dark border-secondary">
+        <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button bg-dark text-white collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.id }}" aria-expanded="false" aria-controls="{{ menu.nombre }}">
+                <button class="accordion-button bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
                     {{ menu.nombre }}
                 </button>
             </h2>
@@ -161,3 +161,20 @@
     {% endfor %}
 </aside>
 
+{% block 'extra_js'%}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var accordion = document.getElementById('accordionExample');
+        var collapseElements = accordion.querySelectorAll('.accordion-collapse');
+
+        collapseElements.forEach(function (collapse) {
+            collapse.addEventListener('shown.bs.collapse', function () {
+                this.classList.add('show');
+            });
+            collapse.addEventListener('hidden.bs.collapse', function () {
+                this.classList.remove('show');
+            });
+        });
+    });
+</script>
+{% endblock %}

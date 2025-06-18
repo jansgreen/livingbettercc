@@ -8,13 +8,16 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            {% if menu_home %}
-                {% for  menu in menu_home %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ menu.url }}">
-                            {{ menu.nombre }}
-                        </a>
-                    </li>
+            {% if navbar_menuitems %}
+                {% for  menu in navbar_menuitems %}
+
+                    {% if menu.nombre != "Home" and menu.orden == 0 %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ menu.get_url }}">
+                                {{ menu.nombre |capfirst }}
+                            </a>
+                        </li>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
             <!--Menu adaptado-->
@@ -182,7 +185,18 @@
             </div>
         </ul>
         <ul class="navbar-nav ms-auto">
+            {% if navbar_menuitems %}
+                {% for  menu in navbar_menuitems %}
 
+                    {% if menu.nombre != "Home" and menu.orden == 1 %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ menu.get_url }}">
+                                {{ menu.nombre |capfirst }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
             {% if menu_cart %}
             <li>
                 <a class="text-decoration-none text-white me-3" href="{{ menu_cart }}">
@@ -205,10 +219,10 @@
                         </div>
                     </li>
                 {% else %}
-            <li class="nav-item me-5">
-                <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
-            </li>
-            {% endif %}
+                    <li class="nav-item me-5">
+                        <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
+                    </li>
+                {% endif %}
         </ul>
     </div>
 </nav>
