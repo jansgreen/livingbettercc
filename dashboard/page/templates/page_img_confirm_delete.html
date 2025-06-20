@@ -1,0 +1,14 @@
+<!-- habilidades/page_img_confirm_delete.html -->
+{% extends 'dashboard.html' %}    
+
+{% block content %}
+<div class="container">
+    <h2>Eliminar Habilidad</h2>
+    <p>¿Estás seguro de que deseas eliminar "{{ page_img.nombre }}"?</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'img_category_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

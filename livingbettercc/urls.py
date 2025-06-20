@@ -26,16 +26,13 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('auth/', include('authentication.urls')),  # Incluir URLs de la app de usuarios
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
-    path('groups/', include('groups.urls')),
     path('shop/', include('shop.urls')),
-    path('page/', include('page.urls')),
     path('cart/', include('cart.urls')),
-    path('docs/', include('docs.urls')),
     path('classroom/', include('classroom.urls')),
     path('google/auth/', include('googleauth.urls')),  # Maneja el login de Google
     path('auth/', include('social_django.urls', namespace='social')),  # Include URLs for social authentication
+]
 
-] 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

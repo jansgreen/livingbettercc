@@ -46,13 +46,10 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'blog',
     'authentication',
-    'groups',
     'shop',
     'shop.checkout',
-    'page',
     'gallery',
     'cart',
-    'docs',
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -61,6 +58,8 @@ INSTALLED_APPS = [
     'social_django',
     'dashboard',
     'dashboard.metadata',
+    'dashboard.groups',
+    'dashboard.page',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -116,17 +115,18 @@ TEMPLATES = [
                 'home.context_processors.context_processor.bootstrap_js',
                 'home.context_processors.context_processor.obtener_navbar',
                 'blog.context_processors.context_processor.obtener_menu_blog',
-                'groups.context_processors.context_processor.obtener_menu_groups',
-                'page.context_processors.context_processor.obtener_menu_setting',
-                'page.context_processors.context_processor.footer_context',
-                'dashboard.metadata.context_processors.context_processor.metadata_context',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',
                 'classroom.context_processors.context_processor.obtener_menu_classroom',
-                'docs.context_processors.context_processor.obtener_menu_docs',
+                'dashboard.context_processors.context_processor.obtener_dashboard_menu',
                 'dashboard.context_processors.context_processor.navbar_menu',
                 'dashboard.context_processors.context_processor.navbar_menuitems',
+                'dashboard.context_processors.context_processor.obtener_create_menu',
+                'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
+                'dashboard.metadata.context_processors.context_processor.metadata_context',
+                'dashboard.page.context_processors.context_processor.obtener_menu_setting',
+                'dashboard.page.context_processors.context_processor.footer_context',
 
 
             ],
@@ -202,8 +202,11 @@ if DEBUG:
 
 else:
     # Configuración de producción
-    BOOTSTRAP_JS = os.path.join(STATIC_URL,'bootstrap/js/bootstrap.bundle.min.js')
     BOOTSTRAP_CSS = os.path.join(STATIC_URL,'bootstrap/css/bootstrap.min.css')
+    BOOTSTRAP_JS = os.path.join(STATIC_URL,'bootstrap/js/bootstrap.bundle.min.js')
+
+print("Bootstrap CSS:", BOOTSTRAP_CSS)
+print("Bootstrap JS:", BOOTSTRAP_JS)
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "ckeditor_uploader.storage.models.ImageField"
@@ -228,7 +231,7 @@ EMAIL_HOST_CC = os.getenv('EMAIL_HOST_CC', '').split(',')
 EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 
 # En settings.py
-LOGIN_REDIRECT_URL = '/shop/'
+LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/shop/'
 
 

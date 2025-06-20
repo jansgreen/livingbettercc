@@ -39,17 +39,68 @@
     <!-- Bootstrap CSS -->
 <!-- Bootstrap Bundle (incluye Popper.js) -->
 
+<style>
+    /* Títulos responsivos */
+    .custom-bg-black {
+        background-color:rgb(33, 37, 41); !important; /* Slightly lighter black for contrast */
+      } 
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+    h2 {
+      font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    }
+    h3 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+    h4 {
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+    }
+    h5 {
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+    }
+    h6 {
+      font-size: clamp(0.875rem, 2vw, 1.25rem);
+    }
+    
+    /* Párrafos responsivos */
+    p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.6;
+    }
+    </style>
+    
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block extrahead %}
+    {% endblock %}
 </head>
 <body class="bg-body-tertiary">
     {% include 'dashboards/navbar.html' %}
 
-    <main class="d-flex flex-nowrap">
-        {% include 'dashboards/asidebar.html'%}
-        <div class="my-3 p-3 bg-body rounded shadow-sm">
-            {% block content %}
-            {% endblock %}
+    <main class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-sm-3 d-flex flex-nowrap custom-bg-black">
+                {% include 'dashboards/asidebar.html' %}
+            </div>
+            <!-- Main Content -->
+            <section class="col-sm-9 p-lg-5">
+                {% block content %}
+                {% endblock %}
+            </section>
         </div>
     </main>
-    <!-- ...existing scripts... -->
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/javascripts.js' %}"></script>
+    
+    {% block extra_js %}
+    {% endblock %}
+
 </body>
 </html>

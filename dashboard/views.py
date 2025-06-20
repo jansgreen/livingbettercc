@@ -4,7 +4,7 @@ from dashboard.forms import CategoriaMenuForm, MenuItemForm
 
 def dashboards(request):
     # Ensure the correct template path and context are used
-    return render(request, 'dashboards/dashboard.html')  # Correct template path
+    return render(request, 'dashboard.html')  # Correct template path
 
 def menu(request):
          

@@ -68,18 +68,18 @@ class CategoryCreateView(CreateView):
     model = blogCategory
     form_class = blogCategoryForm
     template_name = 'category_form.html'
-    success_url = reverse_lazy('category_list')
+    success_url = reverse_lazy('category_blog_list')
 
 class CategoryUpdateView(UpdateView):
     model = blogCategory
     form_class = blogCategoryForm
     template_name = 'category_form.html'
-    success_url = reverse_lazy('category_list')
+    success_url = reverse_lazy('category_blog_list')
 
 class CategoryDeleteView(DeleteView):
     model = blogCategory
     template_name = 'category_confirm_delete.html'
-    success_url = reverse_lazy('category_list')
+    success_url = reverse_lazy('category_blog_list')
 
 def archive_posts(request, year, month):
     posts = blogPost.objects.filter(created_at__year=year, created_at__month=month)

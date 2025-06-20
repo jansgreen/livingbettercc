@@ -2,7 +2,7 @@ from django.urls import reverse
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
-        user_in_manager_group = request.user.groups.filter(name='manager').exists()
+        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
         menu = [
             {
                 'nombre': 'Classroom',
@@ -11,7 +11,7 @@ def obtener_menu_classroom(request):
             }
         ]
         
-        if user_in_manager_group:
+        if user_has_module_access:
             menu[0]['submenus'].append({'nombre': 'Admin Panel', 'url':'/classroom/curso/admin/'})
             menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url':'/classroom/curso/create/'})
             menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': '/classroom/curso/list'})

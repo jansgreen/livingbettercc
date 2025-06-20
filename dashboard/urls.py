@@ -14,6 +14,11 @@ urlpatterns = [
     path('menuitems/create/', views.menuitem_create, name='menuitem_create'),
     path('menuitems/<int:pk>/update/', views.menuitem_update, name='menuitem_update'),
     path('menuitems/<int:pk>/delete/', views.menuitem_delete, name='menuitem_delete'),
+
+    # app acopladas
     path('metadata/', include('dashboard.metadata.urls')),
+    path('groups/', include('dashboard.groups.urls')),
+    path('page/', include('dashboard.page.urls')),
+
 
 ]

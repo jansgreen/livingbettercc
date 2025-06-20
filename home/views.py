@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
-from page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
+from dashboard.page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
 
 from django.conf import settings
 from django.contrib.auth.models import User

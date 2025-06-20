@@ -34,8 +34,3 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'telefono', 'numero_identidad', 'profesion', 'roll')
     list_filter = ('roll',)  # Ensure 'roll' is a valid field in the Profiles model
 
-@admin.register(Customers)
-class CustomersAdmin(admin.ModelAdmin):
-    list_display = ['user', 'Profiles', 'address']  # Ensure these fields exist in the Customers model
-    search_fields = ('user__username', 'Profiles', 'address')
-    list_filter = ['user']  # Ensure 'roll' is a valid field in the Customers model

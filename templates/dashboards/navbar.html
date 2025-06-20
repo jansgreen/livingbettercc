@@ -4,14 +4,10 @@
 
       <ul class="nav">
         
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false">
           <img src="{{ user.profile.imagen.url }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
           <strong>{{ user.username | capfirst }}</strong>
         </a>
-
-        <li class="nav-item">
-          <a class="nav-link text-light" href="{% url 'menus' %}">Menus</a>
-        </li>
       </ul>
 
     <ul class="nav justify-content-end">

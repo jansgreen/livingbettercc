@@ -1,7 +1,7 @@
 # your_project/context_processors.py
 from django.conf import settings
 from blog.models import blogPost
-from page.models import PageCategory
+from dashboard.page.models import PageCategory
 
 def bootstrap_css(request):
     return {'BOOTSTRAP_CSS': settings.BOOTSTRAP_CSS}

@@ -2,4 +2,91 @@
 {% load static %}
 
 {% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Dashboard Overview</h1>
+<div class="container mt-5">
+    <!-- Users Summary Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5>User Summary</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Role</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Customers</td>
+                        <td>{{ customers_count }}</td>
+                    </tr>
+                    <tr>
+                        <td>Students</td>
+                        <td>{{ students_count }}</td>
+                    </tr>
+                    <tr>
+                        <td>Staff</td>
+                        <td>{{ staff_count }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Posts Summary Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5>Posts Summary</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Category</th>
+                        <th>Published Posts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category, count in posts_summary %}
+                    <tr>
+                        <td>{{ category }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Classroom Modules Summary Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5>Classroom Modules Summary</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Module</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for module, count in modules_summary %}
+                    <tr>
+                        <td>{{ module }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 {% endblock %}
+
+
+

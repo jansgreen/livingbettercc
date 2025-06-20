@@ -108,4 +108,36 @@ def customer_view(request):
             return redirect('shop:checkout')  # Redirect to the next stage
     else:
         form = CustomerForm()
-    return render(request, 'authentication/customers.html', {'form': form})
+    return render(request, 'customers/customers.html', {'form': form})
+
+def customer_list_view(request):
+    customers = Customers.objects.all()
+    return render(request, 'customers/customer_list.html', {'customers': customers})
+
+def customer_create_view(request):
+    if request.method == 'POST':
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list')  # Redirect to customer list after creation
+    else:
+        form = CustomerForm()
+    return render(request, 'customers/customer_create.html', {'form': form})
+
+def customer_update_view(request, pk):
+    customer = get_object_or_404(Customers, pk=pk)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_list')  # Redirect to customer list after update
+    else:
+        form = CustomerForm(instance=customer)
+    return render(request, 'customers/customer_update.html', {'form': form})
+
+def customer_delete_view(request, pk):
+    customer = get_object_or_404(Customers, pk=pk)
+    if request.method == 'POST':
+        customer.delete()
+        return redirect('customer_list')  # Redirect to customer list after deletion
+    return render(request, 'customers/customer_delete.html', {'customer': customer})
