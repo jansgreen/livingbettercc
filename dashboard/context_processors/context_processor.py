@@ -13,12 +13,12 @@ def navbar_menuitems(request):
     """
     Context processor to add menu items to the context.
     """
-    if request.user.is_authenticated:
-        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
-        if user_has_module_access:
-            menuitems = MenuItem.objects.all()
-            return {'navbar_menuitems': menuitems}
-    return {'navbar_menuitems': None}
+    try:
+        menuitems = MenuItem.objects.all()
+    except MenuItem.DoesNotExist:
+        menuitems = None
+    return {'navbar_menuitems': menuitems}
+
 def obtener_create_menu(request):
     """
     Context processor to generate a menu structure for settings based on user authentication and group membership.
@@ -62,7 +62,7 @@ def obtener_dashboard_menu(request):
         ]
         
         if user_has_module_access:
-            menu[0]['submenus'].append({'nombre': 'Dashboard', 'url': '/dashboard/dashboards/'})
+            menu[0]['submenus'].append({'nombre': 'Dashboard', 'url': 'dashboard/dashboards/'})
         
         return {'dashboard_menu': menu}
     return {'dashboard_menu': None}
