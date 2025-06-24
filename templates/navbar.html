@@ -10,7 +10,6 @@
         <ul class="navbar-nav ml-auto">
             {% if navbar_menuitems %}
                 {% for  menu in navbar_menuitems %}
-
                     {% if menu.nombre != "Home" and menu.orden == 0 %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ menu.get_url }}">
@@ -212,6 +211,15 @@
                             <strong>{{ user.username | capfirst }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                                {% for menu in dashboard_menu %}
+                                    {% if menu.submenus %}
+                                            {% for submenu in menu.submenus %}
+                                                <li>
+                                                    <a class="nav-link text-light" href="{{ submenu.url }}">{{ submenu.nombre }}</a>
+                                                </li>
+                                            {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
                               <li><a class="nav-link text-light" href="{% url 'logout' %}">Logout</a></li>
                             </ul>
 

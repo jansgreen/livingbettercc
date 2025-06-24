@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views
+from . import views   
+from .views import DirectivesUpdateView, DirectivesDeleteView
 
 urlpatterns = [
     path('profile/<int:pk>/', views.profile_view, name='profile_detail'),
@@ -21,4 +22,16 @@ urlpatterns = [
     path('customers/create/', views.customer_create_view, name='customer_create'),
     path('customers/<int:pk>/update/', views.customer_update_view, name='customer_update'),
     path('customers/<int:pk>/delete/', views.customer_delete_view, name='customer_delete'),
+
+    # Address CRUD views
+    path('addresses/', views.address_list, name='address_list'),
+    path('addresses/<int:pk>/', views.address_detail, name='address_detail'),
+    path('addresses/create/', views.address_create, name='address_create'),
+    path('addresses/<int:pk>/update/', views.address_update, name='address_update'),
+    path('addresses/<int:pk>/delete/', views.address_delete, name='address_delete'),
+
+    # Directives CRUD views
+    path('directives/DirectivesCreate/', views.DirectivesCreate, name='DirectivesCreate'),
+    path('directives/<int:pk>/update/', DirectivesUpdateView.as_view(), name='directives-update'),
+    path('directives/<int:pk>/delete/', DirectivesDeleteView.as_view(), name='directives-delete'),
 ]

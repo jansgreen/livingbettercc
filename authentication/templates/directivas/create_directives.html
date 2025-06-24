@@ -1,0 +1,21 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<h1>Create Directives</h1>
+<form method="POST" enctype="multipart/form-data" action="{% url 'DirectivesCreate' %}">
+    {% csrf_token %}
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Error!</strong> Please correct the errors below.
+        </div>
+    {% endif %}
+
+
+    <!-- Render directives form -->
+    <h2>Directives</h2>
+    {{ directives_form.media }}
+    {{ directives_form.as_p }}
+    <button class="btn btn-success" type="submit">Save</button>
+</form>
+<a href="{% url 'customer_list' %}">Back to Customer List</a>
+{% endblock %}

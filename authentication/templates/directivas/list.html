@@ -1,0 +1,12 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Lista de Directivas{% endblock %}
+
+{% block content %}
+    <h2>Lista de Directivas</h2>
+    <ul>
+        {% for directive in directives %}
+            <li>{{ directive.name }} - {{ directive.roll }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+<h1>Address List</h1>
+<a href="{% url 'address_create' %}">Create New Address</a>
+<ul>
+    {% for address in addresses %}
+    <li>
+        {{ address }} - 
+        <a href="{% url 'address_detail' address.pk %}">View</a> | 
+        <a href="{% url 'address_update' address.pk %}">Edit</a> | 
+        <a href="{% url 'address_delete' address.pk %}">Delete</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -78,9 +78,11 @@ def group_update(request, pk):
     form.fields['name'].widget.attrs.update
 
 def user_list(request):
-    users = User.objects.all()
-    form = GroupForm()
-    return render(request, 'user_list.html', {'users': users, 'form': form})
+    users = User.objects.all().prefetch_related('groups')
+    for user in users:
+        user.is_customer = user.groups.filter(name='customers').exists()
+        user.is_student = user.groups.filter(name='students').exists()
+    return render(request, 'user_list.html', {'users': users})
 
 class InviteFriendView(View):
     form_class = InviteForm

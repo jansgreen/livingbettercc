@@ -1,0 +1,11 @@
+{% extends "frontend.html" %}
+
+{% block content %}
+<h1>Address Detail</h1>
+<p>Street: {{ address.street }}</p>
+<p>Neighborhood: {{ address.neighborhood }}</p>
+<p>City: {{ address.city }}</p>
+<p>State: {{ address.state }}</p>
+<p>Zip Code: {{ address.zip_code }}</p>
+<a href="{% url 'address_list' %}">Back to List</a>
+{% endblock %}

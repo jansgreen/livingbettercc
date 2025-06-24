@@ -6,14 +6,14 @@ from authentication.models.profiles import Profiles
 from authentication.models.customers import Customers
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
+from .models.directives import Directives
 
 # Unregister the default User model
 
-
 @admin.register(Staffs)
 class StaffsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'Profiles', 'address', 'nivel_acceso', 'biografia']  # Ensure these fields exist in the Staffs model
-    search_fields = ('user__username', 'Profiles', 'address', 'nivel_acceso', 'biografia')
+    list_display = ['user', 'Profiles', 'address']  # Ensure these fields exist in the Staffs model
+    search_fields = ('user__username', 'Profiles', 'address')
     list_filter = ['user']  # Ensure 'department' is a valid field in the Staffs model
 
 @admin.register(Students)
@@ -34,3 +34,12 @@ class ProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'telefono', 'numero_identidad', 'profesion', 'roll')
     list_filter = ('roll',)  # Ensure 'roll' is a valid field in the Profiles model
 
+@admin.register(Directives)
+class DirectivesAdmin(admin.ModelAdmin):
+    list_display = ('user', 'address')
+    search_fields = ('user__username',)
+
+@admin.register(Customers)
+class CustomersAdmin(admin.ModelAdmin):
+    list_display = ('user', 'address')
+    search_fields = ('user__username',)

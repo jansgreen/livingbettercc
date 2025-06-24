@@ -4,7 +4,9 @@ from .models.profiles import Profiles
 from .models.customers import Customers
 from .models.students import Students
 from .models.staffs import Staffs
+from .models.directives import Directives
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 
 
 class AddressForm(forms.ModelForm):
@@ -12,10 +14,32 @@ class AddressForm(forms.ModelForm):
         model = Address
         exclude = '__all__'  # Adjust fields as needed
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
 class ProfileForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Profiles
         fields = '__all__'  # Adjust fields as needed
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
 class CustomerForm(forms.ModelForm):
     username = forms.CharField(
@@ -39,6 +63,11 @@ class CustomerForm(forms.ModelForm):
         model = Customers
         fields = ['username', 'password', 'email', 'first_name', 'last_name']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
     def save(self, commit=True):
         user = User.objects.create_user(
             username=self.cleaned_data['username'],
@@ -51,13 +80,43 @@ class CustomerForm(forms.ModelForm):
         Customers.objects.create(user=user)
         return user
 
-
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Students
         fields = '__all__'  # Adjust fields as needed
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staffs
         fields = '__all__'  # Adjust fields as needed
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+class DirectivesForm(forms.ModelForm):
+    class Meta:
+        model = Directives
+        fields = ['user', 'profiles', 'address', 'role', 'biografia']  # Ensure 'biografia' is included
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Accept the user as a parameter
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+class BootstrapUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password1', 'password2', 'email', 'first_name', 'last_name']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'

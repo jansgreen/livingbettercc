@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group  # Import Group
 from .address import Address
 
 class Students(models.Model):
@@ -9,4 +9,11 @@ class Students(models.Model):
     certifications = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Estudiante: {self.user.username}"
+        return f"students: {self.user.username}"
+
+def assign_students_group(sender, instance, created, **kwargs):
+    if created:
+        group, _ = Group.objects.get_or_create(name="students")
+        instance.user.groups.add(group)
+
+models.signals.post_save.connect(assign_students_group, sender=Students)

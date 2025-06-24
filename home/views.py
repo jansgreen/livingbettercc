@@ -3,14 +3,14 @@ from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
 from dashboard.page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
-
 from django.conf import settings
-from django.contrib.auth.models import User
+from authentication.models.directives import Directives
+from django.db.models import Case, When, IntegerField
+
+# Importa el modelo de biografías
 
 #para borrar 
 from shop.cart import Cart
-
-
 
 
 # Create your views here.
@@ -28,24 +28,20 @@ def quienes_somos(request):
     # Buscar la categoría con el slug 'quienes_somos'
     user = request.user
     # Filtrar usuarios con el grupo 'manager' y obtener su perfil
-    managers = User.objects.filter(groups__name='manager').select_related('profile')
 
-    # Ordenar los managers colocando a los que tienen el roll 'CEO' primero
-    managers = sorted(managers, key=lambda x: x.profile.roll != 'CEO')
-
+    directives_list = Directives.objects.all().order_by('role')
     # Obtener la categoría y los posts relacionados
     category = PageCategory.objects.filter(slug='quienes_somos').first()
     posts = PageContent.objects.filter(category=category)
 
     # Contexto para el template
     context = {
-        'managers': managers,
+        'directives': directives_list,
         'posts': posts,
         'user': user,
     }
 
     return render(request, 'quienes_somos.html', context)
-
 
 def contactanos(request):
     if request.method == 'POST':
@@ -91,3 +87,18 @@ def single_page(request, pk):
         'article': article,
         'related_articles': related_articles,
     })
+
+def view_bio(request, pk):
+    directives_list = Directives.objects.annotate(
+    prioridad=Case( 
+        When(role__iexact="CEO", then=0),
+        default=1,
+        output_field=IntegerField()
+    )
+).order_by('prioridad', 'role')
+    articles = Directives.objects.get(pk=pk)
+    context = {
+        'directives': directives_list,
+        'articles': articles,
+    }
+    return render(request, 'leer_bio.html', context)

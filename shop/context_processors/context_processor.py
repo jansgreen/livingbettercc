@@ -7,7 +7,8 @@ def obtener_menu_shop(request):
         }
     ]
     
-    menu[0]['submenus'].append({'nombre': 'Shop', 'url': '/shop/ '})
+    # Make "Shop" visible to all users
+    menu[0]['submenus'].append({'nombre': 'Shop', 'url': '/shop/product_list/'})
     
     # Check if the user has module access
     if request.user.is_authenticated:

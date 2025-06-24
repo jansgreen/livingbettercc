@@ -1,4 +1,3 @@
-
 import os
 from django.db import models
 from django.contrib.auth.models import User
@@ -9,6 +8,19 @@ from ckeditor.fields import RichTextField
 
 class Profiles(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # Add fields from the related User model
+    @property
+    def first_name(self):
+        return self.user.first_name
+
+    @property
+    def last_name(self):
+        return self.user.last_name
+
+    @property
+    def email(self):
+        return self.user.email
+
     GENERO_CHOICES = [
             ('M', 'Masculino'),
             ('F', 'Femenino'),
@@ -21,7 +33,6 @@ class Profiles(models.Model):
     roll = models.CharField(max_length=100, blank=True, null=True)
     imagen = models.ImageField(upload_to='profiles/', default='profiles/default.jpg')
     direccion = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='Direcciones')
-    old_cart = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

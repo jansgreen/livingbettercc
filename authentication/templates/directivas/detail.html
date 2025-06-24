@@ -1,0 +1,10 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Detalle de Directiva{% endblock %}
+
+{% block content %}
+    <h2>Detalle de Directiva</h2>
+    <p><strong>Nombre:</strong> {{ directive.name }}</p>
+    <p><strong>Rol:</strong> {{ directive.roll }}</p>
+    <p><strong>Descripción:</strong> {{ directive.description }}</p>
+{% endblock %}

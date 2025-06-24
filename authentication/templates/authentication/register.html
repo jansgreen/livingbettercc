@@ -1,10 +1,15 @@
 {% extends 'frontend.html' %}
 
 {% block content %}
-<h2>Register</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-4">
+        <h2>Register</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p}}
+            <button type="submit" class="btn btn-primary">Registrate</button>
+        </form>
+    </div>
+</div>
+
 {% endblock %}
