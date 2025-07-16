@@ -3,7 +3,7 @@ from django.urls import path, include
 from dashboard import views
 
 urlpatterns = [
-    path('dashboards/', views.dashboards, name='dashboards'),
+    path('', views.dashboards, name='dashboard'),
     # menu paths
     path('menus', views.menu, name='menus'),
     path('categorias/', views.categoria_menu_list, name='categoria_menu_list'),

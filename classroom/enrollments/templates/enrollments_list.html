@@ -1,0 +1,34 @@
+{% extends "classroom.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>Mis Inscripciones</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Curso</th>
+        <th>Progreso</th>
+        <th>Completado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for enrollment in enrollments %}
+      <tr>
+        <td>{{ enrollment.course.title }}</td>
+        <td>{{ enrollment.progress }}%</td>
+        <td>{{ enrollment.completed }}</td>
+        <td>
+          <a href="{% url 'enrollments:enrollment-detail' enrollment.pk %}" class="btn btn-info btn-sm">Ver</a>
+          <a href="{% url 'enrollments:enrollment-delete' enrollment.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4">No tienes inscripciones activas.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

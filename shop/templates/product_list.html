@@ -3,6 +3,33 @@
 
 {% block content %}
 <h1 class="mb-4 text-center">Por cada libro que adquieras, estás ayudando a que nuestra misión continúe. ¡Gracias por tu apoyo!</h1>
+
+
+<div class="row">
+   {% if courses %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-sm-12 mb-3 mb-sm-0">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" class="img-fluid mb-3" alt="{{ course.title }}">
+                            {% endif %}
+                        <p class="card-text">{{ course.description|safe }}</p>
+                        <a href="{% url 'courses:course-detail' course.id %}" class="btn btn-primary">Ver</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %} 
+</div>
+
+
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for product in products %}
     <div class="col">

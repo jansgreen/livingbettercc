@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from .models import Product, Cart, CartItem, Category, SubCategory
 from .forms import ProductForm, CategoryForm, SubCategoryForm
 from django.conf import settings
+from classroom.courses.models import Course
 import requests
 from django.contrib import messages
 from cart.cart import Cart as sc  # Import Cart with alias sc
@@ -11,7 +12,12 @@ from django.db import IntegrityError
 
 def product_list(request):
     products = Product.objects.all()
-    return render(request, 'product_list.html', {'products': products})
+    course = Course.objects.all()
+    context = {
+        'products': products,
+        'courses': course,
+    }
+    return render(request, 'product_list.html', context)
 
 def product_create(request):
     if request.method == 'POST':

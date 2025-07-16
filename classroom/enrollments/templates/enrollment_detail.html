@@ -1,0 +1,12 @@
+{% extends "classroom.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>Detalle de Inscripción</h1>
+  <p><strong>Curso:</strong> {{ enrollment.course.title }}</p>
+  <p><strong>Usuario:</strong> {{ enrollment.user.username }}</p>
+  <p><strong>Progreso:</strong> {{ enrollment.progress }}%</p>
+  <p><strong>Completado:</strong> {{ enrollment.completed }}</p>
+  <a href="{% url 'enrollments:enrollment-list' %}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

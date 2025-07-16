@@ -1,4 +1,5 @@
 from django.urls import reverse
+from classroom.courses.models import Course
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
@@ -12,16 +13,31 @@ def obtener_menu_classroom(request):
         ]
         
         if user_has_module_access:
-            menu[0]['submenus'].append({'nombre': 'Admin Panel', 'url':'/classroom/curso/admin/'})
-            menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url':'/classroom/curso/create/'})
-            menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': '/classroom/curso/list'})
-            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'url': '/classroom/modules/new/'})
-            menu[0]['submenus'].append({'nombre': 'Modulos', 'url': '/classroom/modules/'})
-            menu[0]['submenus'].append({'nombre': 'Lession', 'url': '/classroom/lessons/'})
-            menu[0]['submenus'].append({'nombre': 'Crear Lession', 'url': '/classroom/lessons/create/'})
-            menu[0]['submenus'].append({'nombre': 'Material', 'url': '/classroom/materials/'})
-            menu[0]['submenus'].append({'nombre': 'Crear Material', 'url': '/classroom/materials/create/'})
+            #courses
+            menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url': reverse('courses:course-create')})
+            menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': reverse('courses:course-list')})
+            # Modules
+            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'url': reverse('courses:module-create')})
+            menu[0]['submenus'].append({'nombre': 'Modulos', 'url': reverse('courses:module-list')})
+            # Lessons
+            menu[0]['submenus'].append({'nombre': 'Lession', 'url': reverse('courses:lesson-list')})
+            menu[0]['submenus'].append({'nombre': 'Crear Lession', 'url': reverse('courses:lesson-create')})
 
         return {'menu_classroom': menu}
     else:
         return {'menu_classroom': None}
+
+def obtener_progress_class(request):
+    if request.user.is_authenticated:
+        courses = Course.objects.filter(published=True)
+        progress = []
+        for course in courses:
+            progress.append({
+                'course': course,
+                'modules': course.modules.all(),
+                'lessons': [lesson for module in course.modules.all() for lesson in module.lessons.all()]
+            })
+        return {'progress_classroom': progress}
+    else:   
+        return {'progress_classroom': None}
+  

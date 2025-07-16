@@ -62,7 +62,7 @@ def obtener_dashboard_menu(request):
         ]
         
         if user_has_module_access:
-            menu[0]['submenus'].append({'nombre': 'Dashboard', 'url': 'dashboard/dashboards/'})
+            menu[0]['submenus'].append({'nombre': 'Dashboard', 'url': '/dashboard/'})
         
         return {'dashboard_menu': menu}
     return {'dashboard_menu': None}

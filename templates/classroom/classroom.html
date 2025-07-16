@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    {% if page_type == 'homepage' %}
+        <meta name="title" content="{{ meta_title }}">
+        <meta name="description" content="{{ meta_description }}">
+        <meta name="keywords" content="{{ meta_keywords }}">
+        {% if meta_search_image %}
+            <meta property="og:image" content="{{ meta_search_image }}">
+        {% endif %}
+        {% if meta_icon %}
+            <link rel="icon" href="{{ meta_icon }}" type="image/png">
+        {% endif %}
+        <title>{{ meta_title }}</title>
+    {% elif page_type == 'blog' %}
+        <meta name="title" content="{{ meta_blog_title }}">
+        <meta name="description" content="{{ meta_blog_description }}">
+        <meta name="keywords" content="{{ meta_blog_keywords }}">
+        {% if meta_blog_search_image %}
+            <meta property="og:image" content="{{ meta_blog_search_image }}">
+        {% endif %}
+        <title>{{ meta_blog_title }}</title>
+    {% else %}
+        <!-- Metadatos genéricos o por defecto -->
+        <meta name="title" content="Título por defecto">
+        <meta name="description" content="Descripción por defecto">
+        <meta name="keywords" content="palabras, clave, por, defecto">
+        <title>Título por defecto</title>
+    {% endif %}
+
+    <link href="{{BOOTSTRAP_CSS}}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap-icons/font/bootstrap-icons.css' %}">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+<!-- Bootstrap Bundle (incluye Popper.js) -->
+
+<style>
+    /* Títulos responsivos */
+    .custom-bg-black {
+        background-color: #0069f3; !important; /* Slightly lighter black for contrast */
+      } 
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+    h2 {
+      font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+    }
+    h3 {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+    h4 {
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+    }
+    h5 {
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+    }
+    h6 {
+      font-size: clamp(0.875rem, 2vw, 1.25rem);
+    }
+    
+    /* Párrafos responsivos */
+    p {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.6;
+    }
+    </style>
+    
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block extrahead %}
+    {% endblock %}
+</head>
+<body class="bg-body-tertiary">
+    {% include 'dashboards/navbar.html' %}
+
+    <main class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-sm-3 d-flex flex-nowrap custom-bg-black">
+                {% include 'classroom/asidebar.html' %}
+            </div>
+            <!-- Main Content -->
+            <section class="col-sm-9 p-lg-5">
+                {% block content %}
+                {% endblock %}
+            </section>
+        </div>
+    </main>
+
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/javascripts.js' %}"></script>
+    
+    {% block extra_js %}
+    {% endblock %}
+
+</body>
+</html>

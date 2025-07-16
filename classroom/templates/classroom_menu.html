@@ -1,0 +1,69 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+<h1>Crear Menu y Categoria</h1>
+
+<div class="my-3 p-3 bg-body rounded shadow-sm">
+    <h6 class="border-bottom pb-2 mb-0">Categoria de menu</h6>
+    <!-- ...existing recent updates content... -->
+     {% if navbar_categorias %}
+    <ul class="list-unstyled">
+        {% for categoria in navbar_categorias %}
+        <li class="media text-muted pt-3">
+            <div class="media-body pb-3 mb-0 small lh-125 border-bottom">
+                <strong class="d-block text-gray-dark">{{ categoria.nombre }}</strong>
+                {{ categoria.descripcion }}
+            </div>
+        </li>
+        <a href="{% url 'categoria_menu_update' categoria.pk %}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="{% url 'categoria_menu_delete' categoria.pk %}" class="btn btn-danger btn-sm">Delete</a>
+        {% endfor %}
+    </ul>
+    {% endif%}
+    <small class="d-block text-end mt-3">
+        <a href="{% url 'categoria_menu_create' %}">Create New Category</a>
+    </small>
+</div>
+
+<div class="my-3 p-3 bg-body rounded shadow-sm">
+    <h6 class="border-bottom pb-2 mb-0">Menu Items</h6>
+    <small class="d-block text-end mb-2">Los url reselvado para el frontend son: Home (home), Nosotros (nosotros), Contactanos (contactanos).</small>
+    <!-- ...existing recent updates content... -->
+    <div class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <p class="navbar-brand">Ejemplo del orden en la barra de menu</p>
+            <p class="navbar-brand">Categoria Navbar</p>
+            <a class="nav-link active" aria-current="page" href="#">0</a>
+
+            <ul class="nav justify-content-end">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">1</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+     {{menuitems}}
+     {% if navbar_menuitems %}
+    <ul class="list-unstyled">
+        {% for menuitems in navbar_menuitems %}
+        <li class="media text-muted pt-3">
+            <div class="media-body pb-3 mb-0 small lh-125 border-bottom">
+                <a href="{% url menuitems.url_name %}" class="text-decoration-none">
+                    <strong class="d-block text-gray-dark">{{ menuitems.nombre }}</strong> 
+                </a>
+                {{menuitems.categoria}}
+                {{ menuitems.url_name }}
+                {{ menuitems.orden }}
+            </div>
+        </li>
+        <a href="{% url 'menuitem_update' menuitems.pk %}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="{% url 'menuitem_delete' menuitems.pk %}" class="btn btn-danger btn-sm">Delete</a>
+        {% endfor %}
+    </ul>
+    {% endif%}
+    <small class="d-block text-end mt-3">
+        <a href="{% url 'menuitem_create' %}">Create New Category</a>
+    </small>
+</div>
+{% endblock %}

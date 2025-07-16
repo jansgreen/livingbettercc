@@ -1,0 +1,26 @@
+{% extends "classroom/classroom.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Modulos</h1>
+  <a href="{% url 'courses:module_create' %}" class="btn btn-primary mb-3">Crear Modulo</a>
+  <div class="row">
+    {% for module in modules %}
+    <div class="col-md-4">
+      <div class="card mb-3">
+        {% if module.image %}
+          <img src="{{ module.image.url }}" class="card-img-top" alt="{{ module.title }}">
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title">{{ module.title }}</h5>
+          <p class="card-text">{{ module.description|truncatewords:20 }}</p>
+          <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-primary">Ver detalles</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p>No hay modulos publicados.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+

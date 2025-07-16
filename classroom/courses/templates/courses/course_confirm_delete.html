@@ -1,0 +1,13 @@
+{% extends "classroom/classroom.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Eliminar Curso</h1>
+  <p>¿Seguro que deseas eliminar el curso "{{ object.title }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'courses:course-detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "classroom/classroom.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h1>{% if object %}Editar Curso{% else %}Crear Curso{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Guardar</button>
+  </form>
+  <a href="{% url 'courses:course-list' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+</div>
+{% endblock %}
