@@ -9,8 +9,8 @@
   <p><strong>Precio:</strong> ${{ object.price }}</p>
 
   {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:module-update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:module-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'courses:module_update' object.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'courses:module_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
   {% endif %}
 </div>
 

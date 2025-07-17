@@ -14,11 +14,11 @@ class CourseForm(forms.ModelForm):
 class ModuleForm(forms.ModelForm):
     class Meta:
         model = Module
-        fields = ['course', 'title', 'description', 'order']
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            for field in self.fields:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
+        fields = ['title', 'description', 'order']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({'class': 'form-control'})
 
 class LessonForm(forms.ModelForm):
     class Meta:

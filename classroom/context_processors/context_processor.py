@@ -13,15 +13,15 @@ def obtener_menu_classroom(request):
         ]
         
         if user_has_module_access:
-            #courses
-            menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url': reverse('courses:course-create')})
-            menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': reverse('courses:course-list')})
+            #courses/
+            menu[0]['submenus'].append({'nombre': 'Crear Curso', 'url': reverse('courses:course_create')})
+            menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'url': reverse('courses:course_list')})
             # Modules
-            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'url': reverse('courses:module-create')})
-            menu[0]['submenus'].append({'nombre': 'Modulos', 'url': reverse('courses:module-list')})
+            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'url': reverse('courses:module_create')})
+            menu[0]['submenus'].append({'nombre': 'Modulos', 'url': reverse('courses:module_list')})
             # Lessons
-            menu[0]['submenus'].append({'nombre': 'Lession', 'url': reverse('courses:lesson-list')})
-            menu[0]['submenus'].append({'nombre': 'Crear Lession', 'url': reverse('courses:lesson-create')})
+            menu[0]['submenus'].append({'nombre': 'Lecciones', 'url': reverse('courses:lesson_list')})
+            menu[0]['submenus'].append({'nombre': 'Crear Lección', 'url': reverse('courses:lesson_create')})
 
         return {'menu_classroom': menu}
     else:

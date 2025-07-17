@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container mt-4">
   <h1>Lecciones</h1>
-  <a href="{% url 'courses:lesson-create' %}" class="btn btn-primary mb-3">Crear Lección</a>
+  <a href="{% url 'courses:lesson_create' %}" class="btn btn-primary mb-3">Crear Lección</a>
   <div class="row">
     {% for lesson in lessons %}
     <div class="col-md-4">
@@ -13,7 +13,7 @@
         <div class="card-body">
           <h5 class="card-title">{{ lesson.title }}</h5>
           <p class="card-text">{{ lesson.description|truncatewords:20 }}</p>
-          <a href="{% url 'courses:lesson-detail' lesson.pk %}" class="btn btn-primary">Ver detalles</a>
+          <a href="{% url 'courses:lesson_detail' lesson.pk %}" class="btn btn-primary">Ver detalles</a>
         </div>
       </div>
     </div>

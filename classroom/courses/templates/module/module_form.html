@@ -1,13 +1,48 @@
-{% extends "classroom/classroom.html" %}
+{% extends 'classroom/classroom.html' %}
 {% block content %}
-<div class="container mt-4">
-  <h1>{% if object %}Editar modulo{% else %}Crear modulo{% endif %}</h1>
-  <form method="POST" action="{% url 'courses:module-create' %}" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.media}}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Guardar</button>
-  </form>
-  <a href="{% url 'courses:module-list' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
-</div>
+  <div class="container mt-4">
+    <h1>
+      {% if object %}
+        Editar modulo
+      {% else %}
+        Crear modulo
+      {% endif %}
+    </h1>
+    <form method="POST" action="{% url 'courses:module_create' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.media }}
+
+         <!-- Campo manual para seleccionar el curso -->
+
+
+    <div class="mb-3">
+      <label for="{{ courses.id }}">Curso:</label>
+      <select name="course" id="id_course" class="form-select" required>
+        <option value="">Seleccione un curso</option>
+        {% for course in courses %}
+          <option value="{{ course.id }}">{{ course.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+      {% for fields in form %}
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">{{ fields.label }}</label>
+          {{ fields }}
+          {% if fields.errors %}
+            <div class="alert alert-danger">
+              {% for error in fields.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+          {% if fields.help_text %}
+            <div class="form-text">{{ fields.help_text }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-success">Guardar</button>
+    </form>
+    <a href="{% url 'courses:module_list' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+  </div>
 {% endblock %}

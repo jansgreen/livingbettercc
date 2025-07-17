@@ -10,13 +10,13 @@
   <p><strong>Precio:</strong> ${{ object.price }}</p>
 
   {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:course-update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:course-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'courses:course_update' object.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'courses:course_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
   {% endif %}
   {% if is_enrolled %}
     <small class="text-success">Ya estás inscrito en este curso.</small>
   {% elif user.is_authenticated %}
-    <a href="{% url 'courses:course-enroll' object.pk %}" class="btn btn-success">Inscribirse</a>
+    <a href="{% url 'courses:course_enroll' object.pk %}" class="btn btn-success">Inscribirse</a>
   {% endif %}
 
   <h2>Detalles del Curso</h2>

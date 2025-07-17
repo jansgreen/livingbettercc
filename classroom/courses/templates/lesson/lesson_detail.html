@@ -8,8 +8,8 @@
   <p>{{ object.description }}</p>
 
   {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:lesson-update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:lesson-delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'courses:lesson_update' object.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'courses:lesson_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
   {% endif %}
 </div>
 {% endblock %}

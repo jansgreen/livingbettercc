@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mt-4">
   <h1>Cursos</h1>
-  <a href="{% url 'courses:course-create' %}" class="btn btn-primary mb-3">Crear Curso</a>
+  <a href="{% url 'courses:course_create' %}" class="btn btn-primary mb-3">Crear Curso</a>
   <div class="row">
     {% for course in courses %}
     <div class="col-md-4">
@@ -16,10 +16,10 @@
           <p class="card-text">{{ course.description|safe|truncatewords:20 }}</p>
 
           {% if can_access_module or request.user.is_superuser %}
-          <a class="btn btn-warning" href="{% url 'courses:course-update' course.pk %}">Editar</a>
-          <a class="btn btn-danger" href="{% url 'courses:course-delete' course.pk %}">Eliminar</a>
+          <a class="btn btn-warning" href="{% url 'courses:course_update' course.pk %}">Editar</a>
+          <a class="btn btn-danger" href="{% url 'courses:course_delete' course.pk %}">Eliminar</a>
           {% endif %}
-          <a href="{% url 'courses:course-detail' course.pk %}" class="btn btn-primary">Ver detalles</a>
+          <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-primary">Ver detalles</a>
         </div>
       </div>
     </div>
