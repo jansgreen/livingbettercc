@@ -2,42 +2,36 @@
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-  <h1>{{ object.title }}</h1>
-  {% if object.image %}
-    <img src="{{ object.image.url }}" class="img-fluid mb-3" alt="{{ object.title }}">
+  <h1>{{ course.title }}</h1>
+  {% if course.image %}
+    <img src="{{ course.image.url }}" class="img-fluid mb-3" alt="{{ course.title }}">
   {% endif %}
-  <p>{{ object.description|safe }}</p>
-  <p><strong>Precio:</strong> ${{ object.price }}</p>
-
-  {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:course_update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:course_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
-  {% endif %}
+  <div class="card-body">
+    <p>{{ course.description|safe }}</p>
   {% if is_enrolled %}
     <small class="text-success">Ya estás inscrito en este curso.</small>
-  {% elif user.is_authenticated %}
-    <a href="{% url 'courses:course_enroll' object.pk %}" class="btn btn-success">Inscribirse</a>
+    <a href="{% url 'courses:my_course' course.pk %}" class="btn btn-primary"> Continuar ...</a>
+  {% else %}
+    <p><strong>Precio:</strong> ${{ course.price }}</p>
+    <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Inscribirse</a>
   {% endif %}
 
-  <h2>Detalles del Curso</h2>
-  <h2>Modulos:</h2>
-  <ul>
-    {% for module in object.modules.all %}
-      <li><a href="{% url 'modules:module-detail' module.pk %}">{{ module.title }}</a></li>
-      <li>{{ module.count }} Modulos</li>
-    {% empty %}
+  {% if course.modules.all %}
+    <h2>Detalles del Curso</h2>
+      <ul class="list-group">
+        {% for module in course.modules.all %}  
+          <li class="list-group-item">
+            {{ module.title }}
+              <ul class="list-group list-group-flush">
+                {% for lesson in module.lessons.all %}
+                  <li class="list-group-item" >{{ lesson.title }}</li>
+                {% endfor %}
+              </ul>
+          </li>
+        {% endfor %}
+      </ul>
+  {% else %}
       <li>No hay módulos disponibles para este curso.</li>
-    {% endfor %}
-  </ul>
-  <h2>Lecciones</h2>
-  <ul>
-    {% for lesson in object.lessons.all %}
-      <li><a href="{% url 'lessons:lesson-detail' lesson.pk %}">{{ lesson.title }}</a></li>
-    {% empty %}
-        <p>No hay lecciones disponibles para este curso.</p>
-      {% endfor %}
-    </ul>
-    <p>Inicia sesión para ver las lecciones de este curso.</p>
-
+  {% endif %}
 </div>
 {% endblock %}

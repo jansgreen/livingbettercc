@@ -1,15 +1,21 @@
 {% extends "classroom/classroom.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h1>{{ object.title }}</h1>
-  {% if object.image %}
-    <img src="{{ object.image.url }}" class="img-fluid mb-3" alt="{{ object.title }}">
+  <h1>{{ lessons.title|capfirst }}</h1>
+  {% if lessons.image %}
+    <img src="{{ lessons.image.url }}" class="img-fluid mb-3" alt="{{ lessons.title }}">
   {% endif %}
-  <p>{{ object.description }}</p>
+  <p>{{ lessons.content|safe|capfirst }}</p>
+  {% if lessons.video %}
+    <h3>Video de la Lección</h3>
+    <video src="{{ lessons.video.url }}" class="object-fit-contain" autoplay></video>
+  {% endif %}
 
-  {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:lesson_update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:lesson_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'enrollments:mark_lesson_complete' lessons.pk %}" class="btn btn-primary">Continuar</a>
+
+  {% if user.is_authenticated and user == lessons.instructor %}
+    <a href="{% url 'courses:lesson_update' lessons.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'courses:lesson_delete' lessons.pk %}" class="btn btn-danger">Eliminar</a>
   {% endif %}
 </div>
 {% endblock %}

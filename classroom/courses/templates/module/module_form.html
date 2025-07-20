@@ -1,18 +1,16 @@
 {% extends 'classroom/classroom.html' %}
 {% block content %}
   <div class="container mt-4">
-    <h1>
-      {% if object %}
-        Editar modulo
-      {% else %}
-        Crear modulo
-      {% endif %}
-    </h1>
-    <form method="POST" action="{% url 'courses:module_create' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.media }}
+    {% if object %}
+      <h1>Editar {{ object.title }}</h1>
+      <form method="POST" action="{% url 'courses:module_update' module.pk %}" enctype="multipart/form-data">
 
-         <!-- Campo manual para seleccionar el curso -->
+    {% else %}
+      <h1>Crear modulo</h1>
+      <form method="POST" action="{% url 'courses:module_create' %}" enctype="multipart/form-data">
+    {% endif %}
+    {% csrf_token %}
+    {{ form.media }}
 
 
     <div class="mb-3">

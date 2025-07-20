@@ -2,11 +2,23 @@
 {% block content %}
 <div class="container mt-4">
   <h1>Eliminar Módulo</h1>
-  <p>¿Seguro que deseas eliminar el módulo "{{ object.title }}"?</p>
-  <form method="post">
+  <p>¿Seguro que deseas eliminar el módulo "{{ module.title }}" del curso "{{ module.course.title }}"?, tambien se borraran las lecciones que contenga este modulo!</p>
+  <p>{{ module.description }}</p>
+  {% if module.image %}
+    <img src="{{ module.image.url }}" class="img-fluid mb-3" alt="{{ module.title }}">
+  {% endif %}
+  {% if module.lessons.exists %}
+    <p><strong>Lecciones asociadas:</strong></p>
+    <ul>  
+      {% for lesson in module.lessons.all %}
+        <li>{{ lesson.title }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  <form method="POST">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Eliminar</button>
-    <a href="{% url 'courses:module_detail' object.pk %}" class="btn btn-secondary">Cancelar</a>
+    <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-secondary">Cancelar</a>
   </form>
 </div>
 {% endblock %}

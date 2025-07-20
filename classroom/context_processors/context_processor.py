@@ -1,5 +1,7 @@
 from django.urls import reverse
-from classroom.courses.models import Course
+from classroom.courses.models import Course, Module, Lesson
+from django.db.models import Prefetch
+from django.shortcuts import render, get_object_or_404, redirect
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
@@ -27,17 +29,24 @@ def obtener_menu_classroom(request):
     else:
         return {'menu_classroom': None}
 
+
 def obtener_progress_class(request):
-    if request.user.is_authenticated:
-        courses = Course.objects.filter(published=True)
-        progress = []
-        for course in courses:
-            progress.append({
-                'course': course,
-                'modules': course.modules.all(),
-                'lessons': [lesson for module in course.modules.all() for lesson in module.lessons.all()]
-            })
-        return {'progress_classroom': progress}
-    else:   
+    if not request.user.is_authenticated:
         return {'progress_classroom': None}
+
+    courses = Course.objects.filter(published=True).prefetch_related(
+        Prefetch('modules', queryset=Module.objects.prefetch_related('lessons'))
+    )
+
+    progress = []
+
+    for course in courses:
+        progress.append({
+            'course': course,
+            'modules': course.modules.all(),
+            'lessons': [lesson for module in course.modules.all() for lesson in module.lessons.all()]
+        })
+
+    return {'progress_classroom': progress}
+
   

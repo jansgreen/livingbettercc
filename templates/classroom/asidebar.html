@@ -2,27 +2,6 @@
 <div class="row w-100">
     <div class="d-flex justify-content-center w-100">
         <div class="accordion accordion-flush w-100 overflow-auto mt-5" id="accordionFlushExample" style="max-height: 90vh;">
-            <!-- menu progress classroom -->
-            {% for progress in progress_classroom %}
-                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ progress.nombre }}" aria-expanded="true" aria-controls="{{ progress.nombre }}">
-                            {{ progress.nombre }}
-                        </button>
-                    </h2>
-                    {% if progress.submenus %}
-                        <div id="{{ progress.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                            <ul class="list-group-flush">
-                                {% for submenu in progress.submenus %}
-                                    <li class="ms-3 border-0 m-3">
-                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>      
-                    {% endif %}
-                </div>
-            {% endfor %}
 
             {% for menu in dashboard_menu %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">

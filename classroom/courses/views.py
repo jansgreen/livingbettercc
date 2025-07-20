@@ -1,14 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Course, Module, Lesson
+from .models import Course, Module, Lesson, TestResult
 from .forms import CourseForm, ModuleForm, LessonForm
+from classroom.enrollments.models import Enrollment, ModuleCompletion, LessonCompletion
 from django.contrib import messages
 
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Module, TestResult
 from classroom.enrollments.models import Enrollment
 
 
@@ -22,21 +22,36 @@ def course_list(request):
     }
     return render(request, 'courses/course_list.html', context)
 
-# 🔹 Detalle de curso
 def course_detail(request, pk):
-    course = get_object_or_404(Course, pk=pk)
+    course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
     is_enrolled = False
 
     if request.user.is_authenticated:
-        is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
-
+        is_enrolled = Enrollment.objects.filter(user=request.user, course=course).first()
+        
     context = {
-        'object': course,
+        'course': course,
         'is_enrolled': is_enrolled,
     }
     return render(request, 'courses/course_detail.html', context)
 
-# 🔹 Crear curso
+@login_required
+def my_course(request, pk):
+    course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
+    enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+
+    completed_ids = LessonCompletion.objects.filter(
+        enrollment__user=request.user,
+        lesson__module__course=course
+    ).values_list('lesson_id', flat=True)
+
+    context = {
+        'course': course,
+        'is_completed': completed_ids,
+    }
+
+    return render(request, 'courses/my_course.html', context)
+
 @login_required
 def course_create(request):
     if request.method == 'POST':
@@ -45,12 +60,11 @@ def course_create(request):
             course = form.save(commit=False)
             course.instructor = request.user
             course.save()
-            return redirect('courses:course-list')
+            return redirect('courses:course_list')
     else:
         form = CourseForm()
     return render(request, 'courses/course_form.html', {'form': form})
 
-# 🔹 Actualizar curso
 @login_required
 def course_update(request, pk):
     course = get_object_or_404(Course, pk=pk)
@@ -58,19 +72,19 @@ def course_update(request, pk):
         form = CourseForm(request.POST, request.FILES, instance=course)
         if form.is_valid():
             form.save()
-            return redirect('courses:course-list')
+            messages.success(request, 'Course updated successfully.')
+            return redirect('courses:course_list')
     else:
         form = CourseForm(instance=course)
     return render(request, 'courses/course_form.html', {'form': form, 'object': course})
 
-# 🔹 Eliminar curso
 @login_required
 def course_delete(request, pk):
     course = get_object_or_404(Course, pk=pk)
     if request.method == 'POST':
         course.delete()
         messages.success(request, 'Course deleted successfully.')
-        return redirect('courses:course-list')
+        return redirect('courses:course_list')
     context = {
         'courses': course
     }
@@ -86,7 +100,6 @@ def module_create(request):
         if form.is_valid():
             module = form.save(commit=False)
             course_id = request.POST.get('course')
-            print(course_id)
             module.course = get_object_or_404(Course, pk=course_id)
             module.save()
             messages.success(request, 'Module created successfully.')
@@ -103,23 +116,31 @@ def module_create(request):
 @login_required
 def module_list(request):
     modules = Module.objects.all()
+    lessons = Lesson.objects.filter(module__in=modules)
     context = {
         'modules': modules,
+        'lessons': lessons,
     }
     return render(request, 'module/module_list.html', context)
 
 @login_required
 def module_update(request, pk):
     module = get_object_or_404(Module, pk=pk)
+    form = ModuleForm(instance=module)
     if request.method == 'POST':
         form = ModuleForm(request.POST, instance=module)
         if form.is_valid():
             form.save()
-            return redirect('courses:module_detail', pk=module.course.pk)
-    else:
-        form = ModuleForm(instance=module)
+            messages.success(request, 'Module updated successfully.')
+            return redirect('courses:module_list')
+        else:
+            messages.error(request, 'Error updating module. Please correct the errors below.')
+            return redirect('courses:module_update', pk=pk)
     context = {
         'form': form,
+        'courses': Course.objects.all(),
+        'module': module,
+        'object': True,
     }
     return render(request, 'module/module_form.html', context)
 
@@ -129,7 +150,7 @@ def module_detail(request, pk):
     lessons = module.lessons.all()
     context = {
         'module': module,
-        'lessons': lessons,
+        'lessons': lessons, #A
     }
     return render(request, 'module/module_detail.html', context)
 
@@ -140,15 +161,10 @@ def module_delete(request, pk):
         module.delete()
         messages.success(request, 'Module deleted successfully.')
         return redirect('courses:module_list')
-    else:
-        messages.error(request, 'Error deleting module.')
-        return redirect('courses:module_list')
-        
     context = {
-        'module': module
+        'module': module,
     }
-    return render(request, 'courses/module_confirm_delete.html', context)
-
+    return render(request, 'module/module_confirm_delete.html', context)
 
 # 🔹 Lecciones funciones
 @login_required
@@ -162,33 +178,43 @@ def lesson_list(request):
 @login_required
 def lesson_create(request):
     form = LessonForm()
+    print(request.POST)
     if request.method == 'POST':
         form = LessonForm(request.POST)
+
         if form.is_valid():
             lesson = form.save(commit=False)
-            lesson.module = get_object_or_404(Module, pk=request.POST.get('module_id'))
+            module_id = request.POST.get('module')
+            lesson.module = get_object_or_404(Module, pk=module_id)
             lesson.save()
+
             messages.success(request, 'Lesson created successfully.')
-            return redirect('courses:module_detail', pk=lesson.module.pk)
+            return redirect('courses:module_list')
+        else:
+            messages.error(request, 'Error creating lesson. Please correct the errors below.')
+            return redirect('courses:lesson_create')
     context = {
         'form': form,
-        'modules': Module.objects.all()
+        'courses': Course.objects.all(),
+        'object': False,  # Indica que no es una edición
     }
     return render(request, 'lesson/lesson_form.html', context)
 
 @login_required
 def lesson_update(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
-    if request.method == 'POST':
+    if request.method == 'POST': #A
         form = LessonForm(request.POST, instance=lesson)
         if form.is_valid():
             form.save()
             messages.success(request, 'Lesson updated successfully.')
-            return redirect('courses:module_detail', pk=lesson.module.pk)
+            return redirect('courses:module_list')
     else:
         form = LessonForm(instance=lesson)
     context = {
         'form': form,
+        'lesson': lesson,
+        'object': True,
     }
     return render(request, 'lesson/lesson_form.html', context)
 
@@ -196,9 +222,9 @@ def lesson_update(request, pk):
 def lesson_detail(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
     context = {
-        'lesson': lesson,
+        'lessons': lesson,
     }
-    return render(request, 'lessons/lesson_detail.html', context)
+    return render(request, 'lesson/lesson_detail.html', context)
 
 @login_required
 def lesson_delete(request, pk):
@@ -206,16 +232,13 @@ def lesson_delete(request, pk):
     if request.method == 'POST':
         lesson.delete()
         messages.success(request, 'Lesson deleted successfully.')
-        return redirect('courses:lesson-list')
+        return redirect('courses:module_list')
     else:
         messages.error(request, 'Error deleting lesson.')
-        return redirect('courses:lesson-list')
-    context = {
-        'lesson': lesson
-    }
-    return render(request, 'lesson/lesson_confirm_delete.html', context)
+        return redirect('courses:module_list')
 
-# guarda los resultados del test
+
+# guarda los resultados del test 
 @csrf_exempt
 @login_required
 def save_test_result(request):
@@ -262,7 +285,6 @@ def test_detail(request, pk):
         return JsonResponse({'status': 'success', 'score': score})
     
     return render(request, 'courses/test_detail.html', {'module': module, 'test': test})
-
 
 @login_required
 def course_enroll(request, pk):

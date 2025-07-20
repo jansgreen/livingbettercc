@@ -118,4 +118,17 @@ p {
   padding: 50px;
 }
 
+/* color de botones */
+.btn-soft-primary {
+  background-color: #b6d4fe;  /* un azul claro */
+  color: #084298;             /* texto azul oscuro */
+  border: 1px solid #b6d4fe;
+}
 
+.btn-soft-primary:hover {
+  background-color: #b6d4fe;
+  color: #052c65;
+}
+.btn-soft-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 123, 233, 0.25);
+}

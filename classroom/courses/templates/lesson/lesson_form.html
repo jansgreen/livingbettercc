@@ -1,11 +1,35 @@
 {% extends "classroom/classroom.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h1>{% if object %}Editar Lección{% else %}Crear Lección{% endif %}</h1>
-  <form method="post" enctype="multipart/form-data">
+  {% if object %}
+    <h1>Editar {{ object.title }}</h1>
+    <form method="POST" action="{% url 'courses:lesson_update' lesson.pk %}" enctype="multipart/form-data">
+  {% else %}
+    <h1>Crear lección</h1>
+    <form method='POST' action="{% url 'courses:lesson_create' %}" enctype="multipart/form-data">
+  {% endif %}
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Guardar</button>
+  {{ form.media }}
+
+  {% for field in form %}
+    <div class="mb-3">
+      <label for="{{field.id_for_label}}" class="form-label">{{field.label}}</label>
+
+    {% if field == 'module' %}
+      <select name="module" class="form-select" aria-label="Default select example">
+        <option selected>Selecciona un módulo</option>
+        {% for course in courses %}
+          <option value="{{ course.module.id }}">{{ course.title }} - {{ course.module.title }}</option>
+        {% endfor %}
+      </select>
+    {% endif %}
+
+    {{ field }}
+      <div id="emailHelp" class="form-text">{{ field.help_text }}</div>
+    </div>
+  {% endfor %}
+  
+  <button type="submit" class="btn btn-success">Guardar</button>
   </form>
   <a href="{% url 'courses:lesson_list' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
 </div>

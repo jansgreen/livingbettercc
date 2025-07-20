@@ -1,25 +1,73 @@
 {% extends "classroom/classroom.html" %}
 {% block content %}
+<style>
+/* color de botones */
+.btn-soft-primary {
+  background-color: #0099ff;  /* un azul claro */
+  color: #ffffff;             /* texto blanco */
+  border: 1px solid #0099ff;
+}
+
+.btn-soft-primary:hover {
+  background-color:#00aeff;
+  color: #052c65;
+}
+</style>
+
 <div class="container mt-4">
-  <h1>Modulos</h1>
+    {% for module in modules %}
+      <h1>{{module.course.title}}</h1>
+    {% endfor %}
   <a href="{% url 'courses:module_create' %}" class="btn btn-primary mb-3">Crear Modulo</a>
+  <a href="{% url 'courses:lesson_create' %}" class="btn btn-soft-primary mb-3">Crear lecciones</a>
+
   <div class="row">
     {% for module in modules %}
-    <div class="col-md-4">
-      <div class="card mb-3">
-        {% if module.image %}
-          <img src="{{ module.image.url }}" class="card-img-top" alt="{{ module.title }}">
-        {% endif %}
-        <div class="card-body">
-          <h5 class="card-title">{{ module.title }}</h5>
-          <p class="card-text">{{ module.description|truncatewords:20 }}</p>
-          <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-primary">Ver detalles</a>
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed flex-grow-1 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+            {{ module.title }}
+          </button>
+        </h2>
+        <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <ul class="list-group">
+              {% for lesson in module.lessons.all %}
+                <li class="list-group-item"> <strong><a href="{% url 'courses:lesson_detail' lesson.pk %}">{{ lesson.title|capfirst }}</a></strong>
+                  <div class="d-flex justify-content-between align-items-center accordion-header">
+                    <div class="ms-3">
+                      {% if can_access_module or request.user.is_superuser %}
+                        <a class="btn btn-warning" href="{% url 'courses:lesson_update' lesson.pk %}">Editar</a>
+                        <form action="{% url 'courses:lesson_delete' lesson.pk %}" method="post" class="d-inline">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </div>
+                </li>
+              {% empty %}
+                <li>No hay lecciones en este módulo.</li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </div>
+        <div class="mb-3">
+          <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-primary btn-sm">Ver Modulo</a>
+          {% if can_access_module or request.user.is_superuser %}
+            <a href="{% url 'courses:module_update' module.pk %}" class="btn btn-warning btn-sm">Editar</a>
+            <a href="{% url 'courses:module_delete' module.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+          {% endif %}
+        </div>
+        <hr>
     </div>
-    {% empty %}
-      <p>No hay modulos publicados.</p>
-    {% endfor %}
+      {% empty %}
+        <p>No hay modulos publicados.</p>
+      {% endfor %}
+
+
   </div>
 </div>
 {% endblock %}

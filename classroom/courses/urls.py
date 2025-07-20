@@ -5,6 +5,7 @@ app_name = 'courses'
 
 urlpatterns = [
     path('course_list/', views.course_list, name='course_list'),
+    path('my_course/<int:pk>/', views.my_course, name='my_course'),
     path('course_create/', views.course_create, name='course_create'),
     path('course_detail/<int:pk>/', views.course_detail, name='course_detail'),
     path('course_update/<int:pk>/', views.course_update, name='course_update'),
@@ -18,8 +19,8 @@ urlpatterns = [
     path('module_detail/<int:pk>/', views.module_detail, name='module_detail'),
 
     # Lessons URLs
-    path('lesson_list/', views.lesson_list, name='lesson_list'),
     path('lesson_create/', views.lesson_create, name='lesson_create'),
+    path('lesson_list/', views.lesson_list, name='lesson_list'),
     path('lesson_update/<int:pk>/', views.lesson_update, name='lesson_update'),
     path('lesson_delete/<int:pk>/', views.lesson_delete, name='lesson_delete'),
     path('lesson_detail/<int:pk>/', views.lesson_detail, name='lesson_detail'),
