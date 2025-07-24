@@ -13,6 +13,8 @@ from django.db import IntegrityError
 def product_list(request):
     products = Product.objects.all()
     course = Course.objects.all()
+    t = [t for t in course ]
+    print(t)
     context = {
         'products': products,
         'courses': course,

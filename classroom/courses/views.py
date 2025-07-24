@@ -10,7 +10,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from classroom.enrollments.models import Enrollment
-
+from classroom.courses.exequatur import exequatur_consurt
 
 # 🔹 Listar cursos publicados
 def course_list(request):
@@ -290,4 +290,14 @@ def test_detail(request, pk):
 def course_enroll(request, pk):
     course = get_object_or_404(Course, pk=pk)
     Enrollment.objects.get_or_create(user=request.user, course=course)
-    return redirect('courses:course-detail', pk=pk)
+    return redirect('courses:course_detail', pk=pk)
+
+
+def validar_exequatur_view(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        if exequatur_consurt(nombre):
+            return render(request, "formulario_avanzado.html")
+        else:
+            return render(request, "sin_exequatur.html", {"mensaje": "No tiene exequátur registrado."})
+    return render(request, "courses/distrito.html")

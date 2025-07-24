@@ -14,6 +14,8 @@
   {% else %}
     <p><strong>Precio:</strong> ${{ course.price }}</p>
     <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Inscribirse</a>
+    <a href="{% url 'courses:validar_exequatur_view'%}" class="btn btn-info">Distrito</a>
+
   {% endif %}
 
   {% if course.modules.all %}

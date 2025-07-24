@@ -1,0 +1,107 @@
+{% extends "frontend.html" %}
+
+{% load static %}
+{% block content %}
+    <div class="container mt-4 " style="max-width: 480px;">
+        <h1>Inscribirse a travez del distrito</h1>
+        <form id="formulario">
+
+        <!-- Paso 1 -->
+        <div id="paso1">
+            <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" id="nombre" required>
+            </div>
+
+            <div class="mb-3">
+            <label for="cedula" class="form-label">Cédula</label>
+            <input type="text" class="form-control" id="cedula" required>
+            </div>
+
+            <div class="mb-3">
+            <label for="exequatur" class="form-label">Exequátur</label>
+            <input type="text" class="form-control" id="exequatur">
+            </div>
+
+            <div class="mb-3">
+            <label for="cargo" class="form-label">Cargo</label>
+            <input type="text" class="form-control" id="cargo" required>
+            </div>
+
+            <div class="mb-3">
+            <label for="institucion" class="form-label">Institución Laboral</label>
+            <input type="text" class="form-control" id="institucion" required>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="mostrarPaso2()">Siguiente</button>
+        </div>
+
+        <!-- Paso 2 -->
+        <div id="paso2" style="display: none;">
+            <div class="mb-3">
+            <label for="regional" class="form-label">Regional</label>
+            <input type="text" class="form-control" id="regional">
+            </div>
+
+            <div class="mb-3">
+            <label for="provincia" class="form-label">Provincia</label>
+            <input type="text" class="form-control" id="provincia">
+            </div>
+
+            <div class="mb-3">
+            <label for="municipio" class="form-label">Municipio</label>
+            <input type="text" class="form-control" id="municipio">
+            </div>
+
+            <div class="mb-3">
+            <label for="distrito" class="form-label">Distrito Educativo</label>
+            <input type="text" class="form-control" id="distrito">
+            </div>
+
+            <div class="mb-3">
+            <label for="correoElectronico" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="correoElectronico">
+            </div>
+
+            <div class="mb-3">
+            <label for="genero" class="form-label">Género (M/F)</label>
+            <select class="form-select" id="genero">
+                <option selected disabled>Seleccione</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+            </select>
+            </div>
+
+            <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="telefono">
+            </div>
+
+            <button type="submit" class="btn btn-success">Enviar</button>
+        </div>
+
+        </form>
+
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function mostrarPaso2() {
+    // Validación básica antes de continuar
+    const nombre = document.getElementById("nombre").value.trim();
+    const cedula = document.getElementById("cedula").value.trim();
+    const cargo = document.getElementById("cargo").value.trim();
+    const institucion = document.getElementById("institucion").value.trim();
+
+    if (nombre === "" || cedula === "" || cargo === "" || institucion === "") {
+      alert("Por favor completa todos los campos requeridos del paso 1.");
+      return;
+    }
+
+    document.getElementById("paso1").style.display = "none";
+    document.getElementById("paso2").style.display = "block";
+  }
+</script>
+
+{% endblock %}
