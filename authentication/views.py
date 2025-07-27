@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+
+from authentication.models import address
 from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, AddressForm, DirectivesForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
@@ -162,17 +164,49 @@ def address_detail(request, pk):
     return render(request, 'authentication/address_detail.html', {'address': address})
 
 @login_required
-def address_create(request):
+def address_create(request, address_type):
     if request.method == 'POST':
         form = AddressForm(request.POST)
+        print(f"Form data: {request.POST}")  # Debugging line
         if form.is_valid():
-            address = form.save(commit=False)
-            address.user = request.user
-            address.save()
-            return redirect('address_list')
+            address_fields = {
+                'user': request.user,
+                'address_type': address_type,
+                'street': request.POST.get('street'),
+                'neighborhood': request.POST.get('neighborhood'),
+                'city': request.POST.get('provincias'),
+                'state': request.POST.get('municipios'),
+                'zip_code': request.POST.get('codigo_postal'),
+            }
+            for key, value in form.cleaned_data.items():
+                setattr(address, key, value)
+            # Explicitly update fields that may be excluded from the form's Meta
+            address = Address.objects.filter(user=request.user, address_type=address_type).first()
+            if address:
+                address.street = request.POST.get('street', address.street)
+                address.neighborhood = request.POST.get('neighborhood', address.neighborhood)
+                address.city = request.POST.get('city', address.city)
+                address.state = request.POST.get('state', address.state)
+                address.zip_code = request.POST.get('zip_code', address.zip_code)
+                address.save()
+
+            defaults = address_fields
+
+            Address.objects.update_or_create(
+                user=request.user,
+                address_type=address_type,
+                defaults=defaults
+            )
+            messages.success(request, 'Dirección creada exitosamente.')
+            return redirect('courses:course_list')  # Redirect to course list after successful creation
     else:
         form = AddressForm()
-    return render(request, 'authentication/address_form.html', {'form': form})
+    context = {
+        'form': form,
+        'address_type': address_type,
+    }
+    return render(request, 'direccion.html', context)
+
 
 @login_required
 def address_update(request, pk):
@@ -213,7 +247,6 @@ def DirectivesCreate(request):
     return render(request, 'directivas/create_directives.html', {
         'directives_form': directives_form,
     })
-
 
 class DirectivesUpdateView(UpdateView):
     model = Directives

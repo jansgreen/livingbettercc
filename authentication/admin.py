@@ -18,8 +18,8 @@ class StaffsAdmin(admin.ModelAdmin):
 
 @admin.register(Students)
 class StudentsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'degree', 'certifications']  # Ensure these fields exist in the Students model
-    search_fields = ('user__username', 'degree', 'certifications')
+    list_display = ['user', 'cedula', 'telefono', 'regional', 'distrito_educativo', 'genero', 'cargo', 'institucion_laboral']
+    search_fields = ('user__username', 'cedula', 'telefono', 'regional', 'distrito_educativo', 'genero', 'cargo', 'institucion_laboral')
     list_filter = ['user']  # Ensure 'grade' is a valid field in the Students model
 
 @admin.register(Address)

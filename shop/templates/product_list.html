@@ -2,63 +2,88 @@
 {% load static %}
 
 {% block content %}
-<h1 class="mb-4 text-center">Por cada libro que adquieras, estás ayudando a que nuestra misión continúe. ¡Gracias por tu apoyo!</h1>
 
-
-   {% if courses %}
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="row">
-            {% for course in courses %}
-                <div class="col-sm-4 mb-3 mb-sm-0">
-                    <div class="card"  style="width: 18rem;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ course.title }}</h5>
+    <div class="album py-5">
+        <div class="container"> 
+            <h1 class="mb-4 text-center">Cursos Disponibles</h1>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3"> 
+                {% if courses %}
+                        <title>Cursos Disponibles</title>
+                    {% for course in courses %} 
+                        <div class="col"> 
+                            <div class="card shadow-sm"> 
                                 {% if course.image %}
-                                    <img src="{{ course.image.url }}" class="img-fluid mb-3" alt="{{ course.title }}">
+                                    <img src="{{ course.image.url }}" class="bd-placeholder-img card-img-top" alt="{{ course.title }}">
+                                {% else %}
+                                    <svg aria-label="Placeholder: Thumbnail" class="bd-placeholder-img card-img-top" height="225" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
+                                        <title>{{ course.title }}</title>
+                                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
+                                    </svg>
                                 {% endif %}
-                            <p class="card-text">{{ course.description|safe }}</p>
-                            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-primary">Ver</a>
+                                <div class="card-body"> 
+                                    <h5 class="card-title">{{ course.title }}</h5>
+                                    <p class="card-text">{{ course.description|safe }}</p>
+                                    <div class="d-flex justify-content-between align-items-center"> 
+                                        <div class="btn-group"> 
+                                            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                            {% if user.is_authenticated %}
+
+                                                {% if user.group.access or superuser %}
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary">Editar</button>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div> 
+                                        <small class="text-body-secondary">{{ course.created_at|date:"d M Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endif %} 
+                    {% endfor %}
+                {% endif %}
+            </div>          
 
+            <hr class="my-4">
+                <h1 class="mb-4 text-center">Libros Disponibles</h1>
+                    <p class="text-center">
+                        Por cada libro que adquieras, estás ayudando a que nuestra misión continúe. ¡Gracias por tu apoyo!
+                    </p>
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for product in products %}
-    <div class="col">
-        <div class="card h-100 shadow-sm border-0">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top img-fluid rounded-top" alt="{{ product.name }}" 
-                 onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
-            {% endif %}
-            <div class="card-body text-center">
-                <h5 class="card-title text-truncate">{{ product.name | capfirst }}</h5>
-                <p class="card-text text-muted small">Leer Resumen</p>
-                <p class="card-text"><strong>Precio:</strong> ${{ product.price }}</p>
-                {% if product.subcategory.name == Digitales %}
-                    <button class="btn btn-primary rounded-pill px-4" type="button">{{ product.category.name | capfirst }} {{ product.subcategory.name | capfirst }}</button>
-                {% else %}
-                    <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
-                    <button class="btn btn-info rounded-pill px-4" type="button">{{ product.category.name | capfirst }} {{ product.subcategory.name | capfirst }}</button>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+                {% if products %}
+                    {% for product in products %}
+                        <div class="col">
+                            <div class="card shadow-sm"> 
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="bd-placeholder-img card-img-top" alt="{{ product.title }}">
+                                {% else %}
+                                    <svg aria-label="Placeholder: Thumbnail" class="bd-placeholder-img card-img-top" height="225" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
+                                        <title>{{ product.title }}</title>
+                                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
+                                    </svg>
+                                {% endif %}
+                                <div class="card-body"> 
+                                    <h5 class="card-title">{{ product.title }}</h5>
+                                    <p class="card-text">{{ product.description|safe|truncatewords:15 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center"> 
+                                        <div class="btn-group"> 
+                                            <a href="{% url 'product_detail' product.id %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                            {% if user.is_authenticated %}
+
+                                                {% if user.group.access or superuser %}
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary">Editar</button>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div> 
+                                        <small class="text-body-secondary">{{ course.created_at|date:"d M Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
                 {% endif %}
             </div>
-            <div class="card-footer bg-white border-0 text-center">
-                <div class="d-flex justify-content-center gap-2">
-                    {% if product.subcategory.name == Digitales %}
-                        <a href="{% url 'add_to_cart' product.id 1 %}" class="btn btn-outline-primary rounded-circle"><i class="bi bi-cart4"></i></a>
-                    {% else %}
-                        <input type="number" name="product_qty" placeholder="Cantidad" class="form-control w-50 d-inline-block" min="1" max="{{ product.stock }}" value="1">
-                        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-outline-primary rounded-circle"><i class="bi bi-cart4"></i></a>
-                    {% endif %}
-                    <a href="{% url 'checkout_list' %}" class="btn btn-success rounded-pill">Pagar</a>
-                </div>
-            </div>
         </div>
     </div>
-    {% endfor %}
-</div>
 {% endblock %}

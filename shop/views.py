@@ -49,6 +49,13 @@ def product_delete(request, pk):
         return redirect('product_list')
     return render(request, 'product_confirm_delete.html', {'product': product})
 
+def product_detail(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    context = {
+        'product': product,
+    }
+    return render(request, 'product_detail.html', context)
+
 # List categories
 def category_list(request):
     categories = Category.objects.all()

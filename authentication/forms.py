@@ -12,10 +12,11 @@ from django.contrib.auth.forms import UserCreationForm
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
-        exclude = '__all__'  # Adjust fields as needed
+        exclude = ['user', 'address_type', 'street', 'neighborhood', 'city', 'state', 'zip_code']  # Exclude user field to be set in the view
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 

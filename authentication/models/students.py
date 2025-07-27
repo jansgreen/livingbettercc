@@ -3,10 +3,20 @@ from django.contrib.auth.models import User, Group  # Import Group
 from .address import Address
 
 class Students(models.Model):
+    genero = (
+        ('Masculino', 'Masculino'),
+        ('Femenino', 'Femenino'),
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    degree = models.CharField(max_length=100)
-    certifications = models.TextField(blank=True)
+    cedula = models.CharField(max_length=11, unique=True, null=True, blank=True)
+    telefono = models.CharField(max_length=15, null=True, blank=True)
+    regional = models.CharField(max_length=100, null=True, blank=True)
+    distrito_educativo = models.CharField(max_length=100, null=True, blank=True)
+    genero = models.CharField(max_length=10, choices=genero, null=True, blank=True)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
+    cargo = models.CharField(max_length=100, null=True, blank=True)
+    institucion_laboral = models.CharField(max_length=100, null=True, blank=True)
+    pendiente = models.BooleanField(default=True)
 
     def __str__(self):
         return f"students: {self.user.username}"

@@ -1,0 +1,33 @@
+
+{% extends 'frontend.html' %}
+
+{% block content %}
+<form action="{% url 'students:student_register_view' %}" method="POST">
+  {% csrf_token %}
+    <h1>Registro de Estudiantes</h1>
+    <p>Por favor, completa el siguiente formulario para registrarte como estudiante.</p>
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        <div class="form-text">{{ field.help_text }}</div>
+      </div>
+    {% endfor %}
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1" name="Check">
+        <label class="form-check-label" for="exampleCheck1">Registrarse por el distrito </label>
+    </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock content %}

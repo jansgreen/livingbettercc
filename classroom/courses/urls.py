@@ -12,7 +12,6 @@ urlpatterns = [
     path('course_delete/<int:pk>/', views.course_delete, name='course_delete'),
 
     # consultas Exequatur
-    path('validar_exequatur_view/', views.validar_exequatur_view, name='validar_exequatur_view'),
 
     #Modules URLs
     path('module_create/', views.module_create, name='module_create'),
