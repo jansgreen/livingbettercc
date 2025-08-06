@@ -1,0 +1,31 @@
+<!-- templates/certificates/public_certificate.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+  <h1>Certificado de Finalización</h1>
+  <p><strong>{{ user.get_full_name }}</strong> ha completado satisfactoriamente el curso:</p>
+  <h3>{{ course.title }}</h3>
+  <p><em>Fecha: {{ date|date:"d/m/Y" }}</em></p>
+
+  <a href="{% url 'certificate_pdf_download' certificate.uuid %}" class="btn btn-primary mt-4">
+    Descargar Certificado (PDF)
+  </a>
+</div>
+{% endblock %}
+<style>
+  .container {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border: 2px solid #5ca3ff;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+  }
+  h1, h3 {
+    color: #5ca3ff;
+  }
+  .btn-primary {
+    background-color: #5ca3ff;
+    border-color: #5ca3ff;
+  }

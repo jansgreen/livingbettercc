@@ -198,7 +198,7 @@
             {% endif %}
             {% if menu_cart %}
             <li>
-                <a class="text-decoration-none text-white me-3" href="{{ menu_cart }}">
+                <a class="text-decoration-none text-white me-3" href="{% url 'checkout:checkout_list' %}">
                     <i class="bi bi-cart4 text-warning">{{ cart_length }}</i>
                 </a>
             </li>

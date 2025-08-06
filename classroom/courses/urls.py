@@ -5,7 +5,7 @@ app_name = 'courses'
 
 urlpatterns = [
     path('course_list/', views.course_list, name='course_list'),
-    path('my_course/<int:pk>/', views.my_course, name='my_course'),
+    path('my_course/', views.my_course, name='my_course'),
     path('course_create/', views.course_create, name='course_create'),
     path('course_detail/<int:pk>/', views.course_detail, name='course_detail'),
     path('course_update/<int:pk>/', views.course_update, name='course_update'),

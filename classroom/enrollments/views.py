@@ -77,4 +77,4 @@ def mark_lesson_complete(request, lesson_id):
     enrollment.completed = progress >= 100
     enrollment.save()
 
-    return redirect('courses:my_course', pk=lesson.module.course.pk)
+    return redirect('courses:my_course')

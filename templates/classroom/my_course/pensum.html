@@ -2,41 +2,70 @@
 <div class="row w-100">
     <div class="d-flex justify-content-center w-100">
         <div class="accordion accordion-flush w-100 overflow-auto mt-5" id="accordionFlushExample" style="max-height: 90vh;">
-                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
-                    <h2 class="accordion-header">
-                        <a href="{% url 'home'%}" class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
-                            Home
-                        </a>
-                    </h2>
-                </div>
-            <!-- menu progress classroom -->
-        {% for progress in progress_classroom %}
-            <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
-                <h2 class="accordion-header">
-                    <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#course{{ progress.course.id }}" aria-expanded="true" aria-controls="course{{ progress.course.id }}">
-                        {{ progress.modules.title }}
-                    </button>
-                </h2>
-                <div id="course{{ progress.course.id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                    <ul class="list-group-flush">
-                        {% for module in progress.modules %}
-                            <li class="ms-3 border-0 m-3">
-                                <strong class="text-white">{{ module.title }}</strong>
-                                <ul>
-                                    {% for lesson in module.lessons.all %}
-                                        <li><a class="list-group-item list-group-item-action text-white border-0 rounded shadow-sm" href="#">{{ lesson.title }}</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>      
-            </div>
-        {% endfor %}
 
+            {% for menu in progress_classroom %}
+                <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse-{{ forloop.counter }}">
+                            {{ menu.course.title|capfirst }} - Progreso: {{ menu.progress }}%
+                        </button>
+                    </h2>
+
+                    <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            {% for module in menu.modules %}
+                                <div class="card my-2">
+                                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                        <span>{{ module.module.title }}</span>
+                                        {% if module.module_completed %}
+                                            <span class="badge bg-success">Módulo completado ✅</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">En progreso ⏳</span>
+                                        {% endif %}
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        {% for lesson in module.lessons %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ lesson.lesson.title }}
+                                                {% if lesson.completed %}
+                                                    <span class="badge bg-success">Completada ✅</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Pendiente</span>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endfor %}
+
+                            {% if menu.completed %}
+                                <div class="text-center mt-3">
+                                    <a href="#" class="btn btn-success">Descargar certificado 🏆</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+            <h6 class="text-center text-white mt-4">Cursos completados</h6>
+                {% for cert in certificados_usuario %}
+                    <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                        <h2 class="accordion-header">
+                            <span class="accordion-button bg-gradient text-white collapsed rounded shadow-sm">
+                                {{ cert.course_title|capfirst }}
+                            </span>
+                        </h2>
+                        <div class="text-center mt-3 mb-3">
+                            <a href="#" class="btn btn-success">Descargar certificado 🏆</a>
+                        </div>
+                    </div>
+                {% endfor %}
         </div>
     </div>
 </div>
+
 <style>
     /* General hover effect for text */
     .text-white:hover {

@@ -24,6 +24,7 @@ def course_list(request):
 
 def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
+
     is_enrolled = False
 
     if request.user.is_authenticated:
@@ -36,19 +37,26 @@ def course_detail(request, pk):
     return render(request, 'courses/course_detail.html', context)
 
 @login_required
-def my_course(request, pk):
-    course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
-    enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+def my_course(request):
+
+    enrollments = Enrollment.objects.filter(user=request.user, completed=False)
+    courses = Course.objects.filter(enrollment__in=enrollments).distinct()
+    modules = Module.objects.filter(course__in=courses).distinct()
+    course_ids = courses.values_list('id', flat=True)
 
     completed_ids = LessonCompletion.objects.filter(
-        enrollment__user=request.user,
-        lesson__module__course=course
+        enrollment__in=enrollments,
+        lesson__module__course__in=course_ids
     ).values_list('lesson_id', flat=True)
 
     context = {
-        'course': course,
+        'enrollments': enrollments,
+        'courses': courses,
+        'modules': modules,
         'is_completed': completed_ids,
+
     }
+
 
     return render(request, 'courses/my_course.html', context)
 
@@ -290,7 +298,7 @@ def test_detail(request, pk):
 def course_enroll(request, pk):
     course = get_object_or_404(Course, pk=pk)
     Enrollment.objects.get_or_create(user=request.user, course=course)
-    return redirect('courses:course_detail', pk=pk)
+    return redirect('courses:my_course')
 
 
 

@@ -9,18 +9,16 @@ from django.contrib.auth.models import Group
 from .exequatur import exequatur_consurt
 from django.contrib.auth.models import User
 import logging
+from classroom.enrollments.models import Enrollment
+from classroom.courses.models import Course, Module, Lesson
 
 logger = logging.getLogger(__name__)
 
 
 
 
-# Create your views here.
 
-# Student views
-def student_list_view(request):
-    students = Profiles.objects.filter(user__is_staff=False)  # Assuming students are not staff
-    return render(request, 'students/student_list.html', {'students': students})
+# Create your views here.
 
 def student_view(request):
     if request.method == 'POST':

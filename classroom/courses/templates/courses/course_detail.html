@@ -11,10 +11,10 @@
 
     {% if is_enrolled and user.is_authenticated %}
         <small class="text-success">Ya estás inscrito en este curso.</small>
-        <a href="{% url 'courses:my_course' course.pk %}" class="btn btn-primary"> Continuar ...</a>
+        <a href="{% url 'courses:my_course' %}" class="btn btn-primary"> Continuar ...</a>
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
-      <a href="{% url 'students:student_register_view'%}" class="btn btn-success">Inscribirse</a>
+      <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Inscribirse</a>
     {% endif %}
 
   {% if course.modules.all %}

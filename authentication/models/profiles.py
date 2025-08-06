@@ -33,7 +33,7 @@ class Profiles(models.Model):
     roll = models.CharField(max_length=100, blank=True, null=True)
     imagen = models.ImageField(upload_to='profiles/', default='profiles/default.jpg')
     direccion = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='Direcciones')
-
+    old_cart = models.JSONField(default=dict, blank=True, null=True)  # Assuming this is a JSON field for cart data
     def __str__(self):
         return self.user.username
 
@@ -50,7 +50,7 @@ class ProfileImage(models.Model):
     def clean(self):
         # Validación para limitar el número de imágenes por producto a 5
         if self.product.images.count() >= 5:
-            raise ValidationError("No puedes agregar más de 5 imágenes para este producto.")
+            raise ValidationError("No puedes  agregar más de 5 imágenes para este producto.")
 
     class Meta:
         unique_together = ('product', 'image') 
