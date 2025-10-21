@@ -34,16 +34,16 @@ def obtener_create_menu(request):
         ]
         
         if user_has_module_access:
-            menu[0]['submenus'].append({'nombre': 'Menus', 'url': '/menus'})
-            menu[0]['submenus'].append({'nombre': 'Listar Categorías', 'url': '/categorias/'})
-            menu[0]['submenus'].append({'nombre': 'Crear Categoría', 'url': '/categorias/create/'})
-            menu[0]['submenus'].append({'nombre': 'Actualizar Categoría', 'url': '/categorias/<int:pk>/update/'})
-            menu[0]['submenus'].append({'nombre': 'Eliminar Categoría', 'url': '/categorias/<int:pk>/delete/'})
-            menu[0]['submenus'].append({'nombre': 'Listar Items del Menú', 'url': '/menuitems/'})
-            menu[0]['submenus'].append({'nombre': 'Crear Item del Menú', 'url': '/menuitems/create/'})
-            menu[0]['submenus'].append({'nombre': 'Actualizar Item del Menú', 'url': '/menuitems/<int:pk>/update/'})
-            menu[0]['submenus'].append({'nombre': 'Eliminar Item del Menú', 'url': '/menuitems/<int:pk>/delete/'})
-        
+            menu[0]['submenus'].append({'nombre': 'Menus', 'url': '/dashboard/menus/'})
+            menu[0]['submenus'].append({'nombre': 'Listar Categorías', 'url': '/dashboard/categorias/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Categoría', 'url': '/dashboard/categorias/create/'})
+            menu[0]['submenus'].append({'nombre': 'Actualizar Categoría', 'url': '/dashboard/categorias/<int:pk>/update/'})
+            menu[0]['submenus'].append({'nombre': 'Eliminar Categoría', 'url': '/dashboard/categorias/<int:pk>/delete/'})
+            menu[0]['submenus'].append({'nombre': 'Listar Items del Menú', 'url': '/dashboard/menuitems/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Item del Menú', 'url': '/dashboard/menuitems/create/'})
+            menu[0]['submenus'].append({'nombre': 'Actualizar Item del Menú', 'url': '/dashboard/menuitems/<int:pk>/update/'})
+            menu[0]['submenus'].append({'nombre': 'Eliminar Item del Menú', 'url': '/dashboard/menuitems/<int:pk>/delete/'})
+
         return {'create_menu': menu}
     return {'create_menu': None}
 

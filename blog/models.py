@@ -5,6 +5,7 @@ from ckeditor.fields import RichTextField
 class blogCategory(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Nombre de la Categoría")
     description = models.TextField(blank=True, null=True, verbose_name="Descripción")
+    
 
     def __str__(self):
         return self.name

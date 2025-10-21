@@ -3,7 +3,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Footer, PagePosition, PageContent, PageCategory, carouselPage
 from .forms import FooterForm, PageContentForm, PagePositionForm, PageContentForm, PageCategoryForm, carouselPageForm
 from django.contrib import messages
-from django.shortcuts import render, redirect
 
 
 def is_admin_or_editor(user):
@@ -33,7 +32,7 @@ def create_page_content(request):
             page_content = form.save(commit=False)
             page_content.author = request.user  # Asignar el autor actual
             page_content.save()
-            return redirect('page_content_list')  # Cambia 'page_content_list' por la URL a la que deseas redirigir
+            return redirect('page:page_content_list')  # Cambia 'page_content_list' por la URL a la que deseas redirigir
     else:
         form = PageContentForm()
     
@@ -45,7 +44,7 @@ def manage_PagePosition(request):
         form = PagePositionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('manage_PagePositions')  # Redirige a la misma vista
+            return redirect('page:manage_PagePositions')  # Redirige a la misma vista
     else:
         form = PagePositionForm()
 
@@ -70,7 +69,7 @@ def delete_PagePosition(request, PagePosition_id):
     PagePosition = PagePosition.objects.get(id=PagePosition_id)
     if request.method == 'POST':
         PagePosition.delete()
-        return redirect('manage_PagePositions')  # Redirigir después de eliminar
+        return redirect('page:manage_PagePositions')  # Redirigir después de eliminar
 
     return render(request, 'delete_PagePosition.html', {'PagePosition': PagePosition})
 
@@ -94,7 +93,7 @@ def edit_page_content(request, content_id):
         form = PageContentForm(request.POST, instance=content)  # Vincula el formulario a la instancia existente
         if form.is_valid():
             form.save()  # Guarda los cambios
-            return redirect('page_content_list')  # Redirige a la lista de contenidos de página
+            return redirect('page:page_content_list')  # Redirige a la lista de contenidos de página
     else:
         form = PageContentForm(instance=content)  # Si no es POST, crea un formulario con los datos actuales
 
@@ -107,7 +106,7 @@ def delete_page_content(request, content_id):
 
     if request.method == 'POST':
         content.delete()  # Elimina el contenido de la base de datos
-        return redirect('page_content_list')  # Redirige a la lista de contenidos de página
+        return redirect('page:page_content_list')  # Redirige a la lista de contenidos de página
 
     return render(request, 'delete_page_content.html', {'content': content})
 
@@ -116,7 +115,7 @@ def crear_PagePosition(request):
         form = PagePositionForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
+            return redirect('page:listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
     else:
         form = PagePositionForm()
     return render(request, 'crear_PagePosition.html', {'form': form})
@@ -126,7 +125,7 @@ def crear_PageCategory(request):
         form = PageCategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
+            return redirect('page:listar_categorias_y_PagePosition')  # Cambia la URL de redirección si es necesario
     else:
         form = PageCategoryForm()
     return render(request, 'crear_PageCategory.html', {'form': form})
@@ -138,19 +137,19 @@ def listar_categorias_y_PagePosition(request):
 def delete_PagePosition(request, pk):
     col = PagePosition.objects.get(num=pk)
     col.delete()
-    return redirect(listar_categorias_y_PagePosition)
+    return redirect('page:listar_categorias_y_PagePosition')
 
 def delete_pageCategorias(request, pk):
     categorias = PageCategory.objects.get(pk=pk)
     categorias.delete()
-    return redirect(listar_categorias_y_PagePosition)
+    return redirect('page:listar_categorias_y_PagePosition')
 
 def carouselPageFunction(request):
     if request.method == "POST":
         form = carouselPageForm(request.POST, request.FILES)
         if form.is_valid:
             form.save()
-        return redirect('carouselPageFunction')
+        return redirect('page:carouselPageFunction')
     form = carouselPageForm()
     image = carouselPage.objects.all()
     context = {

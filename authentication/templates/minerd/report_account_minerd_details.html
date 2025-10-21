@@ -1,0 +1,15 @@
+{% extends "frontend.html" %}
+{% load static %}
+{% block content %}
+<h1>Detalles del Reporte de Cuenta Minerd</h1>
+
+<table class="table">
+
+    {% for field in report._meta.fields %}
+    <tr>
+        <th>{{ field.verbose_name }}:</th>
+        <td>{{ report|attr:field.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

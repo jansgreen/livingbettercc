@@ -41,7 +41,9 @@ def student_create_view(request):
             profile.user.is_staff = False  # Ensure the user is not a staff member
             profile.user.save()
             profile.save()
-            return redirect('student_list')  # Redirect to student list after creation
+            request.user.groups.add(name='students')
+            
+            return redirect('course_list')  # Redirect to student list after creation
     else:
         form = ProfileForm()
     return render(request, 'students/student_create.html', {'form': form})

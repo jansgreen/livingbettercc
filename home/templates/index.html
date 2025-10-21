@@ -2,41 +2,76 @@
 {% load static %}
 {% block content %}
 
-<div class="container-fluid">
-    <div class="row  mt-5">
-      <div class="row mb-5">
-          <h1 class="text-primary"> Living Better Community Center </h1>
-      </div>
-    </div>
 
-    <hr class="mb-5 border opacity-80 desg-hr">
 
-    <div class="row justify-content-md-center">
+<!-- POSTS PRINCIPALES -->
+<div class="container">
+  <div class="row g-4">
     {% for post in posts %}
-        {% if "Home" in  post.category.name and post.position.column == 1%}
-        <div class="col-12 col-md-4"> <!-- Puedes ajustar el número de columnas según tu diseño -->
-          <a href="{% url 'single_page' post.id %}" class="list-group-item list-group-item-action" aria-current="true">
-            <h3>{{post.title}}</h3>
-            <img src="{{post.cover_image.url}}" alt="" width="300" class="rounded img-fluid border border-light-subtle" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
-            {% if "Nuestro Valores" in post.title %}
-            <p>{{post.content|safe}}</p>
-            {% else %}
-            <p>{{post.summary|safe}}</p>
+      {% if "Home" in post.category.name and post.position.row == 0 %}
+        <div class="col-12 col-md-6">
+          <div class="card shadow-sm border-0 h-100">
+            {% if post.cover_image %}
+              <img src="{{ post.cover_image.url }}" class="card-img-top rounded-top"
+                   alt="{{post.title}}" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
             {% endif %}
-            </a>
-          <small>{{post.updated_at}}</small>
+            <div class="card-body">
+              <h3 class="card-title text-primary">{{ post.title|capfirst }}</h3>
+              {% if "Nuestro Valores" in post.title %}
+                <p class="card-text">{{ post.content|safe }}</p>
+              {% else %}
+                <p class="card-text">{{ post.summary|safe }}</p>
+              {% endif %}
+              <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2">Leer más</a>
+            </div>
+            <div class="card-footer text-muted small">
+              Última actualización: {{ post.updated_at }}
+            </div>
+          </div>
         </div>
-        {% endif %}
+      {% endif %}
     {% endfor %}
-    </div>
-    
-    <div class="row">
-      {% include 'actividades.html'%}
-    </div>
-    <div class="row">
-      {% include 'habilitadas.html'%}
-    </div>
+  </div>
 </div>
 
+<!-- POSTS SECUNDARIOS -->
+<div class="container mt-5">
+  <div class="row g-4">
+    {% for post in posts %}
+      {% if "Home" in post.category.name and post.position.row == 1 %}
+        <div class="col-12 col-md-4">
+          <div class="card shadow-sm border-0 h-100">
+            {% if post.cover_image %}
+              <img src="{{ post.cover_image.url }}" class="card-img-top rounded-top"
+                   alt="{{post.title}}" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
+            {% endif %}
+            <div class="card-body">
+              <h4 class="card-title text-primary">{{ post.title|capfirst }}</h4>
+              {% if "Nuestro Valores" in post.title %}
+                <p class="card-text">{{ post.content|safe }}</p>
+              {% else %}
+                <p class="card-text">{{ post.summary|safe }}</p>
+              {% endif %}
+              <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2">Leer más</a>
+            </div>
+            <div class="card-footer text-muted small">
+              {{ post.updated_at }}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<!-- SECCIONES INCLUIDAS -->
+<div class="container mt-5">
+  <div class="row">
+    {% include 'actividades.html' %}
+  </div>
+  <div class="row mt-4">
+    {% include 'habilitadas.html' %}
+  </div>
+</div>
 
 {% endblock %}

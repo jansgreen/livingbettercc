@@ -7,5 +7,5 @@
     {{ form.as_p }}  <!-- Renderiza los campos del formulario -->
     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
 </form>
-<a href="{% url 'page_content_list' %}" class="btn btn-secondary">Cancelar</a>
+<a href="{% url 'page:page_content_list' %}" class="btn btn-secondary">Cancelar</a>
 {% endblock %}

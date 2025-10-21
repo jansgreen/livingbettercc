@@ -58,24 +58,20 @@ def post_delete(request, pk):
         post.delete()
         return redirect('post_list')
     return render(request, 'post_confirm_delete.html', {'post': post})
-
 class CategoryListView(ListView):
     model = blogCategory
     template_name = 'category_list.html'
     context_object_name = 'categories'
-
 class CategoryCreateView(CreateView):
     model = blogCategory
     form_class = blogCategoryForm
     template_name = 'category_form.html'
     success_url = reverse_lazy('category_blog_list')
-
 class CategoryUpdateView(UpdateView):
     model = blogCategory
     form_class = blogCategoryForm
     template_name = 'category_form.html'
     success_url = reverse_lazy('category_blog_list')
-
 class CategoryDeleteView(DeleteView):
     model = blogCategory
     template_name = 'category_confirm_delete.html'

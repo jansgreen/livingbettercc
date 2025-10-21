@@ -9,7 +9,10 @@
   <div class="card-body">
     <p>{{ course.description|safe }}</p>
 
-    {% if is_enrolled and user.is_authenticated %}
+    {% if not user.is_authenticated %}
+      <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Login</a>
+
+    {% elif is_enrolled and user.is_authenticated %}
         <small class="text-success">Ya estás inscrito en este curso.</small>
         <a href="{% url 'courses:my_course' %}" class="btn btn-primary"> Continuar ...</a>
     {% else %}

@@ -7,5 +7,5 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Eliminar</button>
 </form>
-<a href="{% url 'manage_columns' %}" class="btn btn-secondary">Cancelar</a>
+<a href="{% url 'page:manage_columns' %}" class="btn btn-secondary">Cancelar</a>
 {% endblock %}

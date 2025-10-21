@@ -35,6 +35,9 @@ urlpatterns = [
     path('directives/DirectivesCreate/', views.DirectivesCreate, name='DirectivesCreate'),
     path('directives/<int:pk>/update/', DirectivesUpdateView.as_view(), name='directives-update'),
     path('directives/<int:pk>/delete/', DirectivesDeleteView.as_view(), name='directives-delete'),
+    
+    # Facilitions Minerd
+
 
     # students registration
     path('students/', include('authentication.students.urls')),

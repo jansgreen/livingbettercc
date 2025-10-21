@@ -1,0 +1,11 @@
+{% extends "frontend.html"  %}
+{% load static %}
+    {% block content %}
+    <h1>Eliminar Reporte de Cuenta Minerd</h1>
+    <p>¿Estás seguro de que deseas eliminar este reporte?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'report_account_miner_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+    {% endblock %}

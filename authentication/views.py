@@ -10,6 +10,7 @@ from authentication.models.profiles import Profiles
 from authentication.models.customers import Customers
 from authentication.models.directives import Directives
 from authentication.models.address import Address
+from authentication.models.students import Students
 
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -257,4 +258,5 @@ class DirectivesDeleteView(DeleteView):
     model = Directives
     template_name = 'dashboard.html'
     success_url = reverse_lazy('directives-list')  # Replace 'directives-list' with the name of your list view URL
+
 

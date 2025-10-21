@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <h2>Create Page Content</h2>
-    <form action="{% url 'create_page_content' %}" method="POST" enctype="multipart/form-data">
+    <form action="{% url 'page:create_page_content' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <p>by {{user.username |capfirst}}</p>
         <input type="text" class="form-control visually-hidden" placeholder="{{user.username}}" value="{{user.username}}" name="author">

@@ -9,11 +9,11 @@
             <p class="lead my-3">{{ form.0.summary|safe }}</p>
             <p class="lead mb-0">
                 <a href="{% url 'post_detail' form.0.id %}" class="text-body-emphasis fw-bold">Continue reading...</a>
-                {{ form.0.thumbnail.url }}
+                {{ form.0 }}
             </p>
     </div>
     <div class="col-lg-6 px-0">
-        <img src="{{ form.0.thumbnail.url  }}" width="200" height="250" alt="{{ form.0.title }}" class="img-fluid">
+        <img src="{{ form.0 }}" width="200" height="250" alt="{{ form.0.title }}" class="img-fluid">
     </div>
     {% endif %}
 

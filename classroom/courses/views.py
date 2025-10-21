@@ -12,7 +12,54 @@ from django.views.decorators.csrf import csrf_exempt
 from classroom.enrollments.models import Enrollment
 from authentication.students.exequatur import exequatur_consurt
 
-# 🔹 Listar cursos publicados
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+from .models import Course
+from classroom.enrollments.models import Enrollment
+from authentication.models.students import Students  # Ajusta el import según tu estructura
+from authentication.students.views import student_create_view
+from authentication.models.profiles import Profiles
+
+
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.models import Group
+from classroom.courses.models import Course, Module, Lesson, TestResult, Question
+
+
+def course_enroll(request, pk):
+    """Permite a un usuario inscribirse en un curso."""
+    if not request.user.is_authenticated:
+        messages.warning(request, 'Debes iniciar sesión para inscribirte en un curso.')
+        return redirect('login')
+
+    user = request.user
+    course = get_object_or_404(Course, pk=pk)
+
+    # Crear o recuperar estudiante
+    student, created = Students.objects.get_or_create(user=user)
+
+    # Asegurarse de que el usuario pertenezca al grupo 'student'
+    student_group, _ = Group.objects.get_or_create(name='student')
+    if not user.groups.filter(name='student').exists():
+        user.groups.add(student_group)
+
+    # Verificar si el usuario tiene perfil
+    if not Profiles.objects.filter(user=user).exists():
+        messages.info(request, 'Por favor, crea tu perfil antes de inscribirte.')
+        return redirect('profile_create_view')
+
+    # Crear o recuperar matrícula
+    enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
+    if created:
+        messages.success(request, f'Te has matriculado con éxito en {course.title}.')
+    else:
+        messages.info(request, f'Ya estás matriculado en {course.title}.')
+
+    return redirect('courses:my_course')
+
+
 def course_list(request):
     can_access_module = request.user.has_perm('groups.access_module')
     courses = Course.objects.filter(published=True)
@@ -35,6 +82,7 @@ def course_detail(request, pk):
         'is_enrolled': is_enrolled,
     }
     return render(request, 'courses/course_detail.html', context)
+
 
 @login_required
 def my_course(request):
@@ -294,11 +342,7 @@ def test_detail(request, pk):
     
     return render(request, 'courses/test_detail.html', {'module': module, 'test': test})
 
-@login_required
-def course_enroll(request, pk):
-    course = get_object_or_404(Course, pk=pk)
-    Enrollment.objects.get_or_create(user=request.user, course=course)
-    return redirect('courses:my_course')
+
 
 
 

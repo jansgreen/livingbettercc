@@ -10,6 +10,7 @@ urlpatterns = [
     path('course_detail/<int:pk>/', views.course_detail, name='course_detail'),
     path('course_update/<int:pk>/', views.course_update, name='course_update'),
     path('course_delete/<int:pk>/', views.course_delete, name='course_delete'),
+    path('course_enroll/<int:pk>/', views.course_enroll, name='course_enroll'),
 
     # consultas Exequatur
 

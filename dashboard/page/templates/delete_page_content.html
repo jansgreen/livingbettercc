@@ -7,5 +7,5 @@
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Eliminar</button>
     </form>
-    <a href="{% url 'page_content_list' %}" class="btn btn-secondary">Cancelar</a>
+    <a href="{% url 'page:page_content_list' %}" class="btn btn-secondary">Cancelar</a>
     {% endblock %}

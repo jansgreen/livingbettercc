@@ -1,0 +1,10 @@
+{% extends "frontend.html"  %}
+{% load static %}
+    {% block content %}
+    <h1>Actualizar Reporte de Cuenta Minerd</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Actualizar Reporte</button>
+    </form>
+    {% endblock %}

@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'blog',
     'authentication',
+    'authentication.students',
+    'authentication.minerd',
     'shop',
     'shop.checkout',
     'gallery',

@@ -1,6 +1,6 @@
 {% extends 'dashboard.html' %}    
 {% block content %}
-<form action="{% url 'crear_PageCategory' %}" method="POST">
+<form action="{% url 'page:crear_PageCategory' %}" method="POST">
     {% csrf_token %}
     <h1>Crear Pestaña</h5>
     {{ form.as_p }}
