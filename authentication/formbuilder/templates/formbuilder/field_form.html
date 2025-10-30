@@ -1,0 +1,18 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<h1>{% if form.instance.pk %}Editar{% else %}Agregar{% endif %} Campo</h1>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            <div class="form-text">{{ field.help_text }}</div>
+        </div>
+    {% endfor %}
+    <button type="submit">Guardar</button>
+</form>
+{% if form.instance.form and form.instance.form.pk %}
+    <a href="{% url 'formbuilder:form_detail' form.instance.form.pk %}">Volver al formulario</a>
+{% endif %}
+{% endblock %}

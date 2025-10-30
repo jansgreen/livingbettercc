@@ -41,6 +41,8 @@ urlpatterns = [
 
     # students registration
     path('students/', include('authentication.students.urls')),
+    path('minerd/', include('authentication.minerd.urls')),
+    path('formbuilder/', include('authentication.formbuilder.urls')),
 
 
 ]

@@ -1,0 +1,14 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<h1>Formularios</h1>
+<a href="{% url 'formbuilder:form_create' %}">Crear nuevo formulario</a>
+<ul  class="list-group">
+    {% for form in forms %}
+        <li class="list-group-item">
+            <a href="{% url 'formbuilder:form_detail' form.pk %}">{{ form.name }}</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item">No hay formularios.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

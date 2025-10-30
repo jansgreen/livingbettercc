@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'authentication',
     'authentication.students',
     'authentication.minerd',
+    'authentication.formbuilder',
     'shop',
     'shop.checkout',
     'gallery',

@@ -1,0 +1,12 @@
+{% extends "frontend.html" %}
+{% block content %}
+<div class="container py-4">
+  <h2>{{ form_name }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Enviar</button>
+  </form>
+  <a class="btn btn-secondary" href="{% url 'formbuilder:form_list' %}">Volver a la lista</a>
+</div>
+{% endblock %}

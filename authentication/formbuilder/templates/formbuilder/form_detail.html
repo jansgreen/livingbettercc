@@ -1,0 +1,44 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<h1>{{ form.name }}</h1>
+
+<div class="card m-3">
+    <div class="card-body">
+        <h5 class="card-title">Descripción</h5>
+        <p class="card-text">{{ form.description |capfirst|safe}}</p>
+    </div>
+</div>
+
+<div class="card m-3">
+    <div class="card-body">
+        <h5 class="card-title">Acciones</h5>
+        {% if form.pk %}
+            <a href="{% url 'formbuilder:form_update' form.pk %}">Editar</a>
+            <a href="{% url 'formbuilder:form_delete' form.pk %}">Eliminar</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card m-3">
+    <div class="card-body">
+        <h5 class="card-title">Campos</h5>
+        {% if form.pk %}
+            <a href="{% url 'formbuilder:field_add' form.pk %}">Agregar campo</a>
+        {% endif %}
+        <ul class="list-group">
+            {% for field in form.fields.all %}
+                <li class="list-group-item">
+                    {{ field.label }} {{ field.get_field_type_display }}
+                    <a href="{% url 'formbuilder:render_form' form.name %}">Ver</a>
+                    
+                    <a href="{% url 'formbuilder:field_update' field.pk %}">Editar</a>
+                    <a href="{% url 'formbuilder:field_delete' field.pk %}">Eliminar</a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No hay campos.</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'formbuilder:form_list' %}">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

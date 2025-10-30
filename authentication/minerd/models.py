@@ -15,15 +15,15 @@ class Campo(models.Model):
 
 
 class ReportAccountMinerd(models.Model):
-    titulo = models.CharField(max_length=200)
+    titulo = models.CharField(max_length=200, blank=True, null=True)
     subtitulo = models.CharField(max_length=250, blank=True, null=True)
-    centro_educativo = models.CharField(max_length=200)
+    centro_educativo = models.CharField(max_length=200, blank=True, null=True)
     responsabilidades = models.TextField(blank=True, null=True)
-    fecha = models.DateField()
+    fecha = models.DateField(blank=True, null=True)
     temas_impartidos = models.TextField(blank=True, null=True)
     objetivo_razon_motivo = models.TextField(blank=True, null=True)
-    regional = models.CharField(max_length=150)
-    campos = models.ManyToManyField(Campo, related_name='reportes')
+    regional = models.CharField(max_length=150, blank=True, null=True)
+    campos = models.ManyToManyField(Campo, related_name='reportes', blank=True)
     documentos = models.FileField(upload_to='reportes_minerd/', blank=True, null=True)
 
     class Meta:

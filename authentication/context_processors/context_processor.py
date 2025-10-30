@@ -35,3 +35,20 @@ def obtener_menu_auth(request):
     else:
         menu = None
         return {'menu_auth': menu}
+    
+def obtener_formbuilder_menu(request):
+    if request.user.is_authenticated and request.user.groups.filter(access='admin').exists():
+        formbuilder_menu = [
+            {
+                'nombre': 'Form Builder',
+                'url': '#',
+                'submenus': [
+                    
+                    {'nombre': 'Lista de Formularios', 'url': '/auth/formbuilder/'},
+                    {'nombre': 'Crear Nuevo Formulario', 'url': '/auth/formbuilder/create/'},
+                ]
+            }
+        ]
+        return {'formbuilder_menu': formbuilder_menu}
+    else:
+        return {'formbuilder_menu': []}

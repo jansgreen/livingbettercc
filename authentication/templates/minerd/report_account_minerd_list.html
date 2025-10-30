@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Lista de Reportes de Cuenta Minerd</h1>
 
-<a class="btn btn-success mb-3" href="{% url 'report_account_miner_create' %}">Crear Nuevo Reporte</a>
+<a class="btn btn-success mb-3" href="{% url 'minerd:report_account_miner_create' %}">Crear Nuevo Reporte</a>
 
 {% if reports %}
     <table class="table">
@@ -20,12 +20,12 @@
             {% for report in reports %}
             <tr>
                 <td>{{ report.id }}</td>
-                <td><a href="{% url 'report_account_miner_detail' report.id %}">{{ report.titulo }}</a></td>
+                <td><a href="{% url 'minerd:report_account_miner_detail' report.id %}">{{ report.titulo }}</a></td>
                 <td>{{ report.username }}</td>
                 <td>{{ report.created_at }}</td>
                 <td>{{ report.status }}</td>
-                <td><a href="{% url 'report_account_miner_update' report.id %}">Editar</a></td>
-                <td><a href="{% url 'report_account_miner_delete' report.id %}">Eliminar</a></td>
+                <td><a href="{% url 'minerd:report_account_miner_update' report.id %}">Editar</a></td>
+                <td><a href="{% url 'minerd:report_account_miner_delete' report.id %}">Eliminar</a></td>
             </tr>
             {% endfor %}
         </tbody>
