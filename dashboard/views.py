@@ -1,10 +1,40 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
 from dashboard.models import CategoriaMenu, MenuItem
 from dashboard.forms import CategoriaMenuForm, MenuItemForm
 
+# Import app models used for dashboard counts
+from authentication.models.students import Students
+from authentication.formbuilder.models import FormDefinition
+from classroom.courses.models import Course
+from authentication.models.customers import Customers
+
+
 def dashboards(request):
-    # Ensure the correct template path and context are used
-    return render(request, 'dashboard.html')  # Correct template path
+    """Render the dashboard overview with counts for key resources.
+
+    Context variables provided to the template:
+    - students_count
+    - users_count
+    - forms_count
+    - courses_count
+    - customers_count
+    """
+    students_count = Students.objects.count()
+    users_count = User.objects.count()
+    forms_count = FormDefinition.objects.count()
+    courses_count = Course.objects.count()
+    customers_count = Customers.objects.count()
+
+    context = {
+        'students_count': students_count,
+        'users_count': users_count,
+        'forms_count': forms_count,
+        'courses_count': courses_count,
+        'customers_count': customers_count,
+    }
+
+    return render(request, 'dashboard.html', context)
 
 def menu(request):
          

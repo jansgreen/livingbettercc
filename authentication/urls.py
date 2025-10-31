@@ -4,7 +4,7 @@ from .views import DirectivesUpdateView, DirectivesDeleteView
 
 
 urlpatterns = [
-    path('profile/<int:pk>/', views.profile_view, name='profile_detail'),
+    path('profile/', views.profile_view, name='profile_detail'),
     path('profile/create/', views.profile_create_view, name='profile_create'),
     path('profile/list/', views.profile_list_view, name='profile_list'),
     path('profile/update/<int:pk>/', views.profile_update_view, name='profile_update'),
@@ -41,7 +41,6 @@ urlpatterns = [
 
     # students registration
     path('students/', include('authentication.students.urls')),
-    path('minerd/', include('authentication.minerd.urls')),
     path('formbuilder/', include('authentication.formbuilder.urls')),
 
 

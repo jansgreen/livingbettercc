@@ -92,6 +92,20 @@ def render_form(request, form_name):
     if not DynamicForm:
         return render(request, 'formbuilder/not_found.html', {'form_name': form_name})
 
+    # If user is not authenticated and the link contains a facilitator flag,
+    # store a session marker and redirect to register so the user can sign up.
+    # The sender can include ?facilitador=1 in the link.
+    if not request.user.is_authenticated:
+        # If the link contains facilitador param, set session flag so registration
+        # view can assign the group after successful signup.
+        if request.GET.get('facilitador'):
+            request.session['assign_facilitador'] = True
+        # Redirect user to register page with next pointing back to this form URL
+        from django.urls import reverse
+        next_url = request.get_full_path()
+        register_url = reverse('register')
+        return redirect(f"{register_url}?next={next_url}")
+
     if request.method == 'POST':
         form = DynamicForm(request.POST)
         if form.is_valid():

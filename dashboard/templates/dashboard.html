@@ -2,89 +2,81 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Dashboard Overview</h1>
-<div class="container mt-5">
-    <!-- Users Summary Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5>User Summary</h5>
+<div class="container mt-4">
+    <h1 class="mb-4">Panel de Administración</h1>
+
+    <div class="row g-4">
+        <!-- Students -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Estudiantes</h5>
+                    <p class="card-text display-6">{{ students_count }}</p>
+                    <p class="text-muted">Total de registros en el módulo de estudiantes.</p>
+                    <div class="mt-auto">
+                        <a href="/auth/students/" class="btn btn-primary">Ir a Estudiantes</a>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Role</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Customers</td>
-                        <td>{{ customers_count }}</td>
-                    </tr>
-                    <tr>
-                        <td>Students</td>
-                        <td>{{ students_count }}</td>
-                    </tr>
-                    <tr>
-                        <td>Staff</td>
-                        <td>{{ staff_count }}</td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <!-- Users / Profiles -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="card-text display-6">{{ users_count }}</p>
+                    <p class="text-muted">Usuarios registrados (tabla User / Profiles).</p>
+                    <div class="mt-auto">
+                        <a href="/auth/profile/list/" class="btn btn-primary">Ir a Usuarios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formbuilder -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Formularios</h5>
+                    <p class="card-text display-6">{{ forms_count }}</p>
+                    <p class="text-muted">Formularios creados con Form Builder.</p>
+                    <div class="mt-auto">
+                        <a href="/auth/formbuilder/" class="btn btn-primary">Ir a Formularios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Courses -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Cursos</h5>
+                    <p class="card-text display-6">{{ courses_count }}</p>
+                    <p class="text-muted">Cursos disponibles en la plataforma.</p>
+                    <div class="mt-auto">
+                        <a href="/classroom/courses/course_list/" class="btn btn-primary">Ir a Cursos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Customers</h5>
+                    <p class="card-text display-6">{{ customers_count }}</p>
+                    <p class="text-muted">Clientes registrados en la app de autenticación.</p>
+                    <div class="mt-auto">
+                        <a href="/auth/customers/" class="btn btn-primary">Ir a Customers</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Posts Summary Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h5>Posts Summary</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Category</th>
-                        <th>Published Posts</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for category, count in posts_summary %}
-                    <tr>
-                        <td>{{ category }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Classroom Modules Summary Table -->
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white">
-            <h5>Classroom Modules Summary</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Module</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for module, count in modules_summary %}
-                    <tr>
-                        <td>{{ module }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 {% endblock %}
 

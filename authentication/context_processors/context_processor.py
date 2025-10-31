@@ -1,8 +1,10 @@
+from urllib3 import request
 from authentication.models import Profiles
+from dashboard.views import menu
 
 def obtener_menu_auth(request):
     if request.user.is_authenticated:
-        user_in_manager_group = (request.user.is_authenticated and request.user.groups.filter(name='manager').exists())
+        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
         menu = [
             {
                 'nombre': 'Profile',
@@ -13,10 +15,11 @@ def obtener_menu_auth(request):
 
         # Dynamically generate the URL for "Mi Perfil"
         profile_id = Profiles.objects.filter(user=request.user).values_list('id', flat=True).first()
+        print("Profile ID:", profile_id)
         if profile_id:
-            menu[0]['submenus'].append({'nombre': 'Mi Perfil', 'url': f'/auth/profile/{profile_id}/'})
+            menu[0]['submenus'].append({'nombre': 'Mi Perfil', 'url': f'/auth/profile/'})
 
-            if user_in_manager_group:
+            if user_has_module_access:
                 menu[0]['submenus'].append({'nombre': 'Crear Biografia', 'url': '/auth/profile/edit_biography/'})
 
             if request.user.is_authenticated and request.user.has_perm('auth.can_create_posts'):
@@ -37,18 +40,17 @@ def obtener_menu_auth(request):
         return {'menu_auth': menu}
     
 def obtener_formbuilder_menu(request):
-    if request.user.is_authenticated and request.user.groups.filter(access='admin').exists():
+    formbuilder_menu = None
+    if request.user.is_authenticated:
+        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
         formbuilder_menu = [
             {
                 'nombre': 'Form Builder',
                 'url': '#',
-                'submenus': [
-                    
-                    {'nombre': 'Lista de Formularios', 'url': '/auth/formbuilder/'},
-                    {'nombre': 'Crear Nuevo Formulario', 'url': '/auth/formbuilder/create/'},
-                ]
+                'submenus': []
             }
         ]
-        return {'formbuilder_menu': formbuilder_menu}
-    else:
-        return {'formbuilder_menu': []}
+
+        if user_has_module_access:
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Formbuilder', 'url': '/auth/formbuilder/'})
+    return {'formbuilder_menu': formbuilder_menu}

@@ -21,6 +21,8 @@ class AddressForm(forms.ModelForm):
             field.widget.attrs.update({'class': 'form-control'})
 
 class ProfileForm(forms.ModelForm):
+
+
     first_name = forms.CharField(
         max_length=150,
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -35,11 +37,14 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Profiles
-        fields = '__all__'  # Adjust fields as needed
+        exclude = ['user', 'old_cart', 'direccion']  # Adjust fields as needed
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
+            if field.label == 'imagen':
+                field.label_suffix = 'Foto de Perfil'
+
             field.widget.attrs.update({'class': 'form-control'})
 
 class CustomerForm(forms.ModelForm):

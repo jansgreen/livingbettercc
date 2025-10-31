@@ -2,9 +2,25 @@
 
 {% block content %}
 <h2>Profile Detail</h2>
-<p><strong>Name:</strong> {{ profile.name }}</p>
-<p><strong>Email:</strong> {{ profile.email }}</p>
-<p><strong>Phone:</strong> {{ profile.phone }}</p>
-<!-- Add more fields as needed -->
-<a href="{% url 'profile_list' %}">Back to Profile List</a>
+{% if profile %}
+    {% for field in profile %}
+        <p><strong>{{ field.username.label }}:</strong> {{ field.user.username }}</p>
+        <p><strong>{{ field.first_name.label }}:</strong> {{ field.first_name }}</p>
+        <p><strong>{{ field.last_name.label }}:</strong> {{ field.last_name }}</p>
+        <p><strong>{{ field.email.label }}:</strong> {{ field.email }}</p>
+        <p><strong>{{ field.telefono.label }}:</strong> {{ field.telefono }}</p>
+        <p><strong>{{ field.direccion.label }}:</strong> {{ field.direccion }}</p>
+        <p><strong>{{ field.genero.label }}:</strong> {{ field.genero }}</p>
+        <p><strong>{{ field.fecha_nacimiento.label }}:</strong> {{ field.fecha_nacimiento }}</p>
+        <p><strong>{{ field.numero_identidad.label }}:</strong> {{ field.numero_identidad }}</p>
+        <p><strong>{{ field.profesion.label }}:</strong> {{ field.profesion }}</p>
+        <p><strong>{{ field.roll.label }}:</strong> {{ field.roll }}</p>
+        <p><strong>{{ field.imagen.label }}:</strong> <img src="{{ field.imagen.url }}" alt="Profile Image"></p>
+
+
+    {% endfor %}
+    <a href="{% url 'profile_list' %}">Back to Profile List</a>
+{% else %}
+<p>No profile found.</p>
+{% endif %}
 {% endblock %}

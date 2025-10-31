@@ -1,4 +1,5 @@
 {% extends "dashboard.html" %}
+{% load static %}
 {% block content %}
 <h1>{{ form.name }}</h1>
 
@@ -23,21 +24,33 @@
     <div class="card-body">
         <h5 class="card-title">Campos</h5>
         {% if form.pk %}
-            <a href="{% url 'formbuilder:field_add' form.pk %}">Agregar campo</a>
-        {% endif %}
-        <ul class="list-group">
-            {% for field in form.fields.all %}
+            <ul class="list-group list-group-horizontal p-3">
                 <li class="list-group-item">
-                    {{ field.label }} {{ field.get_field_type_display }}
-                    <a href="{% url 'formbuilder:render_form' form.name %}">Ver</a>
-                    
-                    <a href="{% url 'formbuilder:field_update' field.pk %}">Editar</a>
-                    <a href="{% url 'formbuilder:field_delete' field.pk %}">Eliminar</a>
+                    <a href="{% url 'formbuilder:field_add' form.pk %}">Agregar campo</a>
                 </li>
-            {% empty %}
-                <li class="list-group-item">No hay campos.</li>
-            {% endfor %}
-        </ul>
+                <li class="list-group-item">
+                    <a href="{% url 'formbuilder:render_form' form.name %}">Ver</a>
+                </li>
+            </ul>
+        {% endif %}
+
+        <table class="table">
+            <tbody class="table-group-divider">
+                {% for field in form.fields.all %}
+                    <tr>
+                        <td>{{ field.label |capfirst}}</td>
+                        <td>{{ field.get_field_type_display }}</td>
+                        <td><a href="{% url 'formbuilder:field_update' field.pk %}">Editar</a></td>
+                        <td><a href="{% url 'formbuilder:field_delete' field.pk %}">Eliminar</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay campos.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <a href="{% url 'formbuilder:form_list' %}">Volver a la lista</a>
     </div>
 </div>

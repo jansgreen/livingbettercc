@@ -4,7 +4,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from authentication.models import address
 from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, AddressForm, DirectivesForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
@@ -36,10 +35,26 @@ def login_view(request):
     return render(request, 'authentication/login.html', {'form': form})
 
 def register_view(request):
+    from django.contrib.auth.models import Group
+
     if request.method == 'POST':
         form = BootstrapUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+
+            # If session or GET indicates this registration came from a facilitator link,
+            # ensure the 'facilitadores' group exists and assign the user to it.
+            assign_flag = False
+            # Prefer explicit GET param (in case redirect included it), otherwise check session
+            if request.GET.get('facilitador'):
+                assign_flag = True
+            elif request.session.pop('assign_facilitador', False):
+                assign_flag = True
+
+            if assign_flag:
+                group, _ = Group.objects.get_or_create(name='facilitadores')
+                user.groups.add(group)
+
             return redirect('login')  # Redirect to login after successful registration
     else:
         form = BootstrapUserCreationForm()
@@ -53,7 +68,17 @@ def profile_create_view(request):
     if request.method == 'POST':
         form = ProfileForm(request.POST)
         if form.is_valid():
-            form.save()
+            profile = form.save(commit=False)
+            profile.user = request.user  # Set the user to the currently logged-in user
+            profile.old_cart = ''  # Initialize old_cart or set as needed
+            if not Address.objects.filter(user=request.user, address_type='Residencial').exists():
+                address, created = Address.objects.get_or_create(user=request.user, address_type='Residencial')
+                profile.direccion = address
+                profile.save()
+                if created:
+                    return redirect('address_create', address_type='Residencial')
+            if not profile.direccion:
+                return redirect('address_create', address_type='Residencial')  # Redirect to address creation if direccion is not set
             return redirect('profile_list')  # Redirect to profile list after creation
     else:
         form = ProfileForm()
@@ -81,9 +106,12 @@ def profile_delete_view(request, pk):
         return redirect('profile_list')  # Redirect to profile list after deletion
     return render(request, 'authentication/profile_delete.html', {'profile': profile})
 
-def profile_view(request, pk):
-    profile = get_object_or_404(Profiles, pk=pk)
-    return render(request, 'authentication/profile_detail.html', {'profile': profile})
+def profile_view(request):
+    profile = Profiles.objects.filter(user=request.user)
+    context = {
+        'profile': profile,
+    }
+    return render(request, 'authentication/profile_detail.html', context)
 
 @csrf_exempt
 def customer_view(request):

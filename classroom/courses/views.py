@@ -48,7 +48,7 @@ def course_enroll(request, pk):
     # Verificar si el usuario tiene perfil
     if not Profiles.objects.filter(user=user).exists():
         messages.info(request, 'Por favor, crea tu perfil antes de inscribirte.')
-        return redirect('profile_create_view')
+        return redirect('profile_create')
 
     # Crear o recuperar matrícula
     enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
