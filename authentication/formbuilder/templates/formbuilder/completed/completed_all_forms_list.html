@@ -1,0 +1,48 @@
+{% extends "dashboard.html" %}
+{% load static %}
+{% block content %}
+<h1>Lista de Formularios Completados</h1>
+<div class="card m-3">
+    <div class="card-body">
+        <h5 class="card-title">Lista de Formularios</h5>
+
+        <table class="table">
+            <tbody class="table-group-divider">
+                <thead>
+                    <tr>
+                    <th scope="col">Form ID</th>
+                    <th scope="col">Formulario</th>
+                    <th scope="col">Titulo</th>
+                    <th scope="col">Fecha de Envío</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                {% for field in completed_forms %}
+                
+                    <tr>
+                        <td>{{ field.id }}</td>
+                        <td>{{ field.form_name |capfirst}}</td>
+                        <td>{{ field.titulo }}</td>
+                        <td>{{ field.submitted_at |date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ field.user.username.email }}</td>
+                        {% if not field.user.username.first_name %}
+                                <td>{{ field.user.username }}</td>
+                        {% else %}
+                                <td>{{ field.user.username.first_name }} | {{ field.user.username.last_name }}</td>
+                        {% endif %}
+                        <td><a href="{% url 'formbuilder:completed_forms_detail' field.pk %}">Ver</a></td>
+                        <td><a href="{% url 'formbuilder:field_update' field.pk %}">Editar</a></td>
+                        <td><a href="{% url 'formbuilder:field_delete' field.pk %}">Eliminar</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay campos.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

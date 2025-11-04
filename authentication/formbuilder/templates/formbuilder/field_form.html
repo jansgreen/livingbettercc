@@ -2,6 +2,8 @@
 {% load static %}
 {% block content %}
 <h1>{% if form.instance.pk %}Editar{% else %}Agregar{% endif %} Campo</h1>
+<p>test</p>
+
 <form method="post">
     {% csrf_token %}
     {% for field in form %}

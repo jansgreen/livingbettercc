@@ -1,28 +1,10 @@
 {% extends "dashboard.html" %}
 {% load static %}
 {% block content %}
-<h1>{{ form.name }}</h1>
-
+<h1>Formularios Completados</h1>
 <div class="card m-3">
     <div class="card-body">
-        <h5 class="card-title">Descripción</h5>
-        <p class="card-text">{{ form.description |capfirst|safe}}</p>
-    </div>
-</div>
-
-<div class="card m-3">
-    <div class="card-body">
-        <h5 class="card-title">Acciones</h5>
-        {% if form.pk %}
-            <a href="{% url 'formbuilder:form_update' form.pk %}">Editar</a>
-            <a href="{% url 'formbuilder:form_delete' form.pk %}">Eliminar</a>
-        {% endif %}
-    </div>
-</div>
-
-<div class="card m-3">
-    <div class="card-body">
-        <h5 class="card-title">Campos</h5>
+        <h5 class="card-title">Lista de Formularios</h5>
         {% if form.pk %}
             <ul class="list-group list-group-horizontal p-3">
                 <li class="list-group-item">
@@ -54,5 +36,4 @@
         <a href="{% url 'formbuilder:form_list' %}">Volver a la lista</a>
     </div>
 </div>
-
 {% endblock %}

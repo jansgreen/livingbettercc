@@ -249,18 +249,25 @@ PAYPAL_MODE = 'sandbox'  # Cambia a 'live' para producción
 
 CKEDITOR_CONFIGS = {
     'default': {
-        'toolbar': 'full',
-        'height': 300,
+        'toolbar': 'Custom',
+        'height': 400,
         'width': '100%',
+        'extraPlugins': ','.join(['image2', 'justify']),
+        'image2_disableResizer': False,
+        'image2_alignClasses': ['align-left', 'align-center', 'align-right'],
+        'image2_captionedClass': 'image-captioned',
+        'removePlugins': 'resize',  # evita conflictos con el redimensionamiento
+        'contentsCss': ['/static/css/style.css'],  # permite que CKEditor use tus estilos
         'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
             ['NumberedList', 'BulletedList'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['Link', 'Unlink'],
-            ['RemoveFormat', 'Source'],
+            ['Image', 'Link', 'Unlink', 'RemoveFormat', 'Source'],
         ],
     },
 }
+
+
 
 # paypal
 PAYPAL_TEST = True

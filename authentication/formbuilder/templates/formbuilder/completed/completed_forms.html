@@ -1,0 +1,35 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<h1>Formularios Completados</h1>
+<div class="card m-3">
+    <div class="card-body">
+        <h5 class="card-title">Lista de Formularios Completados</h5>
+        {% if completed_forms %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Formulario</th>
+                        <th>Fecha de Compleción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for completed_form in completed_forms %}
+                        <tr>
+                            <td>{{ completed_form.form_name }}</td>
+                            <td>{{ completed_form.completed_at }}</td>
+                            <td>
+                                <a href="{% url 'formbuilder:completed_forms_detail' completed_form.pk %}">Ver Detalles</a> |
+                                <a href="{% url 'formbuilder:completed_forms_edit' completed_form.pk %}">Editar</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No has completado ningún formulario aún.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

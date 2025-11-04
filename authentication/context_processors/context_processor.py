@@ -53,4 +53,8 @@ def obtener_formbuilder_menu(request):
 
         if user_has_module_access:
             formbuilder_menu[0]['submenus'].append({'nombre': 'Formbuilder', 'url': '/auth/formbuilder/'})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Lista Formularios Completados', 'url': '/auth/formbuilder/completed/completed_all_forms/'})
+        formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados', 'url': '/auth/formbuilder/completed/completed_forms/'})
+        formbuilder_menu[0]['submenus'].append({'nombre': 'Crear Formulario', 'url': '/auth/formbuilder/create/'})
+
     return {'formbuilder_menu': formbuilder_menu}

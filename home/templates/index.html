@@ -1,77 +1,313 @@
 {% extends 'frontend.html' %}
 {% load static %}
 {% block content %}
+  {# Estilos locales: paleta institucional (#7ec8ff light, #0d6efd dark), degradados, animaciones y microinteracciones #}
+  {# AOS and icon libraries are loaded in base template (frontend.html) to avoid duplication across pages. #}
+  <style>
+    :root {
+      --lb-blue-light: #7ec8ff;
+      --lb-blue-dark: #0d6efd;
+      --card-radius: 0.75rem;
+      --soft-shadow: 0 12px 28px rgba(13, 110, 253, 0.08);
+    }
+    
+    /* Animated subtle background behind hero using CSS gradient animation */
+    .hero-wrap {
+      position: relative;
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+    .hero-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background: radial-gradient(1200px 400px at 10% 10%, rgba(126, 200, 255, 0.12), transparent 10%), radial-gradient(900px 300px at 90% 80%, rgba(13, 110, 253, 0.06), transparent 8%);
+      transform: translateZ(0);
+      animation: floatBG 12s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes floatBG {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+    
+    /* Hero specifics */
+    .hero-caption h1 {
+      color: var(--lb-blue-dark);
+      font-weight: 700;
+    }
+    .hero-caption p {
+      color: #234;
+      opacity: 0.85;
+    }
+    .hero-figure img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+    }
+    @media (max-width: 768px) {
+      .hero-figure img {
+        height: 200px;
+      }
+    }
+    
+    /* Card visuals */
+    .post-card {
+      border: 0;
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--soft-shadow);
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 254, 255, 0.99));
+    }
+    .post-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 26px 60px rgba(13, 110, 253, 0.12);
+    }
+    .home-card-img-wrapper {
+      max-height: 300px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(126, 200, 255, 0.06), rgba(13, 110, 253, 0.02));
+    }
+    .home-card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .home-card-img-wrapper:hover img {
+      transform: scale(1.03);
+    }
+    
+    .card-body .card-title.text-primary,
+    .card-body h4.text-primary {
+      color: var(--lb-blue-dark);
+    }
+    .btn-outline-primary {
+      border-color: var(--lb-blue-dark);
+      color: var(--lb-blue-dark);
+    }
+    .btn-outline-primary:hover {
+      background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
+      color: white;
+      border-color: transparent;
+    }
+    
+    .card-footer {
+      background: transparent;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      color: #6c757d;
+    }
+    
+    /* Richtext images (keeps aspect ratio and fits into card body) */
+    .richtext-content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      max-height: 300px;
+      object-fit: contain;
+      border-radius: 0.35rem;
+      box-shadow: 0 10px 30px rgba(13, 110, 253, 0.05);
+    }
+    
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.8rem;
+    }
+    .gallery-item {
+      border-radius: 0.6rem;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(3, 10, 34, 0.04);
+      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .gallery-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+    
+    /* Microbadge */
+    .meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    
+    /* Accessibility: focus states */
+    a:focus,
+    button:focus {
+      outline: 3px solid rgba(13, 110, 253, 0.14);
+      outline-offset: 3px;
+    }
+    
+    .b-example-divider {
+      position: relative;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      width: 100vw;
+      height: 3rem;
+      background-color: #3299ff;
+      border: solid rgba(0, 0, 0, 0.15);
+      border-width: 1px 0;
+      box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1), inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+      z-index: 0;
+    }
+  </style>
 
+  <!-- Posts de las programas realizados -->
 
+{% if "Programas" in post.category.name %}
+  <div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom">{{ post.category.name }}</h2> 
 
-<!-- POSTS PRINCIPALES -->
-<div class="container">
-  <div class="row g-4">
-    {% for post in posts %}
-      {% if "Home" in post.category.name and post.position.row == 0 %}
-        <div class="col-12 col-md-6">
-          <div class="card shadow-sm border-0 h-100">
-            {% if post.cover_image %}
-              <img src="{{ post.cover_image.url }}" class="card-img-top rounded-top"
-                   alt="{{post.title}}" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
-            {% endif %}
-            <div class="card-body">
-              <h3 class="card-title text-primary">{{ post.title|capfirst }}</h3>
-              {% if "Nuestro Valores" in post.title %}
-                <p class="card-text">{{ post.content|safe }}</p>
-              {% else %}
-                <p class="card-text">{{ post.summary|safe }}</p>
-              {% endif %}
-              <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2">Leer más</a>
+    <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
+      <div class="col d-flex flex-column align-items-start gap-2">
+        <h2 class="fw-bold text-body-emphasis">{{ post.title }}</h2>
+        <p class="text-body-secondary">
+          {{ post.summary|safe }}
+        </p>
+        <a href="{% url 'single_page' post.id %}" class="btn btn-primary btn-lg">Leer más</a>
+      </div>
+
+      <div class="col">
+        <div class="row row-cols-1 row-cols-sm-2 g-4">
+          {% for item in items %}
+            <div class="col d-flex flex-column gap-2">
+              <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
+                <svg class="bi" width="1em" height="1em" aria-hidden="true">
+                  <use xlink:href="#gear-fill"></use>
+                </svg>
+              </div>
+              <h4 class="fw-semibold mb-0 text-body-emphasis">{{ item.name }}</h4>
+              <p class="text-body-secondary">{{ item.description|default:"Descripción no disponible" }}</p>
             </div>
-            <div class="card-footer text-muted small">
-              Última actualización: {{ post.updated_at }}
-            </div>
-          </div>
+          {% endfor %}
         </div>
-      {% endif %}
-    {% endfor %}
+      </div>
+    </div>
   </div>
-</div>
+{% endif %}
 
-<!-- POSTS SECUNDARIOS -->
-<div class="container mt-5">
-  <div class="row g-4">
-    {% for post in posts %}
-      {% if "Home" in post.category.name and post.position.row == 1 %}
-        <div class="col-12 col-md-4">
-          <div class="card shadow-sm border-0 h-100">
-            {% if post.cover_image %}
-              <img src="{{ post.cover_image.url }}" class="card-img-top rounded-top"
-                   alt="{{post.title}}" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
-            {% endif %}
-            <div class="card-body">
-              <h4 class="card-title text-primary">{{ post.title|capfirst }}</h4>
-              {% if "Nuestro Valores" in post.title %}
-                <p class="card-text">{{ post.content|safe }}</p>
-              {% else %}
-                <p class="card-text">{{ post.summary|safe }}</p>
+
+  <div class="b-example-divider"></div>
+
+  <div class="container">
+    <div class="row g-4">
+      {% for post in posts %}
+        {% if 'Home' in post.category.name and post.position.row == 0 %}
+          <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="60">
+            <article class="card post-card shadow-sm border-0 h-100">
+              {% if post.cover_image %}
+                <div class="home-card-img-wrapper">
+                  <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'" />
+                </div>
               {% endif %}
-              <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2">Leer más</a>
-            </div>
-            <div class="card-footer text-muted small">
-              {{ post.updated_at }}
-            </div>
+              <div class="card-body richtext-content">
+                <h3 class="card-title text-primary">{{ post.title|capfirst }}</h3>
+                {% if 'Nuestro Valores' in post.title %}
+                  <p class="card-text">{{ post.content|safe }}</p>
+                {% else %}
+                  <p class="card-text">{{ post.summary|safe }}</p>
+                {% endif %}
+                <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2" aria-label="Leer más sobre {{ post.title }}">Leer más →</a>
+              </div>
+              <div class="card-footer text-muted small">Última actualización: {{ post.updated_at|date:'d/m/Y' }}</div>
+            </article>
           </div>
-        </div>
-      {% endif %}
-    {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
-</div>
 
-<!-- SECCIONES INCLUIDAS -->
-<div class="container mt-5">
-  <div class="row">
-    {% include 'actividades.html' %}
+  <!-- Posts secundarios -->
+  <div class="container mt-5">
+    <div class="row g-4">
+      {% for post in posts %}
+        {% if 'Home' in post.category.name and post.position.row == 1 %}
+          <div class="col-12 col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <article class="card post-card shadow-sm border-0 h-100">
+              {% if post.cover_image %}
+                <div class="home-card-img-wrapper">
+                  <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'" />
+                </div>
+              {% endif %}
+              <div class="card-body">
+                <h4 class="card-title text-primary">{{ post.title|capfirst }}</h4>
+                {% if 'Nuestro Valores' in post.title %}
+                  <p class="card-text">{{ post.content|safe }}</p>
+                {% else %}
+                  <p class="card-text">{{ post.summary|safe }}</p>
+                {% endif %}
+                <a href="{% url 'single_page' post.id %}" class="btn btn-outline-primary btn-sm mt-2" aria-label="Leer más sobre {{ post.title }}">Leer más →</a>
+              </div>
+              <div class="card-footer text-muted small">{{ post.updated_at|date:'d/m/Y' }}</div>
+            </article>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
-  <div class="row mt-4">
-    {% include 'habilitadas.html' %}
-  </div>
-</div>
 
+  <!-- Secciones incluidas -->
+  <div class="container mt-5">
+    <div class="row">
+      {% include 'actividades.html' %}
+    </div>
+    <div class="row mt-4">
+      {% include 'habilitadas.html' %}
+    </div>
+  </div>
+
+  <!-- Galería animada ligera (usa posts secundarios) -->
+  <div class="container mt-5" data-aos="fade-up">
+    <h3 class="mb-3 text-primary">Galería</h3>
+    <div class="gallery-grid">
+      {% for post in posts %}
+        {% if post.cover_image and 'Home' in post.category.name and post.position.row == 1 %}
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="80">
+            <a href="{% url 'single_page' post.id %}" aria-label="Ver {{ post.title }}"><img src="{{ post.cover_image.url }}" alt="{{ post.title }}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'" /></a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- AOS init -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.AOS) AOS.init({ duration: 700, easing: 'ease-out-cubic', once: true })
+    })
+  </script>
 {% endblock %}

@@ -3,13 +3,15 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-from .models import FormDefinition, FormField
+from .models import FormDefinition, FormField, CompletedForm
 from .forms import FormDefinitionForm, FormFieldForm
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 # formbuilder/views.py
 from django.shortcuts import render, redirect
 from .utils import generate_dynamic_form
+from django.contrib import messages
+
 
 # FormDefinition CRUD - function-based views
 def form_list(request):
@@ -88,6 +90,7 @@ def field_delete(request, pk):
     return render(request, 'formbuilder/field_confirm_delete.html', {'object': instance})
 
 def render_form(request, form_name):
+    form_obj = get_object_or_404(FormDefinition, name=form_name)
     DynamicForm = generate_dynamic_form(form_name)
     if not DynamicForm:
         return render(request, 'formbuilder/not_found.html', {'form_name': form_name})
@@ -109,10 +112,68 @@ def render_form(request, form_name):
     if request.method == 'POST':
         form = DynamicForm(request.POST)
         if form.is_valid():
-            # Aquí puedes guardar las respuestas si quieres
-            print(form.cleaned_data)
+            # Aqui tengo que guardar los datos del form y en un nuevo model CRUD, para los formularios ya completados.
+            completed_form = CompletedForm.objects.create(
+                user=request.user,
+                form_name=form_name,
+                titulo=form.cleaned_data.get('titulo', ''),
+                descripcion=form.cleaned_data.get('descripcion', ''),
+                form_data=form.cleaned_data
+            )
+            completed_form.save()
+            messages.success(request, f'Formulario guardado con éxito.')
             return render(request, 'formbuilder/success.html')
     else:
         form = DynamicForm()
 
-    return render(request, 'formbuilder/render_form.html', {'form': form, 'form_name': form_name})
+    context={
+        'form_obj': form_obj,
+        'form': form, 
+        'form_name': form_name
+
+    }
+
+    return render(request, 'formbuilder/render_form.html', context)
+
+# Completed Forms Views
+def completed_forms_list(request):
+    completed_forms = CompletedForm.objects.filter(user=request.user)
+    if not completed_forms:
+        messages.info(request, 'No has completado ningún formulario aún.')
+    context = {
+        'completed_forms': completed_forms
+    }
+    return render(request, 'formbuilder/completed/completed_forms.html', context)
+
+def completed_forms_detail(request, pk):
+    completed_form = get_object_or_404(CompletedForm, pk=pk, user=request.user)
+    return render(request, 'formbuilder/completed/completed_form_detail.html', {'completed_form': completed_form})
+
+def completed_forms_edit(request, pk):
+    completed_form = get_object_or_404(CompletedForm, pk=pk, user=request.user)
+    DynamicForm = generate_dynamic_form(completed_form.form_name)
+    if not DynamicForm:
+        return render(request, 'formbuilder/not_found.html', {'form_name': completed_form.form_name})
+
+    if request.method == 'POST':
+        form = DynamicForm(request.POST)
+        if form.is_valid():
+            completed_form.form_data = form.cleaned_data
+            completed_form.save()
+            messages.success(request, f'Formulario actualizado con éxito.')
+            return redirect('formbuilder:completed_forms_detail', pk=completed_form.pk)
+    else:
+        form = DynamicForm(initial=completed_form.form_data)
+
+    context = {
+        'form': form,
+        'completed_form': completed_form,
+    }
+    return render(request, 'formbuilder/completed/edit_completed_form.html', context)
+
+def completed_all_forms_list(request):
+    completed_forms = CompletedForm.objects.all()
+    context = {
+        'completed_forms': completed_forms
+    }
+    return render(request, 'formbuilder/completed/completed_all_forms_list.html', context)

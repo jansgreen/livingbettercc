@@ -38,3 +38,15 @@ class FormField(models.Model):
 
     def __str__(self):
         return f"{self.form.name} - {self.label}"
+
+
+class CompletedForm(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    form_name = models.CharField(max_length=255)
+    titulo = models.CharField(max_length=255, blank=True, null=True)
+    descripcion = models.TextField(blank=True, null=True)
+    form_data = models.JSONField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"CompletedForm by {self.user.username} for {self.form_name} at {self.submitted_at}"

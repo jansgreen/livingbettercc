@@ -114,9 +114,19 @@ p {
 
 /* Opción con un degradado más curvado usando radial-gradient */
 .seccion-derecha {
-  background: radial-gradient(circle at 30% 100%, white 70%, #0d6efd 70%);
-  padding: 50px;
+  background: radial-gradient(circle at 10% 90%, #ffffff 65%, #0d6efd 100%);
+  padding: 4rem 3rem;
+  border-top-left-radius: 40px;
+  box-shadow: inset 0 0 60px rgba(13,110,253,0.08), 0 0 40px rgba(13,110,253,0.1);
+  transition: all 0.5s ease-in-out;
 }
+
+.seccion-derecha:hover {
+  background: radial-gradient(circle at 20% 80%, #ffffff 55%, #3299ff 100%);
+  box-shadow: inset 0 0 80px rgba(13,110,253,0.12), 0 0 60px rgba(13,110,253,0.15);
+  transform: scale(1.01);
+}
+
 
 /* color de botones */
 .btn-soft-primary {
@@ -132,3 +142,15 @@ p {
 .btn-soft-primary:focus {
   box-shadow: 0 0 0 0.2rem rgba(13, 123, 233, 0.25);
 }
+
+.richtext-content img,
+.ck-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+

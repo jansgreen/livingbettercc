@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+
 from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, AddressForm, DirectivesForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
@@ -56,6 +57,8 @@ def register_view(request):
                 user.groups.add(group)
 
             return redirect('login')  # Redirect to login after successful registration
+        else:
+            messages.error(request, f'{form.errors} Por favor verifique el error mencionado')
     else:
         form = BootstrapUserCreationForm()
     return render(request, 'authentication/register.html', {'form': form})

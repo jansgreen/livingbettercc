@@ -1,0 +1,100 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<style>
+    /* ====== ESTILO TIPO DOCUMENTO ====== */
+    .report-container {
+        background-color: #fff;
+        padding: 40px 60px;
+        margin: 20px auto;
+        max-width: 900px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: "Times New Roman", serif;
+    }
+
+    .report-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .report-header h3 {
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .report-header p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .report-section {
+        margin-bottom: 25px;
+    }
+
+    .report-section h5 {
+        text-decoration: underline;
+        font-weight: bold;
+        font-size: 16px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        color: #222;
+    }
+
+    .report-section p, .report-section li {
+        font-size: 15px;
+        line-height: 1.6;
+        text-align: justify;
+    }
+
+    .report-footer {
+        text-align: right;
+        margin-top: 40px;
+        font-size: 14px;
+        color: #555;
+        font-style: italic;
+    }
+
+    /* Ajustes visuales generales */
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    ul li::before {
+        content: "• ";
+        color: #000;
+    }
+</style>
+    <div class="report-header">
+        <h3>Living Better Community Center Inc.</h3>
+        <p>C/CUL DE SAC2 SUR EDF T APT A 4 LAS PRADERAS</p>
+        <p>Residencial Santo Domingo</p>
+        <p>Email: livingbetter08@yahoo.com | Tel.: 809-498-5985</p>
+        <hr style="border: 1px solid #000; width: 80%; margin: 20px auto;">
+        <h1>{{ completed_form.form_name|capfirst }}</h1>
+        <h5 style="text-decoration: underline; margin-bottom: 0;">{{ completed_form.titulo|capfirst }}</h5>
+        <p><em>{{ completed_form.descripcion|capfirst }}</em></p>
+    </div>
+
+<h1>Editar Formulario: {{ completed_form.form_name|capfirst }} </h1>
+
+
+
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label |capfirst }}</label>
+            {{ field }}
+            {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+{% endblock %}

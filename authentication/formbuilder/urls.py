@@ -16,5 +16,10 @@ urlpatterns = [
     path('fields/<int:pk>/delete/', views.field_delete, name='field_delete'),
     path('<str:form_name>/', views.render_form, name='render_form'),
 
+    # Completed Forms Views
+    path('completed/completed_forms/', views.completed_forms_list, name='completed_forms_list'),
+    path('completed/completed_forms_detail/<int:pk>/', views.completed_forms_detail, name='completed_forms_detail'),
+    path('completed/completed_forms_edit/<int:pk>/edit/', views.completed_forms_edit, name='completed_forms_edit'),
+    path('completed/completed_all_forms/', views.completed_all_forms_list, name='completed_all_forms_list'),
 ]
 

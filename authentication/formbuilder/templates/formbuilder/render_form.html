@@ -3,9 +3,16 @@
 {% block content %}
 <div class="container py-4">
   <h2>{{ form_name }}</h2>
+
+  <h6>{{ form_obj.description }}</h6>
+  <img src="{{ form_obj.image}}" alt="Form Image" class="img-fluid mb-4"/>
+
   <form method="post">
     {% csrf_token %}
+    <input type="hidden" name="titulo" value="{{ form_obj.titulo }}"/>
+    <input type="hidden" name="descripcion" value="{{ form_obj.descripcion }}"/>
     {% for field in form %}
+    
     <div class="mb-3">
       <label for="{{ field.id_for_label }}" class="form-label">{{ field.label |capfirst }}</label>
       {{ field }}
