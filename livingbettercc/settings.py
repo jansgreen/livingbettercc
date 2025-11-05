@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'classroom.certifications',
     'ckeditor',
     'ckeditor_uploader',
-    'blog',
     'authentication',
     'authentication.students',
     'authentication.formbuilder',
@@ -65,6 +64,7 @@ INSTALLED_APPS = [
     'dashboard.metadata',
     'dashboard.groups',
     'dashboard.page',
+    'dashboard.contents',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -106,7 +106,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'blog/templates'),
             os.path.join(BASE_DIR, 'home/templates'), 
             ],
         'APP_DIRS': True,
@@ -118,8 +117,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'home.context_processors.context_processor.bootstrap_css',
                 'home.context_processors.context_processor.bootstrap_js',
-                'home.context_processors.context_processor.obtener_navbar',
-                'blog.context_processors.context_processor.obtener_menu_blog',
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'authentication.context_processors.context_processor.obtener_formbuilder_menu',
                 'shop.context_processors.context_processor.obtener_menu_shop',
@@ -131,8 +128,10 @@ TEMPLATES = [
                 'dashboard.context_processors.context_processor.navbar_menu',
                 'dashboard.context_processors.context_processor.navbar_menuitems',
                 'dashboard.context_processors.context_processor.obtener_create_menu',
+                'dashboard.context_processors.context_processor.obtener_menu_contents',
                 'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
                 'dashboard.metadata.context_processors.context_processor.metadata_context',
+                'dashboard.page.context_processors.context_processor.obtener_navbar',
                 'dashboard.page.context_processors.context_processor.obtener_menu_setting',
                 'dashboard.page.context_processors.context_processor.footer_context',
 

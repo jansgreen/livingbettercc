@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
 from django.core.mail import send_mail, EmailMessage
-from dashboard.page.models import Footer, PagePosition, PageContent, PageCategory, carouselPage
+from dashboard.page.models import Page, PageSection, Footer, carouselPage
+from dashboard.contents.models import ContentPost, ContentCategory
 from django.conf import settings
 from authentication.models.directives import Directives
 from django.db.models import Case, When, IntegerField
@@ -15,14 +16,22 @@ from shop.cart import Cart
 
 # Create your views here.
 def home(request):
-    posts = PageContent.objects.all()
+    # 1. Obtener la página "Home"
+    page = get_object_or_404(Page, slug="home")
+
+    # 2. Obtener sus secciones ordenadas (lógica visual)
+    sections = page.sections.all().order_by("row", "column")
+
+    # 3. Carrusel (opcional, si sigues usándolo)
     actividades = carouselPage.objects.all()
-    # Contexto para el template
+
     context = {
-        'posts': posts,
-        'actividades': actividades,
+        "page": page,
+        "sections": sections,
+        "actividades": actividades,
     }
-    return render(request, 'index.html', context)
+    return render(request, "index.html", context)
+
 
 def quienes_somos(request):
     # Buscar la categoría con el slug 'quienes_somos'

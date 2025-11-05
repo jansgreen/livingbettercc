@@ -10,10 +10,10 @@
         <ul class="navbar-nav ml-auto">
             {% if navbar_menuitems %}
                 {% for  menu in navbar_menuitems %}
-                    {% if menu.nombre != "Home" and menu.orden == 0 %}
+                    {% if menu.name|default:''|lower == "navbar" or menu.row|default:0 == 0 or menu.column|default:0 == 0 %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ menu.get_url }}">
-                                {{ menu.nombre |capfirst }}
+                                {{ menu.page |capfirst }}
                             </a>
                         </li>
                     {% endif %}

@@ -1,23 +1,26 @@
 from django.contrib import admin
-from .models import Footer, PageContent, carouselPage, PageCategory
+from .models import carouselPage, Page, PageSection
 
-@admin.register(Footer)
-class FooterAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'email_contacto', 'telefono_contacto')
 
-class PageContentAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'created_at', 'status', 'category', 'cover_image')
-    list_filter = ('status', 'author', 'category', 'cover_image')
-    search_fields = ('title', 'content', 'tags')
-    prepopulated_fields = {'excerpt': ('content',)}
-    ordering = ('-created_at',)
-    date_hierarchy = 'created_at'
-    
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'show_in_navbar', 'order')
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ('order',)
+
     fieldsets = (
         (None, {
-            'fields': ('title', 'content', 'author', 'category', 'cover_image', 'tags', 'status', 'excerpt')
+            'fields': ('name', 'slug', 'description', 'parent', 'show_in_navbar', 'order')
         }),
-        # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
+    )
+
+class PageSectionAdmin(admin.ModelAdmin):
+
+    list_display = ('page', 'name', 'row', 'column', 'zone')
+    ordering = ('page', 'name', 'row', 'column')
+    fieldsets = (
+        (None, {
+            'fields': ('page', 'name', 'row', 'column', 'zone')
+        }),
     )
 
 class carouselPageAdmin(admin.ModelAdmin):
@@ -31,10 +34,7 @@ class carouselPageAdmin(admin.ModelAdmin):
         # Eliminar el grupo de fechas, ya que no se necesitan los campos auto manejados
     )
 
-class PageCategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'slug')
-
-admin.site.register(PageCategory, PageCategoryAdmin)
 admin.site.register(carouselPage, carouselPageAdmin)
-admin.site.register(PageContent, PageContentAdmin)
+admin.site.register(Page, PageAdmin)
+admin.site.register(PageSection, PageSectionAdmin)
 

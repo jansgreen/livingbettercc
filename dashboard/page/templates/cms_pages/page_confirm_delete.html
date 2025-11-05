@@ -1,0 +1,18 @@
+{% extends 'dashboards/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Eliminar página</h5>
+      <p class="mb-4">¿Estás seguro que deseas eliminar la página <strong>{{ page.name }}</strong>? Esta acción no se puede deshacer.</p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+        <a href="{% url 'page:list' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

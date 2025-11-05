@@ -1,0 +1,43 @@
+{% extends 'dashboards/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Secciones</h4>
+    <a href="{% url 'page:sections_create' %}" class="btn btn-primary">Crear sección</a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Página</th>
+            <th>Nombre</th>
+            <th>Fila</th>
+            <th>Columna</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for section in sections %}
+            <tr>
+              <td>{{ section.page.name }}</td>
+              <td>{{ section.name }}</td>
+              <td>{{ section.row }}</td>
+              <td>{{ section.column }}</td>
+              <td class="text-end">
+                <a href="{% url 'page:sections_update' section.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <a href="{% url 'page:sections_delete' section.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-center text-muted">No hay secciones registradas.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,21 +1,24 @@
 # app_name/context_processors.py
 
-from dashboard.models import CategoriaMenu, MenuItem
+from dashboard.page.models import Page, PageSection
+
 
 def navbar_menu(request):
     if request.user.is_authenticated:
         user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
         if user_has_module_access:
-            categorias = CategoriaMenu.objects.prefetch_related('menus').all()
-            return {'navbar_categorias': categorias}
+            secciones = PageSection.objects.prefetch_related('menus').all()
+            return {'navbar_categorias': secciones}
     return {'navbar_categorias': None}
+
 def navbar_menuitems(request):
     """
     Context processor to add menu items to the context.
     """
     try:
-        menuitems = MenuItem.objects.all()
-    except MenuItem.DoesNotExist:
+        menuitems = PageSection.objects.all()
+        print("Menu Items:", menuitems)  # Debugging line
+    except PageSection.DoesNotExist:
         menuitems = None
     return {'navbar_menuitems': menuitems}
 
@@ -66,3 +69,26 @@ def obtener_dashboard_menu(request):
         
         return {'dashboard_menu': menu}
     return {'dashboard_menu': None}
+
+def obtener_menu_contents(request):
+    """
+    Context processor to generate a menu structure for contents based on user authentication and group membership.
+    """
+    if request.user.is_authenticated:
+        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
+        menu = [
+            {
+                'nombre': 'Opciones de Contenidos',
+                'url': '#',
+                'submenus': []
+            }
+        ]
+        
+        if user_has_module_access:
+            menu[0]['submenus'].append({'nombre': 'Listar Contenidos', 'url': '/dashboard/contents/content/ContentListView/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Contenido', 'url': '/dashboard/contents/content/ContentCreateView/'})
+            menu[0]['submenus'].append({'nombre': 'Listar Categorías', 'url': '/dashboard/contents/categories/CategoryListView/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Categoría', 'url': '/dashboard/contents/categories/CategoryCreateView/'})
+
+        return {'menu_contents': menu}
+    return {'menu_contents': None}

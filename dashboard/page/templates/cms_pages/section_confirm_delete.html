@@ -1,0 +1,18 @@
+{% extends 'dashboards/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Eliminar sección</h5>
+      <p class="mb-4">¿Seguro que deseas eliminar la sección <strong>{{ section.name }}</strong> de la página <strong>{{ section.page.name }}</strong>?</p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirmar eliminación</button>
+        <a href="{% url 'page:sections_list' %}" class="btn btn-outline-secondary ms-2">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

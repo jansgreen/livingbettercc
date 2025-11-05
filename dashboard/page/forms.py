@@ -1,52 +1,26 @@
 from django import forms
-from .models import Footer, PageContent, PagePosition, carouselPage, PageCategory
+from .models import Footer, carouselPage, Page, PageSection
 
 class FooterForm(forms.ModelForm):
     class Meta:
         model = Footer
         fields = '__all__'  # Incluye todos los campos del modelo Footer
 
-
-class PageContentForm(forms.ModelForm):
+class PageForm(forms.ModelForm):
     class Meta:
-        model = PageContent
-        fields = ['title', 'content', 'category', 'position', 'tags', 'cover_image']
+        model = Page
+        fields = ['name', 'slug', 'description', 'show_in_navbar', 'order']
         widgets = {
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'cover_image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
-            'tags': forms.TextInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'position': forms.Select(attrs={'class': 'form-control'}),
-
+            'description': forms.Textarea(attrs={'rows': 3}),
         }
 
-
-
-class PagePositionForm(forms.ModelForm):
+class PageSectionForm(forms.ModelForm):
     class Meta:
-        model = PagePosition
-        fields = ['category', 'row', 'column', 'description']
+        model = PageSection
+        fields = ['page', 'name', 'row', 'column', 'zone']
         widgets = {
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'row': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'numero de la fila'}),
-            'column': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'numero de la columna'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción opcional'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
         }
-
-
-class PageCategoryForm(forms.ModelForm):
-    class Meta:
-        model = PageCategory
-        fields = ['name', 'description', 'slug']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de la Pestaña'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Descripción opcional'}),
-            'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'No es obligatirio'}),
-
-        }
-
-
 
 class carouselPageForm(forms.ModelForm):
     class Meta:

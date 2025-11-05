@@ -19,6 +19,7 @@ urlpatterns = [
     path('metadata/', include('dashboard.metadata.urls')),
     path('groups/', include('dashboard.groups.urls')),
     path('page/', include('dashboard.page.urls')),
+    path('contents/', include('dashboard.contents.urls')),
 
 
 ]
