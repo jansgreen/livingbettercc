@@ -61,7 +61,7 @@ def ContentDeleteView(request, pk):
         messages.success(request, "Contenido eliminado exitosamente.")
         # After deleting content, return to the content list
         return redirect('contents:ContentListView')
-    return render(request, 'dashboard/contents/content_confirm_delete.html', {'content': content})
+    return render(request, 'contents/content_confirm_delete.html', {'content': content})
 
 # CRUD para Categorías de Contenido
 def CategoryListView(request):

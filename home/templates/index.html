@@ -3,370 +3,203 @@
 {% block content %}
   {# Estilos locales: paleta institucional (#7ec8ff light, #0d6efd dark), degradados, animaciones y microinteracciones #}
   {# AOS and icon libraries are loaded in base template (frontend.html) to avoid duplication across pages. #}
-  <style>
-    :root {
-      --lb-blue-light: #7ec8ff;
-      --lb-blue-dark: #0d6efd;
-      --card-radius: 0.75rem;
-      --soft-shadow: 0 12px 28px rgba(13, 110, 253, 0.08);
-    }
-    
-    /* Animated subtle background behind hero using CSS gradient animation */
-    .hero-wrap {
-      position: relative;
-      border-radius: 0.75rem;
-      overflow: hidden;
-    }
-    .hero-wrap::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      background: radial-gradient(1200px 400px at 10% 10%, rgba(126, 200, 255, 0.12), transparent 10%), radial-gradient(900px 300px at 90% 80%, rgba(13, 110, 253, 0.06), transparent 8%);
-      transform: translateZ(0);
-      animation: floatBG 12s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes floatBG {
-      0% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
-    
-    /* Hero specifics */
-    .hero-caption h1 {
-      color: var(--lb-blue-dark);
-      font-weight: 700;
-    }
-    .hero-caption p {
-      color: #234;
-      opacity: 0.85;
-    }
-    .hero-figure img {
-      width: 100%;
-      height: 320px;
-      object-fit: cover;
-      border-radius: 0.5rem;
-    }
-    @media (max-width: 768px) {
-      .hero-figure img {
-        height: 200px;
-      }
-    }
-    
-    /* Card visuals */
-    .post-card {
-      border: 0;
-      border-radius: var(--card-radius);
-      overflow: hidden;
-      box-shadow: var(--soft-shadow);
-      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 254, 255, 0.99));
-    }
-    .post-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 26px 60px rgba(13, 110, 253, 0.12);
-    }
-    .home-card-img-wrapper {
-      max-height: 300px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(180deg, rgba(126, 200, 255, 0.06), rgba(13, 110, 253, 0.02));
-    }
-    .home-card-img-wrapper img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-      transition: transform 0.6s ease;
-    }
-    .home-card-img-wrapper:hover img {
-      transform: scale(1.03);
-    }
-    
-    .card-body .card-title.text-primary,
-    .card-body h4.text-primary {
-      color: var(--lb-blue-dark);
-    }
-    .btn-outline-primary {
-      border-color: var(--lb-blue-dark);
-      color: var(--lb-blue-dark);
-    }
-    .btn-outline-primary:hover {
-      background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
-      color: white;
-      border-color: transparent;
-    }
-    
-    .card-footer {
-      background: transparent;
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
-      color: #6c757d;
-    }
-    
-    /* Richtext images (keeps aspect ratio and fits into card body) */
-    .richtext-content img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto;
-      max-height: 300px;
-      object-fit: contain;
-      border-radius: 0.35rem;
-      box-shadow: 0 10px 30px rgba(13, 110, 253, 0.05);
-    }
-    
-    /* Gallery */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 0.8rem;
-    }
-    .gallery-item {
-      border-radius: 0.6rem;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 10px 28px rgba(3, 10, 34, 0.04);
-      transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .gallery-item img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.6s ease;
-    }
-    .gallery-item:hover img {
-      transform: scale(1.08);
-    }
-    
-    /* Microbadge */
-    .meta-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.85rem;
-    }
-    
-    /* Accessibility: focus states */
-    a:focus,
-    button:focus {
-      outline: 3px solid rgba(13, 110, 253, 0.14);
-      outline-offset: 3px;
-    }
-    
-    .b-example-divider {
-      position: relative;
-      left: 50%;
-      right: 50%;
-      margin-left: -50vw;
-      margin-right: -50vw;
-      width: 100vw;
-      height: 3rem;
-      background-color: #3299ff;
-      border: solid rgba(0, 0, 0, 0.15);
-      border-width: 1px 0;
-      box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1), inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
-      z-index: 0;
-    }
-  </style>
+<style>
+  .container.px-4.py-5 {
+    position: relative;
+  }
+
+  .container.px-4.py-5 > h2 {
+    color: var(--lb-blue-dark);
+    font-weight: 700;
+  }
+
+  /* Primer contenido destacado (lado izquierdo) */
+  .row.row-cols-1.row-cols-md-2.align-items-md-center.g-5.py-5 h2.fw-bold {
+    color: var(--lb-blue-dark);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .row.row-cols-1.row-cols-md-2.align-items-md-center.g-5.py-5 p {
+    color: #234;
+    opacity: .85;
+  }
+
+  /* Botón LBCC */
+  .btn.btn-primary.btn-lg {
+    border-radius: .5rem;
+    padding: .6rem 1.5rem;
+    background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
+    border: none;
+    font-weight: 600;
+    transition: background .3s ease;
+  }
+  .btn.btn-primary.btn-lg:hover {
+    background: var(--lb-blue-dark);
+  }
+
+  /* ===== ICONOS PEQUEÑOS (lado derecho fila 0) ===== */
+  .feature-icon-small {
+    width: 48px;
+    height: 48px;
+    display: inline-flex;
+    border-radius: .65rem;
+    background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)) !important;
+    color: white !important;
+    box-shadow: var(--soft-shadow);
+  }
 
 
+  /* ===== APLICAR ESTILO LBCC A FILA 1 (Tarjetas Grid) ===== */
 
-<!---Feature sections-->
-{% for section in page.sections.all %}
-  {% if section.row == 0 %}
-    {% with contents=section.contents.all|dictsortreversed:"created_at"|slice:":5" %}
-      {% if contents %}
-        <div class="container px-4 py-5">
-          <h2 class="pb-2 border-bottom">{{ section.name|default:"Encabezado" }}</h2>
+  .card {
+    border: 0 !important;
+    border-radius: var(--card-radius);
+    box-shadow: var(--soft-shadow);
+    overflow: hidden;
+    transition: transform .3s ease, box-shadow .4s ease;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 60px rgba(13, 110, 253, 0.18);
+  }
 
-          <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
-            <div class="col d-flex flex-column align-items-start gap-2">
-              {% for content in contents|slice:":1" %}
-                <h2 class="fw-bold text-body-emphasis">{{ content.title|capfirst}}</h2>
-                <p class="text-body-secondary">{{ content.content|safe|truncatewords:40 }}</p>
-                <a href="{% url 'contents:ContentDetailView' content.pk %}" class="btn btn-primary btn-lg">Leer más</a>
-              {% endfor %}
-            </div>
+  .card-img-top {
+    max-height: 260px;
+    object-fit: cover;
+    border-bottom: 0;
+  }
 
-            <div class="col">
-              <div class="row row-cols-1 row-cols-sm-2 g-4">
-                {% for content in contents|slice:"1:5" %}
-                  <div class="col d-flex flex-column gap-2">
-                    <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                      <i class="bi bi-trophy"><use xlink:href="#gear-fill"></use>
-</i>
-                      <svg class="bi bi" width="1em" height="1em" aria-hidden="true">
-                        <use xlink:href="#gear-fill"></use>
-                      </svg>
-                    </div>
-                    <h4 class="fw-semibold mb-0 text-body-emphasis">{{ content.title|title }}</h4>
-                    <p class="text-body-secondary">{{ content.body|striptags|truncatewords:20 }}</p>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
+  .card-body .card-title {
+    color: var(--lb-blue-dark);
+    font-weight: 600;
+  }
+
+ 
+  .btn.btn-primary:hover {
+    background: #4bccffff !important;
+  }
+
+  /* ===== APLICAR ESTILO LBCC FILA 3+ ("feature col") ===== */
+
+  .feature.col {
+    background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,254,255,.99));
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--soft-shadow);
+    transition: transform .3s ease, box-shadow .4s ease;
+  }
+  .feature.col:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 60px rgba(13,110,253,0.14);
+  }
+
+  .feature .feature-icon {
+    background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark));
+    color: #000000;
+    border-radius: 0.75rem;
+    box-shadow: var(--soft-shadow);
+  }
+
+  /* division del hero */
+
+    
+</style>
+
+  
+    {# Primer POST destacado #}
+  <div class="container px-4 py-2">
+    <h2 class="border-bottom">Actividades Realizadas</h2>
+    <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5">
+      {% for post in sections_Posts %}
+        {% if post.section|default:0 == "0" %}
+          <div class="col d-flex flex-column align-items-start gap-2">
+            <h5 class="fw-bold text-body-emphasis">{{ post.title|capfirst }}</h5>
+            <p class="text-body-secondary">{{ post.content|safe|truncatewords:40 }}</p>
+            <a class="btn btn-primary" href="{% url 'contents:ContentDetailView' post.pk %}">Leer más</a>
           </div>
-        </div>
-      {% endif %}
-    {% endwith %}
-  {% endif %}
-{% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
 
 <div class="b-example-divider"></div>
 
-<!---Grid cards-->
-{% for section in page.sections.all %}
-  {% if section.row == 1 %}
-    {% with contents=section.contents.all|dictsortreversed:"created_at"|slice:":6" %}
-      {% if contents %}
-        <div class="container my-5">
-          <div class="row row-cols-1 row-cols-md-3 g-4">
-            {% for content in contents %}
-              <div class="col">
-                <div class="card shadow-sm h-100 border-0">
-                  {% if content.cover_image %}
-                    <img src="{{ content.cover_image.url }}" class="card-img-top" alt="{{ content.title }}">
-                  {% else %}
-                    <img src="{% static 'Profile/default.webp' %}" class="card-img-top" alt="default image">
-                  {% endif %}
-                  <div class="card-body">
-                    <h5 class="card-title">{{ content.title }}</h5>
-                    <p class="card-text">{{ content.body|striptags|truncatewords:25 }}</p>
-                    <a href="{% url 'contents:ContentDetailView' content.pk %}" class="btn btn-primary">Leer más</a>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
-    {% endwith %}
-  {% endif %}
-{% endfor %}
-
-<!---Carousel-->
-{% for section in page.sections.all %}
-  {% if section.row == 2 %}
-  {% include 'carousel.html' %}
-  {% endif %}
-{% endfor %}
-
-<!---Otras filas y columnas-->
-{% for section in page.sections.all %}
-  {% if section.row > 2 %}
-    {% with contents=section.contents.all %}
-      {% if contents %}
-        <div class="container my-5">
-          <h3 class="pb-3 border-bottom">{{ section.name }}</h3>
-          <div class="row g-4">
-            {% for content in contents %}
-              <div class="col-md-{{ 12|divisibleby:section.column|default:4 }}">
-                <div class="card h-100 shadow-sm border-0">
-                  {% if content.cover_image %}
-                    <img src="{{ content.cover_image.url }}" class="card-img-top" alt="{{ content.title }}">
-                  {% endif %}
-                  <div class="card-body">
-                    <h5 class="card-title">{{ content.title }}</h5>
-                    <p class="card-text">{{ content.body|striptags|truncatewords:25 }}</p>
-                    <a href="{% url 'contents:ContentDetailView' content.pk %}" class="btn btn-primary">Leer más</a>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      {% endif %}
-    {% endwith %}
-  {% endif %}
-{% endfor %}
-
-
-
-  <!-- Posts de las programas realizados -->
-
-{% for post in posts %}
-  {% if post.page.name|default:""|lower == "home" and post.section.zone == "hero" %}
-    <div class="container px-4 py-5">
-      <h2 class="pb-2 border-bottom">{{ post.section.name }}test</h2> 
-      <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
-        <div class="col d-flex flex-column align-items-start gap-2">
-          <h2 class="fw-bold text-body-emphasis">{{ post.title }}</h2>
-          <p class="text-body-secondary">{{ post.summary|safe }}</p>
-          <a href="{% url 'contents:ContentDetailView' post.pk %}" class="btn btn-primary btn-lg">Leer más</a>
-        </div>
-
+    <!---Fila 1 Grid cards-->
+<div class="container my-5">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for post in sections_Posts %}
+      {% if post.section|default:1 == "1" %}
         <div class="col">
-          <div class="row row-cols-1 row-cols-sm-2 g-4">
-            {% for item in items %}
-              <div class="col d-flex flex-column gap-2">
-                <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                  <svg class="bi" width="1em" height="1em" aria-hidden="true">
-                    <use xlink:href="#gear-fill"></use>
-                  </svg>
-                </div>
-                <h4 class="fw-semibold mb-0 text-body-emphasis">{{ item.name }}</h4>
-                <p class="text-body-secondary">{{ item.description|default:"Descripción no disponible" }}</p>
-              </div>
+
+          <div class="card h-100 shadow-sm border-0">
+            {% if post.cover_image %}
+              <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
+            {% else %}
+              <img src="{% static 'Profile/default.webp' %}" class="card-img-top" alt="default image">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ post.title }}</h5>
+              <p class="card-text">{{ post.content|striptags|truncatewords:25 }}</p>
+              <a href="{% url 'contents:ContentDetailView' post.pk %}" class="btn btn-primary">Leer más</a>
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+    <!---Fila 2 Carousel-->
+    {% for section in pages.sections.all %}
+      {% if section.row == 2 %}
+      {% include 'carousel.html' %}
+      {% endif %}
+    {% endfor %}
+
+    <!---Otras filas y columnas-->
+    {% regroup pages.sections.all by row as grouped_rows %}
+    {% for row in grouped_rows %}
+      {% if row.grouper > 2 %} {# Mostrar solo fila 3 en adelante #}
+        <div class="container px-4 py-5">
+          {% with first_section=row.list|dictsort:"column"|first %}
+            <h2 class="pb-2 border-bottom">{{ first_section.name }}</h2>
+          {% endwith %}
+
+
+          <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+
+            {% for section in row.list|dictsort:"column" %}
+
+              {% with content=section.contents.all|dictsortreversed:"created_at"|first %}
+                {% if content %}
+                  <div class="feature col">
+
+                    <!-- Ícono de ejemplo (puedes cambiarlo o poner un icono dinámico) -->
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3 p-3">
+                      <img src="{{ content.cover_image.url }}" class="img-fluid rounded-start" alt="...">
+                    </div>
+
+                    <!-- Resumen del contenido -->
+                    <p>{{ content.content|safe|linebreaksbr|truncatewords:25 }}</p>
+
+                    <!-- Botón -->
+                    <a href="{% url 'contents:ContentDetailView' content.pk %}" class="icon-link">
+                      Leer más
+                      <svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
+                    </a>
+
+                  </div>
+                {% endif %}
+              {% endwith %}
+
             {% endfor %}
+
           </div>
         </div>
-      </div>
-    </div>
-  {% endif %}
-{% endfor %}
 
-{% if "actividades" in post.category.name %}
-  <div class="container px-4 py-5">
-    <h2 class="pb-2 border-bottom">{{ post.category.name }}</h2> 
-
-    <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
-      <div class="col d-flex flex-column align-items-start gap-2">
-        <h2 class="fw-bold text-body-emphasis">{{ post.title }}</h2>
-        <p class="text-body-secondary">
-          {{ post.summary|safe }}
-        </p>
-        <a href="{% url 'contents:ContentDetailView' post.pk %}" class="btn btn-primary btn-lg">Leer más</a>
-      </div>
-
-      <div class="col">
-        <div class="row row-cols-1 row-cols-sm-2 g-4">
-          {% for item in items %}
-            <div class="col d-flex flex-column gap-2">
-              <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
-                <svg class="bi" width="1em" height="1em" aria-hidden="true">
-                  <use xlink:href="#gear-fill"></use>
-                </svg>
-              </div>
-              <h4 class="fw-semibold mb-0 text-body-emphasis">{{ item.name }}</h4>
-              <p class="text-body-secondary">{{ item.description|default:"Descripción no disponible" }}</p>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  </div>
-{% endif %}
-
-
-    <div class="row mt-4">
-      {% include 'habilitadas.html' %}
-    </div>
+      {% endif %}
+    {% endfor %}
 
   <!-- AOS init -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>

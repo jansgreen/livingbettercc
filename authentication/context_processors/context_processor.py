@@ -1,6 +1,5 @@
 from urllib3 import request
 from authentication.models import Profiles
-from dashboard.views import menu
 
 def obtener_menu_auth(request):
     if request.user.is_authenticated:

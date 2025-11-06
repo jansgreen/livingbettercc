@@ -11,14 +11,17 @@
             {% if navbar_menuitems %}
                 {% for  menu in navbar_menuitems %}
                     {% if menu.name|default:''|lower == "navbar" or menu.row|default:0 == 0 or menu.column|default:0 == 0 %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ menu.get_url }}">
-                                {{ menu.page |capfirst }}
-                            </a>
-                        </li>
+                        {% if not menu.page|default:''|lower == 'home' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ menu.get_url }}">
+                                    {{ menu.page |capfirst }}
+                                </a>
+                            </li>
+                        {% endif %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
+
             <!--Menu adaptado-->
             <div class="accordion d-block d-md-none" id="accordionExample">
                 {% for menu in menu_shop %}

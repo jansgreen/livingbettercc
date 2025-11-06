@@ -11,7 +11,11 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('page', '0018_remove_pagecontent_category_and_more'),
+        # Removed dependency on a specific 'page' migration which was not present in the repo
+        # (was: ('page', '0018_remove_pagecontent_category_and_more')).
+        # If your 'page' app provides models referenced below, add a dependency to a valid
+        # migration for that app (for example: ('page', '0001_initial')) or restore the
+        # missing migration file. For now we keep only the auth user dependency.
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -46,8 +50,10 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Actualizado el')),
                 ('author', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='contents', to=settings.AUTH_USER_MODEL, verbose_name='Autor')),
                 ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='posts', to='contents.contentcategory', verbose_name='Categoría')),
-                ('page', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='contents', to='page.page', verbose_name='Página')),
-                ('section', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='contents', to='page.pagesection', verbose_name='Sección de Página')),
+                # The original migration referenced a separate 'page' app for Page/PageSection
+                # which is not present in this repository. The current model defines
+                # `section` as a CharField (not a FK), so we create a matching field here.
+                ('section', models.CharField(blank=True, max_length=200, null=True, verbose_name='Sections')),
             ],
             options={
                 'verbose_name': 'Contenido',

@@ -1,13 +1,14 @@
 from django import forms
 from .models import ContentCategory, ContentPost
-from dashboard.page.models import Page, PageSection
 
 class ContentPostForm(forms.ModelForm):
     class Meta:
         model = ContentPost
-        fields = ['title', 'slug', 'content', 'cover_image', 'category', 'page', 'section', 'tags']
+        fields = ['title', 'slug', 'content', 'status', 'cover_image', 'category', 'section', 'tags']
+        widgets = {
+            'status': forms.Select(),  # usa Select para mostrar las opciones
+        }
 
-   
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Apply a consistent `form-control` class to all visible fields

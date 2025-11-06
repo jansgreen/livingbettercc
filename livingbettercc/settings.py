@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'dashboard',
     'dashboard.metadata',
     'dashboard.groups',
-    'dashboard.page',
     'dashboard.contents',
 ]
 
@@ -124,16 +123,10 @@ TEMPLATES = [
                 'classroom.context_processors.context_processor.obtener_menu_classroom',
                 'classroom.context_processors.context_processor.obtener_progress_class',
                 'classroom.context_processors.context_processor.obtener_certificados_usuario',
-                'dashboard.context_processors.context_processor.obtener_dashboard_menu',
-                'dashboard.context_processors.context_processor.navbar_menu',
-                'dashboard.context_processors.context_processor.navbar_menuitems',
-                'dashboard.context_processors.context_processor.obtener_create_menu',
+
                 'dashboard.context_processors.context_processor.obtener_menu_contents',
                 'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
                 'dashboard.metadata.context_processors.context_processor.metadata_context',
-                'dashboard.page.context_processors.context_processor.obtener_navbar',
-                'dashboard.page.context_processors.context_processor.obtener_menu_setting',
-                'dashboard.page.context_processors.context_processor.footer_context',
 
 
             ],

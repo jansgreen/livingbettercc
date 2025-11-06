@@ -6,7 +6,6 @@ from django.db import models
 from ckeditor.fields import RichTextField
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
-from dashboard.page.models import Page, PageSection  # Ajusta si tu app de pages tiene otro nombre
 
 User = get_user_model()
 
@@ -37,14 +36,20 @@ class ContentPost(models.Model):
     ]
 
     # --- Campos principales ---
-    title = models.CharField(max_length=200, verbose_name="Título")
+    title = models.CharField(max_length=200, verbose_name="Título", unique=True)
     slug = models.SlugField(max_length=220, unique=True, blank=True, null=True)
-    content = RichTextField(verbose_name="Contenido")
+    content = RichTextField(verbose_name="Contenido", blank=True, null=True)
+    section = models.CharField(max_length=200, verbose_name="Sections", blank=True, null=True)
 
     # --- Relaciones ---
-    category = models.ForeignKey(ContentCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts", verbose_name="Categoría")
-    page = models.ForeignKey(Page, on_delete=models.SET_NULL, null=True, blank=True, related_name="contents", verbose_name="Página")
-    section = models.ForeignKey(PageSection, on_delete=models.SET_NULL, null=True, blank=True, related_name="contents", verbose_name="Sección de Página")
+    category = models.ForeignKey(
+        ContentCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="posts",
+        verbose_name="PostCategory"
+    )
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="contents", verbose_name="Autor")
 
     # --- Multimedia ---

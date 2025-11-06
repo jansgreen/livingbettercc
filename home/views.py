@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .forms import ContactoForm
-from django.core.mail import send_mail, EmailMessage
-from dashboard.page.models import Page, PageSection, Footer, carouselPage
-from dashboard.contents.models import ContentPost, ContentCategory
+from django.core.mail import EmailMessage
 from django.conf import settings
 from authentication.models.directives import Directives
 from django.db.models import Case, When, IntegerField
+from dashboard.contents.models import ContentPost, ContentCategory
 
 # Importa el modelo de biografías
 
@@ -17,37 +16,26 @@ from shop.cart import Cart
 # Create your views here.
 def home(request):
     # 1. Obtener la página "Home"
-    page = get_object_or_404(Page, slug="home")
+    category = ContentCategory.objects.filter(slug="home").first()
 
-    # 2. Obtener sus secciones ordenadas (lógica visual)
-    sections = page.sections.all().order_by("row", "column")
+    if category:
+        sections_Posts = category.posts.filter(
+            status="published"
+        ).order_by("-created_at")[:5]
+    else:
+        sections_Posts = None
 
-    # 3. Carrusel (opcional, si sigues usándolo)
-    actividades = carouselPage.objects.all()
 
     context = {
-        "page": page,
-        "sections": sections,
-        "actividades": actividades,
+        "sections_Posts": sections_Posts,
     }
     return render(request, "index.html", context)
 
-
 def quienes_somos(request):
-    # Buscar la categoría con el slug 'quienes_somos'
-    user = request.user
-    # Filtrar usuarios con el grupo 'manager' y obtener su perfil
-
-    directives_list = Directives.objects.all().order_by('role')
-    # Obtener la categoría y los posts relacionados
-    category = PageCategory.objects.filter(slug='quienes_somos').first()
-    posts = PageContent.objects.filter(category=category)
-
+    pages = Page.objects.filter(slug='quienes_somos').first()
     # Contexto para el template
     context = {
-        'directives': directives_list,
-        'posts': posts,
-        'user': user,
+        "pages": pages,
     }
 
     return render(request, 'quienes_somos.html', context)

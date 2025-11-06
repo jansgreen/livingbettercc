@@ -1,7 +1,6 @@
 # utils/management/commands/update_routes.py
 from django.core.management.base import BaseCommand
 from django.urls import get_resolver
-from menu.models import Route
 
 
 class Command(BaseCommand):
