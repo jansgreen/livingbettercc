@@ -1,34 +1,40 @@
 {% load static %}
 
 
-    {% with contents=section.contents.all|dictsortreversed:"created_at"|slice:":5" %}
-      {% if contents %}
-        <div id="carouselSection{{ section.id }}" class="carousel slide my-5" data-bs-ride="carousel">
-          <div class="carousel-inner">
-            {% for content in contents %}
+  {# ============================ Carrusel (sección 2) ============================ #}
+<div class="container">
+  <div class="row">
+    <div class="col-12 mb-5">
+      <div id="carouselSection{{ imagen.id }}" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for imagen in gallery %}
+            {% if imagen.forcarousel %}
               <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                {% if content.cover_image %}
-                  <img src="{{ content.cover_image.url }}" class="d-block w-100" alt="{{ content.title }}">
+                {% if imagen.image_file %}
+                  <img src="{{ imagen.image_file.url }}" class="d-block w-100" alt="{{ imagen.title }}">
                 {% else %}
                   <img src="{% static 'Profile/default.webp' %}" class="d-block w-100" alt="default image">
                 {% endif %}
                 <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
-                  <h5>{{ content.title }}</h5>
-                  <p>{{ content.body|striptags|truncatewords:20 }}</p>
+                  <h5>{{ imagen.name }}</h5>
+                  <p>{{ imagen.description|striptags|truncatewords:20 }}</p>
                 </div>
               </div>
-            {% endfor %}
-          </div>
-
-          <button class="carousel-control-prev" type="button" data-bs-target="#carouselSection{{ section.id }}" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Anterior</span>
-          </button>
-          <button class="carousel-control-next" type="button" data-bs-target="#carouselSection{{ section.id }}" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Siguiente</span>
-          </button>
+            {% endif %}
+          {% endfor %}
         </div>
-      {% endif %}
-    {% endwith %}
+
+        {# Botones del carrusel (opcionales si solo hay una imagen, pero los dejo puestos) #}
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSection{{ imagen.id }}" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSection{{ imagen.id }}" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 

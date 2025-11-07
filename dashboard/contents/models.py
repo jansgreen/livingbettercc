@@ -6,6 +6,8 @@ from django.db import models
 from ckeditor.fields import RichTextField
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 User = get_user_model()
 
@@ -39,7 +41,7 @@ class ContentPost(models.Model):
     title = models.CharField(max_length=200, verbose_name="Título", unique=True)
     slug = models.SlugField(max_length=220, unique=True, blank=True, null=True)
     content = RichTextField(verbose_name="Contenido", blank=True, null=True)
-    section = models.CharField(max_length=200, verbose_name="Sections", blank=True, null=True)
+    section = models.IntegerField(max_length=2, validators=[MinValueValidator(1), MaxValueValidator(99)], blank=True, null=True)
 
     # --- Relaciones ---
     category = models.ForeignKey(

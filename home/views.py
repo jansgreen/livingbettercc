@@ -6,6 +6,7 @@ from django.conf import settings
 from authentication.models.directives import Directives
 from django.db.models import Case, When, IntegerField
 from dashboard.contents.models import ContentPost, ContentCategory
+from gallery.models import Image
 
 # Importa el modelo de biografías
 
@@ -17,25 +18,32 @@ from shop.cart import Cart
 def home(request):
     # 1. Obtener la página "Home"
     category = ContentCategory.objects.filter(slug="home").first()
+    gallery = Image.objects.all()
 
     if category:
-        sections_Posts = category.posts.filter(
-            status="published"
-        ).order_by("-created_at")[:5]
+        posts = category.posts.filter(status="published").order_by("-created_at")
+
+        print(posts)
     else:
-        sections_Posts = None
+        posts = None
 
 
     context = {
-        "sections_Posts": sections_Posts,
+        "gallery": gallery,
+        "posts": posts,
     }
     return render(request, "index.html", context)
 
 def quienes_somos(request):
-    pages = Page.objects.filter(slug='quienes_somos').first()
-    # Contexto para el template
+    category = ContentCategory.objects.filter(slug='quienes_somos').first()
+    if category:
+        posts = category.posts.filter(
+            status="published"
+        ).order_by("-created_at")[:5]
+    else:
+        posts = None
     context = {
-        "pages": pages,
+        "posts": posts,
     }
 
     return render(request, 'quienes_somos.html', context)

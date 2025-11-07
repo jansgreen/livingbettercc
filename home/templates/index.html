@@ -110,8 +110,8 @@
   <div class="container px-4 py-2">
     <h2 class="border-bottom">Actividades Realizadas</h2>
     <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5">
-      {% for post in sections_Posts %}
-        {% if post.section|default:0 == "0" %}
+      {% for post in posts %}
+        {% if post.section == 1 %}
           <div class="col d-flex flex-column align-items-start gap-2">
             <h5 class="fw-bold text-body-emphasis">{{ post.title|capfirst }}</h5>
             <p class="text-body-secondary">{{ post.content|safe|truncatewords:40 }}</p>
@@ -127,8 +127,8 @@
     <!---Fila 1 Grid cards-->
 <div class="container my-5">
   <div class="row row-cols-1 row-cols-md-3 g-4">
-    {% for post in sections_Posts %}
-      {% if post.section|default:1 == "1" %}
+    {% for post in posts %}
+      {% if post.section == 2 %}
         <div class="col">
 
           <div class="card h-100 shadow-sm border-0">
@@ -150,56 +150,58 @@
   </div>
 </div>
 
-    <!---Fila 2 Carousel-->
-    {% for section in pages.sections.all %}
-      {% if section.row == 2 %}
-      {% include 'carousel.html' %}
-      {% endif %}
-    {% endfor %}
+    <!---Me quede arreglando esta section-->
+{% include 'carousel.html' %}
 
-    <!---Otras filas y columnas-->
-    {% regroup pages.sections.all by row as grouped_rows %}
-    {% for row in grouped_rows %}
-      {% if row.grouper > 2 %} {# Mostrar solo fila 3 en adelante #}
-        <div class="container px-4 py-5">
-          {% with first_section=row.list|dictsort:"column"|first %}
-            <h2 class="pb-2 border-bottom">{{ first_section.name }}</h2>
-          {% endwith %}
-
-
-          <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-
-            {% for section in row.list|dictsort:"column" %}
-
-              {% with content=section.contents.all|dictsortreversed:"created_at"|first %}
-                {% if content %}
-                  <div class="feature col">
-
-                    <!-- Ícono de ejemplo (puedes cambiarlo o poner un icono dinámico) -->
-                    <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-3 p-3">
-                      <img src="{{ content.cover_image.url }}" class="img-fluid rounded-start" alt="...">
-                    </div>
-
-                    <!-- Resumen del contenido -->
-                    <p>{{ content.content|safe|linebreaksbr|truncatewords:25 }}</p>
-
-                    <!-- Botón -->
-                    <a href="{% url 'contents:ContentDetailView' content.pk %}" class="icon-link">
-                      Leer más
-                      <svg class="bi" aria-hidden="true"><use xlink:href="#chevron-right"></use></svg>
-                    </a>
-
-                  </div>
-                {% endif %}
-              {% endwith %}
-
-            {% endfor %}
-
+<div class="container my-5">
+    <h2 class="border-bottom mb-5"> Habilitada y Certificada For: </h2>
+  <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
+    {% for post in posts %}
+      {% if post.section == 3 %}
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0">
+            <h5 class="card-title m-2 text-center">{{ post.title }}</h5>
+            {% if post.cover_image %}
+              <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
+            {% else %}
+              <img src="{% static 'Profile/default.webp' %}" class="card-img-top" alt="default image">
+            {% endif %}
+            <div class="card-body">
+              <p class="card-text">{{ post.content|striptags|truncatewords:25 }}</p>
+              <a href="{% url 'contents:ContentDetailView' post.pk %}" class="btn btn-primary">Leer más</a>
+            </div>
           </div>
-        </div>
 
+        </div>
       {% endif %}
     {% endfor %}
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for post in posts|slice:":5" %}
+      {% if post.section > 3 %}
+        <div class="col">
+
+          <div class="card h-100 shadow-sm border-0">
+            {% if post.cover_image %}
+              <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
+            {% else %}
+              <img src="{% static 'Profile/default.webp' %}" class="card-img-top" alt="default image">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title">{{ post.title }}</h5>
+              <p class="card-text">{{ post.content|striptags|truncatewords:25 }}</p>
+              <a href="{% url 'contents:ContentDetailView' post.pk %}" class="btn btn-primary">Leer más</a>
+            </div>
+          </div>
+
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
 
   <!-- AOS init -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>

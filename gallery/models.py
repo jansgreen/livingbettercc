@@ -8,6 +8,7 @@ class Image(models.Model):
     image_file = models.ImageField(upload_to='gallery/')
     thumbnail = models.ImageField(upload_to='gallery/thumbnails/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    forcarousel = models.BooleanField(default=True, verbose_name="Carousel")
 
     def __str__(self):
         return self.name

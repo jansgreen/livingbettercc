@@ -120,13 +120,19 @@ TEMPLATES = [
                 'authentication.context_processors.context_processor.obtener_formbuilder_menu',
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',
+
+                # Classroom
                 'classroom.context_processors.context_processor.obtener_menu_classroom',
                 'classroom.context_processors.context_processor.obtener_progress_class',
                 'classroom.context_processors.context_processor.obtener_certificados_usuario',
 
+                # Dashboard
                 'dashboard.context_processors.context_processor.obtener_menu_contents',
                 'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
                 'dashboard.metadata.context_processors.context_processor.metadata_context',
+                
+                # Gallery
+                'gallery.context_processors.context_processor.obtener_gallery_img'
 
 
             ],

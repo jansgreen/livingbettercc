@@ -20,6 +20,8 @@ class AddressForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
 
+# me quede aqui, tengo que trabajar con la logica de los datos personales y la certificacion
+
 class ProfileForm(forms.ModelForm):
 
 

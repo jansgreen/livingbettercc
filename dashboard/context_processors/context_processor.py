@@ -22,3 +22,4 @@ def obtener_menu_contents(request):
 
         return {'menu_contents': menu}
     return {'menu_contents': None}
+
