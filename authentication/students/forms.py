@@ -2,17 +2,6 @@ from django import forms
 from authentication.models import Students, profiles
 from django.contrib.auth.models import User
 
-
-class studentRegisterForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'password', 'email', 'first_name', 'last_name']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
-
 class StudentByDistrictForm(forms.ModelForm):
     class Meta:
         model = Students
@@ -26,6 +15,7 @@ class StudentByDistrictForm(forms.ModelForm):
             'cedula': 'Cedula',
             'telefono': 'Telefono',
             'regional': 'Regional',
+            'por_distrito': 'False',
             'distrito_educativo': 'Distrito Educativo',
             'genero': 'Genero',
             'cargo': 'Cargo',

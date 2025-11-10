@@ -22,20 +22,19 @@ def home(request):
 
     if category:
         posts = category.posts.filter(status="published").order_by("-created_at")
-
-        print(posts)
     else:
         posts = None
 
 
     context = {
-        "gallery": gallery,
-        "posts": posts,
+        'gallery': gallery,
+        'posts': posts,
     }
     return render(request, "index.html", context)
 
 def quienes_somos(request):
     category = ContentCategory.objects.filter(slug='quienes_somos').first()
+    directives = Directives.objects.all()
     if category:
         posts = category.posts.filter(
             status="published"
@@ -44,6 +43,7 @@ def quienes_somos(request):
         posts = None
     context = {
         "posts": posts,
+        'directives':directives,
     }
 
     return render(request, 'quienes_somos.html', context)

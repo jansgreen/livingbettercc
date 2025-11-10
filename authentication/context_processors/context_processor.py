@@ -1,5 +1,10 @@
 from urllib3 import request
 from authentication.models import Profiles
+import logging
+from django.urls import reverse
+from authentication.models import Directives
+logger = logging.getLogger(__name__)
+
 
 def obtener_menu_auth(request):
     if request.user.is_authenticated:
@@ -13,33 +18,23 @@ def obtener_menu_auth(request):
         ]
 
         # Dynamically generate the URL for "Mi Perfil"
-        profile_id = Profiles.objects.filter(user=request.user).values_list('id', flat=True).first()
-        print("Profile ID:", profile_id)
-        if profile_id:
-            menu[0]['submenus'].append({'nombre': 'Mi Perfil', 'url': f'/auth/profile/'})
+        if user_has_module_access:
+            menu[0]['submenus'].append({'nombre': 'Crear Biografia', 'url': '/auth/profile/edit_biography/'})
 
-            if user_has_module_access:
-                menu[0]['submenus'].append({'nombre': 'Crear Biografia', 'url': '/auth/profile/edit_biography/'})
-
-            if request.user.is_authenticated and request.user.has_perm('auth.can_create_posts'):
-                menu[0]['submenus'].append({'nombre': 'Lista de Perfil', 'url': '/auth/profile/list/'})
-        menu[0]['submenus'].append({'nombre': 'Crear Profile', 'url': '/auth/profile/create/'})
-
-        # Add new submenu items
-        menu[0]['submenus'].extend([
-            {'nombre': 'Customer Form', 'url': '/auth/customer_form/'},
-            {'nombre': 'Customer List', 'url': '/auth/customers/'},
-            {'nombre': 'Create Customer', 'url': '/auth/customers/create/'},
-            {'nombre': 'Crear Directivo', 'url': '/auth/directives/DirectivesCreate/'},
-        ])
-        
-        return {'menu_auth': menu}
+        if request.user.is_authenticated and request.user.has_perm('auth.can_create_posts'):
+            menu[0]['submenus'].append({'nombre': 'Lista de Perfil', 'url': '/auth/profile/list/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Profile', 'url': '/auth/profile/create/'})
+            menu[0]['submenus'].append({'nombre': 'Customer Form', 'url': '/auth/customer_form/'})
+            menu[0]['submenus'].append({'nombre': 'Customer List', 'url': '/auth/customers/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Directivo', 'url': '/auth/directives/DirectivesCreate/'})
+            menu[0]['submenus'].append({'nombre': 'Ver Lista de Estudiantes', 'url': '/auth/students/student_list_view/'})
+            menu[0]['submenus'].append({'nombre': 'Crear Nuevo Estudiate', 'url': '/auth/students/student_create_view/'})
+        return {'menu_auth': []}
     else:
-        menu = None
-        return {'menu_auth': menu}
+        return {'menu_auth': []}
     
 def obtener_formbuilder_menu(request):
-    formbuilder_menu = None
+    formbuilder_menu = []
     if request.user.is_authenticated:
         user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
         formbuilder_menu = [
@@ -55,5 +50,70 @@ def obtener_formbuilder_menu(request):
             formbuilder_menu[0]['submenus'].append({'nombre': 'Lista Formularios Completados', 'url': '/auth/formbuilder/completed/completed_all_forms/'})
         formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados', 'url': '/auth/formbuilder/completed/completed_forms/'})
         formbuilder_menu[0]['submenus'].append({'nombre': 'Crear Formulario', 'url': '/auth/formbuilder/create/'})
-
+    logger.warning(f"[CTX] obtener_formbuilder_menu => {type(formbuilder_menu)} | {formbuilder_menu}")
     return {'formbuilder_menu': formbuilder_menu}
+
+
+# authentication/context_processors/context_processor.py
+
+def obtener_menu_directives(request):
+    """
+    Muestra opciones de Directiva según el rol:
+    
+    - Admin / Superuser → Puede ver lista, crear, editar cualquier miembro.
+    - Directivo normal → Solo puede ver lista y editar su propio perfil.
+    """
+
+    menu_directives = []  # Siempre lista, nunca None.
+
+    if not request.user.is_authenticated:
+        return {'menu_directives': menu_directives}
+
+    is_directiva = request.user.groups.filter(name="Directiva").exists()
+    is_admin = request.user.is_superuser
+
+    # Si no es directivo y no es administrador → no mostrar menú.
+    if not is_directiva and not is_admin:
+        return {'menu_directives': menu_directives}
+
+    # Base del menú
+    menu_directives = [
+        {
+            'nombre': 'Directiva',
+            'url': '#',
+            'submenus': [
+                {'nombre': 'Ver Directiva', 'url': reverse('directives_list')},
+            ]
+        }
+    ]
+
+    # Si es administrador → puede crear nuevos miembros
+    if is_admin:
+        menu_directives[0]['submenus'].append(
+            {'nombre': 'Crear Nuevo Directivo', 'url': reverse('directives_create')}
+        )
+
+    # Intentamos obtener el perfil de la directiva actual
+    try:
+        directive = Directives.objects.get(user=request.user)
+
+        # Ver biografía pública
+        menu_directives[0]['submenus'].append({
+            'nombre': 'Ver Mi Perfil Público',
+            'url': reverse('directives_detail', args=[directive.pk])
+        })
+
+        # Editar sus datos (biografía, foto, cargo, redes)
+        menu_directives[0]['submenus'].append({
+            'nombre': 'Editar Mi Perfil',
+            'url': reverse('directives_update', args=[directive.pk])
+        })
+
+    except Directives.DoesNotExist:
+        # Si aún no tiene perfil pero pertenece a directiva → crear su archivo
+        menu_directives[0]['submenus'].append({
+            'nombre': 'Completar Mi Perfil de Directivo',
+            'url': reverse('directives_create')
+        })
+
+    return {'menu_directives': menu_directives}

@@ -8,11 +8,15 @@ from ckeditor.fields import RichTextField  # Asegúrate de tener django-ckeditor
 
 class Directives(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    cargo = models.CharField(max_length=150, null=True)  # Ej: "Director General"
+    foto = models.ImageField(upload_to="directiva_fotos/", null=True, blank=True)
     profiles = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
     address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    role = models.CharField(max_length=100)  # Asegúrate de que el campo se llame 'role'
     biografia = RichTextField(verbose_name="Biografia", null=True, blank=True)
 
+    facebook = models.URLField(blank=True, null=True)
+    instagram = models.URLField(blank=True, null=True)
+    linkedin = models.URLField(blank=True, null=True)
     def summary(self, char_limit=150):
         if len(self.biografia) <= char_limit:
             return self.biografia

@@ -1,0 +1,13 @@
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="container py-4">
+  <h3>¿Eliminar a {{ directive.user.get_full_name }}?</h3>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'directives_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}

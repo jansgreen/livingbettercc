@@ -8,6 +8,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
+            <li class="nav-item me-3"><a class="nav-link" href="{% url 'quienes_somos'%}">Quienes Somos</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="{% url 'contactanos'%}">Contactanos</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="{% url 'product_list'%}">Tienda</a></li>
+
             {% if navbar_menuitems %}
                 {% for  menu in navbar_menuitems %}
                     {% if menu.name|default:''|lower == "navbar" or menu.row|default:0 == 0 or menu.column|default:0 == 0 %}

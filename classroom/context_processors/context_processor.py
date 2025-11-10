@@ -4,6 +4,8 @@ from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
 
+import logging
+logger = logging.getLogger(__name__)
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
@@ -26,10 +28,9 @@ def obtener_menu_classroom(request):
             # Lessons
             menu[0]['submenus'].append({'nombre': 'Lecciones', 'url': reverse('courses:lesson_list')})
             menu[0]['submenus'].append({'nombre': 'Crear Lección', 'url': reverse('courses:lesson_create')})
-
         return {'menu_classroom': menu}
     else:
-        return {'menu_classroom': None}
+        return {'menu_classroom': []}
 
 def obtener_progress_class(request):
     if not request.user.is_authenticated:
@@ -93,7 +94,7 @@ def obtener_progress_class(request):
             'modules': modules_progress,
             'completed': enrollment.completed,
         })
-
+    logger.warning(f"[CTX] obtener_progress_class => {type(progress)} | {progress}")
     return {'progress_classroom': progress}
 
 def obtener_certificados_usuario(request):
@@ -133,5 +134,5 @@ def obtener_certificados_usuario(request):
                 'course_title': curso.title,
                 'completed': completado,
             })
-
+    logger.warning(f"[CTX] obtener_certificados_usuario => {type(certificados)} | {certificados}")
     return {'certificados_usuario': certificados}

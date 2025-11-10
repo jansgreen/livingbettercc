@@ -16,6 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG')
+
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
 # Permitir HTTP solo en desarrollo
@@ -109,15 +110,22 @@ TEMPLATES = [
             ],
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': True,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
                 'home.context_processors.context_processor.bootstrap_css',
                 'home.context_processors.context_processor.bootstrap_js',
+
+                # authentication
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'authentication.context_processors.context_processor.obtener_formbuilder_menu',
+                'authentication.context_processors.context_processor.obtener_menu_directives',
+
+                #shop and cart
                 'shop.context_processors.context_processor.obtener_menu_shop',
                 'cart.context_processors.context_processor.obtener_menu_cart',
 
@@ -139,6 +147,8 @@ TEMPLATES = [
         },
     },
 ]
+
+TEMPLATES[0]['OPTIONS']['debug'] = True
 
 WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 

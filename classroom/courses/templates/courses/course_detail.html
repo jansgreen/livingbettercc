@@ -9,15 +9,13 @@
   <div class="card-body">
     <p>{{ course.description|safe }}</p>
 
-    {% if not user.is_authenticated %}
-      <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Login</a>
-
-    {% elif is_enrolled and user.is_authenticated %}
+    <!-- Si el usuario no esta registrado o autenticado muestra inscribirse -->
+    {% if is_enrolled and user.is_authenticated %}
         <small class="text-success">Ya estás inscrito en este curso.</small>
         <a href="{% url 'courses:my_course' %}" class="btn btn-primary"> Continuar ...</a>
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
-      <a href="{% url 'courses:course_enroll' course.pk %}" class="btn btn-success">Inscribirse</a>
+      <a href="{% url 'students:prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
     {% endif %}
 
   {% if course.modules.all %}

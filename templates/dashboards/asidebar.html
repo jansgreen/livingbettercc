@@ -71,6 +71,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_gallery %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -91,6 +92,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_groups %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm"  style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -111,6 +113,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_metadata %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -131,6 +134,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_auth %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -151,6 +155,28 @@
                     {% endif %}
                 </div>
             {% endfor %}
+
+            {% for menu in menu_directives %}
+                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                            {{ menu.nombre }}
+                        </button>
+                    </h2>
+                    {% if menu.submenus %}
+                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                            <ul class="list-group-flush">
+                                {% for submenu in menu.submenus %}
+                                    <li class="ms-3 border-0 m-3">
+                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
             {% for menu in create_menu %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -171,6 +197,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_classroom %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -191,6 +218,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in menu_setting %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -211,6 +239,7 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            
             {% for menu in formbuilder_menu %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">

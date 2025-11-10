@@ -18,6 +18,7 @@ class Students(models.Model):
     cedula = models.CharField(max_length=11, unique=True, null=True, blank=True)
     telefono = models.CharField(max_length=15, null=True, blank=True)
     regional = models.CharField(max_length=100, null=True, blank=True)
+    por_distrito = models.BooleanField(default=False)
     distrito_educativo = models.CharField(max_length=100, null=True, blank=True)
     genero = models.CharField(max_length=10, choices=genero, null=True, blank=True)
     fecha_nacimiento = models.DateField(null=True, blank=True)

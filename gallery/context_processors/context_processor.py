@@ -11,4 +11,4 @@ def obtener_gallery_img(request):
             menu[0]['submenus'].append({'nombre': 'Subir Imagen', 'url': '/gallery/image_create/'})
 
         return {'menu_gallery':menu}
-    return {'menu_gallery'}
+    return {'menu_gallery':[]}

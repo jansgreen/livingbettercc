@@ -6,50 +6,41 @@
   <div class="row gx-0 align-items-start">
 
     <!-- Lado Izquierdo -->
-{% for section in pages.sections.all %}
-  {% if section.row == 0 %}
-    {% if section.column == 1 %}
-        {% with contents=section.contents.all|dictsortreversed:"created_at"|slice:":5" %}
-          {% if contents %}
-            <div class="col-md-5 bg-body-tertiary rounded-start">
-              <div class="py-4">
-                <h1 class="display-5 fw-bold">{{ content.title|capfirst }}</h1>
-                <p class="fs-5">{{content.content|safe|truncatewords:40 }}</p>
-                <a class="btn btn-primary" href="/docs/5.3/components/navbar#offcanvas">Leer Mas</a>
-              </div>
-            </div>
-          {% endif %}
-        {% endwith %} 
+{% for post in posts %}
+  {% if post.section == 1 %}
+    {% if post.content %}
+      <div class="col-md-5 bg-body-tertiary rounded-start">
+        <div class="py-4">
+          <h1 class="display-5 fw-bold">{{ post.title|capfirst }}</h1>
+            <img src="{{post.cover_image.url }}" class="card-img-top" alt="...">
+          <p class="fs-5">{{post.content|safe|truncatewords:40 }}</p>
+          <a class="btn btn-primary" href="{% url 'contents:ContentDetailView' post.pk %}">Leer Mas</a>
+        </div>
+      </div>
     {% endif %}
+  {% endif %}
+{% endfor %}
 
 
     <!-- Lado Derecho -->
-  {% if section.column == 2 %}
+{% for post in directives%}
       <div class="col-md-5 d-flex flex-column p-4 rounded-end">
         <div class="list-group w-100">
-
-          {% with contents=section.contents.all|dictsortreversed:"created_at"|slice:":5" %}
-            {% if contents %}
-              {% for content in contents %}
-                  <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3">
-                    <img src="https://github.com/twbs.png" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
-                    <div class="d-flex gap-2 w-100 justify-content-between">
-                      <div>
-                        <h6 class="mb-0">{{ content.title|capfirst }}</h6>
-                        <p class="mb-0 opacity-75">{{ content.content|safe|truncatewords:40 }}</p>
-                      </div>
-                      <small class="opacity-50 text-nowrap">Leer</small>
+                <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                  <img src="{{post.foto}}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
+                  <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                      <h6 class="mb-0">{{ post.user|capfirst }}</h6>
+                      <p class="mb-0 opacity-75">{{ post.biografia|safe|truncatewords:15 }}</p>
                     </div>
-                  </a>
-              {% endfor %}
-            {% endif %}
-          {% endwith %} 
+                    <small class="opacity-50 text-nowrap">Leer</small>
+                  </div>
+                </a>
         </div>
       </div>
-  {% endif %}
+{% endfor %}
 
   </div>
 </div>
-
 
 {% endblock %}

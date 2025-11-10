@@ -3,20 +3,18 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Course, Module, Lesson, TestResult
 from .forms import CourseForm, ModuleForm, LessonForm
-from classroom.enrollments.models import Enrollment, ModuleCompletion, LessonCompletion
+from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.contrib import messages
 
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from classroom.enrollments.models import Enrollment
 from authentication.students.exequatur import exequatur_consurt
 
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from .models import Course
-from classroom.enrollments.models import Enrollment
 from authentication.models.students import Students  # Ajusta el import según tu estructura
 from authentication.students.views import student_create_view
 from authentication.models.profiles import Profiles
@@ -58,7 +56,6 @@ def course_enroll(request, pk):
         messages.info(request, f'Ya estás matriculado en {course.title}.')
 
     return redirect('courses:my_course')
-
 
 def course_list(request):
     can_access_module = request.user.has_perm('groups.access_module')

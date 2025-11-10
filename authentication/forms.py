@@ -88,16 +88,6 @@ class CustomerForm(forms.ModelForm):
         Customers.objects.create(user=user)
         return user
 
-class StudentForm(forms.ModelForm):
-    class Meta:
-        model = Students
-        fields = '__all__'  # Adjust fields as needed
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
-
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staffs
@@ -111,7 +101,7 @@ class StaffForm(forms.ModelForm):
 class DirectivesForm(forms.ModelForm):
     class Meta:
         model = Directives
-        fields = ['user', 'profiles', 'address', 'role', 'biografia']  # Ensure 'biografia' is included
+        fields = ('__all__')  # Ensure 'biografia' is included
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)  # Accept the user as a parameter

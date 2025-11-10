@@ -1,6 +1,5 @@
 from django.urls import path, include
 from . import views   
-from .views import DirectivesUpdateView, DirectivesDeleteView
 
 
 urlpatterns = [
@@ -9,13 +8,15 @@ urlpatterns = [
     path('profile/list/', views.profile_list_view, name='profile_list'),
     path('profile/update/<int:pk>/', views.profile_update_view, name='profile_update'),
     path('profile/delete/<int:pk>/', views.profile_delete_view, name='profile_delete'),
-   # Diferente tipos de usuarios
-    #path('customer/', views.customer_view, name='customer_form'),
-    # path('student/', views.student_view, name='student_form'),
-    # path('staff/', views.staff_view, name='staff_form'),
+   # Registro de usuarios y 
+
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
+
+    # Aqui identifico la categoria a la que se le asignara al usuario
+    path('prepare_register/<int:pk>/<str:role>/', views.prepare_register, name='prepare_register'),
+
 
     #usuarios clientes
     path('customer_form/', views.customer_view, name='customer_form'),
@@ -32,11 +33,11 @@ urlpatterns = [
     path('addresses/<int:pk>/delete/', views.address_delete, name='address_delete'),
 
     # Directives CRUD views
-    path('directives/DirectivesCreate/', views.DirectivesCreate, name='DirectivesCreate'),
-    path('directives/<int:pk>/update/', DirectivesUpdateView.as_view(), name='directives-update'),
-    path('directives/<int:pk>/delete/', DirectivesDeleteView.as_view(), name='directives-delete'),
+    path('directives/', views.directives_list, name='directives_list'),
+    path('directives/create/', views.directives_create, name='directives_create'),
+    path('directives/<int:pk>/edit/', views.directives_update, name='directives_update'),
+    path('directives/<int:pk>/delete/', views.directives_delete, name='directives_delete'),
     
-    # Facilitions Minerd
 
 
     # students registration

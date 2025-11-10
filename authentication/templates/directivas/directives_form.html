@@ -1,0 +1,16 @@
+{% extends 'frontend.html' %}
+{% block content %}
+
+<div class="container py-4">
+  <h2>{{ title }}</h2>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ form.media }}
+    <button class="btn btn-success">Guardar</button>
+    <a href="{% url 'directives_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+
+{% endblock %}
