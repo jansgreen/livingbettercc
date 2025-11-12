@@ -41,7 +41,7 @@ class ContentPost(models.Model):
     title = models.CharField(max_length=200, verbose_name="Título", unique=True)
     slug = models.SlugField(max_length=220, unique=True, blank=True, null=True)
     content = RichTextField(verbose_name="Contenido", blank=True, null=True)
-    section = models.IntegerField(max_length=2, validators=[MinValueValidator(1), MaxValueValidator(99)], blank=True, null=True)
+    section = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(99)], blank=True, null=True)
 
     # --- Relaciones ---
     category = models.ForeignKey(
