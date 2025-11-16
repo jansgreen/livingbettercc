@@ -1,3 +1,33 @@
+from django.shortcuts import redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+def beca_application_action(request, app_id):
+    if not request.user.is_staff or request.method != 'POST':
+        return redirect('beca_applications_list')
+    from classroom.enrollments.models import BecaApplication
+    app = get_object_or_404(BecaApplication, id=app_id)
+    action = request.POST.get('action')
+    if action == 'aprobar':
+        app.estado = 'aprobada'
+        app.save()
+    elif action == 'rechazar':
+        app.estado = 'rechazada'
+        app.save()
+    return redirect('beca_applications_list')
+from classroom.enrollments.models import BecaApplication
+
+def beca_applications_list(request):
+    # Solo staff puede ver
+    if not request.user.is_staff:
+        return render(request, 'dashboard/dashboard_base.html', {'error': 'No autorizado'})
+    estado = request.GET.get('estado', 'todos')
+    qs = BecaApplication.objects.select_related('user', 'course', 'address').order_by('-fecha_aplicacion')
+    if estado != 'todos':
+        qs = qs.filter(estado=estado)
+    return render(request, 'dashboard/beca_applications_list.html', {
+        'beca_applications': qs,
+        'estado': estado,
+    })
 from django.shortcuts import render
 from django.contrib.auth.models import User
 
@@ -25,12 +55,16 @@ def dashboards(request):
     courses_count = Course.objects.count()
     customers_count = Customers.objects.count()
 
+    from classroom.enrollments.models import BecaApplication
+    beca_applications_count = BecaApplication.objects.count()
+    becados_count = BecaApplication.objects.filter(estado='aprobada').count()
     context = {
         'students_count': students_count,
         'users_count': users_count,
         'forms_count': forms_count,
         'courses_count': courses_count,
         'customers_count': customers_count,
+        'beca_applications_count': beca_applications_count,
+        'becados_count': becados_count,
     }
-
     return render(request, 'dashboard.html', context)

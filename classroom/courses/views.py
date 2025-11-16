@@ -1,7 +1,9 @@
+from .models import Module, QuickTestResult
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import Course, Module, Lesson, TestResult
+from django.contrib.auth.decorators import login_required
+from .models import Course, Module, Lesson
 from .forms import CourseForm, ModuleForm, LessonForm
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.contrib import messages
@@ -9,21 +11,48 @@ from django.contrib import messages
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from authentication.students.exequatur import exequatur_consurt
-
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
 from .models import Course
 from authentication.models.students import Students  # Ajusta el import según tu estructura
-from authentication.students.views import student_create_view
 from authentication.models.profiles import Profiles
-
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import Group
-from classroom.courses.models import Course, Module, Lesson, TestResult, Question
+from classroom.courses.models import Course, Module, Lesson
+
+
+@login_required
+def quicktest_view(request, module_id):
+    module = get_object_or_404(Module, pk=module_id)
+    test = getattr(module, 'test', None)
+    if not test:
+        messages.error(request, 'Este módulo no tiene test asignado.')
+        return redirect('courses:module_detail', pk=module_id)
+
+    if request.method == 'POST':
+        correct = 0
+        total = test.questions.count()
+        for q in test.questions.all():
+            user_answer = request.POST.get(f'question_{q.id}')
+            if user_answer == q.correct_option:
+                correct += 1
+        score = (correct / total) * 100 if total > 0 else 0
+        passed = score >= 70
+        QuickTestResult.objects.update_or_create(
+            user=request.user,
+            module=module,
+            defaults={'score': score, 'passed': passed}
+        )
+        if passed:
+            messages.success(request, '¡Test aprobado! Puedes continuar al siguiente módulo.')
+            return redirect('courses:next_module', module_id=module_id)
+        else:
+            messages.error(request, 'No aprobaste el test. Repasa la lección antes de continuar.')
+            return redirect('courses:module_detail', pk=module_id)
+
+    return render(request, 'courses/quicktest.html', {'module': module, 'test': test})
 
 
 def course_enroll(request, pk):
@@ -44,11 +73,67 @@ def course_enroll(request, pk):
         user.groups.add(student_group)
 
     # Verificar si el usuario tiene perfil
-    if not Profiles.objects.filter(user=user).exists():
+    profile = Profiles.objects.filter(user=user).first()
+    if not profile:
         messages.info(request, 'Por favor, crea tu perfil antes de inscribirte.')
         return redirect('profile_create')
 
-    # Crear o recuperar matrícula
+    # Si el usuario aplica a beca Minerd (POST con cedula y exequatur)
+    if request.method == 'POST' and 'cedula' in request.POST and 'exequatur' in request.POST:
+        cedula = request.POST.get('cedula', '').strip()
+        exequatur = request.POST.get('exequatur', '').strip()
+        centro_educativo = request.POST.get('centro_educativo', '').strip()
+        distrito_escolar = request.POST.get('distrito_escolar', '').strip()
+        # Dirección laboral
+        street = request.POST.get('street', '').strip()
+        neighborhood = request.POST.get('neighborhood', '').strip()
+        provincia = request.POST.get('provincia', '').strip()
+        municipio = request.POST.get('municipio', '').strip()
+        zip_code = request.POST.get('zip_code', '').strip()
+        city = request.POST.get('city', '').strip()
+        state = request.POST.get('state', '').strip()
+        # Validar profesional
+        if not profile.profesion:
+            messages.error(request, 'Debes tener una profesión registrada en tu perfil para aplicar a la beca Minerd.')
+            return redirect('courses:course_detail', pk=pk)
+        if not cedula or not exequatur or not centro_educativo or not distrito_escolar:
+            messages.error(request, 'Debes completar todos los campos para aplicar a la beca Minerd.')
+            return redirect('courses:course_detail', pk=pk)
+        # Guardar datos en Students
+        student.cedula = cedula
+        student.certification = exequatur
+        student.save()
+        # Guardar dirección laboral
+        from authentication.models.address import Address
+        address = Address.objects.create(
+            user=user,
+            address_type='laboral',
+            street=street,
+            neighborhood=neighborhood,
+            city=city,
+            state=state,
+            zip_code=zip_code
+        )
+        # Guardar aplicación a beca
+        from classroom.enrollments.models import BecaApplication
+        BecaApplication.objects.create(
+            user=user,
+            course=course,
+            cedula=cedula,
+            exequatur=exequatur,
+            centro_educativo=centro_educativo,
+            distrito_escolar=distrito_escolar,
+            address=address
+        )
+        # Crear o recuperar matrícula
+        enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
+        if created:
+            messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada correctamente.')
+        else:
+            messages.info(request, f'Ya tienes una aplicación/matrícula para este curso.')
+        return redirect('courses:my_course')
+
+    # Inscripción normal (pago)
     enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
     if created:
         messages.success(request, f'Te has matriculado con éxito en {course.title}.')
@@ -70,13 +155,18 @@ def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
 
     is_enrolled = False
-
+    beca_status = None
     if request.user.is_authenticated:
         is_enrolled = Enrollment.objects.filter(user=request.user, course=course).first()
-        
+        # Consultar estado de beca Minerd para este curso
+        from classroom.enrollments.models import BecaApplication
+        beca_app = BecaApplication.objects.filter(user=request.user, course=course).order_by('-fecha_aplicacion').first()
+        if beca_app:
+            beca_status = beca_app.estado
     context = {
         'course': course,
         'is_enrolled': is_enrolled,
+        'beca_status': beca_status,
     }
     return render(request, 'courses/course_detail.html', context)
 
@@ -201,9 +291,14 @@ def module_update(request, pk):
 def module_detail(request, pk):
     module = get_object_or_404(Module, pk=pk)
     lessons = module.lessons.all()
+    quicktest_result = None
+    if request.user.is_authenticated and module.test:
+        from .models import QuickTestResult
+        quicktest_result = QuickTestResult.objects.filter(user=request.user, module=module).first()
     context = {
         'module': module,
-        'lessons': lessons, #A
+        'lessons': lessons,
+        'quicktest_result': quicktest_result,
     }
     return render(request, 'module/module_detail.html', context)
 
@@ -308,7 +403,7 @@ def save_test_result(request):
         enrollment = Enrollment.objects.get(user=user, course=module.course)
 
         # Guarda resultado
-        result, created = TestResult.objects.get_or_create(
+        result, created = QuickTestResult.objects.get_or_create(
             enrollment=enrollment,
             test=test,
             defaults={'score': score}
@@ -338,6 +433,17 @@ def test_detail(request, pk):
         return JsonResponse({'status': 'success', 'score': score})
     
     return render(request, 'courses/test_detail.html', {'module': module, 'test': test})
+
+@login_required
+def next_module(request, module_id):
+    module = get_object_or_404(Module, pk=module_id)
+    course = module.course
+    next_mod = Module.objects.filter(course=course, order__gt=module.order).order_by('order').first()
+    if next_mod:
+        return redirect('courses:module_detail', pk=next_mod.pk)
+    else:
+        messages.success(request, '¡Has completado todos los módulos de este curso!')
+        return redirect('courses:my_course')
 
 
 

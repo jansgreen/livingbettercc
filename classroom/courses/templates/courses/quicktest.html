@@ -1,0 +1,22 @@
+{% extends "classroom/classroom.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Test rápido del módulo: {{ module.title }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% for question in test.questions.all %}
+      <div class="mb-3">
+        <label class="form-label">{{ question.text|safe }}</label>
+        <div>
+          <label><input type="radio" name="question_{{ question.id }}" value="A"> {{ question.option_a }}</label><br>
+          <label><input type="radio" name="question_{{ question.id }}" value="B"> {{ question.option_b }}</label><br>
+          <label><input type="radio" name="question_{{ question.id }}" value="C"> {{ question.option_c }}</label><br>
+          <label><input type="radio" name="question_{{ question.id }}" value="D"> {{ question.option_d }}</label>
+        </div>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Enviar respuestas</button>
+  </form>
+</div>
+{% endblock %}

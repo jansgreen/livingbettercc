@@ -16,6 +16,134 @@
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
       <a href="{% url 'prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
+      <!-- Botón para aplicar a beca Minerd -->
+      <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#becaMinerdModal">Aplicar a beca Minerd</button>
+
+      <!-- Modal Beca Minerd -->
+      <div class="modal fade" id="becaMinerdModal" tabindex="-1" aria-labelledby="becaMinerdLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <form method="post" action="{% url 'courses:course_enroll' course.pk %}">
+              {% csrf_token %}
+              <div class="modal-header">
+                <h5 class="modal-title" id="becaMinerdLabel">Aplicar a beca Minerd</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p>Para aplicar a la beca Minerd debes ser profesional y adjuntar tu cédula y exequatur.</p>
+                <div class="mb-3">
+                  <label for="cedula" class="form-label">Cédula</label>
+                  <input type="text" class="form-control" id="cedula" name="cedula" required maxlength="11">
+                </div>
+                <div class="mb-3">
+                  <label for="exequatur" class="form-label">Exequatur</label>
+                  <input type="text" class="form-control" id="exequatur" name="exequatur" required>
+                </div>
+                <div class="mb-3">
+                  <label for="centro_educativo" class="form-label">Centro Educativo</label>
+                  <input type="text" class="form-control" id="centro_educativo" name="centro_educativo" required>
+                </div>
+                <div class="mb-3">
+                  <label for="distrito_escolar" class="form-label">Distrito Escolar</label>
+                  <input type="text" class="form-control" id="distrito_escolar" name="distrito_escolar" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Dirección del Centro Educativo</label>
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <label for="street" class="form-label">Calle</label>
+                      <input type="text" class="form-control" name="street" id="street" required>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="neighborhood" class="form-label">Barrio o sector</label>
+                      <input type="text" class="form-control" name="neighborhood" id="neighborhood" required>
+                    </div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="provincia" class="form-label">Provincia</label>
+                      <select class="form-select" name="provincia" id="provincia" required>
+                        <option value="">Seleccione provincia</option>
+                        <option>Azua</option>
+                        <option>Bahoruco</option>
+                        <option>Barahona</option>
+                        <option>Dajabón</option>
+                        <option>Distrito Nacional</option>
+                        <option>Duarte</option>
+                        <option>El Seibo</option>
+                        <option>Espaillat</option>
+                        <option>Hato Mayor</option>
+                        <option>Hermanas Mirabal</option>
+                        <option>Independencia</option>
+                        <option>La Altagracia</option>
+                        <option>La Romana</option>
+                        <option>La Vega</option>
+                        <option>María Trinidad Sánchez</option>
+                        <option>Monseñor Nouel</option>
+                        <option>Monte Cristi</option>
+                        <option>Monte Plata</option>
+                        <option>Pedernales</option>
+                        <option>Peravia</option>
+                        <option>Puerto Plata</option>
+                        <option>Samaná</option>
+                        <option>San Cristóbal</option>
+                        <option>San José de Ocoa</option>
+                        <option>San Juan</option>
+                        <option>San Pedro de Macorís</option>
+                        <option>Sánchez Ramírez</option>
+                        <option>Santiago</option>
+                        <option>Santiago Rodríguez</option>
+                        <option>Santo Domingo</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="municipios" class="form-label">Municipio</label>
+                      <select class="form-select" name="municipio" id="municipios" required disabled>
+                        <option value="">Seleccione municipio</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="codigo_postal" class="form-label">Código postal</label>
+                      <select class="form-select" name="zip_code" id="codigo_postal" required disabled>
+                        <option value="">Seleccione código postal</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="city" class="form-label">Ciudad</label>
+                      <input type="text" class="form-control" name="city" id="city" required>
+                    </div>
+                  </div>
+                  <div class="row g-2 mt-2">
+                    <div class="col-md-6">
+                      <label for="state" class="form-label">Estado/Municipio</label>
+                      <input type="text" class="form-control" name="state" id="state" required>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-info">Aplicar a beca</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if beca_status %}
+      <div class="alert alert-info mt-3">
+        Estado de tu aplicación a beca Minerd:
+        {% if beca_status == 'pendiente' %}
+          <span class="badge bg-warning text-dark">Pendiente / En revisión</span>
+        {% elif beca_status == 'aprobada' %}
+          <span class="badge bg-success">Aprobada</span>
+        {% else %}
+          <span class="badge bg-danger">Rechazada</span>
+        {% endif %}
+      </div>
     {% endif %}
 
   {% if course.modules.all %}
@@ -36,4 +164,81 @@
       <li>No hay módulos disponibles para este curso.</li>
   {% endif %}
 </div>
+{% endblock %}
+{% block extra_js %}
+  <script>
+    const provincias = {
+      'Distrito Nacional': ['Santo Domingo'],
+      Azua: ['Azua de Compostela', 'Estebanía', 'Guayabal', 'Las Charcas', 'Las Yayas de Viajama', 'Padre Las Casas', 'Peralta', 'Sabana Yegua', 'Tábara Arriba'],
+      Bahoruco: ['Neiba', 'Galván', 'Los Ríos', 'Tamayo', 'Villa Jaragua'],
+      Barahona: ['Santa Cruz de Barahona', 'Cabral', 'El Peñón', 'Enriquillo', 'Fundación', 'Jaquimeyes', 'La Ciénaga', 'Las Salinas', 'Paraíso', 'Polo'],
+      Dajabón: ['Dajabón', 'El Pino', 'Loma de Cabrera', 'Partido', 'Restauración'],
+      Duarte: ['San Francisco de Macorís', 'Arenoso', 'Castillo', 'Eugenio María de Hostos', 'Las Guáranas', 'Pimentel', 'Villa Riva'],
+      'El Seibo': ['Santa Cruz de El Seibo', 'Miches', 'Pedro Sánchez'],
+      Espaillat: ['Moca', 'Cayetano Germosén', 'Gaspar Hernández', 'Jamao al Norte'],
+      'Hato Mayor': ['Hato Mayor del Rey', 'El Valle', 'Sabana de la Mar'],
+      'Hermanas Mirabal': ['Salcedo', 'Tenares', 'Villa Tapia'],
+      Independencia: ['Jimaní', 'Cristóbal', 'Duvergé', 'La Descubierta', 'Mella', 'Postrer Río'],
+      'La Altagracia': ['Higüey', 'Bávaro', 'Miches'],
+      'La Romana': ['La Romana', 'Guaymate', 'Villa Hermosa'],
+      'La Vega': ['Concepción de La Vega', 'Bonao', 'Jima Abajo', 'Mamá Tingó'],
+      'María Trinidad Sánchez': ['Nagua', 'Arenoso', 'El Factor', 'Río San Juan'],
+      'Monseñor Nouel': ['Bonao', 'Maimón', 'Piedra Blanca'],
+      'Monte Cristi': ['Monte Cristi', 'Castañuela', 'Guayubín', 'Las Matas de Santa Cruz', 'Pepillo Salcedo', 'Villa Vásquez'],
+      'Monte Plata': ['Monte Plata', 'Bayaguana', 'Don Juan', 'Peralvillo', 'Sabana Grande de Boyá', 'Yamasá'],
+      Pedernales: ['Pedernales', 'Oviedo', 'Bahía de las Águilas']
+    }
+    const zipCodes = {
+      Azua: '71000',
+      Bahoruco: '81000',
+      Barahona: '81000',
+      Dajabón: '63000',
+      'Distrito Nacional': '10100',
+      Duarte: '31000',
+      'El Seibo': '24000',
+      Espaillat: '57000',
+      'Hato Mayor': '25000',
+      'Hermanas Mirabal': '33000',
+      Independencia: '75000',
+      'La Altagracia': '23000',
+      'La Romana': '22000',
+      'La Vega': '41000',
+      'María Trinidad Sánchez': '33000',
+      'Monseñor Nouel': '41000',
+      'Monte Cristi': '61000',
+      MontesPlata: '92000',
+      Pedernales: '71000',
+      Peravia: '94000',
+      PuertoPlata: '57000',
+      Samaná: '32000',
+      SanCristóbal: '91000',
+      SanJosédeOcoa: '91000',
+      SanJuan: '57000',
+      SanPedrodeMacorís: '21000',
+      SánchezRamírez: '41000',
+      Santiago: '51000',
+      SantiagoRodríguez: '65000',
+      SantoDomingo: '10205'
+    }
+    const provinciaSelect = document.getElementById('provincia')
+    const municipiosSelect = document.getElementById('municipios')
+    const zip = document.getElementById('codigo_postal')
+    provinciaSelect.addEventListener('change', function () {
+      const provincia = provinciaSelect.value
+      if (provincia) {
+        const municipios = provincias[provincia]
+        const options = municipios.map((municipio) => `<option>${municipio}</option>`).join('')
+        municipiosSelect.innerHTML = options
+        municipiosSelect.disabled = false
+        const zip_code = zipCodes[provincia]
+        zip.innerHTML = `<option>${zip_code}</option>`
+        zip.disabled = false
+      } else {
+        municipiosSelect.innerHTML = '<option value="">--</option>'
+        municipiosSelect.disabled = true
+        zip.innerHTML = '<option value="">--</option>'
+        zip.disabled = true
+      }
+    })
+  </script>
 {% endblock %}

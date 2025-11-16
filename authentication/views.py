@@ -209,8 +209,14 @@ def profile_delete_view(request, pk):
 
 def profile_view(request):
     profile = Profiles.objects.filter(user=request.user)
+    beca_status = None
+    from classroom.enrollments.models import BecaApplication
+    beca_app = BecaApplication.objects.filter(user=request.user).order_by('-fecha_aplicacion').first()
+    if beca_app:
+        beca_status = beca_app.estado
     context = {
         'profile': profile,
+        'beca_status': beca_status,
     }
     return render(request, 'authentication/profile_detail.html', context)
 

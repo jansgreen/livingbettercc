@@ -34,4 +34,6 @@ urlpatterns = [
 
     # Enroll
     path('course_enroll/<int:pk>/', views.course_enroll, name='course_enroll'),
+    path('quicktest/<int:module_id>/', views.quicktest_view, name='quicktest'),
+    path('next_module/<int:module_id>/', views.next_module, name='next_module'),
 ]

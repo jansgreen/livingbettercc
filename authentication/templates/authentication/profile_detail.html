@@ -1,4 +1,5 @@
-{% extends 'dashboard.html' %}    
+{% extends 'dashboard.html' %}
+{% load static %}
 
 {% block content %}
 <h2>Profile Detail</h2>
@@ -17,8 +18,19 @@
         <p><strong>{{ field.roll.label }}:</strong> {{ field.roll }}</p>
         <p><strong>{{ field.imagen.label }}:</strong> <img src="{{ field.imagen.url }}" alt="Profile Image"></p>
 
-
     {% endfor %}
+    {% if beca_status %}
+      <div class="alert alert-info mt-3">
+        Estado de tu aplicación a beca Minerd:
+        {% if beca_status == 'pendiente' %}
+          <span class="badge bg-warning text-dark">Pendiente / En revisión</span>
+        {% elif beca_status == 'aprobada' %}
+          <span class="badge bg-success">Aprobada</span>
+        {% else %}
+          <span class="badge bg-danger">Rechazada</span>
+        {% endif %}
+      </div>
+    {% endif %}
     <a href="{% url 'profile_list' %}">Back to Profile List</a>
 {% else %}
 <p>No profile found.</p>

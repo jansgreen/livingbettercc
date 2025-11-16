@@ -1,0 +1,61 @@
+{% extends 'dashboards/dashboard.html' %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Aplicaciones a Beca Minerd</h2>
+  <form method="get" class="mb-3">
+    <div class="input-group">
+      <label class="input-group-text" for="estado">Filtrar por estado:</label>
+      <select class="form-select" name="estado" id="estado" onchange="this.form.submit()">
+        <option value="todos" {% if estado == 'todos' %}selected{% endif %}>Todos</option>
+        <option value="pendiente" {% if estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="aprobada" {% if estado == 'aprobada' %}selected{% endif %}>Aprobada</option>
+        <option value="rechazada" {% if estado == 'rechazada' %}selected{% endif %}>Rechazada</option>
+      </select>
+    </div>
+  </form>
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>Estudiante</th>
+        <th>Curso</th>
+        <th>Centro Educativo</th>
+        <th>Distrito Escolar</th>
+        <th>Dirección Laboral</th>
+        <th>Estado</th>
+        <th>Fecha de Aplicación</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in beca_applications %}
+      <tr>
+        <td>{{ app.user.get_full_name }} ({{ app.user.username }})</td>
+        <td>{{ app.course.title }}</td>
+        <td>{{ app.centro_educativo }}</td>
+        <td>{{ app.distrito_escolar }}</td>
+        <td>{{ app.address }}</td>
+        <td>
+          {% if app.estado == 'pendiente' %}
+            <span class="badge bg-warning text-dark">Pendiente</span>
+          {% elif app.estado == 'aprobada' %}
+            <span class="badge bg-success">Aprobada</span>
+          {% else %}
+            <span class="badge bg-danger">Rechazada</span>
+          {% endif %}
+        </td>
+        <td>{{ app.fecha_aplicacion|date:"d/m/Y H:i" }}</td>
+        <td>
+          {% if app.estado == 'pendiente' %}
+            <form method="post" action="{% url 'beca_application_action' app.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" name="action" value="aprobar" class="btn btn-success btn-sm">Aprobar</button>
+              <button type="submit" name="action" value="rechazar" class="btn btn-danger btn-sm">Rechazar</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
