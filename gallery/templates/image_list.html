@@ -1,23 +1,37 @@
 {% extends 'dashboard.html' %}
 {% load static %}
 {% block content %}
-<div class="container">
-    <h1>Galería de Imágenes</h1>
-    <a href="{% url 'image_create' %}" class="btn btn-primary mb-3">Agregar Imagen</a>
-    {% for image in images %}
-    <div class="card" style="width: 18rem;">
-        <img src="{{image.image_file.url}}" class="card-img-top" alt="...">
-        <div class="card-body">
-            <h5 class="card-name">{{ image.name |capfirst }}</h5>
-            <p class="card-text">Url: {{image.image_file.url}}</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary">Galería de Imágenes</h1>
+        <a href="{% url 'image_create' %}" class="btn btn-success btn-lg shadow">Agregar Imagen</a>
+    </div>
 
-            <a href="{% url 'image_update' image.pk %}" class="btn btn-sm btn-warning">Editar</a>
-            <form action="{% url 'image_delete' image.pk %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-            </form>                  
+    {% if images %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for image in images %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="ratio ratio-4x3">
+                    <img src="{{image.image_file.url}}" class="card-img-top object-fit-cover" alt="{{ image.name }}">
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-truncate">{{ image.name|capfirst }}</h5>
+                    <p class="card-text small text-muted mb-2">URL: <a href="{{image.image_file.url}}" target="_blank">Ver imagen</a></p>
+                    <div class="mt-auto d-flex gap-2">
+                        <a href="{% url 'image_update' image.pk %}" class="btn btn-outline-warning btn-sm">Editar</a>
+                        <form action="{% url 'image_delete' image.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="alert alert-info mt-4">No hay imágenes en la galería.</div>
+    {% endif %}
 </div>
 {% endblock %}

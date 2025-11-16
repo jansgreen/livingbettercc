@@ -10,14 +10,31 @@ from cart.cart import Cart as sc  # Import Cart with alias sc
 from django.utils.text import slugify
 from django.db import IntegrityError
 
+from django.core.paginator import Paginator
+
 def product_list(request):
+    # Búsqueda
+    search_query = request.GET.get('q', '').strip()
+
+    courses = Course.objects.all()
     products = Product.objects.all()
-    course = Course.objects.all()
-    t = [t for t in course ]
-    print(t)
+
+    if search_query:
+        courses = courses.filter(title__icontains=search_query)
+        products = products.filter(title__icontains=search_query)
+
+    # Paginación
+    course_paginator = Paginator(courses, 8)
+    product_paginator = Paginator(products, 8)
+    course_page_number = request.GET.get('course_page')
+    product_page_number = request.GET.get('product_page')
+    course_page_obj = course_paginator.get_page(course_page_number)
+    product_page_obj = product_paginator.get_page(product_page_number)
+
     context = {
-        'products': products,
-        'courses': course,
+        'courses': course_page_obj,
+        'products': product_page_obj,
+        'search_query': search_query,
     }
     return render(request, 'product_list.html', context)
 

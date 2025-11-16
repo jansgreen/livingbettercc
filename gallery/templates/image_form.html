@@ -3,11 +3,30 @@
 {% block content %}
 <div class="container">
     <h2>{% if image %}Actualizar Imagen{% else %}Agregar Imagen{% endif %}</h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="row g-3">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">{% if image %}Actualizar{% else %}Guardar{% endif %}</button>
-        <a href="{% url 'image_list' %}" class="btn btn-secondary">Cancelar</a>
+        <div class="col-md-6">
+            <label for="id_name" class="form-label">Nombre</label>
+            {{ form.name }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_description" class="form-label">Descripción</label>
+            {{ form.description }}
+        </div>
+        <div class="col-md-6">
+            <label for="id_image_file" class="form-label">Archivo de imagen</label>
+            {{ form.image_file }}
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div class="form-check">
+                {{ form.forcarousel }}
+                <label class="form-check-label ms-2" for="forcarouselCheck">¿Mostrar en carrusel?</label>
+            </div>
+        </div>
+        <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-success me-2">{% if image %}Actualizar{% else %}Guardar{% endif %}</button>
+            <a href="{% url 'image_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
     </form>
 </div>
 {% endblock %}

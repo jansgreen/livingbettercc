@@ -8,7 +8,7 @@ def obtener_gallery_img(request):
         }]
         if user_has_module_access:
             menu[0]['submenus'].append({'nombre': 'Galeria', 'url': '/gallery/'})
-            menu[0]['submenus'].append({'nombre': 'Subir Imagen', 'url': '/gallery/image_create/'})
+            menu[0]['submenus'].append({'nombre': 'Subir Imagen', 'url': '/gallery/create/'})
 
         return {'menu_gallery':menu}
     return {'menu_gallery':[]}

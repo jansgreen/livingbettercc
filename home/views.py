@@ -18,13 +18,13 @@ from shop.cart import Cart
 def home(request):
     # 1. Obtener la página "Home"
     category = ContentCategory.objects.filter(slug="home").first()
-    gallery = Image.objects.all()
+    # Solo imágenes marcadas para el carrusel
+    gallery = Image.objects.filter(forcarousel=True)
 
     if category:
         posts = category.posts.filter(status="published").order_by("-created_at")
     else:
         posts = None
-
 
     context = {
         'gallery': gallery,
