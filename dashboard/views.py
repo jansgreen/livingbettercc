@@ -58,6 +58,8 @@ def dashboards(request):
     from classroom.enrollments.models import BecaApplication
     beca_applications_count = BecaApplication.objects.count()
     becados_count = BecaApplication.objects.filter(estado='aprobada').count()
+    # Group checks for template logic
+    user_groups = request.user.groups.values_list('name', flat=True) if request.user.is_authenticated else []
     context = {
         'students_count': students_count,
         'users_count': users_count,
@@ -66,5 +68,8 @@ def dashboards(request):
         'customers_count': customers_count,
         'beca_applications_count': beca_applications_count,
         'becados_count': becados_count,
+        'is_student': 'student' in user_groups,
+        'is_tecnico': 'tecnico' in user_groups,
+        'is_facilitador': 'facilitador' in user_groups,
     }
     return render(request, 'dashboard.html', context)

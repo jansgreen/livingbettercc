@@ -1,8 +1,23 @@
-{% extends 'dashboard.html' %}    
 
+{% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
-<div class="alert alert-success mt-4">
-    {{ message }}
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white d-flex align-items-center">
+                    <i class="fas fa-check-circle fa-lg me-2"></i>
+                    <h4 class="mb-0">Invitación enviada</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success animate__animated animate__fadeInDown">
+                        <i class="fas fa-paper-plane"></i> {{ message }}
+                    </div>
+                    <a href="{% url 'invite_friend' %}" class="btn btn-primary w-100 animate__animated animate__pulse"><i class="fas fa-arrow-left"></i> Volver</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<a href="{% url 'invite_friend' %}" class="btn btn-primary mt-3">Volver</a>
 {% endblock %}

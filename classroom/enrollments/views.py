@@ -11,12 +11,12 @@ from classroom.courses.models import Course, Module, Lesson
 @login_required
 def enrollment_list(request):
     enrollments = Enrollment.objects.filter(user=request.user)
-    return render(request, 'enrollments/enrollment_list.html', {'enrollments': enrollments})
+    return render(request, 'enrollments_list.html', {'enrollments': enrollments})
 
 @login_required
 def enrollment_detail(request, pk):
     enrollment = get_object_or_404(Enrollment, pk=pk, user=request.user)
-    return render(request, 'enrollments/enrollment_detail.html', {'enrollment': enrollment})
+    return render(request, 'enrollment_detail.html', {'enrollment': enrollment})
 
 @login_required
 def enrollment_create(request, course_id):
@@ -36,7 +36,7 @@ def enrollment_delete(request, pk):
         enrollment.delete()
         messages.success(request, "Inscripción eliminada.")
         return redirect('enrollments:enrollment-list')
-    return render(request, 'enrollments/enrollment_confirm_delete.html', {'enrollment': enrollment})
+    return render(request, 'enrollment_confirm_delete.html', {'enrollment': enrollment})
 
 #module completion view
 @login_required

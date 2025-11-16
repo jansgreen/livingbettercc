@@ -1,17 +1,28 @@
-{% extends 'dashboard.html' %}    
 
+{% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
-<div class="container mt-5">
-    <h2>¡Te han invitado a unirte a nuestro sitio!</h2>
-    <p>{{ user.username }} te ha invitado a unirte a nuestro sitio en el grupo <strong>{{ group_name }}</strong>.</p>
-    <p>Haz clic en el siguiente enlace para aceptar la invitación:</p>
-    <p>
-        <a href="{{ invite_url }}" class="btn btn-primary">
-            Aceptar Invitación
-        </a>
-    </p>
-    <p>Si el enlace no funciona, copia y pega la siguiente URL en tu navegador:</p>
-    <p>{{ invite_url }}</p>
-    <p>¡Esperamos verte pronto!</p>
+<div class="container py-5 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white d-flex align-items-center">
+                    <i class="fas fa-envelope-open-text fa-lg me-2"></i>
+                    <h3 class="mb-0">¡Te han invitado a unirte!</h3>
+                </div>
+                <div class="card-body">
+                    <p class="fs-5"><strong>{{ user.username }}</strong> te ha invitado a unirte al grupo <span class="badge bg-primary">{{ group_name }}</span>.</p>
+                    <p>Haz clic en el siguiente enlace para aceptar la invitación:</p>
+                    <a href="{{ invite_url }}" class="btn btn-success btn-lg animate__animated animate__pulse">
+                        <i class="fas fa-user-plus"></i> Aceptar Invitación
+                    </a>
+                    <hr>
+                    <p class="text-muted">Si el enlace no funciona, copia y pega la siguiente URL en tu navegador:</p>
+                    <div class="alert alert-secondary">{{ invite_url }}</div>
+                    <p class="mt-3">¡Esperamos verte pronto! <i class="fas fa-smile"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

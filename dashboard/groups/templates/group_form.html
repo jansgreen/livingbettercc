@@ -1,19 +1,33 @@
-{% extends 'dashboard.html' %}    
+{% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
-<div class="py-3 bg-light">
-    <div class="container">
-        <!-- groups_access/group_form.html -->
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-user-plus fa-lg me-2"></i>
+                    <h4 class="mb-0">Formulario de Grupo</h4>
                 </div>
-            {% endfor %}
-            <button type="submit">Guardar cambios</button>
-        </form>
+                <div class="card-body">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small animate__animated animate__shakeX">{{ field.errors }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-success btn-lg w-100 animate__animated animate__pulse">
+                            <i class="fas fa-save"></i> Guardar cambios
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}

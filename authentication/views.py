@@ -90,7 +90,57 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect('home')  # Replace 'home' with your desired redirect URL
+            # Si hay intención previa almacenada (inscribirse en un curso), respetarla
+            role = request.session.get('post_register_role', None)
+            item_id = request.session.get('selected_item', None)
+            pending_beca = request.session.get('pending_beca')
+            if pending_beca and role == 'student' and item_id:
+                try:
+                    # Procesar la solicitud de beca guardada en sesión
+                    from authentication.models.students import Students
+                    from authentication.models.address import Address
+                    from classroom.enrollments.models import BecaApplication, Enrollment
+                    from classroom.courses.models import Course
+                    # Crear matrícula
+                    Enrollment.objects.get_or_create(user=user, course_id=item_id)
+                    # Guardar student y address
+                    student, _ = Students.objects.get_or_create(user=user)
+                    student.cedula = pending_beca.get('cedula')
+                    student.certification = pending_beca.get('exequatur')
+                    student.save()
+                    address = Address.objects.create(
+                        user=user,
+                        address_type='laboral',
+                        street=pending_beca.get('street',''),
+                        neighborhood=pending_beca.get('neighborhood',''),
+                        city=pending_beca.get('city',''),
+                        state=pending_beca.get('state',''),
+                        zip_code=pending_beca.get('zip_code','')
+                    )
+                    course_obj = Course.objects.get(pk=item_id)
+                    BecaApplication.objects.create(
+                        user=user,
+                        course=course_obj,
+                        cedula=pending_beca.get('cedula',''),
+                        exequatur=pending_beca.get('exequatur',''),
+                        centro_educativo=pending_beca.get('centro_educativo',''),
+                        distrito_escolar=pending_beca.get('distrito_escolar',''),
+                        address=address
+                    )
+                    messages.success(request, f'Tu aplicación a la beca Minerd para {course_obj.title} fue procesada correctamente.')
+                except Exception:
+                    messages.warning(request, 'No se pudo procesar automáticamente la solicitud de beca después del inicio de sesión.')
+                finally:
+                    request.session.pop('pending_beca', None)
+                    request.session.pop('post_register_role', None)
+                    request.session.pop('selected_item', None)
+                return redirect('courses:course_detail', pk=item_id)
+            if role == 'student' and item_id:
+                # Limpiar sesiones y redirigir al flujo de inscripción
+                request.session.pop('post_register_role', None)
+                request.session.pop('selected_item', None)
+                return redirect('courses:course_enroll', pk=item_id)
+            return redirect('home')  # Default
     else:
         form = AuthenticationForm()
 
@@ -107,6 +157,15 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
 
+            # Autenticamos al usuario recién creado para mantener la sesión
+            try:
+                backend = get_backends()[0]
+                user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+                auth_login(request, user)
+            except Exception:
+                # Si por alguna razón no podemos autenticar ahora, seguimos sin fallo
+                pass
+
             # Recuperar datos temporales de la sesión
             role = request.session.get('post_register_role', None)
             item_id = request.session.get('selected_item', None)
@@ -119,6 +178,49 @@ def register_view(request):
             # Si venía para tomar un curso y registrarse como estudiante
             if role == 'student' and item_id:
                 Enrollment.objects.get_or_create(user=user, course_id=item_id)
+                # Si había una solicitud de beca pendiente, procesarla ahora
+                pending_beca = request.session.get('pending_beca')
+                if pending_beca:
+                    try:
+                        # Guardar datos en Students y Address y crear BecaApplication
+                        student, _ = Students.objects.get_or_create(user=user)
+                        student.cedula = pending_beca.get('cedula')
+                        student.certification = pending_beca.get('exequatur')
+                        student.save()
+                        from authentication.models.address import Address
+                        address = Address.objects.create(
+                            user=user,
+                            address_type='laboral',
+                            street=pending_beca.get('street',''),
+                            neighborhood=pending_beca.get('neighborhood',''),
+                            city=pending_beca.get('city',''),
+                            state=pending_beca.get('state',''),
+                            zip_code=pending_beca.get('zip_code','')
+                        )
+                        from classroom.enrollments.models import BecaApplication
+                        from classroom.courses.models import Course
+                        course_obj = Course.objects.get(pk=item_id)
+                        BecaApplication.objects.create(
+                            user=user,
+                            course=course_obj,
+                            cedula=pending_beca.get('cedula',''),
+                            exequatur=pending_beca.get('exequatur',''),
+                            centro_educativo=pending_beca.get('centro_educativo',''),
+                            distrito_escolar=pending_beca.get('distrito_escolar',''),
+                            address=address
+                        )
+                        messages.success(request, f'Tu aplicación a la beca Minerd para {course_obj.title} fue enviada correctamente.')
+                    except Exception:
+                        # No interrumpimos el flujo si algo falla; informar más adelante
+                        messages.warning(request, 'No se pudo procesar completamente la solicitud de beca automáticamente.')
+                    finally:
+                        request.session.pop('pending_beca', None)
+
+                # Limpiar variables temporales
+                request.session.pop('post_register_role', None)
+                request.session.pop('selected_item', None)
+                messages.success(request, 'Tu cuenta ha sido creada y estás inscrito en el curso.')
+                return redirect('courses:course_detail', pk=item_id)
 
             # Estudiante que viene por Distrito Educativo
             elif role == 'student' and student_mode == 'district':
@@ -155,13 +257,27 @@ def logout_view(request):
     return redirect('login')  # Redirect to login after logout
 
 def prepare_register(request, pk, role):
-    if request.user.is_authenticated:
-        group = Group.objects.get(name=role)
-        request.user.groups.add(group)
-        return redirect('dashboard')
-
+    # Store the user's intention in session so after register/login we can continue
     request.session['post_register_role'] = role
     request.session['selected_item'] = pk
+
+    if request.user.is_authenticated:
+        # Ensure the group exists and add the user to it (idempotent)
+        group, _ = Group.objects.get_or_create(name=role)
+        request.user.groups.add(group)
+
+        # Ensure enrollment exists; use get_or_create so it's saved and returned
+        enrollment, created = Enrollment.objects.get_or_create(user=request.user, course_id=pk)
+
+        # Store a lightweight reference (id) in session instead of the model instance
+        try:
+            request.session['post_register_info_id'] = int(enrollment.id)
+        except Exception:
+            # Fallback: store course id so frontend can still find context
+            request.session['selected_item'] = pk
+
+        return redirect('courses:my_course')
+
     return redirect('register')
 
 def profile_create_view(request):

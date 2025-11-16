@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'home',
     'classroom',
     'classroom.courses',
+    'classroom.quicktest',
     'classroom.enrollments',
     'classroom.certifications',
     'ckeditor',

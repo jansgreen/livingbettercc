@@ -54,12 +54,30 @@ def quicktest_view(request, module_id):
 
     return render(request, 'courses/quicktest.html', {'module': module, 'test': test})
 
-
 def course_enroll(request, pk):
     """Permite a un usuario inscribirse en un curso."""
     if not request.user.is_authenticated:
-        messages.warning(request, 'Debes iniciar sesión para inscribirte en un curso.')
-        return redirect('login')
+        # Guardar intención en sesión para redirigir al curso después del registro
+        request.session['post_register_role'] = 'student'
+        request.session['selected_item'] = pk
+        # Si viene un POST con datos de beca, guardarlos temporalmente en sesión
+        if request.method == 'POST' and 'cedula' in request.POST:
+            pending = {
+                'cedula': request.POST.get('cedula', '').strip(),
+                'exequatur': request.POST.get('exequatur', '').strip(),
+                'centro_educativo': request.POST.get('centro_educativo', '').strip(),
+                'distrito_escolar': request.POST.get('distrito_escolar', '').strip(),
+                'street': request.POST.get('street', '').strip(),
+                'neighborhood': request.POST.get('neighborhood', '').strip(),
+                'provincia': request.POST.get('provincia', '').strip(),
+                'municipio': request.POST.get('municipio', '').strip(),
+                'zip_code': request.POST.get('zip_code', '').strip(),
+                'city': request.POST.get('city', '').strip(),
+                'state': request.POST.get('state', '').strip(),
+            }
+            request.session['pending_beca'] = pending
+        messages.warning(request, 'Debes iniciar sesión o registrarte para inscribirte en un curso.')
+        return redirect('register')
 
     user = request.user
     course = get_object_or_404(Course, pk=pk)
@@ -169,7 +187,6 @@ def course_detail(request, pk):
         'beca_status': beca_status,
     }
     return render(request, 'courses/course_detail.html', context)
-
 
 @login_required
 def my_course(request):
@@ -442,7 +459,10 @@ def next_module(request, module_id):
     if next_mod:
         return redirect('courses:module_detail', pk=next_mod.pk)
     else:
-        messages.success(request, '¡Has completado todos los módulos de este curso!')
+        # El usuario ha completado todos los módulos del curso
+        from classroom.certifications.views import create_certificate_for_user
+        create_certificate_for_user(request.user, course)
+        messages.success(request, '¡Has completado todos los módulos de este curso! Se ha generado tu certificado.')
         return redirect('courses:my_course')
 
 

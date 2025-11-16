@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Mis QuickTests</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Módulo</th>
+            <th>Puntaje</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for test in tests %}
+        <tr>
+            <td>{{ test.module.title }}</td>
+            <td>{{ test.score }}</td>
+            <td>{{ test.completed_at|date:'d/m/Y H:i' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No has realizado ningún QuickTest.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

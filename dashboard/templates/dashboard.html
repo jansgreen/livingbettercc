@@ -1,98 +1,233 @@
 {% extends 'dashboards/dashboard.html' %}
 {% load static %}
 
+
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Panel de Administración</h1>
-
     <div class="row g-4">
-        <!-- Students -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Estudiantes</h5>
-                    <p class="card-text display-6">{{ students_count }}</p>
-                    <p class="text-muted">Total de registros en el módulo de estudiantes.</p>
-                    <div class="mt-auto">
-                        <a href="/auth/students/" class="btn btn-primary">Ir a Estudiantes</a>
+        {# SUPERUSER/ADMIN: acceso total #}
+        {% if request.user.is_superuser or request.user.is_staff %}
+            <!-- ...existing cards for todos los módulos... -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Estudiantes</h5>
+                        <p class="card-text display-6">{{ students_count }}</p>
+                        <p class="text-muted">Total de registros en el módulo de estudiantes.</p>
+                        <div class="mt-auto">
+                            <a href="/auth/students/" class="btn btn-primary">Ir a Estudiantes</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Users / Profiles -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Usuarios</h5>
-                    <p class="card-text display-6">{{ users_count }}</p>
-                    <p class="text-muted">Usuarios registrados (tabla User / Profiles).</p>
-                    <div class="mt-auto">
-                        <a href="/auth/profile/list/" class="btn btn-primary">Ir a Usuarios</a>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Usuarios</h5>
+                        <p class="card-text display-6">{{ users_count }}</p>
+                        <p class="text-muted">Usuarios registrados (tabla User / Profiles).</p>
+                        <div class="mt-auto">
+                            <a href="/auth/profile/list/" class="btn btn-primary">Ir a Usuarios</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Formbuilder -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Formularios</h5>
-                    <p class="card-text display-6">{{ forms_count }}</p>
-                    <p class="text-muted">Formularios creados con Form Builder.</p>
-                    <div class="mt-auto">
-                        <a href="/auth/formbuilder/" class="btn btn-primary">Ir a Formularios</a>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Formularios</h5>
+                        <p class="card-text display-6">{{ forms_count }}</p>
+                        <p class="text-muted">Formularios creados con Form Builder.</p>
+                        <div class="mt-auto">
+                            <a href="/auth/formbuilder/" class="btn btn-primary">Ir a Formularios</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Courses -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Cursos</h5>
-                    <p class="card-text display-6">{{ courses_count }}</p>
-                    <p class="text-muted">Cursos disponibles en la plataforma.</p>
-                    <div class="mt-auto">
-                        <a href="/classroom/courses/course_list/" class="btn btn-primary">Ir a Cursos</a>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Cursos</h5>
+                        <p class="card-text display-6">{{ courses_count }}</p>
+                        <p class="text-muted">Cursos disponibles en la plataforma.</p>
+                        <div class="mt-auto">
+                            <a href="/classroom/courses/course_list/" class="btn btn-primary">Ir a Cursos</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Customers -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Customers</h5>
-                    <p class="card-text display-6">{{ customers_count }}</p>
-                    <p class="text-muted">Clientes registrados en la app de autenticación.</p>
-                    <div class="mt-auto">
-                        <a href="/auth/customers/" class="btn btn-primary">Ir a Customers</a>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Customers</h5>
+                        <p class="card-text display-6">{{ customers_count }}</p>
+                        <p class="text-muted">Clientes registrados en la app de autenticación.</p>
+                        <div class="mt-auto">
+                            <a href="/auth/customers/" class="btn btn-primary">Ir a Customers</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Becas Minerd -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm h-100">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Estudiantes Becados Minerd</h5>
-                    <p class="card-text display-6">{{ beca_applications_count }}</p>
-                    <p class="text-muted">Total de aplicaciones a beca Minerd. <br> <span class="fw-bold">Becados:</span> {{ becados_count }}</p>
-                    <div class="mt-auto">
-                        <a href="{% url 'beca_applications_list' %}" class="btn btn-info">Ver aplicaciones</a>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Estudiantes Becados Minerd</h5>
+                        <p class="card-text display-6">{{ beca_applications_count }}</p>
+                        <p class="text-muted">Total de aplicaciones a beca Minerd. <br> <span class="fw-bold">Becados:</span> {{ becados_count }}</p>
+                        <div class="mt-auto">
+                            <a href="{% url 'beca_applications_list' %}" class="btn btn-primary">Ver aplicaciones</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            {# ESTUDIANTE #}
+            {% if is_student %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Mis Calificaciones</h5>
+                            <p class="card-text display-6">{{ my_grades_count }}</p>
+                            <p class="text-muted">Ver tus calificaciones y progreso.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'courses:my_course' %}" class="btn btn-primary">Ver progreso</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Certificados</h5>
+                            <p class="card-text display-6">{{ my_certificates_count }}</p>
+                            <p class="text-muted">Descarga tus certificados de cursos completados.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'courses:my_course' %}#certificados" class="btn btn-success">Ver certificados</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {# TECNICO #}
+            {% if is_tecnico %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Formularios Completados</h5>
+                            <p class="card-text display-6">{{ completed_forms_count }}</p>
+                            <p class="text-muted">Lista de formularios que has completado.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'formbuilder:completed_forms' %}" class="btn btn-primary">Ver formularios</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {# FACILITADOR #}
+            {% if is_facilitador %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Formulario a Completar</h5>
+                            <p class="card-text display-6">{{ pending_forms_count }}</p>
+                            <p class="text-muted">Formularios pendientes para completar.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'formbuilder:pending_forms' %}" class="btn btn-warning">Completar formulario</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Formularios Completados</h5>
+                            <p class="card-text display-6">{{ completed_forms_count }}</p>
+                            <p class="text-muted">Formularios que has completado.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'formbuilder:completed_forms' %}" class="btn btn-primary">Ver completados</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">Editar Formularios</h5>
+                            <p class="card-text display-6">{{ editable_forms_count }}</p>
+                            <p class="text-muted">Puedes editar tus formularios, pero no eliminarlos.</p>
+                            <div class="mt-auto">
+                                <a href="{% url 'formbuilder:edit_forms' %}" class="btn btn-info">Editar formularios</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% if certificados_usuario %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                <h2 class="accordion-header">
+                    <span class="accordion-button bg-gradient text-white collapsed rounded shadow-sm">
+                        Cursos completados y certificados
+                    </span>
+                </h2>
+                <div class="accordion-collapse collapse show">
+                    <div class="accordion-body">
+                        {% for cert in certificados_usuario %}
+                            <div class="mb-3">
+                                <strong>{{ cert.course_title }}</strong>
+                                {% if cert.certificate_uuid %}
+                                    <a href="{% url 'certifications:certificate_pdf_download' cert.certificate_uuid %}" class="btn btn-success btn-sm ms-2">Descargar certificado 🏆</a>
+                                    <a href="{% url 'certifications:certificate_public_view' cert.certificate_uuid %}" class="btn btn-primary btn-sm ms-2">Ver certificado</a>
+                                {% else %}
+                                    {% if certificados_usuario|length > 0 %}
+                                        <ul class="mt-2">
+                                            {% for c in certificados_usuario %}
+                                                {% if c.certificate_uuid %}
+                                                    <li>
+                                                        <a href="{% url 'certifications:certificate_pdf_download' c.certificate_uuid %}" class="link-light">Descargar #{{ c.certificate_uuid }}</a>
+                                                        <a href="{% url 'certifications:certificate_public_view' c.certificate_uuid %}" class="link-light ms-2">Ver certificado</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span class="badge bg-secondary ms-2">Sin certificado</span>
+                                    {% endif %}
+                                {% endif %}
+                                {% if cert.modules %}
+                                    <ul class="mt-2">
+                                    {% for mod in cert.modules %}
+                                        <li class="mb-1">
+                                            <span class="fw-bold">{{ mod.module_title }}</span>
+                                            {% if mod.quicktest %}
+                                                <a href="/quicktest/result/?course={{ mod.course_id }}&module={{ mod.module_id }}" class="badge bg-info ms-2 text-decoration-none">
+                                                    QuickTest: {{ mod.quicktest.score }} / 100
+                                                </a>
+                                                <span class="text-muted ms-2">{{ mod.quicktest.completed_at|date:'d/m/Y H:i' }}</span>
+                                            {% else %}
+                                                <a href="/quicktest/take/?course={{ mod.course_id }}&module={{ mod.module_id }}" class="badge bg-warning ms-2 text-decoration-none">
+                                                    Tomar QuickTest
+                                                </a>
+                                            {% endif %}
+                                            <a href="/cursos/terminados/" class="btn btn-sm btn-outline-light ms-3">Ver cursos terminados</a>
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-</div>
-{% endblock %}
+{% endif %}
 
 
 

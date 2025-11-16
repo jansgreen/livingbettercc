@@ -1,56 +1,77 @@
-{% extends 'dashboard.html' %}    
 
+{% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
-    <div class="row ">
-        <h2>Crea Nuevo Grupo</h2>
-        <form method="POST" action="{% url 'group_create' %}">
-        {% csrf_token %}
-            <div class="col-12 col-md-4">
-                <label for="{{ form_0.id_for_label }}" class="visually-hidden">Group {{ form_0.label }}</label>
-            </div>
-            <div class="col-12 col-md-4">
-                {{ form_0.name |capfirst}}
-            </div>
-            <div class="col-12 col-md-4">
-                <button type="submit" name="action" value="add" class="btn btn-success">Crear Grupo</button>
-            </div>
-        </form>
-    </div>
-    <hr>
-    {% if groups %}
-    <div class="row">
-        <h2>Asignar Permisos a Grupos</h2>
-        {% for group in groups %}
-            <div class="col-12 col-md-2 mt-5">
-            <h5>{{ group.name }}</h5>
-            </div>
-            <div class="col-12 col-md-5">
-                <h6>Permisos Asignados</h6>
-                <div class="scroll-container" style="max-height: 300px; overflow-y: scroll;">
-                    <ul class="list-group">
-                        {% for permission in group.permissions.all %}
-                            <li class="list-group-item">{{ permission.content_type.app_label }}/{{ permission.name }}</li>
-                            {% empty %}
-                            <li class="list-group-item">
-                                <p>No hay permiso asignado para este grupo, seleccionelo en la siguiente lista</p>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-            <div class="col-12 col-md-5">
-                <h6>Permisos Disponibles</h6>
-                <form method="POST" action="{% url 'add_and_remove_permission_to_groups' group.id %}">
-                    {% csrf_token %}
-                    {{ form_1.as_p }}
-                    <button type="submit" name="action" value="add" class="btn btn-info delete-cart-item">Aplicar</button>
-                    <button type="submit" name="action" value="remove" class="btn btn-danger delete-cart-item">Remover</button>
-                </form>
-            </div>
-        {% endfor %}
-    {% else %}
-        <h1>No hay grupos creados</h1>
-    {% endif %}
+<div class="container py-4 animate__animated animate__fadeIn">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="fas fa-users fa-lg me-2"></i>
+            <h3 class="mb-0">Crear Nuevo Grupo</h3>
         </div>
+        <div class="card-body">
+            <form method="POST" action="{% url 'group_create' %}" class="row g-3 align-items-center">
+                {% csrf_token %}
+                <div class="col-md-8">
+                    <label for="{{ form_0.id_for_label }}" class="form-label">{{ form_0.label }}</label>
+                    {{ form_0.name|capfirst }}
+                </div>
+                <div class="col-md-4 text-end">
+                    <button type="submit" name="action" value="add" class="btn btn-success btn-lg animate__animated animate__pulse"><i class="fas fa-plus-circle"></i> Crear Grupo</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
+    {% if groups %}
+    <div class="card shadow mb-4">
+        <div class="card-header bg-info text-white d-flex align-items-center">
+            <i class="fas fa-shield-alt fa-lg me-2"></i>
+            <h3 class="mb-0">Asignar Permisos a Grupos</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for group in groups %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 animate__animated animate__fadeInUp">
+                        <div class="card-header bg-secondary text-white">
+                            <i class="fas fa-user-tag"></i> {{ group.name }}
+                        </div>
+                        <div class="card-body">
+                            <h6 class="fw-bold">Permisos Asignados</h6>
+                            <div class="scroll-container" style="max-height: 180px; overflow-y: auto;">
+                                <ul class="list-group mb-2">
+                                    {% for permission in group.permissions.all %}
+                                        <li class="list-group-item d-flex align-items-center">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            <span>{{ permission.content_type.app_label }}/{{ permission.name }}</span>
+                                        </li>
+                                    {% empty %}
+                                        <li class="list-group-item">
+                                            <span class="text-warning"><i class="fas fa-exclamation-circle"></i> No hay permiso asignado para este grupo</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <h6 class="fw-bold mt-3">Permisos Disponibles</h6>
+                            <form method="POST" action="{% url 'add_and_remove_permission_to_groups' group.id %}">
+                                {% csrf_token %}
+                                {{ form_1.as_p }}
+                                <div class="d-flex gap-2 mt-2">
+                                    <button type="submit" name="action" value="add" class="btn btn-info btn-sm animate__animated animate__pulse"><i class="fas fa-plus"></i> Aplicar</button>
+                                    <button type="submit" name="action" value="remove" class="btn btn-danger btn-sm animate__animated animate__shakeX"><i class="fas fa-minus"></i> Remover</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-4 animate__animated animate__fadeInDown">
+        <i class="fas fa-exclamation-triangle"></i> No hay grupos creados
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

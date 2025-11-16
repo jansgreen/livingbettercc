@@ -7,64 +7,89 @@
     <div class="row">
         <h2 class="text-light">Lista de Usuarios</h2>
         {% if users %}
-            <table class="table table-striped table-hover mt-4">
-                <thead>
-                    <tr>
-                        <th scope="col">Imagen</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Grupos</th>
-                        <th scope="col">Tipo de Usuario</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                        <tr>
-                            <td>
-                                <img src="{{ user.profile.image.urls }}" alt="Profile Image" width="48" height="48" class="rounded-circle" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
-                            </td>
-                            <td>{{ user | capfirst }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                <ul class="list-group list-group-flush">
-                                    {% for group in user.groups.all %}
-                                        <li class="list-group-item bg-dark text-light">{{ group.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                            <td>
-                                {% if user.is_customer %}
-                                    Customer
-                                {% elif user.is_staff %}
-
-                                    {% if user.is_superuser %}
-                                        Superuser
-                                    {% else %}
-                                        Staff
-                                    {% endif %}
-                                {% elif user.is_student %}
-                                    Student
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                            <td>
-                                <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}">
-                                    {% csrf_token %}
-                                    {{ form.as_p }}
-                                    <button type="submit" name="action" value="add" class="btn btn-info btn-sm">Aplicar</button>
-                                    <button type="submit" name="action" value="remove" class="btn btn-danger btn-sm">Remover</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="text-light">No hay usuarios disponibles.</p>
+            <div class="container py-4 animate__animated animate__fadeIn">
+                <div class="card shadow-lg mb-4">
+                    <div class="card-header bg-success text-white d-flex align-items-center">
+                        <i class="fas fa-users fa-lg me-2"></i>
+                        <h3 class="mb-0">Lista de Usuarios</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if users %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover align-middle animate__animated animate__fadeInUp mt-4">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th scope="col"><i class="fas fa-image"></i></th>
+                                            <th scope="col"><i class="fas fa-user"></i> Nombre</th>
+                                            <th scope="col"><i class="fas fa-envelope"></i> Email</th>
+                                            <th scope="col"><i class="fas fa-users"></i> Grupos</th>
+                                            <th scope="col"><i class="fas fa-id-badge"></i> Tipo</th>
+                                            <th scope="col"><i class="fas fa-cogs"></i> Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                            <tr class="animate__animated animate__fadeIn">
+                                                {% if user.profile.image %}
+                                                <td>
+                                                    <img src="{{ user.profile.image.url }}" alt="Profile Image" width="64" height="64"
+                                                         class="border border-2 border-primary"
+                                                         style="object-fit: cover; border-radius: 12px; display: block;"
+                                                         onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                                                </td>
+                                                {% else %}
+                                                <td>
+                                                    <img src="{% static 'Profile/default.webp' %}" alt="Default Image" width="64" height="64"
+                                                         class="border border-2 border-primary"
+                                                         style="object-fit: cover; border-radius: 12px; display: block;"/>
+                                                </td>
+                                                {% endif %}
+                                                <td class="fw-bold">{{ user | capfirst }}</td>
+                                                <td><span class="badge bg-info text-dark"><i class="fas fa-envelope"></i> {{ user.email }}</span></td>
+                                                <td>
+                                                    <ul class="list-group list-group-flush mb-0">
+                                                        {% for group in user.groups.all %}
+                                                            <li class="list-group-item bg-secondary text-white rounded-pill mb-1 animate__animated animate__fadeInLeft"><i class="fas fa-user-tag"></i> {{ group.name }}</li>
+                                                        {% empty %}
+                                                            <li class="list-group-item text-warning"><i class="fas fa-exclamation-circle"></i> Sin grupo</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </td>
+                                                <td>
+                                                    {% if user.is_customer %}
+                                                        <span class="badge bg-primary"><i class="fas fa-user"></i> Customer</span>
+                                                    {% elif user.is_staff %}
+                                                        {% if user.is_superuser %}
+                                                            <span class="badge bg-danger"><i class="fas fa-crown"></i> Superuser</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning text-dark"><i class="fas fa-user-shield"></i> Staff</span>
+                                                        {% endif %}
+                                                    {% elif user.is_student %}
+                                                        <span class="badge bg-success"><i class="fas fa-graduation-cap"></i> Student</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">N/A</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="d-flex gap-2">
+                                                        {% csrf_token %}
+                                                        {{ form.as_p }}
+                                                        <button type="submit" name="action" value="add" class="btn btn-info btn-sm animate__animated animate__pulse"><i class="fas fa-plus"></i> Aplicar</button>
+                                                        <button type="submit" name="action" value="remove" class="btn btn-danger btn-sm animate__animated animate__shakeX"><i class="fas fa-minus"></i> Remover</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning animate__animated animate__fadeInDown">
+                                <i class="fas fa-exclamation-triangle"></i> No hay usuarios disponibles.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% endif %}
-    </div>
-</div>
-
-{% endblock content %}
+{% endblock %}
