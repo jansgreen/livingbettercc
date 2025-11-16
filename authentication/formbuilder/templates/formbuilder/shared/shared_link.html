@@ -1,0 +1,32 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+  <h1>Enlace para compartir</h1>
+  <p>Comparte este enlace con los técnicos para que puedan ver el formulario completado:</p>
+  <div class="input-group mb-3">
+    <input type="text" id="shareUrl" class="form-control" value="{{ share_url }}" readonly>
+    <button class="btn btn-outline-secondary" type="button" id="copyBtn">Copiar</button>
+  </div>
+  <p>
+    <a href="{{ share_url }}" target="_blank" class="btn btn-primary">Abrir enlace (prueba)</a>
+    <a href="{% url 'formbuilder:completed_forms_list' %}" class="btn btn-link">Volver a listados</a>
+  </p>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.addEventListener('click', function () {
+        const input = document.getElementById('shareUrl');
+        input.select();
+        input.setSelectionRange(0, 99999); // For mobile
+        try {
+          document.execCommand('copy');
+          copyBtn.innerText = 'Copiado';
+          setTimeout(() => copyBtn.innerText = 'Copiar', 2000);
+        } catch (e) {
+          alert('Por favor selecciona y copia el enlace manualmente.');
+        }
+      });
+    });
+  </script>
+{% endblock %}

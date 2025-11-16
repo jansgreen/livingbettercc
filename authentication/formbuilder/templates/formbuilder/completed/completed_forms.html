@@ -11,6 +11,7 @@
                     <tr>
                         <th>Formulario</th>
                         <th>Fecha de Compleción</th>
+                        <th>Usuario</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -18,10 +19,16 @@
                     {% for completed_form in completed_forms %}
                         <tr>
                             <td>{{ completed_form.form_name }}</td>
-                            <td>{{ completed_form.completed_at }}</td>
+                            <td>{{ completed_form.submitted_at }}</td>
+                            <td>{{ completed_form.user.get_full_name|default:completed_form.user.username }}</td>
                             <td>
                                 <a href="{% url 'formbuilder:completed_forms_detail' completed_form.pk %}">Ver Detalles</a> |
-                                <a href="{% url 'formbuilder:completed_forms_edit' completed_form.pk %}">Editar</a>
+                                <a href="{% url 'formbuilder:completed_forms_edit' completed_form.pk %}">Editar</a> |
+                                {# Botón para compartir con facilitadores - envía POST a la vista 'share_with_facilitadores' #}
+                                <form method="post" action="{% url 'formbuilder:share_with_facilitadores' completed_form.pk %}" style="display:inline; margin:0; padding:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Compartir</button>
+                                </form>
                             </td>
                         </tr>
                     {% endfor %}

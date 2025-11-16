@@ -8,7 +8,7 @@
             {% comment %} Show menus only to authenticated users who are superusers or have the permission.
                Parentheses are not supported in the template 'if' tag, so expand the condition. {% endcomment %}
             {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_authenticated and perms.groups.access_module %}
-                {% for menu in dashboard_menu %}
+                {% for menu in menu_dashboard %}
                     <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                         <h2 class="accordion-header">
                             <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">

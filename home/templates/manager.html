@@ -5,10 +5,10 @@
             {% for direct in directives %}
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                        <img src="{{ direct.user.Profiles.imagen.urls }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
+                        <img src="{{ direct.profile.imagen.url }}" alt="" width="32" height="32" class="rounded-circle me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
                         {{ direct.user.first_name | capfirst }}-
                         {{ direct.user.last_name | capfirst }} - ( 
-                        {{ direct.role | capfirst }})
+                        {{ direct.cargo | capfirst }})
                     </button>
                 </h2>
                 <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">

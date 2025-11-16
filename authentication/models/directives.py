@@ -8,23 +8,33 @@ from ckeditor.fields import RichTextField  # Asegúrate de tener django-ckeditor
 
 class Directives(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    cargo = models.CharField(max_length=150, null=True)  # Ej: "Director General"
-    foto = models.ImageField(upload_to="directiva_fotos/", null=True, blank=True)
-    profiles = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
-    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
-    biografia = RichTextField(verbose_name="Biografia", null=True, blank=True)
+    cargo = models.CharField(max_length=150, null=True, verbose_name="Cargo")  # Ej: "Director General"
+    foto = models.ImageField(upload_to="directiva_fotos/", null=True, blank=True, verbose_name="Foto")
+    # Renombrado de 'profiles' a 'profile' para consistencia
+    profile = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
+    # Cambiado a ForeignKey para permitir múltiples direcciones
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='directives')
+    biografia = RichTextField(verbose_name="Biografía", null=True, blank=True)
 
-    facebook = models.URLField(blank=True, null=True)
-    instagram = models.URLField(blank=True, null=True)
-    linkedin = models.URLField(blank=True, null=True)
+    facebook = models.URLField(blank=True, null=True, verbose_name="Facebook")
+    instagram = models.URLField(blank=True, null=True, verbose_name="Instagram")
+    linkedin = models.URLField(blank=True, null=True, verbose_name="LinkedIn")
+
+    class Meta:
+        verbose_name = 'Directivo'
+        verbose_name_plural = 'Directivos'
+
     def summary(self, char_limit=150):
-        if len(self.biografia) <= char_limit:
-            return self.biografia
+        """Devuelve un resumen de la biografía truncado a char_limit caracteres"""
+        if not self.biografia or len(self.biografia) <= char_limit:
+            return self.biografia or ""
         end = self.biografia.rfind(' ', 0, char_limit)
+        if end == -1:
+            end = char_limit
         return self.biografia[:end] + '...'
 
     def __str__(self):
-        return f"Directives: {self.user.username}"
+        return f"Directivo: {self.user.username} - {self.cargo or 'Sin cargo'}"
 
 
 #asigna un grupo a los Directives al crearlos

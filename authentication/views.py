@@ -1,3 +1,4 @@
+from .forms import FacilitadorRegistrationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -22,6 +23,66 @@ from django.urls import reverse_lazy
 
 
 # identifico si el usuario es studiante, customer o staff ..
+
+def facilitador_register_view(request):
+    next_url = request.GET.get('next', None)
+    if request.method == 'POST':
+        form = FacilitadorRegistrationForm(request.POST)
+        if form.is_valid():
+            user, distrito, address = form.save()
+            # Asignar grupo facilitador
+            from django.contrib.auth.models import Group
+            group, _ = Group.objects.get_or_create(name='facilitador')
+            user.groups.add(group)
+            # Autenticar usuario
+            from django.contrib.auth import login, get_backends
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            login(request, user)
+            # Redirigir al formulario original
+            if next_url:
+                return redirect(next_url)
+            else:
+                from django.urls import reverse
+                return redirect(reverse('dashboard'))
+        else:
+            messages.error(request, "Por favor verifica los datos del formulario.")
+    else:
+        form = FacilitadorRegistrationForm()
+    return render(request, 'authentication/facilitador_register.html', {'form': form})
+
+
+def tecnico_register_view(request):
+    """
+    Registro para técnicos. Igual que el registro de facilitador pero asigna
+    al grupo 'tecnico'. Los técnicos pueden revisar qué formularios completaron
+    los facilitadores (acceso de solo lectura).
+    """
+    next_url = request.GET.get('next', None)
+    if request.method == 'POST':
+        form = FacilitadorRegistrationForm(request.POST)
+        if form.is_valid():
+            user, distrito, address = form.save()
+            # Asignar grupo tecnico
+            from django.contrib.auth.models import Group
+            group, _ = Group.objects.get_or_create(name='tecnico')
+            user.groups.add(group)
+            # Autenticar usuario
+            from django.contrib.auth import login, get_backends
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            login(request, user)
+            # Redirigir al listado de facilitadores para revisar formularios
+            if next_url:
+                return redirect(next_url)
+            else:
+                from django.urls import reverse
+                return redirect(reverse('formbuilder:facilitador_list_view'))
+        else:
+            messages.error(request, "Por favor verifica los datos del formulario.")
+    else:
+        form = FacilitadorRegistrationForm()
+    return render(request, 'authentication/facilitador_register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -78,17 +139,15 @@ def register_view(request):
 
             # 3. Limpiar variables temporales de la sesión
             request.session.pop('post_register_role', None)
-            request.session.pop('selected_item', None)
+            request.session.pop('selected_item', None) 
 
             messages.success(request, 'Tu cuenta ha sido creada con éxito.')
             return redirect('dashboard')
 
         else:
-            messages.error(request, "Por favor verifica los datos del formulario.")
-    
+            messages.error(request, f'Por favor verifica los datos del formulario: {form.errors}')
     else:
         form = BootstrapUserCreationForm()
-
     return render(request, 'authentication/register.html', {'form': form})
 
 def logout_view(request):
@@ -104,7 +163,6 @@ def prepare_register(request, pk, role):
     request.session['post_register_role'] = role
     request.session['selected_item'] = pk
     return redirect('register')
-
 
 def profile_create_view(request):
     if request.method == 'POST':
@@ -127,8 +185,9 @@ def profile_create_view(request):
     return render(request, 'authentication/profile_create.html', {'form': form})
 
 def profile_list_view(request):
-    profiles = Profiles.objects.all()
-    return render(request, 'authentication/profile_list.html', {'profiles': profiles})
+    object_list = User.objects.all()
+    context = {'object_list': object_list}
+    return render(request, 'authentication/profile_list.html', context)
 
 def profile_update_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
@@ -154,7 +213,6 @@ def profile_view(request):
         'profile': profile,
     }
     return render(request, 'authentication/profile_detail.html', context)
-
 
 
 @csrf_exempt
@@ -238,45 +296,35 @@ def address_detail(request, pk):
 
 @login_required
 def address_create(request, address_type):
+    """
+    Crea o actualiza una dirección del tipo especificado para el usuario actual.
+    Si ya existe una dirección de ese tipo, la actualiza.
+    """
+    # Obtener dirección existente si existe
+    address_instance = Address.objects.filter(user=request.user, address_type=address_type).first()
+    
     if request.method == 'POST':
-        form = AddressForm(request.POST)
-        print(f"Form data: {request.POST}")  # Debugging line
+        form = AddressForm(request.POST, instance=address_instance)
         if form.is_valid():
-            address_fields = {
-                'user': request.user,
-                'address_type': address_type,
-                'street': request.POST.get('street'),
-                'neighborhood': request.POST.get('neighborhood'),
-                'city': request.POST.get('provincias'),
-                'state': request.POST.get('municipios'),
-                'zip_code': request.POST.get('codigo_postal'),
-            }
-            for key, value in form.cleaned_data.items():
-                setattr(address, key, value)
-            # Explicitly update fields that may be excluded from the form's Meta
-            address = Address.objects.filter(user=request.user, address_type=address_type).first()
-            if address:
-                address.street = request.POST.get('street', address.street)
-                address.neighborhood = request.POST.get('neighborhood', address.neighborhood)
-                address.city = request.POST.get('city', address.city)
-                address.state = request.POST.get('state', address.state)
-                address.zip_code = request.POST.get('zip_code', address.zip_code)
-                address.save()
-
-            defaults = address_fields
-
-            Address.objects.update_or_create(
-                user=request.user,
-                address_type=address_type,
-                defaults=defaults
-            )
-            messages.success(request, 'Dirección creada exitosamente.')
-            return redirect('courses:course_list')  # Redirect to course list after successful creation
+            address = form.save(commit=False)
+            address.user = request.user
+            address.address_type = address_type
+            address.save()
+            
+            messages.success(request, f'Dirección {address.get_address_type_display()} guardada exitosamente.')
+            
+            # Redirigir según el contexto (puede personalizarse)
+            next_url = request.GET.get('next', 'courses:course_list')
+            return redirect(next_url)
+        else:
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
     else:
-        form = AddressForm()
+        form = AddressForm(instance=address_instance)
+    
     context = {
         'form': form,
         'address_type': address_type,
+        'address_type_display': dict(Address.a_type).get(address_type, address_type),
     }
     return render(request, 'direccion.html', context)
 

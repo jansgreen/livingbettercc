@@ -72,28 +72,34 @@
 </style>
 
 <div class="report-container">
-    <div class="report-header">
+    <div class="report-header">        
+        <img src="{% static '/setting/logo.png' %}" alt="Form Icon" style="width: 200px; height: 200px;">
         <h3>Living Better Community Center Inc.</h3>
         <p>C/CUL DE SAC2 SUR EDF T APT A 4 LAS PRADERAS</p>
         <p>Residencial Santo Domingo</p>
         <p>Email: livingbetter08@yahoo.com | Tel.: 809-498-5985</p>
         <hr style="border: 1px solid #000; width: 80%; margin: 20px auto;">
-        <img src="{% static 'formbuilder/images/form_icon.png' %}" alt="Form Icon" style="width: 50px; height: 50px;">
+        <img src="{{ completed_form.image.url }}" alt="Form Icon" style="width: 50px; height: 50px;">
         <h1>{{ completed_form.form_name|capfirst }}</h1>
         <h5 style="text-decoration: underline; margin-bottom: 0;">{{ completed_form.titulo|capfirst }}</h5>
         <p><em>{{ completed_form.descripcion|capfirst }}</em></p>
     </div>
 
     <div class="report-section">
-        <p><strong>Completado por:</strong> {{ completed_form.user.username.first_name|capfirst }} {{ completed_form.user.username.last_name|capfirst }}</p>
+        {% if completed_form.user.first_name %}
+        <p><strong>Completado por:</strong> {{ completed_form.user.first_name|capfirst }} {{ completed_form.user.last_name|capfirst }}</p>
+        {% else %}
+        <p><strong>Completado por:</strong> {{ completed_form.user.username|capfirst }}</p>
+        {% endif %}
         <p><strong>Fecha de completado:</strong> {{ completed_form.submitted_at|date:"d/m/Y H:i" }}</p>
     </div>
 
     <div class="report-section">
         <h5>Respuestas</h5>
-        <ul>
+        <ul class="list-group">
             {% for field, value in completed_form.form_data.items %}
-                <li><strong>{{ field|capfirst }}:</strong> {{ value }}</li>
+            
+                <li class="list-group-item"><strong> {{ field|capfirst }}: </strong> {{ value }}</li>
             {% endfor %}
         </ul>
     </div>

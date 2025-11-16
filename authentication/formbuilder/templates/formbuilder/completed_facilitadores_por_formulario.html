@@ -1,0 +1,28 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<h1>Facilitadores por formulario</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Formulario</th>
+            <th>Facilitador</th>
+            <th>Distrito</th>
+            <th>Fecha de envío</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for completed in completed_forms %}
+        <tr>
+            <td>{{ completed.form_name }}</td>
+            <td>{{ completed.user.get_full_name|default:completed.user.username }}</td>
+            <td>{{ completed.distrito }}</td>
+            <td>{{ completed.submitted_at|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No hay formularios completados por facilitadores.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

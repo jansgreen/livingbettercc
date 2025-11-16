@@ -16,10 +16,17 @@ urlpatterns = [
     path('fields/<int:pk>/delete/', views.field_delete, name='field_delete'),
     path('<str:form_name>/', views.render_form, name='render_form'),
 
+    # Completed Forms Views - All Users
+    path('facilitador/facilitador_list_view/', views.facilitador_list_view, name='facilitador_list_view'),
+
+
     # Completed Forms Views
     path('completed/completed_forms/', views.completed_forms_list, name='completed_forms_list'),
     path('completed/completed_forms_detail/<int:pk>/', views.completed_forms_detail, name='completed_forms_detail'),
     path('completed/completed_forms_edit/<int:pk>/edit/', views.completed_forms_edit, name='completed_forms_edit'),
-    path('completed/completed_all_forms/', views.completed_all_forms_list, name='completed_all_forms_list'),
+    path('completed/<int:pk>/share/', views.share_with_facilitadores, name='share_with_facilitadores'),
+    path('completed/shared/<int:pk>/', views.shared_completed_form, name='shared_completed_form'),
+    path('completed/facilitadores_por_formulario/', views.facilitadores_por_formulario, name='facilitadores_por_formulario'),
+    path('completed/my_user_complete_forms/', views.my_user_complete_forms, name='my_user_completed_forms'),
 ]
 

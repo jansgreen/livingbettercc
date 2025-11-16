@@ -19,7 +19,6 @@ FIELD_TYPES = [
     ('select', 'Selección'),
 ]
 
-
 class FormField(models.Model):
     form = models.ForeignKey(FormDefinition, on_delete=models.CASCADE, related_name='fields')
     label = models.CharField(max_length=255)
@@ -39,13 +38,14 @@ class FormField(models.Model):
     def __str__(self):
         return f"{self.form.name} - {self.label}"
 
-
 class CompletedForm(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     form_name = models.CharField(max_length=255)
     titulo = models.CharField(max_length=255, blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
     form_data = models.JSONField()
+    distrito = models.CharField(max_length=100, blank=True, null=True, help_text="Distrito del facilitador")
+    address = models.ForeignKey('authentication.Address', on_delete=models.SET_NULL, blank=True, null=True, help_text="Dirección del facilitador")
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

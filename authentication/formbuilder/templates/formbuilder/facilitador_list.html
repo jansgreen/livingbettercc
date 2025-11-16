@@ -1,0 +1,55 @@
+{% extends 'dashboard.html' %}
+
+{% block content %}
+    <h1>Lista de Facilitadores</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Formularios Completados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for facilitador in facilitadores %}
+                <tr>
+                    <td>{{ facilitador.id }}</td>
+                    <td>{{ facilitador.username }}</td>
+                    <td>{{ facilitador.email }}</td>
+                    <td>
+                        {% with completed_forms=facilitador.completedform_set.all %}
+                            <select class="form-select" onchange="if(this.value) window.location.href=this.value">
+                                <option value="">{% if completed_forms.count %}Seleccione formulario ({{ completed_forms.count }}){% else %}No hay formularios completados{% endif %}</option>
+                                {% for cf in completed_forms %}
+                                    {% if cf.get_absolute_url %}
+                                        <option value="{{ cf.get_absolute_url }}">{{ cf }}</option>
+                                    {% else %}
+                                        {# Si no tiene get_absolute_url, use la URL con namespace completo #}
+                                        <option value="{% url 'formbuilder:render_form' cf.form_name %}">{{ cf.form_name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+
+                            <noscript>
+                                <ul>
+                                    {% for cf in completed_forms %}
+                                        {% if cf.get_absolute_url %}
+                                            <li><a href="{{ cf.get_absolute_url }}">{{ cf }}</a></li>
+                                        {% else %}
+                                        <option value="{% url 'formbuilder:render_form' cf.form_name %}">{{ cf.form_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </noscript>
+                        {% endwith %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">No hay facilitadores registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

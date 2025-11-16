@@ -138,6 +138,7 @@ TEMPLATES = [
                 'dashboard.context_processors.context_processor.obtener_menu_contents',
                 'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
                 'dashboard.metadata.context_processors.context_processor.metadata_context',
+                'dashboard.context_processors.context_processor.obtener_menu_dashboard',
                 
                 # Gallery
                 'gallery.context_processors.context_processor.obtener_gallery_img'

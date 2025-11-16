@@ -15,34 +15,57 @@
                 <th>Profession</th>
                 <th>Role</th>
                 <th>Direccion</th>
+                <th>Grupo</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for profile in profiles %}
+            {% for obj in object_list %}
             <tr>
-                <td><img src="{{ profile.imagen.url }}" alt="Profile Image" width="50" height="50"></td>
-                <td>{{ profile.user |capfirst}}</td>
-                <td>{{ profile.user.first_name }} {{ profile.user.last_name }}</td>
-                <td>{{ profile.user.email }}</td>
-                <td>{{ profile.telefono }}</td>
-                <td>{{ profile.numero_identidad }}</td>
-                <td>{{ profile.profesion }}</td>
-                <td>{{ profile.roll }}</td>
                 <td>
-                    {% if not profile.user.address %}
-                        <form action="{% url 'address_create' 'Residential' %}" method="POST">
-                        {% csrf_token %}
-                            <input type="hidden" name="profile_id" value="{{ profile.user.id }}">
-                            <button type="submit" class="btn btn-sm btn-success">Add Address</button>
-                        </form>
+                    {% if obj.imagen %}
+                    <img src="{{ obj.imagen.url }}" alt="Profile Image" width="50" height="50">
                     {% else %}
-                    <a href="{% url 'address_update' profile.user.address.pk %}">Ver Direccion</a>
+                    <span>No Image</span>
+                    {% endif %}
+
+                </td>
+                <td>{{ obj |capfirst}}</td>
+                <td>{{ obj.first_name }} {{ obj.last_name }}</td>
+                <td>{{ obj.email }}</td>
+                {% if obj.telefono %}
+                <td>{{ obj.telefono }}</td>
+                {% else %}
+                <td>No</td>
+                {% endif %}
+                {% if obj.numero_identidad %}
+                <td>{{ obj.numero_identidad }}</td>
+                {% else %}
+                <td>No</td>
+                {% endif %}
+                {% if obj.profesion %}
+                <td>{{ obj.profesion }}</td>
+                {% else %}
+                <td>No</td>
+                {% endif %}
+                {% if obj.roll %}
+                <td>{{ obj.roll }}</td>
+                {% else %}
+                <td>No</td>
+                {% endif %}
+                <td>
+                    {% if not profile.user.addresses.exists %}
+                        <a href="{% url 'address_create' 'residencial' %}" class="btn btn-sm btn-success">Agregar Dirección</a>
+                    {% else %}
+                        {% with first_address=profile.user.addresses.first %}
+                            <a href="{% url 'address_update' first_address.pk %}">Ver Direcciones</a>
+                        {% endwith %}
                     {% endif %}
                 </td>
+                <td>{{ obj.user.groups.all|join:", "|capfirst }}</td>
                 <td>
-                    <a href="{% url 'profile_update' profile.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{% url 'profile_delete' profile.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="{% url 'profile_update' obj.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'profile_delete' obj.pk %}" class="btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
             {% endfor %}

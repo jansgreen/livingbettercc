@@ -12,9 +12,9 @@ from .models.directives import Directives
 
 @admin.register(Staffs)
 class StaffsAdmin(admin.ModelAdmin):
-    list_display = ['user', 'Profiles', 'address']  # Ensure these fields exist in the Staffs model
-    search_fields = ('user__username', 'Profiles', 'address')
-    list_filter = ['user']  # Ensure 'department' is a valid field in the Staffs model
+    list_display = ['user', 'profile', 'address']  # Cambiado 'Profiles' a 'profile'
+    search_fields = ('user__username',)
+    list_filter = ['user']
 
 @admin.register(Students)
 class StudentsAdmin(admin.ModelAdmin):

@@ -1,0 +1,17 @@
+{% extends "frontend.html" %}
+{% block content %}
+  <div class="container py-4">
+    <h2>Mis Formularios Completados</h2>
+    {% if completed_forms %}
+      <ul class="list-group">
+        {% for form in completed_forms %}
+          <li class="list-group-item">
+            <a href="{% url 'formbuilder:completed_forms_detail' form.pk %}">{{ form.form_name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No has completado ningún formulario aún.</p>
+    {% endif %}
+  </div>
+{% endblock %}

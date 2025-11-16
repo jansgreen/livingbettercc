@@ -6,12 +6,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Staffs(models.Model):
-    Profiles = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
+    # Renombrado de 'Profiles' a 'profile' (convención lowercase)
+    profile = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.OneToOneField(Address, on_delete=models.SET_NULL, null=True, blank=True)
+    # Cambiado a ForeignKey para permitir múltiples direcciones
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='staffs')
+
+    class Meta:
+        verbose_name = 'Personal'
+        verbose_name_plural = 'Personal'
 
     def __str__(self):
-        return f"Staff: {self.user.username} ({self.nivel_acceso})"
+        return f"Staff: {self.user.username}"
 
 @receiver(post_save, sender=Staffs)
 def activate_staff_status(sender, instance, created, **kwargs):

@@ -1,14 +1,36 @@
 {% extends 'frontend.html' %}
-
+{% load static %}
 {% block content %}
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="col-4">
-        <h2>Register</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p}}
-            <button type="submit" class="btn btn-primary">Registrate</button>
-        </form>
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light py-5">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-2">Regístrate</h2>
+                <p class="text-muted small mb-4">Crea tu cuenta de forma rápida y segura</p>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        {% for field in form %}
+                            <div class="col-12 col-md-6">
+                                {{ field.label }}
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text small text-muted">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Crear cuenta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 

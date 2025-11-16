@@ -218,7 +218,7 @@
                             <strong>{{ user.username | capfirst }}</strong>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                                {% for menu in dashboard_menu %}
+                                {% for menu in menu_dashboard %}
                                     {% if menu.submenus %}
                                             {% for submenu in menu.submenus %}
                                                 <li>

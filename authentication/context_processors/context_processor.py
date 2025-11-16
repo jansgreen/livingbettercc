@@ -45,11 +45,24 @@ def obtener_formbuilder_menu(request):
             }
         ]
 
-        if user_has_module_access:
+        from django.urls import NoReverseMatch
+        try:
+            if user_has_module_access:
+                formbuilder_menu[0]['submenus'].append({'nombre': 'Formbuilder', 'url': reverse('formbuilder:form_list')})
+                formbuilder_menu[0]['submenus'].append({'nombre': 'Lista Formularios Completados', 'url': reverse('formbuilder:completed_forms_list')})
+                formbuilder_menu[0]['submenus'].append({'nombre': 'Crear Formulario', 'url': reverse('formbuilder:form_create')} )
+            # Common links available to authenticated users
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados', 'url': reverse('formbuilder:my_user_completed_forms')})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Lista de Facilitadores', 'url': reverse('formbuilder:facilitador_list_view')})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados (Usuario)', 'url': reverse('formbuilder:my_user_completed_forms')})
+        except NoReverseMatch:
+            # If any of the named routes are missing, fall back to the hardcoded paths
             formbuilder_menu[0]['submenus'].append({'nombre': 'Formbuilder', 'url': '/auth/formbuilder/'})
-            formbuilder_menu[0]['submenus'].append({'nombre': 'Lista Formularios Completados', 'url': '/auth/formbuilder/completed/completed_all_forms/'})
-        formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados', 'url': '/auth/formbuilder/completed/completed_forms/'})
-        formbuilder_menu[0]['submenus'].append({'nombre': 'Crear Formulario', 'url': '/auth/formbuilder/create/'})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Lista Formularios Completados', 'url': '/auth/formbuilder/completed/completed_forms/'})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Crear Formulario', 'url': '/auth/formbuilder/create/'} )
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados', 'url': '/auth/formbuilder/completed/completed_forms/'})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Lista de Facilitadores', 'url': '/auth/formbuilder/facilitador/facilitador_list_view/'})
+            formbuilder_menu[0]['submenus'].append({'nombre': 'Mis Formularios Completados (Usuario)', 'url': '/auth/formbuilder/facilitador_list_view/'})
     logger.warning(f"[CTX] obtener_formbuilder_menu => {type(formbuilder_menu)} | {formbuilder_menu}")
     return {'formbuilder_menu': formbuilder_menu}
 
