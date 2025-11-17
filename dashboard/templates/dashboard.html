@@ -103,7 +103,7 @@
                             <p class="card-text display-6">{{ my_certificates_count }}</p>
                             <p class="text-muted">Descarga tus certificados de cursos completados.</p>
                             <div class="mt-auto">
-                                <a href="{% url 'courses:my_course' %}#certificados" class="btn btn-success">Ver certificados</a>
+                                <a href="{% url 'certifications:certificate_list' %}#certificados" class="btn btn-success">Ver certificados</a>
                             </div>
                         </div>
                     </div>
@@ -182,8 +182,9 @@
                             <div class="mb-3">
                                 <strong>{{ cert.course_title }}</strong>
                                 {% if cert.certificate_uuid %}
+                                {{ cert.certificate_uuid }}
                                     <a href="{% url 'certifications:certificate_pdf_download' cert.certificate_uuid %}" class="btn btn-success btn-sm ms-2">Descargar certificado 🏆</a>
-                                    <a href="{% url 'certifications:certificate_public_view' cert.certificate_uuid %}" class="btn btn-primary btn-sm ms-2">Ver certificado</a>
+                                    <a href="{% url 'certifications:list' cert.certificate_uuid %}" class="btn btn-primary btn-sm ms-2">Mis certificados</a>
                                 {% else %}
                                     {% if certificados_usuario|length > 0 %}
                                         <ul class="mt-2">
@@ -191,7 +192,7 @@
                                                 {% if c.certificate_uuid %}
                                                     <li>
                                                         <a href="{% url 'certifications:certificate_pdf_download' c.certificate_uuid %}" class="link-light">Descargar #{{ c.certificate_uuid }}</a>
-                                                        <a href="{% url 'certifications:certificate_public_view' c.certificate_uuid %}" class="link-light ms-2">Ver certificado</a>
+                                                        <a href="{% url 'certifications:list' %}" class="link-light ms-2">Ver certificados...</a>
                                                     </li>
                                                 {% endif %}
                                             {% endfor %}

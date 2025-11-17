@@ -1,0 +1,28 @@
+    {% extends 'dashboards/dashboard.html' %}
+    {% load static %}
+    {% block content %}
+    <div class="container py-4">
+        <h2 class="mb-4 text-center">Mis Certificados</h2>
+        <div class="d-flex flex-wrap gap-3 justify-content-start">
+            {% for cert in certificados %}
+            {{ cert }} 
+                <div class="card" style="width: 18rem;">
+                    {% if cert.pdf_file %}
+                        <img src="{{ cert.pdf_file.url }}" class="card-img-top" alt="{{ cert.course.title }}">
+                    {% else %}
+                        <img src="{% static 'img/certificate-placeholder.png' %}" class="card-img-top" alt="placeholder">
+                    {% endif %}
+                    <div class="card-body">
+                        <h1 class="card-title">{{ cert.user__first_name }} {{ cert.user__last_name }}</h1>
+                        <h5 class="card-title">{{ cert.course__title|capfirst }}</h5>
+                        <p class="card-text">Emitido: {{ cert.issued_date|date:'d/m/Y' }} · Nº: {{ cert.certificate_number }}</p>
+                        <a href="{% url 'certifications:certificate_public_view' cert.public_uuid %}" class="btn btn-primary btn-sm" target="_blank">Ver certificado</a>
+                        <a href="{% url 'certifications:certificate_pdf_download' cert.public_uuid %}" class="btn btn-outline-secondary btn-sm ms-2">Descargar</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info">No tienes certificados aún.</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}

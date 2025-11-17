@@ -1,4 +1,5 @@
-from .models import Module, QuickTestResult
+from .models import Module, Question, QuickTestResult
+from classroom.certifications.views import create_certificate_for_user
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -190,7 +191,6 @@ def course_detail(request, pk):
 
 @login_required
 def my_course(request):
-
     enrollments = Enrollment.objects.filter(user=request.user, completed=False)
     courses = Course.objects.filter(enrollment__in=enrollments).distinct()
     modules = Module.objects.filter(course__in=courses).distinct()
@@ -208,8 +208,6 @@ def my_course(request):
         'is_completed': completed_ids,
 
     }
-
-
     return render(request, 'courses/my_course.html', context)
 
 @login_required
@@ -457,10 +455,18 @@ def next_module(request, module_id):
     course = module.course
     next_mod = Module.objects.filter(course=course, order__gt=module.order).order_by('order').first()
     if next_mod:
+        quicktests = Question.objects.filter(module=next_mod, user=request.user)
+        if quicktests.exists():
+            messages.info(request, 'Debes completar el test del módulo anterior antes de continuar.')
+            return redirect('courses:quicktest_detail', pk=quicktests.first().pk)
         return redirect('courses:module_detail', pk=next_mod.pk)
     else:
         # El usuario ha completado todos los módulos del curso
-        from classroom.certifications.views import create_certificate_for_user
+        # Marcar la matrícula como completada
+        enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+        if enrollment:
+            enrollment.completed = True
+            enrollment.save()
         create_certificate_for_user(request.user, course)
         messages.success(request, '¡Has completado todos los módulos de este curso! Se ha generado tu certificado.')
         return redirect('courses:my_course')

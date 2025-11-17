@@ -32,6 +32,5 @@ class Certificate(models.Model):
     def get_download_url(self):
         from django.urls import reverse
         return reverse('certifications:certificate_pdf_download', kwargs={'uuid': str(self.public_uuid)})
-        return reverse('certifications:certificate_pdf_download', kwargs={'uuid': str(self.public_uuid)})
 
         

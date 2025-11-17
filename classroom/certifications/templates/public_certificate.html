@@ -1,30 +1,26 @@
 <!-- templates/certificates/public_certificate.html -->
 {% extends "dashboards/dashboard.html" %}
+{% load static %}
 {% block content %}
-<div class="container mt-5 text-center">
-  <h1>Certificado de Finalización</h1>
-  <p><strong>{{ user.get_full_name }}</strong> ha completado satisfactoriamente el curso:</p>
-  <h3>{{ course.title }}</h3>
-  <p><em>Fecha: {{ date|date:"d/m/Y" }}</em></p>
-
-  <a href="{% url 'certificate_pdf_download' certificate.uuid %}" class="btn btn-primary mt-4">
-    Descargar Certificado (PDF)
-  </a>
+<div style="position:relative; width:900px; height:650px; margin:auto;">
+  <img src="/media/certificates/user_67/certificados_regional.png" alt="Certificado fondo" style="position:absolute; top:0; left:0; width:900px; height:650px; object-fit:cover; z-index:0;">
+  <!-- Nombre del usuario -->
+  <div style="position:absolute; top:330px; left:0; width:100%; text-align:center; font-size:2.2em; font-weight:bold; color:#2a2a2a; letter-spacing:1px; z-index:2;">
+    {{ user.get_full_name }}
+  </div>
+  <!-- Título del curso -->
+  <div style="position:absolute; top:380px; left:0; width:100%; text-align:center; font-size:1.5em; color:#3a7bd5; z-index:2;">
+    {{ course.title }}
+  </div>
+  <!-- Fecha -->
+  <div style="position:absolute; top:430px; left:0; width:100%; text-align:center; font-size:1.2em; color:#444; z-index:2;">
+    Fecha: {{ date|date:"d/m/Y" }}
+  </div>
 </div>
 {% endblock %}
 <style>
-  .container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    border: 2px solid #5ca3ff;
-    border-radius: 10px;
-    background-color: #f8f9fa;
+  /* Ajustes para posicionar los datos sobre el fondo */
+  body {
+    background: #eaf4ff;
   }
-  h1, h3 {
-    color: #5ca3ff;
-  }
-  .btn-primary {
-    background-color: #5ca3ff;
-    border-color: #5ca3ff;
-  }
+</style>

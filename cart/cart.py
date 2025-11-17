@@ -20,7 +20,6 @@ class Cart():
 	def db_add(self, product, quantity):
 		product_id = str(product)
 		product_qty = str(quantity)
-		print(product_qty, product_id)
 		# Logic
 		if product_id in self.cart:
 			pass
