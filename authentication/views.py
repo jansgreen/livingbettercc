@@ -323,6 +323,7 @@ def profile_delete_view(request, pk):
         return redirect('profile_list')  # Redirect to profile list after deletion
     return render(request, 'authentication/profile_delete.html', {'profile': profile})
 
+@login_required
 def profile_view(request):
     profile = Profiles.objects.filter(user=request.user)
     beca_status = None
