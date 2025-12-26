@@ -2,16 +2,12 @@
 # courses/models.py
 from django.db import models
 from django.conf import settings
-from ckeditor.fields import RichTextField
-from classroom.enrollments.models import Enrollment
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
-    description =  RichTextField(verbose_name="course description")
+    description = CKEditor5Field('course description', config_name='extends')
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,7 +20,7 @@ class Course(models.Model):
 class Module(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     title = models.CharField(max_length=255)
-    description =  RichTextField(verbose_name="module description")
+    description = CKEditor5Field('module description', config_name='extends')
     order = models.PositiveIntegerField()
 
     class Meta:
@@ -36,7 +32,7 @@ class Module(models.Model):
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
-    content =  RichTextField(verbose_name="lesson content")
+    content = CKEditor5Field('lesson content', config_name='extends')
     video_url = models.URLField(blank=True)
     order = models.PositiveIntegerField()
 
@@ -58,7 +54,7 @@ class Test(models.Model):
 
 class Question(models.Model):
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='questions')
-    text = RichTextField(verbose_name="questions")
+    text = CKEditor5Field('questions', config_name='extends')
     option_a = models.CharField(max_length=255)
     option_b = models.CharField(max_length=255)
     option_c = models.CharField(max_length=255)

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User, Group  # Import Group
 from django.apps import apps  # Importa apps para usar get_model
 from .address import Address
 from .profiles import Profiles
-from ckeditor.fields import RichTextField  # Asegúrate de tener django-ckeditor instalado
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Directives(models.Model):
@@ -14,7 +14,7 @@ class Directives(models.Model):
     profile = models.OneToOneField(Profiles, on_delete=models.SET_NULL, null=True, blank=True)
     # Cambiado a ForeignKey para permitir múltiples direcciones
     address = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='directives')
-    biografia = RichTextField(verbose_name="Biografía", null=True, blank=True)
+    biografia = CKEditor5Field('Biografía', config_name='extends', null=True, blank=True)
 
     facebook = models.URLField(blank=True, null=True, verbose_name="Facebook")
     instagram = models.URLField(blank=True, null=True, verbose_name="Instagram")

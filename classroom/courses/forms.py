@@ -1,15 +1,25 @@
 from django import forms
 from .models import Course, Module, Lesson, Test, Question
 
+
+def _append_css_class(widget, css_class: str) -> None:
+    existing = (widget.attrs.get('class') or '').split()
+    for c in (css_class or '').split():
+        if c and c not in existing:
+            existing.append(c)
+    widget.attrs['class'] = ' '.join(existing).strip()
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ['title', 'description', 'price', 'image', 'published']
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            for field in self.fields:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
-            self.fields['image'].widget.attrs.update({'class': 'form-control-file'})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            _append_css_class(self.fields[field].widget, 'form-control')
+        if 'image' in self.fields:
+            _append_css_class(self.fields['image'].widget, 'form-control-file')
 
 class ModuleForm(forms.ModelForm):
     class Meta:
@@ -18,7 +28,7 @@ class ModuleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
+            _append_css_class(self.fields[field].widget, 'form-control')
 
 class LessonForm(forms.ModelForm):
     class Meta:
@@ -27,28 +37,29 @@ class LessonForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs.update({'class': 'form-control'})
+            _append_css_class(self.fields[field].widget, 'form-control')
 
 class TestForm(forms.ModelForm):
     class Meta:
         model = Test
         fields = ['module', 'title']
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            for field in self.fields:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            _append_css_class(self.fields[field].widget, 'form-control')
 
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['test', 'text', 'option_a', 'option_b']
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            for field in self.fields:
-                self.fields[field].widget.attrs.update({'class': 'form-control'})
-            self.fields['text'].widget.attrs.update({'class': 'form-control rich-text'})
-            self.fields['option_a'].widget.attrs.update({'class': 'form-control'})
-            self.fields['option_b'].widget.attrs.update({'class': 'form-control'})
-            self.fields['option_c'].widget.attrs.update({'class': 'form-control'})
-            self.fields['option_d'].widget.attrs.update({'class': 'form-control'})
-            self.fields['correct_option'].widget.attrs.update({'class': 'form-control'})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            _append_css_class(self.fields[field].widget, 'form-control')
+        if 'text' in self.fields:
+            _append_css_class(self.fields['text'].widget, 'rich-text')
+        for name in ['option_a', 'option_b', 'option_c', 'option_d', 'correct_option']:
+            if name in self.fields:
+                _append_css_class(self.fields[name].widget, 'form-control')

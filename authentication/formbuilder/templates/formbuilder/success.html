@@ -1,6 +1,11 @@
 {% extends "dashboard.html" %}
 {% load static %}
 {% block content %}
-<h1>Formulario Completado</h1>
-<p>Gracias por completar el formulario "{{ form_name }}".</p>
+<div class="py-4">
+	<div class="alert alert-success" role="alert">
+		<h1 class="h5 mb-1">Formulario completado</h1>
+		<p class="mb-0">Gracias por completar el formulario.</p>
+	</div>
+	<a class="btn btn-outline-secondary" href="{% url 'formbuilder:form_list' %}">Volver a formularios</a>
+</div>
 {% endblock %}

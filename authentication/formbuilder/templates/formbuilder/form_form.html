@@ -2,10 +2,11 @@
 {% load static %}
 {% block content %}
 <h1>{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Formulario</h1>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ form.media }}
     {{ form.as_p }}
-    <button type="submit">Guardar</button>
+    <button class="btn btn-primary" type="submit">Guardar</button>
 </form>
 <a href="{% url 'formbuilder:form_list' %}">Volver a la lista</a>
 {% endblock %}

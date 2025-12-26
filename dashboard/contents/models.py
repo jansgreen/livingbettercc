@@ -1,9 +1,5 @@
 from django.db import models
-from ckeditor.fields import RichTextField
-
-# Create your models here.
-from django.db import models
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -40,7 +36,7 @@ class ContentPost(models.Model):
     # --- Campos principales ---
     title = models.CharField(max_length=200, verbose_name="Título", unique=True)
     slug = models.SlugField(max_length=220, unique=True, blank=True, null=True)
-    content = RichTextField(verbose_name="Contenido", blank=True, null=True)
+    content = CKEditor5Field('Contenido', config_name='extends', blank=True, null=True)
     section = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(99)], blank=True, null=True)
 
     # --- Relaciones ---

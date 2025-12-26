@@ -9,6 +9,14 @@ from .models.directives import Directives
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
+
+def _append_css_class(widget, css_class: str) -> None:
+    existing = (widget.attrs.get('class') or '').split()
+    for c in (css_class or '').split():
+        if c and c not in existing:
+            existing.append(c)
+    widget.attrs['class'] = ' '.join(existing).strip()
+
 class FacilitadorRegistrationForm(forms.Form):
     def clean_username(self):
         from django.contrib.auth.models import User
@@ -67,7 +75,7 @@ class AddressForm(forms.ModelForm):
 
         # Aplicar clase Bootstrap a todos los campos
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+            _append_css_class(field.widget, 'form-control')
         
         # Etiquetas en español
         self.fields['street'].label = 'Calle y número'
@@ -100,7 +108,7 @@ class ProfileForm(forms.ModelForm):
             if field.label == 'imagen':
                 field.label_suffix = 'Foto de Perfil'
 
-            field.widget.attrs.update({'class': 'form-control'})
+            _append_css_class(field.widget, 'form-control')
 class CustomerForm(forms.ModelForm):
     username = forms.CharField(
         max_length=150,
@@ -126,7 +134,7 @@ class CustomerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+            _append_css_class(field.widget, 'form-control')
 
     def save(self, commit=True):
         user = User.objects.create_user(
@@ -147,7 +155,7 @@ class StaffForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+            _append_css_class(field.widget, 'form-control')
 class DirectivesForm(forms.ModelForm):
     class Meta:
         model = Directives
@@ -157,7 +165,7 @@ class DirectivesForm(forms.ModelForm):
         user = kwargs.pop('user', None)  # Accept the user as a parameter
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
+            _append_css_class(field.widget, 'form-control')
 class BootstrapUserCreationForm(UserCreationForm):
     class Meta:
         model = User
@@ -166,4 +174,4 @@ class BootstrapUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs['class'] = 'form-control'
+            _append_css_class(self.fields[field].widget, 'form-control')

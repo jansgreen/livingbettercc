@@ -1,10 +1,15 @@
 from django.db import models
+from django_ckeditor_5.fields import CKEditor5Field
+
 
 class FormDefinition(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    description = models.TextField(blank=True, null=True)
+    description = CKEditor5Field('Text', config_name='extends', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # Backward compatible single image (legacy). Prefer image_left/image_right in UI.
     image = models.ImageField(upload_to='form_images/', blank=True, null=True)
+    image_left = models.ImageField(upload_to='form_images/', blank=True, null=True)
+    image_right = models.ImageField(upload_to='form_images/', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -17,6 +22,7 @@ FIELD_TYPES = [
     ('text', 'Área de texto'),
     ('boolean', 'Casilla de verificación'),
     ('select', 'Selección'),
+    ('files', 'Anexos (múltiples archivos)'),
 ]
 
 class FormField(models.Model):

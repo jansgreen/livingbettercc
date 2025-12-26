@@ -2,110 +2,66 @@
 {% load static %}
 
 {% block content %}
-<style>
-    /* ====== ESTILO TIPO DOCUMENTO ====== */
-    .report-container {
-        background-color: #fff;
-        padding: 40px 60px;
-        margin: 20px auto;
-        max-width: 900px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        font-family: "Times New Roman", serif;
-    }
 
-    .report-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
+<div class="py-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+                <div>
+                    <h1 class="h4 mb-1">{{ completed_form.form_name|capfirst }}</h1>
+                    {% if completed_form.descripcion %}
+                        <p class="text-muted mb-0">{{ completed_form.descripcion }}</p>
+                    {% elif form_obj and form_obj.description %}
+                        <p class="text-muted mb-0">{{ form_obj.description }}</p>
+                    {% endif %}
+                </div>
+                {% if form_obj and form_obj.image_left %}
+                    <img src="{{ form_obj.image_left.url }}" alt="Imagen izquierda del formulario" class="img-fluid" style="max-height: 72px;" />
+                {% elif form_obj and form_obj.image %}
+                    <img src="{{ form_obj.image.url }}" alt="Imagen del formulario" class="img-fluid" style="max-height: 72px;" />
+                {% endif %}
+            </div>
 
-    .report-header h3 {
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 5px;
-    }
+            <div class="mb-4">
+                <div class="small text-muted">
+                    {% if completed_form.user.first_name %}
+                        Completado por {{ completed_form.user.first_name|capfirst }} {{ completed_form.user.last_name|capfirst }}
+                    {% else %}
+                        Completado por {{ completed_form.user.username|capfirst }}
+                    {% endif %}
+                    · {{ completed_form.submitted_at|date:"d/m/Y H:i" }}
+                </div>
+            </div>
 
-    .report-header p {
-        margin: 0;
-        font-size: 14px;
-        line-height: 1.4;
-    }
+            <h2 class="h6 mb-3">Respuestas</h2>
+            <div class="list-group">
+                {% for r in responses %}
+                    <div class="list-group-item">
+                        <div class="fw-semibold">{{ r.label }}</div>
+                        {% if r.is_list %}
+                            <ul class="mb-0">
+                                {% for item in r.value %}
+                                    <li><a href="{{ item }}" target="_blank" rel="noopener">{{ item }}</a></li>
+                                {% empty %}
+                                    <li class="text-muted">(Sin archivos)</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-body">{{ r.value }}</div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="list-group-item">No hay respuestas.</div>
+                {% endfor %}
+            </div>
 
-    .report-section {
-        margin-bottom: 25px;
-    }
-
-    .report-section h5 {
-        text-decoration: underline;
-        font-weight: bold;
-        font-size: 16px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-        color: #222;
-    }
-
-    .report-section p, .report-section li {
-        font-size: 15px;
-        line-height: 1.6;
-        text-align: justify;
-    }
-
-    .report-footer {
-        text-align: right;
-        margin-top: 40px;
-        font-size: 14px;
-        color: #555;
-        font-style: italic;
-    }
-
-    /* Ajustes visuales generales */
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-    ul li::before {
-        content: "• ";
-        color: #000;
-    }
-</style>
-
-<div class="report-container">
-    <div class="report-header">        
-        <img src="{% static '/setting/logo.png' %}" alt="Form Icon" style="width: 200px; height: 200px;">
-        <h3>Living Better Community Center Inc.</h3>
-        <p>C/CUL DE SAC2 SUR EDF T APT A 4 LAS PRADERAS</p>
-        <p>Residencial Santo Domingo</p>
-        <p>Email: livingbetter08@yahoo.com | Tel.: 809-498-5985</p>
-        <hr style="border: 1px solid #000; width: 80%; margin: 20px auto;">
-        <img src="{{ completed_form.image.url }}" alt="Form Icon" style="width: 50px; height: 50px;">
-        <h1>{{ completed_form.form_name|capfirst }}</h1>
-        <h5 style="text-decoration: underline; margin-bottom: 0;">{{ completed_form.titulo|capfirst }}</h5>
-        <p><em>{{ completed_form.descripcion|capfirst }}</em></p>
-    </div>
-
-    <div class="report-section">
-        {% if completed_form.user.first_name %}
-        <p><strong>Completado por:</strong> {{ completed_form.user.first_name|capfirst }} {{ completed_form.user.last_name|capfirst }}</p>
-        {% else %}
-        <p><strong>Completado por:</strong> {{ completed_form.user.username|capfirst }}</p>
-        {% endif %}
-        <p><strong>Fecha de completado:</strong> {{ completed_form.submitted_at|date:"d/m/Y H:i" }}</p>
-    </div>
-
-    <div class="report-section">
-        <h5>Respuestas</h5>
-        <ul class="list-group">
-            {% for field, value in completed_form.form_data.items %}
-            
-                <li class="list-group-item"><strong> {{ field|capfirst }}: </strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div class="report-footer">
-        <p>ID del formulario: {{ completed_form.pk }}</p>
+            <div class="d-flex gap-2 mt-4">
+                {% if completed_form.user == request.user %}
+                    <a class="btn btn-primary" href="{% url 'formbuilder:completed_forms_edit' completed_form.pk %}">Editar</a>
+                {% endif %}
+                <a class="btn btn-outline-secondary" href="{% url 'formbuilder:completed_forms_list' %}">Volver</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

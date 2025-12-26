@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from .address import Address
 from django.core.exceptions import ValidationError
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Profiles(models.Model):
@@ -58,7 +58,7 @@ class ProfileImage(models.Model):
 
 class Biography(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    biography = RichTextField(verbose_name="Biografia")
+    biography = CKEditor5Field('Biografia', config_name='extends')
 
     def summary(self, char_limit=100):
         if len(self.content) <= char_limit:

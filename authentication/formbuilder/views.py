@@ -10,10 +10,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 # formbuilder/views.py
 from django.shortcuts import render, redirect
-from .utils import generate_dynamic_form
+from .utils import generate_dynamic_form, build_ordered_responses
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
+from django.utils.text import slugify
+import os
 
 
 def facilitador_list_view(request):
@@ -35,7 +38,7 @@ def form_detail(request, pk):
 @require_http_methods(["GET", "POST"])
 def form_create(request):
     if request.method == 'POST':
-        form = FormDefinitionForm(request.POST)
+        form = FormDefinitionForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect(reverse('formbuilder:form_list'))
@@ -47,7 +50,7 @@ def form_create(request):
 def form_update(request, pk):
     instance = get_object_or_404(FormDefinition, pk=pk)
     if request.method == 'POST':
-        form = FormDefinitionForm(request.POST, instance=instance)
+        form = FormDefinitionForm(request.POST, request.FILES, instance=instance)
         if form.is_valid():
             form.save()
             return redirect(reverse('formbuilder:form_list'))
@@ -111,22 +114,69 @@ def render_form(request, form_name):
         register_url = reverse('facilitador_register')
         return redirect(f"{register_url}?next={next_url}")
 
+    subtitle = (form_obj.description or '').strip()
+
+    file_field_names = set(
+        form_obj.fields.filter(field_type='files').values_list('name', flat=True)
+    )
+
+    def _save_uploaded_files(uploaded_files, *, user_id: int, form_name: str, field_name: str) -> list[str]:
+        saved_urls: list[str] = []
+        if not uploaded_files:
+            return saved_urls
+
+        safe_form = slugify(form_name)[:60] or 'form'
+        safe_field = slugify(field_name)[:60] or 'files'
+        base_dir = os.path.join('form_uploads', safe_form, str(user_id), safe_field)
+
+        for f in uploaded_files:
+            filename = f.name
+            path = default_storage.save(os.path.join(base_dir, filename), f)
+            saved_urls.append(default_storage.url(path))
+        return saved_urls
+
     if request.method == 'POST':
-        form = DynamicForm(request.POST)
+        post_data = request.POST
+
+        # If the form includes the 'objetivo_razon_motivo' field, we use the
+        # FormDefinition.description as its fixed value (subtitle).
+        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
+            if 'objetivo_razon_motivo' not in post_data:
+                post_data = post_data.copy()
+                post_data['objetivo_razon_motivo'] = subtitle
+
+        form = DynamicForm(post_data, request.FILES)
         if form.is_valid():
+            json_safe_data = dict(form.cleaned_data)
+
+            # Persist uploaded files and store URLs (JSON-safe) instead of UploadedFile objects.
+            for field_name in file_field_names:
+                uploaded_list = form.cleaned_data.get(field_name) or []
+                if uploaded_list and not isinstance(uploaded_list, (list, tuple)):
+                    uploaded_list = [uploaded_list]
+                json_safe_data[field_name] = _save_uploaded_files(
+                    uploaded_list,
+                    user_id=request.user.id,
+                    form_name=form_name,
+                    field_name=field_name,
+                )
+
             # Aqui tengo que guardar los datos del form y en un nuevo model CRUD, para los formularios ya completados.
             completed_form = CompletedForm.objects.create(
                 user=request.user,
                 form_name=form_name,
                 titulo=form.cleaned_data.get('titulo', ''),
-                descripcion=form.cleaned_data.get('descripcion', ''),
-                form_data=form.cleaned_data
+                descripcion=subtitle or form.cleaned_data.get('descripcion', ''),
+                form_data=json_safe_data
             )
             completed_form.save()
             messages.success(request, f'Formulario guardado con éxito.')
             return render(request, 'formbuilder/success.html')
     else:
-        form = DynamicForm()
+        initial = {}
+        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
+            initial['objetivo_razon_motivo'] = subtitle
+        form = DynamicForm(initial=initial)
     context={
         'form_obj': form_obj,
         'form': form, 
@@ -168,7 +218,17 @@ def completed_forms_detail(request, pk):
     if completed_form.user != request.user and not request.user.is_staff and not is_tecnico:
         # Keep previous behavior (404) for non-authorized users.
         raise Http404("No encontrado")
-    return render(request, 'formbuilder/completed/completed_form_detail.html', {'completed_form': completed_form})
+    form_obj = FormDefinition.objects.filter(name=completed_form.form_name).first()
+    responses = build_ordered_responses(completed_form.form_name, completed_form.form_data)
+    return render(
+        request,
+        'formbuilder/completed/completed_form_detail.html',
+        {
+            'completed_form': completed_form,
+            'form_obj': form_obj,
+            'responses': responses,
+        },
+    )
 
 def completed_forms_edit(request, pk):
     completed_form = get_object_or_404(CompletedForm, pk=pk, user=request.user)
@@ -176,18 +236,60 @@ def completed_forms_edit(request, pk):
     if not DynamicForm:
         return render(request, 'formbuilder/not_found.html', {'form_name': completed_form.form_name})
 
+    form_obj = FormDefinition.objects.filter(name=completed_form.form_name).first()
+    file_field_names = set()
+    if form_obj:
+        file_field_names = set(
+            form_obj.fields.filter(field_type='files').values_list('name', flat=True)
+        )
+
+    subtitle = (completed_form.descripcion or (form_obj.description if form_obj else '') or '').strip()
+
     if request.method == 'POST':
-        form = DynamicForm(request.POST)
+        post_data = request.POST
+        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
+            if 'objetivo_razon_motivo' not in post_data:
+                post_data = post_data.copy()
+                post_data['objetivo_razon_motivo'] = subtitle
+
+        form = DynamicForm(post_data, request.FILES)
         if form.is_valid():
-            completed_form.form_data = form.cleaned_data
+            json_safe_data = dict(form.cleaned_data)
+            existing_data = completed_form.form_data or {}
+
+            # Replace attachments only when new files are uploaded; otherwise keep existing URLs.
+            for field_name in file_field_names:
+                uploaded_list = form.cleaned_data.get(field_name) or []
+                if uploaded_list and not isinstance(uploaded_list, (list, tuple)):
+                    uploaded_list = [uploaded_list]
+
+                if uploaded_list:
+                    safe_form = slugify(completed_form.form_name)[:60] or 'form'
+                    safe_field = slugify(field_name)[:60] or 'files'
+                    base_dir = os.path.join('form_uploads', safe_form, str(request.user.id), safe_field)
+                    saved_urls: list[str] = []
+                    for f in uploaded_list:
+                        path = default_storage.save(os.path.join(base_dir, f.name), f)
+                        saved_urls.append(default_storage.url(path))
+                    json_safe_data[field_name] = saved_urls
+                else:
+                    json_safe_data[field_name] = existing_data.get(field_name, [])
+
+            completed_form.form_data = json_safe_data
+            if subtitle:
+                completed_form.descripcion = subtitle
             completed_form.save()
             messages.success(request, f'Formulario actualizado con éxito.')
             return redirect('formbuilder:completed_forms_detail', pk=completed_form.pk)
     else:
-        form = DynamicForm(initial=completed_form.form_data)
+        initial = dict(completed_form.form_data or {})
+        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
+            initial.setdefault('objetivo_razon_motivo', subtitle)
+        form = DynamicForm(initial=initial)
 
     context = {
         'form': form,
+        'form_obj': form_obj,
         'completed_form': completed_form,
     }
     return render(request, 'formbuilder/completed/edit_completed_form.html', context)

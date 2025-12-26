@@ -53,8 +53,6 @@ INSTALLED_APPS = [
     'classroom.quicktest',
     'classroom.enrollments',
     'classroom.certifications',
-    'ckeditor',
-    'ckeditor_uploader',
     'authentication',
     'authentication.students',
     'authentication.formbuilder',
@@ -72,6 +70,8 @@ INSTALLED_APPS = [
     'dashboard.metadata',
     'dashboard.groups',
     'dashboard.contents',
+    'django_ckeditor_5',
+
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -229,12 +229,6 @@ else:
     BOOTSTRAP_CSS = os.path.join(STATIC_URL,'bootstrap/css/bootstrap.min.css')
     BOOTSTRAP_JS = os.path.join(STATIC_URL,'bootstrap/js/bootstrap.bundle.min.js')
 
-print("Bootstrap CSS:", BOOTSTRAP_CSS)
-print("Bootstrap JS:", BOOTSTRAP_JS)
-
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_IMAGE_BACKEND = "ckeditor_uploader.storage.models.ImageField"
-
 # Configurar el framework de mensajes
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
@@ -263,28 +257,107 @@ PAYPAL_CLIENT_ID = 'tu_client_id'
 PAYPAL_CLIENT_SECRET = 'tu_client_secret'
 PAYPAL_MODE = 'sandbox'  # Cambia a 'live' para producción
 
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'Custom',
-        'height': 400,
-        'width': '100%',
-        'extraPlugins': ','.join(['image2', 'justify']),
-        'image2_disableResizer': False,
-        'image2_alignClasses': ['align-left', 'align-center', 'align-right'],
-        'image2_captionedClass': 'image-captioned',
-        'removePlugins': 'resize',  # evita conflictos con el redimensionamiento
-        'contentsCss': ['/static/css/style.css'],  # permite que CKEditor use tus estilos
-        'toolbar_Custom': [
-            ['Bold', 'Italic', 'Underline', 'Strike'],
-            ['NumberedList', 'BulletedList'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['Image', 'Link', 'Unlink', 'RemoveFormat', 'Source'],
-        ],
-    },
-}
-
 
 
 # paypal
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = 'livingbettecommunitycenter@gmail.com'
+# django_ckeditor_5 provides the upload endpoint named "ck_editor_5_upload_file"
+# (see include('django_ckeditor_5.urls') in the project urls).
+CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME = "ck_editor_5_upload_file"
+
+customColorPalette = [
+        {
+            'color': 'hsl(4, 90%, 58%)',
+            'label': 'Red'
+        },
+        {
+            'color': 'hsl(340, 82%, 52%)',
+            'label': 'Pink'
+        },
+        {
+            'color': 'hsl(291, 64%, 42%)',
+            'label': 'Purple'
+        },
+        {
+            'color': 'hsl(262, 52%, 47%)',
+            'label': 'Deep Purple'
+        },
+        {
+            'color': 'hsl(231, 48%, 48%)',
+            'label': 'Indigo'
+        },
+        {
+            'color': 'hsl(207, 90%, 54%)',
+            'label': 'Blue'
+        },
+    ]
+
+CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
+CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage"
+CKEDITOR_5_CONFIGS = {
+        'default': {
+            'toolbar': {
+                'items': ['heading', '|', 'bold', 'italic', 'link',
+                        'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+                        }
+
+        },
+        'extends': {
+            'blockToolbar': [
+                'paragraph', 'heading1', 'heading2', 'heading3',
+                '|',
+                'bulletedList', 'numberedList',
+                '|',
+                'blockQuote',
+            ],
+            'toolbar': {
+                'items': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+                        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
+                        'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
+                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                        'insertTable',
+                        ],
+                'shouldNotGroupWhenFull': 'true'
+            },
+            'image': {
+                'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
+                            'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+                'styles': [
+                    'full',
+                    'side',
+                    'alignLeft',
+                    'alignRight',
+                    'alignCenter',
+                ]
+
+            },
+            'table': {
+                'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+                'tableProperties', 'tableCellProperties' ],
+                'tableProperties': {
+                    'borderColors': customColorPalette,
+                    'backgroundColors': customColorPalette
+                },
+                'tableCellProperties': {
+                    'borderColors': customColorPalette,
+                    'backgroundColors': customColorPalette
+                }
+            },
+            'heading' : {
+                'options': [
+                    { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                    { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                    { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                    { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+                ]
+            }
+        },
+        'list': {
+            'properties': {
+                'styles': 'true',
+                'startIndex': 'true',
+                'reversed': 'true',
+            }
+        }
+    }
