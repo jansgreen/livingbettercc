@@ -11,7 +11,7 @@ def ContentListView(request):
     return render(request, 'contents/content_list.html', context)
 
 def ContentDetailView(request, pk):
-    content = ContentPost.objects.get(pk=pk)
+    content = get_object_or_404(ContentPost, pk=pk)
     # Prepare tags as a list for template iteration (templates cannot call split())
     tags_list = []
     if getattr(content, 'tags', None):
@@ -40,7 +40,7 @@ def ContentCreateView(request):
     return render(request, 'contents/content_form.html', {'form': form})
 
 def ContentUpdateView(request, pk):
-    content = ContentPost.objects.get(pk=pk)
+    content = get_object_or_404(ContentPost, pk=pk)
     if request.method == "POST":
         form = ContentPostForm(request.POST, request.FILES, instance=content)
         if form.is_valid():
@@ -55,7 +55,7 @@ def ContentUpdateView(request, pk):
     return render(request, 'contents/content_form.html', {'form': form})
 
 def ContentDeleteView(request, pk):
-    content = ContentPost.objects.get(pk=pk)
+    content = get_object_or_404(ContentPost, pk=pk)
     if request.method == "POST":
         content.delete()
         messages.success(request, "Contenido eliminado exitosamente.")
@@ -84,7 +84,7 @@ def CategoryCreateView(request):
     return render(request, 'contents/category_form.html', context)
 
 def CategoryUpdateView(request, pk):
-    category = ContentCategory.objects.get(pk=pk)
+    category = get_object_or_404(ContentCategory, pk=pk)
     if request.method == "POST":
         form = ContentCategoryForm(request.POST, instance=category)
         if form.is_valid():
@@ -99,7 +99,7 @@ def CategoryUpdateView(request, pk):
     return render(request, 'dashboard/contents/category_form.html', context)
 
 def CategoryDeleteView(request, pk):
-    category = ContentCategory.objects.get(pk=pk)
+    category = get_object_or_404(ContentCategory, pk=pk)
     if request.method == "POST":
         category.delete()
         messages.success(request, "Categoría eliminada exitosamente.")
