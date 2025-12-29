@@ -23,6 +23,9 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 DEBUG = _env_bool('DEBUG', default=False)
 
+# Detección de entorno: Heroku define DYNO. También soportamos DJANGO_ENV=heroku.
+IS_HEROKU = bool(os.getenv("DYNO")) or os.getenv("DJANGO_ENV") == "heroku"
+
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
 if not DEBUG:
@@ -33,15 +36,53 @@ if not DEBUG:
 
 
 # Permitir HTTP solo en desarrollo
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+if DEBUG:
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 GOOGLE_OAUTH2_CLIENT_SECRETS_JSON = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_OAUTH2_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
-if os.getenv("DEBUG") == False:
-    ALLOWED_HOSTS = ["*.*", ".herokuapp.com"]
+def _parse_hosts_csv(value: str) -> list[str]:
+    hosts: list[str] = []
+    for raw in (value or "").split(","):
+        host = (raw or "").strip()
+        if not host:
+            continue
+        host = host.replace("https://", "").replace("http://", "")
+        host = host.split("/")[0]
+        host = host.split(":")[0]
+        if host:
+            hosts.append(host)
+    # Quitar duplicados preservando orden
+    return list(dict.fromkeys(hosts))
+
+
+if IS_HEROKU:
+    # Si HOSTS está definido en Heroku, úsalo; pero siempre agrega defaults seguros.
+    _env_hosts = _parse_hosts_csv(os.getenv("HOSTS", ""))
+    _required_hosts = [
+        "livingbettercc.herokuapp.com",
+        # Acepta cualquier subdominio de herokuapp (p.ej. livingbettercc-xxxx.herokuapp.com)
+        ".herokuapp.com",
+        "livingbettercc.com",
+        "www.livingbettercc.com",
+        "livingbettercc.net",
+        "www.livingbettercc.net",
+        # Acepta cualquier subdominio (p.ej. blog., api.)
+        ".livingbettercc.com",
+        ".livingbettercc.net",
+    ]
+    ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
+
+    CSRF_TRUSTED_ORIGINS = [
+        "https://livingbettercc.herokuapp.com",
+        "https://livingbettercc.com",
+        "https://www.livingbettercc.com",
+        "https://livingbettercc.net",
+        "https://www.livingbettercc.net",
+    ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
@@ -179,7 +220,8 @@ WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 
 import dj_database_url
 
-if os.getenv("DEBUG") == False: 
+if IS_HEROKU:
+    # En Heroku: PostgreSQL vía DATABASE_URL
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
@@ -188,6 +230,7 @@ if os.getenv("DEBUG") == False:
         )
     }
 else:
+    # En local: SQLite3
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -254,7 +297,7 @@ STORAGES = {
 
 
 # Loguea errores de requests a consola (aparece en heroku logs)
-if os.getenv("DEBUG") == False:
+if IS_HEROKU:
     LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
@@ -292,7 +335,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_HOST_FROM_USER = os.getenv('EMAIL_HOST_FROM_USE')
+EMAIL_HOST_FROM_USER = os.getenv('EMAIL_HOST_FROM_USER')
 EMAIL_HOST_CC = os.getenv('EMAIL_HOST_CC', '').split(',')
 EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 
