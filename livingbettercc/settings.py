@@ -25,11 +25,11 @@ DEBUG = _env_bool('DEBUG', default=False)
 
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
-
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Permitir HTTP solo en desarrollo
@@ -41,9 +41,25 @@ GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
 if os.getenv("DJANGO_ENV") == "heroku":
-    ALLOWED_HOSTS = os.getenv("HOSTS", "").split(",")
+    _raw_hosts = os.getenv("HOSTS", "")
+    _hosts = []
+    for _h in _raw_hosts.split(","):
+        _h = (_h or "").strip()
+        if not _h:
+            continue
+        _h = _h.replace("https://", "").replace("http://", "")
+        _h = _h.split("/")[0]
+        _h = _h.split(":")[0]
+        if _h:
+            _hosts.append(_h)
+    ALLOWED_HOSTS = _hosts
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+
+if DEBUG:
+    for _h in ("localhost", "127.0.0.1", "0.0.0.0"):
+        if _h not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_h)
 
 # Application definition
 
