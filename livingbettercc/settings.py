@@ -302,8 +302,11 @@ if IS_HEROKU:
         "version": 1,
         "disable_existing_loggers": False,
         "handlers": {"console": {"class": "logging.StreamHandler"}},
+        "root": {"handlers": ["console"], "level": "INFO"},
         "loggers": {
             "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": True},
+            # Captura específicamente DisallowedHost / SuspiciousOperation
+            "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
         },
     }
 
