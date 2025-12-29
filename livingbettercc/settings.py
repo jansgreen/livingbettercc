@@ -52,14 +52,22 @@ if os.getenv("DJANGO_ENV") == "heroku":
         _h = _h.split(":")[0]
         if _h:
             _hosts.append(_h)
-    ALLOWED_HOSTS = _hosts
+
+    # Fallback: evita ALLOWED_HOSTS vacío si HOSTS no está seteado
+    ALLOWED_HOSTS = _hosts or [
+        "livingbettercc.herokuapp.com",
+        "www.livingbettercc.com",
+        "livingbettercc.com",
+    ]
+
+    CSRF_TRUSTED_ORIGINS = [
+        "https://livingbettercc.herokuapp.com",
+        "https://www.livingbettercc.com",
+        "https://livingbettercc.com",
+    ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
-if DEBUG:
-    for _h in ("localhost", "127.0.0.1", "0.0.0.0"):
-        if _h not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(_h)
 
 # Application definition
 
@@ -95,8 +103,6 @@ INSTALLED_APPS = [
     'dashboard.groups',
     'dashboard.contents',
     'django_ckeditor_5',
-    'cloudinary',
-    'cloudinary_storage',
 
 ]
 
@@ -123,6 +129,8 @@ AUTHENTICATION_BACKENDS = (
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -130,8 +138,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware', 
     'allauth.account.middleware.AccountMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'livingbettercc.urls'
@@ -194,7 +201,7 @@ WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 
 import dj_database_url
 
-if os.getenv("DJANGO_ENV") == "heroku":
+if os.getenv("DJANGO_ENV") == "heroku": 
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
@@ -305,7 +312,6 @@ PAYPAL_RECEIVER_EMAIL = 'livingbettecommunitycenter@gmail.com'
 # django_ckeditor_5 provides the upload endpoint named "ck_editor_5_upload_file"
 # (see include('django_ckeditor_5.urls') in the project urls).
 CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME = "ck_editor_5_upload_file"
-
 customColorPalette = [
         {
             'color': 'hsl(4, 90%, 58%)',
@@ -334,7 +340,7 @@ customColorPalette = [
     ]
 
 CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
-CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage"
+CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 CKEDITOR_5_CONFIGS = {
         'default': {
             'toolbar': {
