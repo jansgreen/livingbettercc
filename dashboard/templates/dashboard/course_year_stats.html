@@ -1,0 +1,73 @@
+{% extends 'dashboards/dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">Certificaciones por año</h2>
+      <div class="text-muted">Curso: <span class="fw-semibold">{{ course.title }}</span></div>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Volver</a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if formset.non_form_errors %}
+          <div class="alert alert-danger">{{ formset.non_form_errors }}</div>
+        {% endif %}
+
+        {{ formset.management_form }}
+
+        <div class="d-grid gap-3">
+          {% for form in formset %}
+            <div class="border rounded p-3">
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger mb-2">{{ form.non_field_errors }}</div>
+              {% endif %}
+
+              <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-3">
+                  <label class="form-label">Año</label>
+                  {{ form.year }}
+                  {% if form.year.errors %}<div class="text-danger small">{{ form.year.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Manual (sumar)</label>
+                  {{ form.manual_certified_add }}
+                  {% if form.manual_certified_add.errors %}<div class="text-danger small">{{ form.manual_certified_add.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Nota</label>
+                  {{ form.note }}
+                  {% if form.note.errors %}<div class="text-danger small">{{ form.note.errors }}</div>{% endif %}
+                </div>
+                <div class="col-12 col-md-1">
+                  <div class="form-check">
+                    {{ form.DELETE }}
+                    <label class="form-check-label">Borrar</label>
+                  </div>
+                </div>
+              </div>
+
+              {{ form.id }}
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="mt-3 text-muted small">
+    Estos valores se suman al total de certificados del curso en el dashboard.
+  </div>
+</div>
+{% endblock %}

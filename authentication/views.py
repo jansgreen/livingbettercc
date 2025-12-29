@@ -21,6 +21,58 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
 
+def _dedupe_student_groups(user):
+    """If both 'student' and 'students' are present, keep only 'students'."""
+    if not user or not getattr(user, 'is_authenticated', False):
+        return
+    names = set(user.groups.values_list('name', flat=True))
+    if 'student' in names and 'students' in names:
+        try:
+            user.groups.remove(Group.objects.get(name='student'))
+        except Group.DoesNotExist:
+            return
+
+
+def _apply_pending_invitation(request, user):
+    token = request.session.get('pending_invitation_token')
+    if not token or not user or not user.is_authenticated:
+        return False
+
+    try:
+        from dashboard.groups.models import Invitation
+        invitation = Invitation.objects.select_related('group').get(token=token)
+    except Exception:
+        request.session.pop('pending_invitation_token', None)
+        request.session.pop('invited_email', None)
+        return False
+
+    if invitation.is_used() or invitation.is_expired():
+        messages.error(request, 'La invitación ya fue usada o expiró.')
+        request.session.pop('pending_invitation_token', None)
+        request.session.pop('invited_email', None)
+        return False
+
+    invited_email = (request.session.get('invited_email') or invitation.email or '').strip().lower()
+    user_email = (user.email or '').strip().lower()
+    if invited_email and user_email and invited_email != user_email:
+        messages.error(request, 'Esta invitación no corresponde a tu correo.')
+        request.session.pop('pending_invitation_token', None)
+        request.session.pop('invited_email', None)
+        return False
+
+    user.groups.add(invitation.group)
+    invitation.mark_used(user)
+    _dedupe_student_groups(user)
+
+    if request.session.get('selected_item') is None and request.session.get('post_register_role') == invitation.group.name:
+        request.session.pop('post_register_role', None)
+
+    request.session.pop('pending_invitation_token', None)
+    request.session.pop('invited_email', None)
+    messages.success(request, 'Invitación aceptada correctamente.')
+    return True
+
+
 
 # identifico si el usuario es studiante, customer o staff ..
 
@@ -90,6 +142,8 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
+            invite_applied = _apply_pending_invitation(request, user)
+            _dedupe_student_groups(user)
             # Si hay intención previa almacenada (inscribirse en un curso), respetarla
             role = request.session.get('post_register_role', None)
             item_id = request.session.get('selected_item', None)
@@ -140,6 +194,8 @@ def login_view(request):
                 request.session.pop('post_register_role', None)
                 request.session.pop('selected_item', None)
                 return redirect('courses:course_enroll', pk=item_id)
+            if invite_applied:
+                return redirect('dashboard')
             return redirect('home')  # Default
     else:
         form = AuthenticationForm()
@@ -170,10 +226,15 @@ def register_view(request):
             role = request.session.get('post_register_role', None)
             item_id = request.session.get('selected_item', None)
             student_mode = request.session.get('student_register_mode', None)
+
+            # Invitación pendiente (si existe)
+            _apply_pending_invitation(request, user)
             # 1. Asignar grupo (si role viene de la sesión)
             if role:
                 group, created = Group.objects.get_or_create(name=role)
                 user.groups.add(group)
+
+            _dedupe_student_groups(user)
 
             # Si venía para tomar un curso y registrarse como estudiante
             if role == 'student' and item_id:

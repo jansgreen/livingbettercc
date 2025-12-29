@@ -1,0 +1,98 @@
+{% comment %}
+Componente elegante para mostrar estadísticas de certificados presenciales.
+Uso en templates:
+  {% include "components/inperson_stats_card.html" with stats=inperson_stats %}
+{% endcomment %}
+
+{% if stats %}
+<div class="container-fluid mt-5 mb-5">
+  <div class="row">
+    {% for course_id, course_data in stats.items %}
+    <div class="col-lg-6 col-xl-4 mb-4">
+      <div class="card h-100 shadow-sm border-0 rounded-3">
+        <!-- Card Header -->
+        <div class="card-header bg-gradient border-0 rounded-top-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <h5 class="card-title text-white mb-0">
+            <i class="bi bi-award me-2"></i>{{ course_data.title }}
+          </h5>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body">
+          <!-- Totales generales -->
+          <div class="row text-center mb-4 g-2">
+            <div class="col-6">
+              <div class="p-3 bg-light rounded-2">
+                <div class="text-muted small">Cantidad</div>
+                <h6 class="fw-bold text-primary">{{ course_data.total_quantity|default:"0" }}</h6>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 bg-light rounded-2">
+                <div class="text-muted small">Presencial</div>
+                <h6 class="fw-bold text-success">{{ course_data.total_presencial|default:"0" }}</h6>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 bg-light rounded-2">
+                <div class="text-muted small">Impacto</div>
+                <h6 class="fw-bold text-info">{{ course_data.total_impact|default:"0" }}</h6>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 bg-light rounded-2">
+                <div class="text-muted small">Registros</div>
+                <h6 class="fw-bold text-warning">{{ course_data.years|length }}</h6>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desglose por año -->
+          {% if course_data.years %}
+          <hr class="my-3">
+          <div class="years-breakdown">
+            <small class="text-muted d-block mb-3"><strong>Desglose por Año</strong></small>
+            {% for year, year_data in course_data.years|dictsort %}
+            <div class="mb-3 pb-3 border-bottom">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-secondary">{{ year }}</span>
+                <small class="text-muted">+{{ year_data.impact|default:"0" }} impacto</small>
+              </div>
+              
+              <!-- Progress bar cantidad -->
+              <div class="progress mb-2" role="progressbar" style="height: 24px;" aria-valuenow="{{ year_data.quantity }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-primary d-flex align-items-center justify-content-center text-white" style="width: 100%; font-size: 12px;">
+                  {{ year_data.quantity|default:"0" }} certificados
+                </div>
+              </div>
+
+              <!-- Progress bar presencial -->
+              <div class="progress" role="progressbar" style="height: 20px;" aria-valuenow="{{ year_data.presencial }}" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-success" style="width: 100%; font-size: 11px;" role="progressbar">
+                  {{ year_data.presencial|default:"0" }} presencial
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer bg-light border-0 rounded-bottom-3">
+          <small class="text-muted">
+            <i class="bi bi-calendar3 me-1"></i>
+            Últimas actualizaciones registradas
+          </small>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="alert alert-info mt-5 mb-5" role="alert">
+  <i class="bi bi-info-circle me-2"></i>
+  <strong>Sin datos</strong> - No hay registros de certificados presenciales en este momento.
+</div>
+{% endif %}

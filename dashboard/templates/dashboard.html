@@ -48,6 +48,17 @@
             <div class="col-12 col-md-6 col-lg-4">
                 <div class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Invitaciones</h5>
+                        <p class="card-text text-muted">Enviar invitaciones por correo para unirse a grupos.</p>
+                        <div class="mt-auto">
+                            <a href="/dashboard/groups/invite/" class="btn btn-primary">Enviar invitación</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Cursos</h5>
                         <p class="card-text display-6">{{ courses_count }}</p>
                         <p class="text-muted">Cursos disponibles en la plataforma.</p>
@@ -165,7 +176,164 @@
             {% endif %}
         {% endif %}
     </div>
+
+    {% if request.user.is_superuser or request.user.is_staff %}
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            Impacto TAOD (Dashboard)
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="text-muted">Información institucional (texto oficial)</div>
+                <div class="mt-2">
+                    <p class="mb-3">
+                        En el año 2022, gracias al ministro, viceministro, director de participación comunitaria, técnicos y otros ministerio como el de economía nacional por aprobar este programa que por nombre lleva “la educación temprana sobre el uso de alcohol, tabaco y otras drogas, previene que nuestros jóvenes no se enfermen bio-psicosocialmente”.
+                        Logros: 2021, 29 entrenadores a nivel nacional, de los docentes, orientadores y psicólogos del ministerio de educación, 2022 a 88 técnicos regionales y distritales tanto de participación comunitaria como de orientación y psicología.
+                        En el año 2023 actualizado, 1442 facilitadores y en el año 2024 certificamos a 816.
+                    </p>
+                    <p class="mb-0">
+                        Incluyendo los 149 que se han certificados en el proyecto de prevención del uso de TAOD y 149 mas sobre la competencia de comunicación efectiva y resolución de conflictos, actualizado a la fecha de hoy un total de 2,383 facilitadores certificados sobre prevención del uso de TAOD y 173 sobre la competencia de comunicación efectiva y resolución de conflictos, que están impactando un promedio de 255,600 niños(as) .
+                        En las regionales 01, 05, 06, 07, 15, 11, 13 16.
+                        La ASFL esta habilitada por los Ministerios de Educación y Salud de una manera permanente.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <div class="text-muted">Total certificados TAOD</div>
+                            <div class="display-6 fw-bold" data-count="{{ taod_kpis.total|default:0 }}">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <div class="text-muted">TAOD este año</div>
+                            <div class="display-6 fw-bold" data-count="{{ taod_kpis.current_year_total|default:0 }}">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <div class="text-muted">Online (acumulado)</div>
+                            <div class="display-6 fw-bold" data-count="{{ taod_kpis.online|default:0 }}">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <div class="text-muted">Presencial (manual)</div>
+                            <div class="display-6 fw-bold" data-count="{{ taod_kpis.in_person|default:0 }}">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="fw-semibold mb-2">Resumen por cursos (TAOD)</div>
+
+                {% if taod_courses %}
+                    <div class="row g-3">
+                        {% for course in taod_courses %}
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <div class="card shadow-sm border-0 h-100">
+                                    <div class="card-body d-flex flex-column">
+                                        <div class="d-flex align-items-start justify-content-between gap-3">
+                                            <div>
+                                                <div class="fw-semibold">{{ course.title }}</div>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="text-muted small">Total</div>
+                                                <div class="h4 mb-0">{{ course.certified_total }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row g-2 mt-2">
+                                            <div class="col-6">
+                                                <div class="text-muted small">Online</div>
+                                                <div class="fw-bold">{{ course.certified_auto_count }}</div>
+                                            </div>
+                                            <div class="col-6 text-end">
+                                                <div class="text-muted small">Presencial</div>
+                                                <div class="fw-bold">{{ course.in_person_total|default:0 }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 d-flex gap-2">
+                                            <a href="{% url 'certifications:inperson_list' %}?course={{ course.pk }}" class="btn btn-outline-primary btn-sm">Editar presencial</a>
+                                            <a href="{% url 'certifications:inperson_create' %}?course={{ course.pk }}" class="btn btn-primary btn-sm">Agregar</a>
+                                            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-primary btn-sm">Ver curso</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-muted">Aún no hay cursos TAOD configurados.</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        Array.prototype.slice.call(document.querySelectorAll('.progress-bar[data-pct]')).forEach(function (bar) {
+            var pct = parseInt(bar.getAttribute('data-pct') || '0', 10);
+            if (!Number.isFinite(pct)) pct = 0;
+            pct = Math.max(0, Math.min(100, pct));
+            bar.style.width = pct.toString() + '%';
+        });
+
+        function animateCount(el) {
+            var target = parseInt(el.getAttribute('data-count') || '0', 10);
+            if (!Number.isFinite(target)) target = 0;
+            var duration = 900;
+            var startTime = null;
+
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                var progress = Math.min((ts - startTime) / duration, 1);
+                el.textContent = Math.floor(target * progress).toString();
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target.toString();
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        var counters = Array.prototype.slice.call(document.querySelectorAll('[data-count]'));
+        if (!counters.length) return;
+
+        if ('IntersectionObserver' in window) {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    var el = entry.target;
+                    if (el.getAttribute('data-animated') === '1') return;
+                    el.setAttribute('data-animated', '1');
+                    animateCount(el);
+                    io.unobserve(el);
+                });
+            }, { threshold: 0.35 });
+
+            counters.forEach(function (el) { io.observe(el); });
+        } else {
+            counters.forEach(function (el) { animateCount(el); });
+        }
+    })();
+</script>
 {% endblock %}
 {% if certificados_usuario %}
     <div class="row mt-4">

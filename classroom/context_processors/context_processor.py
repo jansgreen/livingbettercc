@@ -31,6 +31,10 @@ def obtener_menu_classroom(request):
             menu[0]['submenus'].append({'nombre': 'Lecciones', 'url': reverse('courses:lesson_list')})
             menu[0]['submenus'].append({'nombre': 'Crear Lección', 'url': reverse('courses:lesson_create')})
 
+            # Certificados presenciales (manual por distrito)
+            menu[0]['submenus'].append({'nombre': 'Certificados Presenciales', 'url': reverse('certifications:inperson_list')})
+            menu[0]['submenus'].append({'nombre': 'Registrar Presencial', 'url': reverse('certifications:inperson_create')})
+
         # If user is a student (support both 'student' and legacy 'students') show student menu
         try:
             is_student = request.user.groups.filter(name__in=['student', 'students']).exists()

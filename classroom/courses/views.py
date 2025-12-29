@@ -244,7 +244,8 @@ def course_delete(request, pk):
         messages.success(request, 'Course deleted successfully.')
         return redirect('courses:course_list')
     context = {
-        'courses': course
+        'object': course,
+        'course': course,
     }
     return render(request, 'courses/course_confirm_delete.html', context)
 

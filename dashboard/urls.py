@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     path('', views.dashboards, name='dashboard'),
 
+    path('courses/<int:pk>/year-stats/', views.course_year_stats_edit, name='dashboard_course_year_stats'),
+
     # app acopladas
     path('metadata/', include('dashboard.metadata.urls')),
     path('groups/', include('dashboard.groups.urls')),

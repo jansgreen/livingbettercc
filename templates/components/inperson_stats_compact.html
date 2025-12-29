@@ -1,0 +1,167 @@
+{% comment %}
+Componente compacto para mostrar resumen de estadísticas de certificados presenciales en el dashboard.
+Uso en templates:
+  {% include "components/inperson_stats_compact.html" with stats=inperson_stats %}
+{% endcomment %}
+
+{% if stats %}
+<section class="inperson-stats-compact mt-5">
+  <div class="container-fluid">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h3 class="mb-0">
+          <i class="bi bi-graph-up me-2"></i>Estadísticas de Certificados Presenciales
+        </h3>
+        <p class="text-muted small mt-2">Alcance y progreso de capacitaciones en línea y presenciales</p>
+      </div>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="row mb-5 g-3">
+      {% comment %} Calcular totales generales {% endcomment %}
+      {% with total_quantity=0 total_presencial=0 total_impact=0 num_courses=0 %}
+        {% for course_id, course_data in stats.items %}
+          {% comment %} Los totales se calculan en el backend, así que solo mostramos {% endcomment %}
+        {% endfor %}
+        
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card rounded-3 p-4 bg-primary bg-opacity-10 border border-primary border-opacity-25">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <p class="text-muted small mb-1">Cursos Registrados</p>
+                <h4 class="fw-bold text-primary mb-0">{{ stats|length }}</h4>
+              </div>
+              <i class="bi bi-book fs-1 text-primary opacity-50"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card rounded-3 p-4 bg-success bg-opacity-10 border border-success border-opacity-25">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <p class="text-muted small mb-1">Total Certificados</p>
+                <h4 class="fw-bold text-success mb-0">
+                  {% for course_id, course_data in stats.items %}
+                    {% if forloop.first %}{{ course_data.total_quantity }}{% endif %}
+                  {% endfor %}
+                </h4>
+              </div>
+              <i class="bi bi-award fs-1 text-success opacity-50"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card rounded-3 p-4 bg-info bg-opacity-10 border border-info border-opacity-25">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <p class="text-muted small mb-1">Participantes</p>
+                <h4 class="fw-bold text-info mb-0">
+                  {% for course_id, course_data in stats.items %}
+                    {% if forloop.first %}{{ course_data.total_presencial }}{% endif %}
+                  {% endfor %}
+                </h4>
+              </div>
+              <i class="bi bi-people fs-1 text-info opacity-50"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6">
+          <div class="stat-card rounded-3 p-4 bg-warning bg-opacity-10 border border-warning border-opacity-25">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <p class="text-muted small mb-1">Impacto Total</p>
+                <h4 class="fw-bold text-warning mb-0">
+                  {% for course_id, course_data in stats.items %}
+                    {% if forloop.first %}{{ course_data.total_impact }}{% endif %}
+                  {% endfor %}
+                </h4>
+              </div>
+              <i class="bi bi-star fs-1 text-warning opacity-50"></i>
+            </div>
+          </div>
+        </div>
+      {% endwith %}
+    </div>
+
+    <!-- Tabla de Cursos -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-header bg-light border-0 rounded-top-3 p-4">
+            <h5 class="mb-0">Detalles por Curso</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr class="text-muted small text-uppercase">
+                  <th class="ps-4">Curso</th>
+                  <th class="text-center">Certificados</th>
+                  <th class="text-center">Presencial</th>
+                  <th class="text-center">Impacto</th>
+                  <th class="text-center">Años</th>
+                  <th class="text-end pe-4">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for course_id, course_data in stats.items %}
+                <tr class="align-middle">
+                  <td class="ps-4">
+                    <strong>{{ course_data.title }}</strong>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-primary">{{ course_data.total_quantity }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-success">{{ course_data.total_presencial }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-warning">{{ course_data.total_impact }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge bg-secondary">{{ course_data.years|length }}</span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <a href="{% url 'certifications:inperson_list' %}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer bg-light border-0 rounded-bottom-3 p-4">
+            <a href="{% url 'certifications:inperson_list' %}" class="btn btn-primary">
+              <i class="bi bi-list-check me-2"></i>Ver Listado Completo
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+</style>
+{% else %}
+<div class="alert alert-info mt-5" role="alert">
+  <i class="bi bi-info-circle me-2"></i>
+  <strong>Sin datos</strong> - No hay registros de certificados presenciales para mostrar.
+</div>
+{% endif %}

@@ -12,12 +12,14 @@ def _append_css_class(widget, css_class: str) -> None:
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['title', 'description', 'price', 'image', 'published']
+        fields = ['title', 'description', 'manual_certified_add', 'price', 'image', 'published']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
             _append_css_class(self.fields[field].widget, 'form-control')
+        if 'published' in self.fields:
+            _append_css_class(self.fields['published'].widget, 'form-check-input')
         if 'image' in self.fields:
             _append_css_class(self.fields['image'].widget, 'form-control-file')
 

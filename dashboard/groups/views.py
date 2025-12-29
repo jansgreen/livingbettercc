@@ -1,21 +1,25 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.models import Group, User
-from .forms import GroupForm, PermissionForm, GroupFormCreate, InviteForm
-from django.core.mail import send_mail, EmailMessage, EmailMultiAlternatives
-from django.contrib.auth.decorators import user_passes_test
-from django.views import View
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.urls import reverse
-from django.template.loader import render_to_string
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.decorators import login_required
+from datetime import timedelta
+
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import Group, User
+from django.core.mail import EmailMessage
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views import View
+
+from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm
+from .models import Invitation
+
+
+def _is_staff(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 
 
+@user_passes_test(_is_staff)
 def add_and_remove_group_to_user(request, user_id):
     if request.method == "POST":
         action = request.POST.get('action')
@@ -30,6 +34,7 @@ def add_and_remove_group_to_user(request, user_id):
             user.groups.remove(*groups_to_remove)
     return redirect ('user_list')
 
+@user_passes_test(_is_staff)
 def add_and_remove_permission_to_groups(request, group_id):
     if request.method == "POST":
         action = request.POST.get('action')
@@ -43,6 +48,7 @@ def add_and_remove_permission_to_groups(request, group_id):
             group.permissions.remove(*Permission_ids)
     return redirect ('group_list')
 
+@user_passes_test(_is_staff)
 def group_list(request):
     groups = Group.objects.all()
     form_create_group = GroupFormCreate()
@@ -55,6 +61,7 @@ def group_list(request):
     }
     return render(request, 'group_list.html', context)
 
+@user_passes_test(_is_staff)
 def group_create(request):
     if request.method == 'POST':
         form = GroupFormCreate(request.POST)
@@ -64,6 +71,7 @@ def group_create(request):
     
     return redirect('group_list')
 
+@user_passes_test(_is_staff)
 def group_update(request, pk):
     group = get_object_or_404(Group, pk=pk)
     
@@ -77,11 +85,12 @@ def group_update(request, pk):
     
     form.fields['name'].widget.attrs.update
 
+@user_passes_test(_is_staff)
 def user_list(request):
     users = User.objects.all().prefetch_related('groups')
     for user in users:
         user.is_customer = user.groups.filter(name='customers').exists()
-        user.is_student = user.groups.filter(name='students').exists()
+        user.is_student = user.groups.filter(name__in=['student', 'students']).exists()
     return render(request, 'user_list.html', {'users': users})
 
 class InviteFriendView(View):
@@ -89,58 +98,74 @@ class InviteFriendView(View):
     template_name = 'invite_friend.html'
 
     def get(self, request):
+        if not _is_staff(request.user):
+            return redirect('login')
         form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
+        if not _is_staff(request.user):
+            return redirect('login')
         form = self.form_class(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             group = form.cleaned_data['group']
 
-            # Generar el token para el enlace único
-            token = default_token_generator.make_token(User(email=email))
-            uid = urlsafe_base64_encode(force_bytes(email))
-
-            # Construir el enlace de invitación
-            current_site = get_current_site(request)
-            invite_url = reverse('accept_invite', kwargs={'uidb64': uid, 'token': token, 'group_id': group.id})
-            full_invite_url = f"http://{current_site.domain}{invite_url}"
-
-            # Preparar y enviar el email en texto plano
-            subject = "¡Te han invitado a unirte a nuestro sitio!"
-            message_text = (
-                f"Hola,\n\n"
-                f"Has sido invitado a unirte al grupo '{group.name}' en nuestro sitio.\n"
-                f"Para aceptar la invitación, haz clic en el siguiente enlace:\n\n"
-                f"{full_invite_url}\n\n"
-                f"Si no puedes hacer clic en el enlace, cópialo y pégalo en tu navegador."
+            expires_at = timezone.now() + timedelta(days=getattr(settings, 'INVITATION_EXPIRE_DAYS', 7))
+            invitation = Invitation.objects.create(
+                email=email,
+                group=group,
+                created_by=request.user,
+                expires_at=expires_at,
             )
-            email_message = EmailMessage(
+
+            invite_url = request.build_absolute_uri(
+                reverse('accept_invite', kwargs={'token': invitation.token})
+            )
+
+            subject = "¡Te han invitado a unirte a LivingBetterCC!"
+            message_text = (
+                "Hola,\n\n"
+                f"Has sido invitado(a) a unirte al grupo '{group.name}'.\n\n"
+                "Para aceptar la invitación, abre este enlace:\n\n"
+                f"{invite_url}\n\n"
+                "Si no solicitaste esto, puedes ignorar este correo."
+            )
+
+            EmailMessage(
                 subject=subject,
                 body=message_text,
-                from_email=settings.EMAIL_HOST_USER,
-                to=[email]
-            )
-            email_message.send(fail_silently=False)
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
+                to=[email],
+            ).send(fail_silently=False)
 
             messages.success(request, 'Tu invitación se ha enviado exitosamente.')
             return redirect('invite_success')
         
         return render(request, self.template_name, {'form': form})
 
+def accept_invite(request, token):
+    invitation = get_object_or_404(Invitation.objects.select_related('group'), token=token)
 
-def accept_invite(request, uidb64, token, group_id):
-    # Obtener el grupo
-    group = get_object_or_404(Group, id=group_id)
+    if invitation.is_used() or invitation.is_expired():
+        messages.error(request, 'Esta invitación ya fue usada o expiró.')
+        return redirect('login')
 
-    # Si el token es válido y el usuario está autenticado
-    if default_token_generator.check_token(request.user, token):
-        request.user.groups.add(group)  # Asigna el grupo al usuario
-        return redirect('success_page')  # Redirige a la página de éxito
+    if not request.user.is_authenticated:
+        request.session['pending_invitation_token'] = str(invitation.token)
+        request.session['post_register_role'] = invitation.group.name
+        request.session['invited_email'] = invitation.email
+        messages.info(request, 'Inicia sesión o regístrate para aceptar la invitación.')
+        return redirect('login')
 
-    # Redirige a login si el token no es válido o el usuario no está autenticado
-    return redirect('login')
+    if invitation.email and request.user.email and invitation.email.strip().lower() != request.user.email.strip().lower():
+        messages.error(request, 'Esta invitación no corresponde a tu correo.')
+        return redirect('dashboard')
+
+    request.user.groups.add(invitation.group)
+    invitation.mark_used(request.user)
+    messages.success(request, f"Invitación aceptada. Ahora perteneces al grupo '{invitation.group.name}'.")
+    return redirect('dashboard')
 
 def invite_success(request):
     """Vista que muestra un mensaje de éxito después de enviar la invitación."""

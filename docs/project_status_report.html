@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LivingBetterCC — Reporte de estado</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #111; font-size: 11pt; line-height: 1.35; }
+    h1 { font-size: 18pt; margin: 0 0 6pt; }
+    h2 { font-size: 13pt; margin: 14pt 0 6pt; padding-top: 6pt; border-top: 1px solid #ddd; }
+    h3 { font-size: 11.5pt; margin: 10pt 0 4pt; }
+    p { margin: 0 0 6pt; }
+    ul { margin: 0 0 8pt 16pt; padding: 0; }
+    li { margin: 0 0 3pt; }
+    .meta { color: #444; font-size: 10pt; margin-bottom: 10pt; }
+    .badge { display: inline-block; padding: 2pt 6pt; border: 1px solid #ccc; border-radius: 10pt; font-size: 9.5pt; color: #333; }
+    .section-note { background: #f7f7f7; border: 1px solid #eee; padding: 8pt; border-radius: 6pt; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 10pt; }
+    .hr { height: 1px; background: #e5e5e5; margin: 10pt 0; }
+  </style>
+</head>
+<body>
+  <h1>LivingBetterCC — Reporte de estado del proyecto</h1>
+  <div class="meta">
+    <span class="badge">Django 5.1.x</span>
+    <span class="badge">CKEditor5</span>
+    <span class="badge">FormBuilder</span>
+    <div>Fecha: 2025-12-27</div>
+  </div>
+
+  <h2>1) Resumen ejecutivo</h2>
+  <p>Aplicación Django con múltiples apps (authentication, classroom, dashboard, shop, etc.) y un sistema de formularios dinámicos (<code>authentication.formbuilder</code>).</p>
+  <div class="section-note">
+    <ul>
+      <li>El proyecto corre sin errores en <code>manage.py check</code>.</li>
+      <li>Migración completa de CKEditor4 (<code>django-ckeditor</code>) a CKEditor5 (<code>django_ckeditor_5</code>).</li>
+      <li>Corrección de <code>NoReverseMatch</code> del upload endpoint de CKEditor5.</li>
+      <li>Corrección de configuración para evitar URLConf equivocado.</li>
+      <li>Fix de subida de imágenes en FormBuilder (uso de <code>request.FILES</code> + <code>multipart/form-data</code>).</li>
+      <li>Soporte de dos imágenes laterales diferentes (<code>image_left</code>/<code>image_right</code>) en el encabezado del formulario.</li>
+      <li>Detalle de formulario completado alineado visualmente con el render + botón “Imprimir”.</li>
+    </ul>
+  </div>
+
+  <h2>2) Objetivos logrados (cambios principales)</h2>
+
+  <h3>2.1 CKEditor: migración total a CKEditor5</h3>
+  <p><b>Problemas iniciales:</b></p>
+  <ul>
+    <li><code>NoReverseMatch</code> por nombre de URL de upload mal configurado.</li>
+    <li>Warning de seguridad de CKEditor4.</li>
+  </ul>
+  <p><b>Acciones:</b></p>
+  <ul>
+    <li>Ajuste de <code>CK_EDITOR_5_UPLOAD_FILE_VIEW_NAME</code> al nombre real de la vista de upload de <code>django_ckeditor_5</code>.</li>
+    <li>Eliminación de <code>django-ckeditor</code> y migración de campos rich text a <code>CKEditor5Field</code>.</li>
+    <li>Limpieza de migraciones antiguas para remover imports de <code>ckeditor</code>.</li>
+  </ul>
+
+  <h3>2.2 Bootstrap vs CKEditor5 (toolbar no aparecía)</h3>
+  <p><b>Causa:</b> varios formularios sobre-escribían <code>widget.attrs['class'] = 'form-control'</code> y borraban la clase <code>django_ckeditor_5</code> requerida para inicializar el editor.</p>
+  <p><b>Solución:</b> patrón de “append class” (agregar sin borrar) y fix de <code>__init__</code> mal indentados en formularios de cursos.</p>
+
+  <h3>2.3 URLConf incorrecto (404 usando otro proyecto)</h3>
+  <p><b>Solución:</b> se forzó <code>DJANGO_SETTINGS_MODULE='livingbettercc.settings'</code> en <code>manage.py</code>.</p>
+
+  <h3>2.4 Subida de imágenes en FormBuilder</h3>
+  <p><b>Causa:</b> el form del CRUD no tenía <code>enctype="multipart/form-data"</code> y las vistas no pasaban <code>request.FILES</code> al <code>ModelForm</code>.</p>
+  <p><b>Solución:</b> se corrigieron plantilla y vistas para soportar upload real.</p>
+
+  <h3>2.5 Dos imágenes laterales distintas (izquierda/derecha)</h3>
+  <ul>
+    <li>Se agregaron <code>image_left</code> y <code>image_right</code> a <code>FormDefinition</code>.</li>
+    <li>Se mantuvo <code>image</code> como legacy (compatibilidad).</li>
+    <li>Plantillas ajustadas para mostrar izquierda/derecha.</li>
+    <li>Migración aplicada: <code>formbuilder.0009_...image_left...image_right</code>.</li>
+  </ul>
+
+  <h3>2.6 Detalle de formulario completado (UI + imprimir)</h3>
+  <ul>
+    <li>Header reestructurado para coincidir con el layout centrado del render.</li>
+    <li>Botón “Imprimir” con <code>window.print()</code>.</li>
+  </ul>
+
+  <h2>3) Estado actual por módulo</h2>
+  <h3>authentication.formbuilder</h3>
+  <ul>
+    <li>CRUD de definiciones de formulario (FormDefinition) funcional.</li>
+    <li>Render dinámico de formularios y guardado de respuestas en <code>CompletedForm</code>.</li>
+    <li>Soporte de anexos: guarda URLs en JSON (no objetos UploadedFile).</li>
+    <li>FormDefinition: descripción rich text con CKEditor5 y 3 campos de imagen (<code>image_left</code>, <code>image_right</code>, <code>image</code>).</li>
+  </ul>
+
+  <h3>classroom / dashboard / shop</h3>
+  <ul>
+    <li>Campos rich text migrados a CKEditor5.</li>
+    <li>Forms ajustados para no romper clases del widget.</li>
+  </ul>
+
+  <h2>4) Riesgos / pendientes recomendados</h2>
+  <ul>
+    <li>Consolidar el helper <code>_append_css_class</code> para reducir duplicación.</li>
+    <li>Verificar que todas las páginas con CKEditor5 incluyan <code>{{ form.media }}</code>.</li>
+    <li>Confirmar cuál venv es el “oficial” (hay más de uno en el workspace).</li>
+  </ul>
+
+  <h2>5) Checklist de validación rápida</h2>
+  <ul>
+    <li><code>manage.py check</code> → OK</li>
+    <li>Crear/editar FormDefinition y subir <code>image_left</code> + <code>image_right</code> → visibles en el render</li>
+    <li>Abrir una página con CKEditor5 → toolbar visible</li>
+    <li>Ver detalle de formulario completado → header alineado + imprimir funciona</li>
+  </ul>
+</body>
+</html>
