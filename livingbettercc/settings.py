@@ -41,7 +41,7 @@ GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
 if os.getenv("DEBUG") == False:
-    ALLOWED_HOSTS = ["*.*"]
+    ALLOWED_HOSTS = ["*.*", ".herokuapp.com"]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
