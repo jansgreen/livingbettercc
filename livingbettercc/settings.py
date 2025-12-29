@@ -53,17 +53,22 @@ if os.getenv("DJANGO_ENV") == "heroku":
         if _h:
             _hosts.append(_h)
 
-    # Fallback: evita ALLOWED_HOSTS vacío si HOSTS no está seteado
     ALLOWED_HOSTS = _hosts or [
         "livingbettercc.herokuapp.com",
         "www.livingbettercc.com",
         "livingbettercc.com",
+        # also allow .net if it points to this app
+        "www.livingbettercc.net",
+        "livingbettercc.net",
     ]
 
     CSRF_TRUSTED_ORIGINS = [
         "https://livingbettercc.herokuapp.com",
         "https://www.livingbettercc.com",
         "https://livingbettercc.com",
+        # if you serve the site on .net over HTTPS
+        "https://www.livingbettercc.net",
+        "https://livingbettercc.net",
     ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
