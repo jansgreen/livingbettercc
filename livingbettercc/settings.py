@@ -41,44 +41,7 @@ GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
 if os.getenv("DEBUG") == False:
-    _raw_hosts = os.getenv("HOSTS", "")
-    _hosts = []
-    for _h in _raw_hosts.split(","):
-        _h = (_h or "").strip()
-        if not _h:
-            continue
-        _h = _h.replace("https://", "").replace("http://", "")
-        _h = _h.split("/")[0]
-        _h = _h.split(":")[0]
-        if _h:
-            _hosts.append(_h)
-
-    # Nunca dejes ALLOWED_HOSTS "corto" en producción: si HOSTS está incompleto,
-    # Django responderá 400 (DisallowedHost) para esos dominios.
-    _required_hosts = [
-        "livingbettercc.herokuapp.com",
-        # Algunos entornos/aliases de Heroku usan subdominios diferentes.
-        ".herokuapp.com",
-        "livingbettercc.com",
-        "www.livingbettercc.com",
-        "livingbettercc.net",
-        "www.livingbettercc.net",
-        # Acepta cualquier subdominio (p.ej. blog., api., etc.)
-        ".livingbettercc.com",
-        ".livingbettercc.net",
-    ]
-
-    # Preserva orden y quita duplicados
-    ALLOWED_HOSTS = list(dict.fromkeys([*_hosts, *_required_hosts]))
-
-    CSRF_TRUSTED_ORIGINS = [
-        "https://livingbettercc.herokuapp.com",
-        "https://www.livingbettercc.com",
-        "https://livingbettercc.com",
-        # if you serve the site on .net over HTTPS
-        "https://www.livingbettercc.net",
-        "https://livingbettercc.net",
-    ]
+    ALLOWED_HOSTS = ["*.*"]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
