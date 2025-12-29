@@ -95,6 +95,8 @@ INSTALLED_APPS = [
     'dashboard.groups',
     'dashboard.contents',
     'django_ckeditor_5',
+    'cloudinary',
+    'cloudinary_storage',
 
 ]
 
@@ -387,4 +389,14 @@ CKEDITOR_5_CONFIGS = {
                 'reversed': 'true',
             }
         }
+    }
+
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
     }
