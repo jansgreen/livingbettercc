@@ -25,6 +25,13 @@ DEBUG = _env_bool('DEBUG', default=False)
 
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
+
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+
 # Permitir HTTP solo en desarrollo
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
