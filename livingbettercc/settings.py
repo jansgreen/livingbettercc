@@ -68,11 +68,20 @@ if IS_HEROKU:
         ".herokuapp.com",
         "livingbettercc.com",
         "www.livingbettercc.com",
+        "livingbettercc.info",
+        "www.livingbettercc.info",
         "livingbettercc.net",
         "www.livingbettercc.net",
+        "livingbettercc.org",
+        "www.livingbettercc.org",
+        "livingbettercc.xyz",
+        "www.livingbettercc.xyz",
         # Acepta cualquier subdominio (p.ej. blog., api.)
         ".livingbettercc.com",
+        ".livingbettercc.info",
         ".livingbettercc.net",
+        ".livingbettercc.org",
+        ".livingbettercc.xyz",
     ]
     ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
 
@@ -80,8 +89,14 @@ if IS_HEROKU:
         "https://livingbettercc.herokuapp.com",
         "https://livingbettercc.com",
         "https://www.livingbettercc.com",
+        "https://livingbettercc.info",
+        "https://www.livingbettercc.info",
         "https://livingbettercc.net",
         "https://www.livingbettercc.net",
+        "https://livingbettercc.org",
+        "https://www.livingbettercc.org",
+        "https://livingbettercc.xyz",
+        "https://www.livingbettercc.xyz",
     ]
 else:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
