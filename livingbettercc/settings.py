@@ -40,7 +40,7 @@ GOOGLE_OAUTH2_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
 
-if os.getenv("DJANGO_ENV") == "heroku":
+if os.getenv("DEBUG") == False:
     _raw_hosts = os.getenv("HOSTS", "")
     _hosts = []
     for _h in _raw_hosts.split(","):
@@ -53,14 +53,23 @@ if os.getenv("DJANGO_ENV") == "heroku":
         if _h:
             _hosts.append(_h)
 
-    ALLOWED_HOSTS = _hosts or [
+    # Nunca dejes ALLOWED_HOSTS "corto" en producción: si HOSTS está incompleto,
+    # Django responderá 400 (DisallowedHost) para esos dominios.
+    _required_hosts = [
         "livingbettercc.herokuapp.com",
-        "www.livingbettercc.com",
+        # Algunos entornos/aliases de Heroku usan subdominios diferentes.
+        ".herokuapp.com",
         "livingbettercc.com",
-        # also allow .net if it points to this app
-        "www.livingbettercc.net",
+        "www.livingbettercc.com",
         "livingbettercc.net",
+        "www.livingbettercc.net",
+        # Acepta cualquier subdominio (p.ej. blog., api., etc.)
+        ".livingbettercc.com",
+        ".livingbettercc.net",
     ]
+
+    # Preserva orden y quita duplicados
+    ALLOWED_HOSTS = list(dict.fromkeys([*_hosts, *_required_hosts]))
 
     CSRF_TRUSTED_ORIGINS = [
         "https://livingbettercc.herokuapp.com",
@@ -84,6 +93,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+
     'home',
     'classroom',
     'classroom.courses',
@@ -157,7 +167,7 @@ TEMPLATES = [
             ],
         'APP_DIRS': True,
         'OPTIONS': {
-            'debug': True,
+            'debug': DEBUG,
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -196,7 +206,7 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATES[0]['OPTIONS']['debug'] = True
+# Evita forzar template debug en producción.
 
 WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 
@@ -206,7 +216,7 @@ WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 
 import dj_database_url
 
-if os.getenv("DJANGO_ENV") == "heroku": 
+if os.getenv("DEBUG") == False: 
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
@@ -264,9 +274,32 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+# Si hay archivos referenciados con {% static %} que no existen en el manifest,
+# WhiteNoise puede convertirlo en 500. Manténlo laxo para evitar caída total.
+WHITENOISE_MANIFEST_STRICT = False
+
 # Archivos de medios (subidos por los usuarios)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+
+
+# Loguea errores de requests a consola (aparece en heroku logs)
+if os.getenv("DEBUG") == False:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {"console": {"class": "logging.StreamHandler"}},
+        "loggers": {
+            "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": True},
+        },
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
