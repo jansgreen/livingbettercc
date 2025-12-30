@@ -4,6 +4,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.core.management.color import no_style
+from django.db.utils import ProgrammingError
 
 
 class Command(BaseCommand):
@@ -20,7 +21,25 @@ class Command(BaseCommand):
             return
 
         with connection.cursor() as cursor:
+            skipped = 0
             for statement in sql_statements:
-                cursor.execute(statement)
+                try:
+                    cursor.execute(statement)
+                except ProgrammingError as e:
+                    # Some models may exist in INSTALLED_APPS but their tables
+                    # are not present in this database (e.g. legacy/optional apps).
+                    msg = str(e)
+                    if "does not exist" in msg or "UndefinedTable" in msg:
+                        skipped += 1
+                        continue
+                    raise
 
-        self.stdout.write(self.style.SUCCESS(f"Reset {len(sql_statements)} sequences."))
+        reset_count = len(sql_statements) - skipped
+        if skipped:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Reset {reset_count} sequences (skipped {skipped} missing tables)."
+                )
+            )
+        else:
+            self.stdout.write(self.style.SUCCESS(f"Reset {reset_count} sequences."))

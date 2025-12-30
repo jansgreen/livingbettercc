@@ -6,6 +6,7 @@ from typing import Any
 
 from django.apps import apps
 from django.core.management.base import BaseCommand
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 
 
@@ -41,38 +42,91 @@ def _is_unique_violation(exc: IntegrityError) -> bool:
     return False
 
 
-def _candidate_unique_lookups(model, fields: dict[str, Any]) -> list[dict[str, Any]]:
+class _DeferRecord(Exception):
+    def __init__(self, kind: str, detail: str = ""):
+        super().__init__(detail)
+        self.kind = kind
+        self.detail = detail
+
+
+def _normalize_unique_field_lookup(model, field_name: str, scalar_kwargs: dict[str, Any]) -> tuple[str, Any] | None:
+    """Return a lookup key/value suitable for QuerySet.filter() for a field name.
+
+    For FK fields, uses the underlying *_id attribute when possible.
+    """
+    field = model._meta.get_field(field_name)
+    if getattr(field, "many_to_many", False):
+        return None
+
+    if getattr(field, "is_relation", False) and (
+        getattr(field, "many_to_one", False) or getattr(field, "one_to_one", False)
+    ):
+        lookup_key = field.attname
+        if lookup_key not in scalar_kwargs:
+            return None
+        return lookup_key, scalar_kwargs[lookup_key]
+
+    if field_name not in scalar_kwargs:
+        return None
+    return field_name, scalar_kwargs[field_name]
+
+
+def _candidate_unique_lookups(
+    model,
+    scalar_kwargs: dict[str, Any],
+) -> list[dict[str, Any]]:
     lookups: list[dict[str, Any]] = []
 
     # Multi-field uniqueness first (unique_together + UniqueConstraint(fields=[...]))
     for ut in getattr(model._meta, "unique_together", []) or []:
-        if all(name in fields for name in ut):
-            lookups.append({name: fields[name] for name in ut})
+        parts: list[tuple[str, Any]] = []
+        for name in ut:
+            normalized = _normalize_unique_field_lookup(model, name, scalar_kwargs)
+            if normalized is None:
+                parts = []
+                break
+            parts.append(normalized)
+        if parts:
+            lookups.append(dict(parts))
 
     for constraint in getattr(model._meta, "constraints", []) or []:
         constraint_fields = getattr(constraint, "fields", None)
         if not constraint_fields:
             continue
-        if all(name in fields for name in constraint_fields):
-            lookups.append({name: fields[name] for name in constraint_fields})
+        parts: list[tuple[str, Any]] = []
+        for name in constraint_fields:
+            normalized = _normalize_unique_field_lookup(model, name, scalar_kwargs)
+            if normalized is None:
+                parts = []
+                break
+            parts.append(normalized)
+        if parts:
+            lookups.append(dict(parts))
 
     # Single unique fields
     for field in model._meta.get_fields():
         if not getattr(field, "unique", False):
             continue
         name = getattr(field, "name", None)
-        if not name or name not in fields:
+        if not name:
             continue
-        value = fields[name]
+        normalized = _normalize_unique_field_lookup(model, name, scalar_kwargs)
+        if normalized is None:
+            continue
+        key, value = normalized
         if value is None:
             continue
-        lookups.append({name: value})
+        lookups.append({key: value})
 
     # De-dup preserving order
     deduped: list[dict[str, Any]] = []
-    seen: set[tuple[tuple[str, Any], ...]] = set()
+    seen: set[str] = set()
     for lookup in lookups:
-        key = tuple(sorted(lookup.items(), key=lambda kv: kv[0]))
+        # Some unique fields may be JSON/list-like; build a stable string key.
+        try:
+            key = json.dumps(lookup, sort_keys=True, ensure_ascii=False, default=str)
+        except Exception:
+            key = str(sorted(lookup.items(), key=lambda kv: kv[0]))
         if key in seen:
             continue
         seen.add(key)
@@ -124,6 +178,19 @@ class Command(BaseCommand):
             help="Print a per-model breakdown of remaining pending objects.",
         )
 
+        parser.add_argument(
+            "--log-deferred",
+            type=int,
+            default=0,
+            help="If >0, print up to N deferred records with the reason (default: 0).",
+        )
+
+        parser.add_argument(
+            "--skip-missing-m2m-targets",
+            action="store_true",
+            help="Skip missing M2M targets (e.g. old permissions/contenttypes) instead of deferring forever.",
+        )
+
     def handle(self, *args, **options):
         fixture_path: str = options["fixture"]
         using: str = options["database"]
@@ -132,6 +199,8 @@ class Command(BaseCommand):
         max_passes: int = options["max_passes"]
         pending_out: str = options["pending_out"]
         print_pending_models: bool = options["print_pending_models"]
+        log_deferred_limit: int = options["log_deferred"]
+        skip_missing_m2m_targets: bool = options["skip_missing_m2m_targets"]
 
         with open(fixture_path, "r", encoding="utf-8") as f:
             records = json.load(f)
@@ -143,6 +212,8 @@ class Command(BaseCommand):
         stats = ImportStats()
         hard_failures: list[tuple[str, Any, str]] = []
         defer_reasons: dict[str, dict[str, int]] = {}
+        pk_map: dict[tuple[str, int], int] = {}
+        logged_deferred = 0
 
         for pass_num in range(1, max_passes + 1):
             if not pending:
@@ -184,22 +255,34 @@ class Command(BaseCommand):
                             m2m_values[name] = value
                             continue
 
-                        if field.is_relation and field.many_to_one:
-                            # ForeignKey
+                        if field.is_relation and (field.many_to_one or field.one_to_one):
+                            # ForeignKey / OneToOne
                             if isinstance(value, (list, tuple)):
                                 rel_model = field.remote_field.model
                                 # natural key
                                 try:
-                                    rel_obj = rel_model._default_manager.using(using).get_by_natural_key(*value)
+                                    rel_obj = rel_model._default_manager.db_manager(using).get_by_natural_key(*value)
                                     scalar_kwargs[field.attname] = rel_obj.pk
-                                except Exception:
+                                except Exception as e:
                                     stats.deferred_fk += 1
                                     should_defer = True
                                     defer_reasons.setdefault(model_label, {}).setdefault("natural_fk_missing", 0)
                                     defer_reasons[model_label]["natural_fk_missing"] += 1
+                                    if log_deferred_limit and logged_deferred < log_deferred_limit:
+                                        self.stdout.write(
+                                            self.style.WARNING(
+                                                f"DEFER {model_label} pk={pk} FK {name}={value}: {e}"
+                                            )
+                                        )
+                                        logged_deferred += 1
                                     break
                             else:
-                                scalar_kwargs[field.attname] = value
+                                # If the related object's PK was remapped, apply it.
+                                if isinstance(value, int):
+                                    rel_label = field.remote_field.model._meta.label_lower
+                                    scalar_kwargs[field.attname] = pk_map.get((rel_label, value), value)
+                                else:
+                                    scalar_kwargs[field.attname] = value
                             continue
 
                         scalar_kwargs[name] = value
@@ -208,17 +291,83 @@ class Command(BaseCommand):
                         next_pending.append(rec)
                         continue
 
+                    # Validate FK/OneToOne numeric references early to avoid opaque FK violations.
+                    for rel_field in Model._meta.fields:
+                        if not rel_field.is_relation or not (rel_field.many_to_one or rel_field.one_to_one):
+                            continue
+                        attname = rel_field.attname
+                        if attname not in scalar_kwargs:
+                            continue
+                        rel_pk = scalar_kwargs.get(attname)
+                        if rel_pk is None:
+                            continue
+                        rel_model = rel_field.remote_field.model
+                        if not rel_model._default_manager.using(using).filter(pk=rel_pk).exists():
+                            stats.deferred_fk += 1
+                            next_pending.append(rec)
+                            defer_reasons.setdefault(model_label, {}).setdefault("fk_missing", 0)
+                            defer_reasons[model_label]["fk_missing"] += 1
+                            if log_deferred_limit and logged_deferred < log_deferred_limit:
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f"DEFER {model_label} pk={pk} FK missing {attname}={rel_pk}"
+                                    )
+                                )
+                                logged_deferred += 1
+                            should_defer = True
+                            break
+
+                    if should_defer:
+                        continue
+
+                    # Resolve M2M targets before writing anything so we can defer cleanly.
+                    m2m_ids: dict[str, list[int]] = {}
+                    for m2m_name, m2m_val in m2m_values.items():
+                        try:
+                            rel_manager = None
+                            # We don't have an instance yet; resolve via model field.
+                            m2m_field = Model._meta.get_field(m2m_name)
+                            rel_model = m2m_field.remote_field.model
+                            m2m_ids[m2m_name] = self._resolve_m2m_ids_model(
+                                rel_model,
+                                m2m_val,
+                                using,
+                                pk_map,
+                                skip_missing=skip_missing_m2m_targets,
+                            )
+                        except Exception as e:
+                            stats.deferred_m2m += 1
+                            next_pending.append(rec)
+                            defer_reasons.setdefault(model_label, {}).setdefault("m2m", 0)
+                            defer_reasons[model_label]["m2m"] += 1
+                            if log_deferred_limit and logged_deferred < log_deferred_limit:
+                                self.stdout.write(
+                                    self.style.WARNING(
+                                        f"DEFER {model_label} pk={pk} M2M {m2m_name}: {e}"
+                                    )
+                                )
+                                logged_deferred += 1
+                            should_defer = True
+                            break
+
+                    if should_defer:
+                        continue
+
                     existing = None
                     if pk is not None:
                         existing = Model._default_manager.using(using).filter(pk=pk).first()
 
                     if existing is None:
-                        for lookup in _candidate_unique_lookups(Model, fields):
+                        for lookup in _candidate_unique_lookups(Model, scalar_kwargs):
                             existing = Model._default_manager.using(using).filter(**lookup).first()
                             if existing is not None:
                                 break
 
                     if existing is not None:
+                        # Record PK remap if this fixture PK maps to an existing different PK.
+                        if pk is not None and existing.pk != pk:
+                            pk_map[(model_label, int(pk))] = int(existing.pk)
+
                         if skip_existing:
                             stats.skipped_existing += 1
                             continue
@@ -230,17 +379,9 @@ class Command(BaseCommand):
                             with transaction.atomic(using=using):
                                 existing.save(using=using)
 
-                                # M2M may fail if related rows aren't in yet.
-                                try:
-                                    for m2m_name, m2m_val in m2m_values.items():
-                                        rel_manager = getattr(existing, m2m_name)
-                                        rel_manager.set(self._resolve_m2m_ids(rel_manager, m2m_val, using))
-                                except Exception as m2m_exc:
-                                    stats.deferred_m2m += 1
-                                    next_pending.append(rec)
-                                    defer_reasons.setdefault(model_label, {}).setdefault("m2m", 0)
-                                    defer_reasons[model_label]["m2m"] += 1
-                                    continue
+                                for m2m_name, ids in m2m_ids.items():
+                                    rel_manager = getattr(existing, m2m_name)
+                                    rel_manager.set(ids)
 
                         stats.updated += 1
                         continue
@@ -253,16 +394,9 @@ class Command(BaseCommand):
                         with transaction.atomic(using=using):
                             obj.save(using=using)
 
-                            try:
-                                for m2m_name, m2m_val in m2m_values.items():
-                                    rel_manager = getattr(obj, m2m_name)
-                                    rel_manager.set(self._resolve_m2m_ids(rel_manager, m2m_val, using))
-                            except Exception:
-                                stats.deferred_m2m += 1
-                                next_pending.append(rec)
-                                defer_reasons.setdefault(model_label, {}).setdefault("m2m", 0)
-                                defer_reasons[model_label]["m2m"] += 1
-                                continue
+                            for m2m_name, ids in m2m_ids.items():
+                                rel_manager = getattr(obj, m2m_name)
+                                rel_manager.set(ids)
 
                     stats.created += 1
 
@@ -277,7 +411,7 @@ class Command(BaseCommand):
                     if _is_unique_violation(e):
                         # Retry as update using unique constraints.
                         existing = None
-                        for lookup in _candidate_unique_lookups(Model, fields):
+                        for lookup in _candidate_unique_lookups(Model, scalar_kwargs):
                             existing = Model._default_manager.using(using).filter(**lookup).first()
                             if existing is not None:
                                 break
@@ -286,6 +420,10 @@ class Command(BaseCommand):
                             stats.failed += 1
                             hard_failures.append((model_label, pk, f"unique violation but no match: {e}"))
                             continue
+
+                        # Record PK remap if fixture PK collides with an existing row.
+                        if pk is not None and existing.pk != pk:
+                            pk_map[(model_label, int(pk))] = int(existing.pk)
 
                         if skip_existing:
                             stats.skipped_existing += 1
@@ -301,7 +439,9 @@ class Command(BaseCommand):
                                 try:
                                     for m2m_name, m2m_val in m2m_values.items():
                                         rel_manager = getattr(existing, m2m_name)
-                                        rel_manager.set(self._resolve_m2m_ids(rel_manager, m2m_val, using))
+                                        rel_manager.set(
+                                            self._resolve_m2m_ids(rel_manager, m2m_val, using, pk_map)
+                                        )
                                 except Exception:
                                     stats.deferred_m2m += 1
                                     next_pending.append(rec)
@@ -318,6 +458,11 @@ class Command(BaseCommand):
                     next_pending.append(rec)
                     defer_reasons.setdefault(model_label, {}).setdefault("other", 0)
                     defer_reasons[model_label]["other"] += 1
+                    if log_deferred_limit and logged_deferred < log_deferred_limit:
+                        self.stdout.write(
+                            self.style.WARNING(f"DEFER {model_label} pk={pk} OTHER: {e}")
+                        )
+                        logged_deferred += 1
 
             # De-duplicate pending records for the next pass to avoid growth.
             deduped: list[dict[str, Any]] = []
@@ -377,7 +522,13 @@ class Command(BaseCommand):
             if len(hard_failures) > 25:
                 self.stdout.write(f"... and {len(hard_failures) - 25} more")
 
-    def _resolve_m2m_ids(self, rel_manager, raw_value: Any, using: str) -> list[int]:
+    def _resolve_m2m_ids(
+        self,
+        rel_manager,
+        raw_value: Any,
+        using: str,
+        pk_map: dict[tuple[str, int], int],
+    ) -> list[int]:
         # Fixture format: list of PKs or list of natural keys.
         if raw_value is None:
             return []
@@ -385,13 +536,44 @@ class Command(BaseCommand):
             return []
 
         rel_model = rel_manager.model
+        rel_label = rel_model._meta.label_lower
         resolved: list[int] = []
         for item in raw_value:
             if isinstance(item, int):
-                resolved.append(item)
+                resolved.append(pk_map.get((rel_label, item), item))
                 continue
             if isinstance(item, (list, tuple)):
                 obj = rel_model._default_manager.using(using).get_by_natural_key(*item)
                 resolved.append(obj.pk)
+                continue
+        return resolved
+
+    def _resolve_m2m_ids_model(
+        self,
+        rel_model,
+        raw_value: Any,
+        using: str,
+        pk_map: dict[tuple[str, int], int],
+        skip_missing: bool,
+    ) -> list[int]:
+        if raw_value is None:
+            return []
+        if not isinstance(raw_value, list):
+            return []
+
+        rel_label = rel_model._meta.label_lower
+        resolved: list[int] = []
+        for item in raw_value:
+            if isinstance(item, int):
+                resolved.append(pk_map.get((rel_label, item), item))
+                continue
+            if isinstance(item, (list, tuple)):
+                try:
+                    obj = rel_model._default_manager.db_manager(using).get_by_natural_key(*item)
+                    resolved.append(obj.pk)
+                except ObjectDoesNotExist:
+                    if skip_missing:
+                        continue
+                    raise
                 continue
         return resolved
