@@ -99,7 +99,7 @@ if IS_HEROKU:
         "https://www.livingbettercc.xyz",
     ]
 else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+    ALLOWED_HOSTS = ["localhost:8000", "127.0.0.1:8000", "0.0.0.0:8000"]
 
 
 # Application definition
