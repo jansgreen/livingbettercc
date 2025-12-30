@@ -30,7 +30,7 @@
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" class="card-img-top" alt="default image">
+                <img src="{% static 'Profile/default.svg' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
@@ -57,7 +57,7 @@
               {% if directive.foto %}
                 <img src="{{ directive.foto }}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
+                <img src="{% static 'Profile/default.svg' %}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
               
                 {% endif %}
               <div class="d-flex gap-2 w-100 justify-content-between">
@@ -86,7 +86,7 @@
               <div class="col" data-aos="fade-up">
                 <div class="card h-100 border-0 shadow-sm" style="overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                   <div style="position: relative; height: 200px; overflow: hidden;">
-                    <img src="{% if impact.image %}{{impact.image.url}}{% else %}{% static 'profile/default.svg' %}{% endif %}" class="w-100 h-100" style="object-fit: cover;" alt="{{impact.course.title}}">
+                    <img src="{% if impact.image %}{{impact.image.url}}{% else %}{% static 'Profile/default.svg' %}{% endif %}" class="w-100 h-100" style="object-fit: cover;" alt="{{impact.course.title}}">
                     <div style="position: absolute; top: 0; right: 0; background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); color: white; padding: 0.75rem 1.25rem; font-weight: 700; font-size: 1.3rem;">
                       {{impact.issued_date}}
                     </div>
@@ -129,7 +129,7 @@
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" class="card-img-top" alt="default image">
+                <img src="{% static 'Profile/default.svg' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
