@@ -3,6 +3,12 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from django.contrib.messages import constants as messages
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+import dj_database_url
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,7 +116,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'django.contrib.humanize',
 
     'home',
@@ -229,11 +237,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-import dj_database_url
 
 if IS_HEROKU:
     # En Heroku: PostgreSQL vía DATABASE_URL
@@ -293,26 +299,30 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Si hay archivos referenciados con {% static %} que no existen en el manifest,
 # WhiteNoise puede convertirlo en 500. Manténlo laxo para evitar caída total.
 WHITENOISE_MANIFEST_STRICT = False
 
 # Archivos de medios (subidos por los usuarios)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
 
-DEFAULT_STORAGE_BACKEND = os.getenv(
-    "DEFAULT_STORAGE_BACKEND",
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# Cloudinary Storage si está habilitado
+
+DEFAULT_STORAGE = (
+    "cloudinary_storage.storage.MediaCloudinaryStorage"
+    if USE_CLOUDINARY else
     "django.core.files.storage.FileSystemStorage"
 )
 
 STORAGES = {
-    "default": {"BACKEND": DEFAULT_STORAGE_BACKEND},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "default": {"BACKEND": DEFAULT_STORAGE},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
-
 
 
 
@@ -407,7 +417,6 @@ customColorPalette = [
     ]
 
 CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
-CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 CKEDITOR_5_CONFIGS = {
         'default': {
             'toolbar': {
