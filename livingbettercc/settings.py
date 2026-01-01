@@ -3,9 +3,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from django.contrib.messages import constants as messages
-import cloudinary
-import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
 import dj_database_url
 
 
@@ -30,7 +27,6 @@ def _env_bool(name: str, default: bool = False) -> bool:
 DEBUG = _env_bool('DEBUG', default=False)
 
 # Detección de entorno: Heroku define DYNO. También soportamos DJANGO_ENV=heroku.
-IS_HEROKU = bool(os.getenv("DYNO")) or os.getenv("DJANGO_ENV") == "heroku"
 
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
@@ -65,7 +61,7 @@ def _parse_hosts_csv(value: str) -> list[str]:
     return list(dict.fromkeys(hosts))
 
 
-if IS_HEROKU:
+if not DEBUG:
     # Si HOSTS está definido en Heroku, úsalo; pero siempre agrega defaults seguros.
     _env_hosts = _parse_hosts_csv(os.getenv("HOSTS", ""))
     _required_hosts = [
@@ -238,17 +234,9 @@ WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASE_URL = os.getenv("DATABASE_URL", "")
 
-if IS_HEROKU:
-    # En Heroku: PostgreSQL vía DATABASE_URL
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-else:
+if DATABASE_URL:
     # En local: SQLite3
     DATABASES = {
         'default': {
@@ -256,6 +244,17 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    # En Heroku: PostgreSQL vía DATABASE_URL
+else:
+    DATABASES = {
+            'default': dj_database_url.config(
+                default=os.getenv('DATABASE_URL'),
+                conn_max_age=600,
+                ssl_require=True
+            )
+        }
+
+
 
 
 # Password validation
@@ -291,15 +290,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
-# Si hay archivos referenciados con {% static %} que no existen en el manifest,
 # WhiteNoise puede convertirlo en 500. Manténlo laxo para evitar caída total.
 WHITENOISE_MANIFEST_STRICT = False
 
@@ -311,20 +305,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Cloudinary Storage si está habilitado
 
-DEFAULT_STORAGE = (
-    "cloudinary_storage.storage.MediaCloudinaryStorage"
-    if USE_CLOUDINARY else
-    "django.core.files.storage.FileSystemStorage"
-)
-
 STORAGES = {
-    "default": {"BACKEND": DEFAULT_STORAGE},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    "default": {
+        "BACKEND": (
+            "cloudinary_storage.storage.MediaCloudinaryStorage"
+            if USE_CLOUDINARY
+            else "django.core.files.storage.FileSystemStorage"
+        )
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"
+    },
 }
 
 
 # Loguea errores de requests a consola (aparece en heroku logs)
-if IS_HEROKU:
+if not DEBUG:
     LOGGING = {
         "version": 1,
         "disable_existing_loggers": False,
