@@ -116,9 +116,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
-    'cloudinary',
     'django.contrib.humanize',
 
     'home',
@@ -323,7 +321,6 @@ STORAGES = {
     "default": {"BACKEND": DEFAULT_STORAGE},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
-
 
 
 # Loguea errores de requests a consola (aparece en heroku logs)
