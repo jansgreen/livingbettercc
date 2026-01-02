@@ -151,36 +151,48 @@ def contactanos(request):
     if request.method == 'POST':
         form = ContactoForm(request.POST)
         if form.is_valid():
-            # Obtén los datos del formulario
             nombre = form.cleaned_data['nombre']
-            email = form.cleaned_data['email']
+            email_usuario = form.cleaned_data['email']
             mensaje = form.cleaned_data['mensaje']
 
-            # Crea el contenido del correo
-            email_message = EmailMessage(
-                subject=f'Mensaje de contacto de {nombre}',
-                body=f'Mensaje: {mensaje}\n\nDe: {nombre} <{email}>',
-                from_email=settings.EMAIL_HOST_USER,
-                to=[settings.EMAIL_HOST_DEST,],  # Cambia esto al correo de destino
+            # Destino principal
+            to_emails = [getattr(settings, "EMAIL_HOST_DEST", settings.EMAIL_HOST_USER)]
+
+            # CC opcional (admins)
+            cc_emails = []
+            raw_cc = getattr(settings, "EMAIL_HOST_CC", "")
+            if isinstance(raw_cc, str):
+                cc_emails = [e.strip() for e in raw_cc.split(",") if e.strip()]
+            elif isinstance(raw_cc, (list, tuple)):
+                cc_emails = list(raw_cc)
+
+            body = (
+                f"Nuevo mensaje desde el formulario de contacto\n\n"
+                f"Nombre: {nombre}\n"
+                f"Email: {email_usuario}\n\n"
+                f"Mensaje:\n{mensaje}\n"
             )
-            email_message.cc = [email]
-            cc_emails = settings.EMAIL_HOST_CC  # Suponiendo que estos son los correos para CC
-            for cc_email in cc_emails:
-                email_message.cc.append(cc_email)
-    
-    # Enviar el correo
-            email_message.send(fail_silently=True)
+
+            email_message = EmailMessage(
+                subject=f"[CONTACTO] Mensaje de {nombre}",
+                body=body,
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER),
+                to=to_emails,
+                cc=cc_emails,
+                reply_to=[email_usuario],  # CLAVE: responder al usuario sin “suplantar”
+            )
+
+            # En producción mejor ver errores: fail_silently=False
+            email_message.send(fail_silently=False)
+
             messages.success(request, 'Mensaje enviado exitosamente.')
             return redirect('contactanos')
         else:
             messages.error(request, 'Por favor corrige los errores a continuación.')
     else:
         form = ContactoForm()
-    
-    context = {
-        'form': form,
-    }
-    return render(request, 'contact_us.html', context)
+
+    return render(request, 'contact_us.html', {'form': form})
 
 def single_page(request, pk):
     article = get_object_or_404(PageContent, pk=pk)

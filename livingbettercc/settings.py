@@ -177,6 +177,8 @@ MIDDLEWARE = [
 
 ]
 
+WHITENOISE_MANIFEST_STRICT = False
+
 ROOT_URLCONF = 'livingbettercc.urls'
 
 TEMPLATES = [
