@@ -27,10 +27,15 @@ def _env_bool(name: str, default: bool = False) -> bool:
 DEBUG = _env_bool('DEBUG', default=False)
 
 # Detección de entorno: Heroku define DYNO. También soportamos DJANGO_ENV=heroku.
+IS_HEROKU = os.getenv("DYNO") is not None or os.getenv("DJANGO_ENV", "").strip().lower() == "heroku"
+
+# Seguridad HTTPS: por defecto solo en producción/Heroku.
+# Si quieres forzarlo en local (solo si realmente sirves HTTPS), exporta SECURE_MODE=1.
+SECURE_MODE = os.getenv("SECURE_MODE") is not None and os.getenv("SECURE_MODE").strip().lower() in {"1", "true", "yes", "y", "on"}
 
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
-if not DEBUG:
+if SECURE_MODE:
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -101,7 +106,7 @@ if not DEBUG:
         "https://www.livingbettercc.xyz",
     ]
 else:
-    ALLOWED_HOSTS = ["localhost:8000", "127.0.0.1:8000", "0.0.0.0:8000"]
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
 
 # Application definition
@@ -239,22 +244,22 @@ WSGI_APPLICATION = 'livingbettercc.wsgi.application'
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
 if DATABASE_URL:
+    # En Heroku: PostgreSQL vía DATABASE_URL (en local también puedes usarla si quieres)
+    _is_postgres_url = DATABASE_URL.startswith(("postgres://", "postgresql://"))
+    DATABASES = {
+        "default": dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=(not DEBUG) and _is_postgres_url,
+        )
+    }
+else:
     # En local: SQLite3
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
-    # En Heroku: PostgreSQL vía DATABASE_URL
-else:
-    DATABASES = {
-            'default': dj_database_url.config(
-                default=f"sqlite:///{BASE_DIR/'db.sqlite3'}",
-                conn_max_age=600,
-                ssl_require=True
-            )
-        }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
