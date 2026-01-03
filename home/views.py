@@ -176,8 +176,8 @@ def contactanos(request):
             email_message = EmailMessage(
                 subject=f"[CONTACTO] Mensaje de {nombre}",
                 body=body,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER),
-                to=to_emails,
+                from_email=to_emails,
+                to=getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER),
                 cc=cc_emails,
                 reply_to=[email_usuario],  # CLAVE: responder al usuario sin “suplantar”
             )
@@ -188,7 +188,7 @@ def contactanos(request):
             messages.success(request, 'Mensaje enviado exitosamente.')
             return redirect('contactanos')
         else:
-            messages.error(request, 'Por favor corrige los errores a continuación.')
+            messages.error(request, f'{form.errors}, Por favor corrige los errores a continuación.')
     else:
         form = ContactoForm()
 
