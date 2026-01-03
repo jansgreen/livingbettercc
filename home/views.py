@@ -174,13 +174,14 @@ def contactanos(request):
             )
 
             email_message = EmailMessage(
-                subject=f"[CONTACTO] Mensaje de {nombre}",
+                subject=f"[CONTACTO] {nombre}",
                 body=body,
-                from_email=to_emails,
-                to=getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER),
-                cc=cc_emails,
-                reply_to=[email_usuario],  # CLAVE: responder al usuario sin “suplantar”
+                from_email=settings.EMAIL_HOST_USER,     # emisor autorizado
+                to=[settings.EMAIL_HOST_USER],           # TU MISMO BUZÓN (no el usuario)
+                reply_to=[email_usuario],                # aquí sí va el usuario
+                cc=settings.LBCC_ADMIN_CC,
             )
+            email_message.send(fail_silently=False)
 
             # En producción mejor ver errores: fail_silently=False
             email_message.send(fail_silently=False)
