@@ -179,7 +179,7 @@ def contactanos(request):
                 from_email=settings.EMAIL_HOST_USER,     # emisor autorizado
                 to=[settings.EMAIL_HOST_USER],           # TU MISMO BUZÓN (no el usuario)
                 reply_to=[email_usuario],                # aquí sí va el usuario
-                cc=settings.LBCC_ADMIN_CC,
+                cc=settings.EMAIL_HOST_CC,
             )
             email_message.send(fail_silently=False)
 
