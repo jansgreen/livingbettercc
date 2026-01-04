@@ -410,7 +410,7 @@ customColorPalette = [
         },
     ]
 
-CKEDITOR_5_CUSTOM_CSS = 'path_to.css'
+CKEDITOR_5_CUSTOM_CSS = None
 CKEDITOR_5_CONFIGS = {
         'default': {
             'toolbar': {
