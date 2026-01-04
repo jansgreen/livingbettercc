@@ -77,48 +77,7 @@
 
   </div>
 
-              <h2 class="mb-5 text-dark fw-bold text-center">Impacto de Nuestras Actividades</h2>
-        <div class="bg-primary py-5 my-5" style="margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%);">
-        <div class="container px-4">
-          {% if inperson_issues %}
-          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for impact in inperson_issues %}
-              <div class="col" data-aos="fade-up">
-                <div class="card h-100 border-0 shadow-sm" style="overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                  <div style="position: relative; height: 200px; overflow: hidden;">
-                    <img src="{% if impact.image %}{{impact.image.url}}{% else %}{% static 'profile/default.svg' %}{% endif %}" class="w-100 h-100" style="object-fit: cover;" alt="{{impact.course.title}}">
-                    <div style="position: absolute; top: 0; right: 0; background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); color: white; padding: 0.75rem 1.25rem; font-weight: 700; font-size: 1.3rem;">
-                      {{impact.issued_date}}
-                    </div>
-                  </div>
-                  
-                  <div class="card-body d-flex flex-column border rounded-4">
-                    <h6>Año {{ impact.issued_date|date:"Y" }}</h6>
-                    <small class="card-title text-dark fw-bold mb-2">{{impact.course.title}}</small>
-                    <p class="text-muted small mb-3">📍 Regionales: {{impact.district}}</p>
-                    
-                    <div class="d-flex gap-2 mb-4">
-                      <span class="badge bg-primary rounded-pill px-3 py-2">
-                        <i class="bi bi-person-fill"></i> {{impact.quantity|intcomma}} Presencial
-                      </span>
-                      <span class="badge bg-info rounded-pill px-3 py-2">
-                        <i class="bi bi-computer"></i> {{impact.impact|intcomma}} Online
-                      </span>
-                    </div>
-                      <div class="progress" role="progressbar" aria-label="Total {{ impact.issued_date|date:"Y" }}" aria-valuenow="{{ impact.pct_total|default:0 }}" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-bar" data-pct="{{ impact.pct_total|default:0 }}" style="width: {{ impact.pct_total|default:0 }}%"></div>
-                      </div>
-                    <p class="card-text fw-bold text-dark mb-2">Total de Impacto: {{ impact.total_impact|default:impact.quantity|add:impact.impact|intcomma }}</p>
-                    <p class="card-text text-muted small flex-grow-1">{{impact.note}}</p>
-                    <small class="text-muted d-block mt-3 pt-3 border-top">📅 {{impact.updated_at|date:"d/m/Y"}}</small>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          {% endif %}
-        </div>
-      </div>
+  {% include "estadistica_proyectos.html" %}
 
   {% if posts %}
     <div class="row">

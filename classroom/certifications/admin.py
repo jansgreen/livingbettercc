@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Certificate, InPersonCertificateIssue
+
+from .models import Certificate, InPersonCategory, InPersonCertificateIssue
 
 @admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):
@@ -16,3 +17,11 @@ class InPersonCertificateIssueAdmin(admin.ModelAdmin):
 	search_fields = ('course__title', 'district', 'created_by__username')
 	list_filter = ('issued_date', 'course', 'district')
 	ordering = ('-issued_date',)
+
+
+@admin.register(InPersonCategory)
+class InPersonCategoryAdmin(admin.ModelAdmin):
+	list_display = ("name", "created_at", "updated_at")
+	search_fields = ("name", "description")
+	list_filter = ("created_at", "updated_at")
+	ordering = ("name",)

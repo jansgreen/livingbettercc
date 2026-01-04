@@ -9,11 +9,15 @@ from django.db.models.functions import Coalesce
 from dashboard.contents.models import ContentPost, ContentCategory
 from gallery.models import Image
 from classroom.courses.models import Course
-from classroom.certifications.models import Certificate, InPersonCertificateIssue
+from classroom.certifications.models import Certificate, InPersonCategory, InPersonCertificateIssue
 from classroom.courses.models import CourseYearStat
 from classroom.courses.services.taod_stats import get_taod_stats
 from classroom.certifications.views import get_inperson_stats_by_course
 from classroom.certifications.services.taod_from_inperson import get_taod_stats_from_inperson_issues
+from django.db.models.functions import ExtractYear
+from collections import OrderedDict
+from shop.cart import Cart
+from collections import defaultdict
 
 
 def _attach_course_year_breakdown(courses_queryset):
@@ -71,37 +75,97 @@ def _attach_course_year_breakdown(courses_queryset):
 
     return courses
 
-# Importa el modelo de biografías
-
-#para borrar 
-from shop.cart import Cart
-
-
-def _get_inperson_issues_for_cards():
+def _get_inperson_issues_grouped_for_tabs():
+    # 1) Traer issues con relaciones
     issues = list(
         InPersonCertificateIssue.objects
-        .select_related('course')
-        .order_by('-issued_date', '-updated_at')
+        .select_related("course", "category")
+        .order_by("-issued_date", "-updated_at")
     )
 
-    totals = [int((i.quantity or 0) + (i.impact or 0)) for i in issues]
-    max_total = max(totals) if totals else 0
+    # 2) Totales por AÑO y por CATEGORÍA (para TAOD "desde")
+    year_rows = (
+        InPersonCertificateIssue.objects
+        .annotate(year=ExtractYear("issued_date"))
+        .values("category_id", "year")
+        .annotate(
+            sum_presencial=Sum("quantity"),
+            sum_online=Sum("impact"),
+        )
+    )
 
-    for issue, total in zip(issues, totals):
-        issue.total_impact = total
-        if max_total > 0:
-            pct = int(round((total / max_total) * 100))
-            pct = max(0, min(100, pct))
-            if total > 0 and pct == 0:
-                pct = 1
+    # year_totals[(cat_id_or_0, year)] -> {"pres": X, "onl": Y}
+    year_totals = {}
+    for r in year_rows:
+        cat_id = r["category_id"] or 0
+        year_totals[(cat_id, r["year"])] = {
+            "pres": r["sum_presencial"] or 0,
+            "onl": r["sum_online"] or 0,
+        }
+
+    # 3) Primero: calcular "desde" por issue (crea desde_presencial_total / desde_online_total)
+    for issue in issues:
+        cat_id = issue.category_id or 0
+
+        if not issue.issued_date:
+            issue.prev_year = None
+            issue.desde_presencial_total = 0
+            issue.desde_online_total = 0
+            continue
+
+        current_year = issue.issued_date.year
+        prev_year = current_year - 1
+        issue.prev_year = prev_year
+
+        prev_vals = year_totals.get((cat_id, prev_year), {"pres": 0, "onl": 0})
+        curr_vals = year_totals.get((cat_id, current_year), {"pres": 0, "onl": 0})
+
+        issue.desde_presencial_total = prev_vals["pres"] + curr_vals["pres"]
+        issue.desde_online_total = prev_vals["onl"] + curr_vals["onl"]
+
+    # 4) Ahora: progreso basado en TAOD presencial (por categoría)
+    cat_totals = defaultdict(list)
+    for i in issues:
+        cat_id = i.category_id or 0
+        cat_totals[cat_id].append(i.desde_presencial_total or 0)
+
+    cat_max = {cat_id: (max(vals) if vals else 0) for cat_id, vals in cat_totals.items()}
+
+    for issue in issues:
+        cat_id = issue.category_id or 0
+        max_val = cat_max.get(cat_id, 0)
+        val = issue.desde_presencial_total or 0
+
+        if max_val > 0:
+            pct = int(round((val / max_val) * 100))
+            pct = max(1 if val > 0 else 0, min(100, pct))
         else:
             pct = 0
+
         issue.pct_total = pct
+        issue.total_impact = int((issue.quantity or 0) + (issue.impact or 0))  # por si lo sigues usando
 
-    return issues
+    # 5) Tabs dinámicos (solo categorías con contenido + "Sin categoría" si aplica)
+    categories = list(InPersonCategory.objects.order_by("name"))
+    tabs = OrderedDict()
 
+    for c in categories:
+        tabs[c.id] = c.name
 
-# Create your views here.
+    has_uncat = any(i.category_id is None for i in issues)
+    if has_uncat:
+        tabs[0] = "Otros"
+
+    # 6) Agrupar issues por categoría
+    issues_by_cat = {}
+    for issue in issues:
+        cat_id = issue.category_id or 0
+        issues_by_cat.setdefault(cat_id, []).append(issue)
+
+    tabs_with_content = [(cat_id, name) for cat_id, name in tabs.items() if issues_by_cat.get(cat_id)]
+
+    return tabs_with_content, issues_by_cat
+
 def home(request):
     # 1. Obtener la página "Home"
     category = ContentCategory.objects.filter(slug="home").first()
@@ -109,7 +173,8 @@ def home(request):
     gallery = Image.objects.filter(forcarousel=True)
 
     online = Certificate.objects.all()
-    inperson_issues = _get_inperson_issues_for_cards()
+    tabs, issues_by_cat = _get_inperson_issues_grouped_for_tabs()
+    categories = InPersonCategory.objects.order_by("name")
 
 
     if category:
@@ -120,8 +185,10 @@ def home(request):
     context = {
         'gallery': gallery,
         'posts': posts,
-        'inperson_issues': inperson_issues,
+        'tabs': tabs,
+        'issues_by_cat': issues_by_cat,
         'online_impact': online,
+        'categories': categories,
 
     }
 
@@ -130,7 +197,8 @@ def home(request):
 def quienes_somos(request):
     category = ContentCategory.objects.filter(slug='quienes_somos').first()
     directives = Directives.objects.all()
-    inperson_issues = _get_inperson_issues_for_cards()
+    tabs, issues_by_cat = _get_inperson_issues_grouped_for_tabs()
+    categories = InPersonCategory.objects.order_by("name")
     if category:
         posts = category.posts.filter(
             status="published"
@@ -141,7 +209,9 @@ def quienes_somos(request):
     context = {
         "posts": posts,
         "directives": directives,
-        'inperson_issues': inperson_issues,
+        'tabs': tabs,
+        'issues_by_cat': issues_by_cat,
+        'categories': categories,
     }
 
 
@@ -219,3 +289,31 @@ def view_bio(request, pk):
         'articles': articles,
     }
     return render(request, 'leer_bio.html', context)
+
+def estadistica_proyectos(request):
+    issues = InPersonCertificateIssue.objects.all()
+    issues = issues.annotate(
+        year=ExtractYear('issued_date'),
+    )
+    year_totals = (
+        issues.values('year')
+        .annotate(
+            presencial_total=Sum('quantity'),
+            online_total=Sum('impact')
+        )
+    )
+
+    # Convertimos a diccionario para acceso rápido
+    year_totals_map = {
+        y['year']: y for y in year_totals
+    }
+
+    # Pegamos los totales a cada objeto
+    for i in issues:
+        totals = year_totals_map.get(i.year, {})
+        i.year_presencial_total = totals.get('presencial_total', 0)
+        i.year_online_total = totals.get('online_total', 0)
+
+    context = {
+        'inperson_issues': issues
+    }

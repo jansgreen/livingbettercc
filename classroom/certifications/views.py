@@ -4,12 +4,15 @@ from django.db.models.functions import Coalesce
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import get_template
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from .forms import InPersonCertificateIssueForm
-from .models import Certificate, InPersonCertificateIssue
+from .models import Certificate, InPersonCategory, InPersonCertificateIssue
 from classroom.courses.models import Course
 from classroom.courses.services.taod_stats import get_taod_stats
 from django.http import HttpResponse, FileResponse
@@ -220,3 +223,38 @@ def certificate_pdf_download(request, uuid):
     response = HttpResponse(html, content_type='text/html')
     response['Content-Disposition'] = f'attachment; filename="certificado_{certificate.user.username}.html"'
     return response
+
+
+class _StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    def test_func(self):
+        return bool(getattr(self.request, "user", None) and self.request.user.is_staff)
+
+
+class InPersonCategoryListView(_StaffRequiredMixin, ListView):
+    model = InPersonCategory
+    template_name = "certifications/inperson_category_list.html"
+    context_object_name = "categories"
+    paginate_by = 50
+
+    def get_queryset(self):
+        return InPersonCategory.objects.order_by("name")
+
+
+class InPersonCategoryCreateView(_StaffRequiredMixin, CreateView):
+    model = InPersonCategory
+    fields = ["name", "description"]
+    template_name = "certifications/inperson_category_form.html"
+    success_url = reverse_lazy("certifications:inperson_category_list")
+
+
+class InPersonCategoryUpdateView(_StaffRequiredMixin, UpdateView):
+    model = InPersonCategory
+    fields = ["name", "description"]
+    template_name = "certifications/inperson_category_form.html"
+    success_url = reverse_lazy("certifications:inperson_category_list")
+
+
+class InPersonCategoryDeleteView(_StaffRequiredMixin, DeleteView):
+    model = InPersonCategory
+    template_name = "certifications/inperson_category_confirm_delete.html"
+    success_url = reverse_lazy("certifications:inperson_category_list")

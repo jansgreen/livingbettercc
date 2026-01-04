@@ -14,4 +14,10 @@ urlpatterns = [
     path('in-person/new/', views.inperson_create, name='inperson_create'),
     path('in-person/<int:pk>/edit/', views.inperson_update, name='inperson_update'),
     path('in-person/<int:pk>/delete/', views.inperson_delete, name='inperson_delete'),
+
+    # In-person categories
+    path("inperson/categories/", views.InPersonCategoryListView.as_view(), name="inperson_category_list"),
+    path("inperson/categories/create/", views.InPersonCategoryCreateView.as_view(), name="inperson_category_create"),
+    path("inperson/categories/<int:pk>/update/", views.InPersonCategoryUpdateView.as_view(), name="inperson_category_update"),
+    path("inperson/categories/<int:pk>/delete/", views.InPersonCategoryDeleteView.as_view(), name="inperson_category_delete"),
 ]

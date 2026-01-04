@@ -66,12 +66,18 @@ class Certificate(models.Model):
     def __str__(self) -> str:  # pragma: no cover
         return f"{self.certificate_number}"
 
-
 class InPersonCertificateIssue(models.Model):
     course = models.ForeignKey(
         "courses.Course",
         on_delete=models.CASCADE,
         related_name="in_person_issues",
+    )
+    category = models.ForeignKey(
+        "certifications.InPersonCategory",
+        on_delete=models.SET_NULL,
+        related_name="issues",
+        blank=True,
+        null=True,
     )
     issued_date = models.DateField(default=timezone.now, db_index=True)
     district = models.CharField(max_length=120, db_index=True)
@@ -102,10 +108,23 @@ class InPersonCertificateIssue(models.Model):
         ordering = ["-issued_date", "course__title", "district"]
         constraints = [
             models.UniqueConstraint(
-                fields=("course", "issued_date", "district"),
+                fields=("course", "issued_date", "district", "category"),
                 name="uniq_inperson_course_date_district",
             )
         ]
 
     def __str__(self) -> str:  # pragma: no cover
         return f"{self.course_id} {self.issued_date} {self.district}"
+
+class InPersonCategory(models.Model):
+    name = models.CharField(max_length=120, unique=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return self.name

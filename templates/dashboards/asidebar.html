@@ -8,17 +8,16 @@
             {% comment %} Show menus only to authenticated users who are superusers or have the permission.
                Parentheses are not supported in the template 'if' tag, so expand the condition. {% endcomment %}
 
-                        {# CURSOS COMPLETADOS Y CERTIFICADOS #}
-
+            {# CURSOS COMPLETADOS Y CERTIFICADOS #}
             {% for menu in menu_dashboard %}
                 <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-{{ menu.safe_id }}" aria-expanded="true" aria-controls="dashboard-{{ menu.safe_id }}">
                             {{ request.user.username|capfirst }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="dashboard-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -80,12 +79,12 @@
             {% for menu in menu_shop %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm"  style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#shop-{{ menu.safe_id }}" aria-expanded="true" aria-controls="shop-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="shop-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -101,12 +100,12 @@
             {% for menu in menu_contents %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#contents-{{ menu.safe_id }}" aria-expanded="true" aria-controls="contents-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="contents-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -122,12 +121,12 @@
             {% for menu in menu_gallery %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#gallery-{{ menu.safe_id }}" aria-expanded="true" aria-controls="gallery-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="gallery-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -143,12 +142,12 @@
             {% for menu in menu_groups %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm"  style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#groups-{{ menu.safe_id }}" aria-expanded="true" aria-controls="groups-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="groups-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -160,28 +159,17 @@
                     {% endif %}
                 </div>
             {% endfor %}
-
-            {% if menu.submenus %}
-                <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-                    <ul class="list-group-flush">
-                        {% for submenu in menu.submenus %}
-                            <li class="ms-3 border-0 m-3">
-                                <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
+            
             
             {% for menu in menu_metadata %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#metadata-{{ menu.safe_id }}" aria-expanded="true" aria-controls="metadata-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="metadata-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -197,12 +185,12 @@
             {% for menu in menu_auth %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow sm" type="button" data-bs-toggle="collapse" data-bs-target="#auth-{{ menu.safe_id }}" aria-expanded="true" aria-controls="auth-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="auth-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -218,12 +206,12 @@
             {% for menu in menu_directives %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#directives-{{ menu.safe_id }}" aria-expanded="true" aria-controls="directives-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="directives-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -239,12 +227,12 @@
             {% for menu in create_menu %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#create-{{ menu.safe_id }}" aria-expanded="true" aria-controls="create-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="create-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -260,12 +248,12 @@
             {% for menu in menu_classroom %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#classroom-{{ menu.safe_id }}" aria-expanded="true" aria-controls="classroom-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="classroom-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -281,12 +269,12 @@
             {% for menu in menu_setting %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.id }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#setting-{{ menu.safe_id }}" aria-expanded="true" aria-controls="setting-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
+                        <div id="setting-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
@@ -302,12 +290,12 @@
             {% for menu in formbuilder_menu %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#{{ menu.nombre }}" aria-expanded="true" aria-controls="{{ menu.nombre }}">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#formbuilder-{{ menu.safe_id }}" aria-expanded="true" aria-controls="formbuilder-{{ menu.safe_id }}">
                             {{ menu.nombre }}
                         </button>
                     </h2>
                     {% if menu.submenus %}
-                        <div id="{{ menu.nombre }}" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                        <div id="formbuilder-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">
