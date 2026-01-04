@@ -29,7 +29,11 @@
         </div>
         <div class="card-body">
           <p>Email: {{ user.email }}</p>
-          <img src="{{ user.profile.image.urls }}" alt="" width="300" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'" />
+          {% if user.profile.image %}
+            <img src="{{ user.profile.image.url }}" alt="Profile Image" width="300" class="rounded me-2" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'" />
+          {% else %}
+            <img src="{% static 'Profile/default.webp' %}" alt="Profile Image" width="300" class="rounded me-2" />
+          {% endif %}
           {% for data in profile %}
             <p>{{ data.direccion }}</p>
           {% endfor %}
