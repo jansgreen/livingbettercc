@@ -133,6 +133,7 @@ INSTALLED_APPS = [
     'shop.checkout',
     'gallery',
     'cart',
+    'core',
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -310,7 +311,9 @@ USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
 
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" if USE_CLOUDINARY else "django.core.files.storage.FileSystemStorage"
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" 
+        if USE_CLOUDINARY else 
+        "django.core.files.storage.FileSystemStorage"
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"

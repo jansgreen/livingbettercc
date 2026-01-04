@@ -152,3 +152,51 @@ p {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
+/* ===== Cloudinary media visibility fixes (global, no JS) ===== */
+img.cloudinary-img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  object-fit: cover;
+}
+
+.cloudinary-wrap {
+  overflow: visible !important;
+  min-height: 1px !important;
+}
+
+/* Specific fix for card images with fixed height */
+img.cloudinary-card-img {
+  width: 100% !important;
+  height: 220px !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* Attribute-selector fallback: apply styles automatically to Cloudinary images */
+img[src*="res.cloudinary.com"] {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+}
+
+/* If used inside Bootstrap cards, ensure cover behavior */
+.card img.card-img-top[src*="res.cloudinary.com"] {
+  object-fit: cover !important;
+}
+
+/* Override problematic class when present */
+img[src*="res.cloudinary.com"].object-fit-cover {
+  object-fit: cover !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Guard against collapsed parent containers */
+.card, .carousel, .cloudinary-wrap {
+  overflow: visible !important;
+}
