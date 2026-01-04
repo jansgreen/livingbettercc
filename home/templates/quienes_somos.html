@@ -19,7 +19,6 @@
 </style>
 
 <div class="container-fluid py-5">
-
   <div class="row gx-0 align-items-start">
     <!-- Lado Izquierdo -->
     <div class="col-md-10 bg-body-tertiary rounded-start">
@@ -30,7 +29,7 @@
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" class="card-img-top" alt="default image">
+                <img src="{% static 'profiles/default.webp' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
@@ -57,7 +56,7 @@
               {% if directive.foto %}
                 <img src="{{ directive.foto }}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
+                <img src="{% static 'profiles/default.webp' %}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
               
                 {% endif %}
               <div class="d-flex gap-2 w-100 justify-content-between">
@@ -88,7 +87,7 @@
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
               {% else %}
-                <img src="{% static 'profile/default.svg' %}" class="card-img-top" alt="default image">
+                <img src="{% static 'profiles/default.webp' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
