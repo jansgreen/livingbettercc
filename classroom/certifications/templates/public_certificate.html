@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
 <div style="position:relative; width:900px; height:650px; margin:auto;">
-  <img src="/media/certificates/user_67/certificados_regional.png" alt="Certificado fondo" style="position:absolute; top:0; left:0; width:900px; height:650px; object-fit:cover; z-index:0;">
+  <img src="{% static 'certificates/certificados_regional.png' %}" alt="Certificado fondo" style="position:absolute; top:0; left:0; width:900px; height:650px; object-fit:cover; z-index:0;">
   <!-- Nombre del usuario -->
   <div style="position:absolute; top:330px; left:0; width:100%; text-align:center; font-size:2.2em; font-weight:bold; color:#2a2a2a; letter-spacing:1px; z-index:2;">
     {{ user.get_full_name }}
