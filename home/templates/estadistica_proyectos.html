@@ -61,7 +61,7 @@
                           <!-- Imagen -->
                           <div style="position: relative; height: 210px; overflow: hidden;">
                             <img
-                              src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'Profile/default.webp' %}{% endif %}"
+                              src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
                               class="w-100 h-100"
                               style="object-fit: cover;"
                               alt="{{ impact.course.title }}"

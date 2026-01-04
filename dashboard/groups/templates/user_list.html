@@ -35,11 +35,11 @@
                                                     <img src="{{ user.profile.image.url }}" alt="Profile Image" width="64" height="64"
                                                          class="border border-2 border-primary"
                                                          style="object-fit: cover; border-radius: 12px; display: block;"
-                                                         onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                                                         onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
                                                 </td>
                                                 {% else %}
                                                 <td>
-                                                    <img src="{% static 'Profile/default.webp' %}" alt="Default Image" width="64" height="64"
+                                                    <img src="{% static 'profiles/default.webp' %}" alt="Default Image" width="64" height="64"
                                                          class="border border-2 border-primary"
                                                          style="object-fit: cover; border-radius: 12px; display: block;"/>
                                                 </td>

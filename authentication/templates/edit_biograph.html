@@ -30,9 +30,9 @@
             <div class="col-md-4">
                                 <picture>
                                         {% if user.profile.image %}
-                                            <img src="{{ user.profile.image.url }}" width="128" height="128" class="img-thumbnail" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'"/>
+                                            <img src="{{ user.profile.image.url }}" width="128" height="128" class="img-thumbnail" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
                                         {% else %}
-                                            <img src="{% static 'Profile/default.webp' %}" width="128" height="128" class="img-thumbnail" alt="Profile Image"/>
+                                            <img src="{% static 'profiles/default.webp' %}" width="128" height="128" class="img-thumbnail" alt="Profile Image"/>
                                         {% endif %}
                                 </picture>
             </div>

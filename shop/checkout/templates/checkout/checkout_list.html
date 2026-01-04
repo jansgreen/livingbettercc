@@ -18,9 +18,9 @@
             <td>
                 {% if product.image %}
                 <img src="{{ product.image.url }}" width="50" class="img-fluid rounded" alt="{{ product.name }}"
-                     onerror="this.onerror=null; this.src='{% static 'Profile/default.webp' %}'">
+                     onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'">
                 {% else %}
-                <img src="{% static 'Profile/default.webp' %}" width="50" class="img-fluid rounded" alt="{{ product.name }}">
+                 <img src="{% static 'profiles/default.webp' %}" width="50" class="img-fluid rounded" alt="{{ product.name }}">
                 {% endif %}
             <td>{{ product.name }}</td>
             <td>{{ quantities }}</td>

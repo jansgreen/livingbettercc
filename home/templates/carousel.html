@@ -13,7 +13,7 @@
                 {% if imagen.image_file %}
                   <img src="{{ imagen.image_file.url }}" class="d-block w-100" alt="{{ imagen.title }}">
                 {% else %}
-                  <img src="{% static 'Profile/default.webp' %}" class="d-block w-100" alt="default image">
+                  <img src="{% static 'profiles/default.webp' %}" class="d-block w-100" alt="default image">
                 {% endif %}
                 <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
                   <h5>{{ imagen.name }}</h5>
