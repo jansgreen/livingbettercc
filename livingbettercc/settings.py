@@ -294,32 +294,28 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # WhiteNoise puede convertirlo en 500. Manténlo laxo para evitar caída total.
 WHITENOISE_MANIFEST_STRICT = False
 
 # Archivos de medios (subidos por los usuarios)
-USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Cloudinary Storage si está habilitado
 
+USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
+
 STORAGES = {
     "default": {
-        "BACKEND": (
-            "cloudinary_storage.storage.MediaCloudinaryStorage"
-            if USE_CLOUDINARY
-            else "django.core.files.storage.FileSystemStorage"
-        )
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" if USE_CLOUDINARY else "django.core.files.storage.FileSystemStorage"
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
     },
 }
-
 
 # Loguea errores de requests a consola (aparece en heroku logs)
 if not DEBUG:
