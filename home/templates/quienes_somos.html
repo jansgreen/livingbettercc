@@ -28,8 +28,6 @@
             <div class="card mb-3">
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
-              {% else %}
-                <img src="{% static 'profiles/default.webp' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
@@ -55,10 +53,7 @@
             <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3">
               {% if directive.foto %}
                 <img src="{{ directive.foto }}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
-              {% else %}
-                <img src="{% static 'profiles/default.webp' %}" alt="" width="48" height="48" class="rounded-circle flex-shrink-0">
-              
-                {% endif %}
+              {% endif %}
               <div class="d-flex gap-2 w-100 justify-content-between">
                 <div>
                   <h6 class="mb-0">{{ directive.user|capfirst }}</h6>
@@ -86,8 +81,6 @@
             <div class="card mb-3">
               {% if post.cover_image %}
                 <img src="{{ post.cover_image.url }}" class="card-img-top" alt="{{ post.title }}">
-              {% else %}
-                <img src="{% static 'profiles/default.webp' %}" class="card-img-top" alt="default image">
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title">{{ post.title|capfirst }}</h5>
