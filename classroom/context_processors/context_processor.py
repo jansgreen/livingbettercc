@@ -8,57 +8,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-import re
-
-def safe_id(text: str) -> str:
-    if not text:
-        return "menu"
-    return re.sub(r'[^a-zA-Z0-9_-]', '', (text or '').replace(" ", "_").lower())
+from core.menu_builder import build_menu, safe_id
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
-        user_has_module_access = request.user.has_perm('groups.access_module') or request.user.is_superuser
-        # Base menu container
-        menu = [
-            {
-                'nombre': 'Classroom',
-                'safe_id': safe_id('Classroom'),
-                'url': '#',
-                'submenus': []
-            }
-        ]
+        submenus = []
+        # Admin/staff actions gated by permission
+        submenus.append({'nombre': 'Crear Curso', 'url': reverse('courses:course_create'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Lista de Cursos', 'url': reverse('courses:course_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Crear Modulo', 'url': reverse('courses:module_create'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Modulos', 'url': reverse('courses:module_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Lecciones', 'url': reverse('courses:lesson_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Crear Lección', 'url': reverse('courses:lesson_create'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Certificados Presenciales', 'url': reverse('certifications:inperson_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Registrar Presencial', 'url': reverse('certifications:inperson_create'), 'perm': 'groups.access_module'})
 
-        # If user can manage modules/courses (staff), show admin options
-        if user_has_module_access:
-            menu[0]['submenus'].append({'nombre': 'Crear Curso', 'safe_id': safe_id('Crear Curso'), 'url': reverse('courses:course_create')})
-            menu[0]['submenus'].append({'nombre': 'Lista de Cursos', 'safe_id': safe_id('Lista de Cursos'), 'url': reverse('courses:course_list')})
-            # Modules
-            menu[0]['submenus'].append({'nombre': 'Crear Modulo', 'safe_id': safe_id('Crear Modulo'), 'url': reverse('courses:module_create')})
-            menu[0]['submenus'].append({'nombre': 'Modulos', 'safe_id': safe_id('Modulos'), 'url': reverse('courses:module_list')})
-            # Lessons
-            menu[0]['submenus'].append({'nombre': 'Lecciones', 'safe_id': safe_id('Lecciones'), 'url': reverse('courses:lesson_list')})
-            menu[0]['submenus'].append({'nombre': 'Crear Lección', 'safe_id': safe_id('Crear Lección'), 'url': reverse('courses:lesson_create')})
-
-            # Certificados presenciales (manual por distrito)
-            menu[0]['submenus'].append({'nombre': 'Certificados Presenciales', 'safe_id': safe_id('Certificados Presenciales'), 'url': reverse('certifications:inperson_list')})
-            menu[0]['submenus'].append({'nombre': 'Registrar Presencial', 'safe_id': safe_id('Registrar Presencial'), 'url': reverse('certifications:inperson_create')})
-
-        # If user is a student (support both 'student' and legacy 'students') show student menu
+        # Student menu (added only if user is in student group)
         try:
             is_student = request.user.groups.filter(name__in=['student', 'students']).exists()
         except Exception:
             is_student = False
-
         if is_student:
-            # Keep student-specific items grouped under Classroom
-            menu[0]['submenus'].append({'nombre': 'Mis Cursos', 'safe_id': safe_id('Mis Cursos'), 'url': reverse('courses:my_course')})
-            menu[0]['submenus'].append({'nombre': 'Cursos Disponibles', 'safe_id': safe_id('Cursos Disponibles'), 'url': reverse('courses:course_list')})
-            # Progress / Certificates (handled in my_course view/templates)
-            menu[0]['submenus'].append({'nombre': 'Progreso y Certificados', 'safe_id': safe_id('Progreso y Certificados'), 'url': reverse('courses:my_course')})
-            # Calificaciones (reuse my_course or a future specific view)
-            menu[0]['submenus'].append({'nombre': 'Mis Calificaciones', 'safe_id': safe_id('Mis Calificaciones'), 'url': reverse('courses:my_course')})
+            submenus.append({'nombre': 'Mis Cursos', 'url': reverse('courses:my_course')})
+            submenus.append({'nombre': 'Cursos Disponibles', 'url': reverse('courses:course_list')})
+            submenus.append({'nombre': 'Progreso y Certificados', 'url': reverse('courses:my_course')})
+            submenus.append({'nombre': 'Mis Calificaciones', 'url': reverse('courses:my_course')})
 
-        return {'menu_classroom': menu}
+        menu = build_menu(request.user, 'Classroom', submenus, url='#')
+        return {'menu_classroom': [menu] if menu else []}
     else:
         return {'menu_classroom': []}
 
