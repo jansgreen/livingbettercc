@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group, User
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.views import View
 
@@ -153,19 +153,28 @@ class InviteFriendView(View):
         
         return render(request, self.template_name, {'form': form})
 
+def _safe_login_url() -> str:
+    # Try common login route names, then fall back to settings.LOGIN_URL or a default path
+    for name in ('authentication:login', 'account_login', 'login'):
+        try:
+            return reverse(name)
+        except NoReverseMatch:
+            continue
+    return getattr(settings, 'LOGIN_URL', '/accounts/login/')
+
 def accept_invite(request, token):
     invitation = get_object_or_404(Invitation.objects.select_related('group'), token=token)
 
     if invitation.is_used() or invitation.is_expired():
         messages.error(request, 'Esta invitación ya fue usada o expiró.')
-        return redirect('login')
+        return redirect(_safe_login_url())
 
     if not request.user.is_authenticated:
         request.session['pending_invitation_token'] = str(invitation.token)
         request.session['post_register_role'] = invitation.group.name
         request.session['invited_email'] = invitation.email
         messages.info(request, 'Inicia sesión o regístrate para aceptar la invitación.')
-        return redirect('login')
+        return redirect(_safe_login_url())
 
     if invitation.email and request.user.email and invitation.email.strip().lower() != request.user.email.strip().lower():
         messages.error(request, 'Esta invitación no corresponde a tu correo.')
