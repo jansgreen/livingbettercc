@@ -8,10 +8,10 @@ def beca_application_action(request, app_id):
     app = get_object_or_404(BecaApplication, id=app_id)
     action = request.POST.get('action')
     if action == 'aprobar':
-        app.estado = 'aprobada'
+        app.status = 'approved'
         app.save()
     elif action == 'rechazar':
-        app.estado = 'rechazada'
+        app.status = 'rejected'
         app.save()
     return redirect('beca_applications_list')
 from classroom.enrollments.models import BecaApplication
@@ -23,7 +23,13 @@ def beca_applications_list(request):
     estado = request.GET.get('estado', 'todos')
     qs = BecaApplication.objects.select_related('user', 'course', 'address').order_by('-fecha_aplicacion')
     if estado != 'todos':
-        qs = qs.filter(estado=estado)
+        # Map legacy spanish status to new english status values
+        estado_map = {
+            'aprobada': 'approved',
+            'rechazada': 'rejected',
+            'pendiente': 'submitted',
+        }
+        qs = qs.filter(status=estado_map.get(estado, estado))
     return render(request, 'dashboard/beca_applications_list.html', {
         'beca_applications': qs,
         'estado': estado,
@@ -67,7 +73,7 @@ def dashboards(request):
 
     from classroom.enrollments.models import BecaApplication
     beca_applications_count = BecaApplication.objects.count()
-    becados_count = BecaApplication.objects.filter(estado='aprobada').count()
+    becados_count = BecaApplication.objects.filter(status='approved').count()
     # Group checks for template logic
     user_groups = request.user.groups.values_list('name', flat=True) if request.user.is_authenticated else []
 
