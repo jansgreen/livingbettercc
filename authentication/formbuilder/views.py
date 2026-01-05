@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import Http404
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, NoReverseMatch
+from django.conf import settings
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
@@ -13,6 +14,17 @@ from django.shortcuts import render, redirect
 from .utils import generate_dynamic_form, build_ordered_responses
 from django.contrib import messages
 from django.urls import reverse
+
+# Safe reverse helper to avoid NoReverseMatch 500s in production
+def reverse_safe(name: str, *, args=None, kwargs=None, default: str = "/") -> str:
+    try:
+        if args is not None:
+            return reverse(name, args=args)
+        if kwargs is not None:
+            return reverse(name, kwargs=kwargs)
+        return reverse(name)
+    except NoReverseMatch:
+        return default
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.utils.text import slugify
@@ -111,7 +123,10 @@ def render_form(request, form_name):
         if request.GET.get('facilitador'):
             request.session['assign_facilitador'] = True
         next_url = request.get_full_path()
-        register_url = reverse('facilitador_register')
+        register_url = reverse_safe(
+            'facilitador_register',
+            default=getattr(settings, 'LOGIN_URL', '/accounts/login/')
+        )
         return redirect(f"{register_url}?next={next_url}")
 
     subtitle = (form_obj.description or '').strip()
@@ -195,7 +210,7 @@ def completed_forms_list(request):
     is_tecnico = request.user.groups.filter(name='tecnico').exists() if request.user.is_authenticated else False
     if not request.user.is_authenticated or (not is_tecnico and not request.user.is_staff):
         next_url = request.get_full_path()
-        register_url = reverse('tecnico_register')
+        register_url = reverse_safe('tecnico_register', default=getattr(settings, 'LOGIN_URL', '/accounts/login/'))
         return redirect(f"{register_url}?next={next_url}")
 
     completed_forms = CompletedForm.objects.all()
@@ -316,7 +331,11 @@ def share_with_facilitadores(request, pk):
         raise Http404("No encontrado")
 
     # Build a short, shareable URL that redirects to the completed form detail.
-    share_path = reverse('formbuilder:shared_completed_form', args=[completed_form.pk])
+    share_path = reverse_safe(
+        'formbuilder:shared_completed_form',
+        args=[completed_form.pk],
+        default=reverse_safe('shared_completed_form', args=[completed_form.pk], default=f"/formbuilder/completed/shared/{completed_form.pk}/")
+    )
     share_url = request.build_absolute_uri(share_path)
 
     # Render a small page that shows the shareable link and a copy-to-clipboard button.
@@ -334,7 +353,11 @@ def shared_completed_form(request, pk):
     registering.
     """
     completed_form = get_object_or_404(CompletedForm, pk=pk)
-    detail_path = reverse('formbuilder:completed_forms_detail', args=[completed_form.pk])
+    detail_path = reverse_safe(
+        'formbuilder:completed_forms_detail',
+        args=[completed_form.pk],
+        default=reverse_safe('completed_forms_detail', args=[completed_form.pk], default=f"/formbuilder/completed/completed_forms_detail/{completed_form.pk}/")
+    )
 
     # If user is authenticated and authorized, redirect to detail
     if request.user.is_authenticated:
@@ -345,7 +368,7 @@ def shared_completed_form(request, pk):
         raise Http404("No encontrado")
 
     # Not authenticated: redirect to tecnico registration with next=detail_path
-    register_url = reverse('tecnico_register')
+    register_url = reverse_safe('tecnico_register', default=getattr(settings, 'LOGIN_URL', '/accounts/login/'))
     return redirect(f"{register_url}?next={detail_path}")
 
 def my_user_complete_forms(request):
