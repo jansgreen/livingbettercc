@@ -40,7 +40,8 @@ def certifications_in_person_delete_alias(request, pk: int):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
-    path('auth/', include('authentication.urls')),  # Incluir URLs de la app de usuarios
+    path('auth/',include(("authentication.urls", "authentication"), namespace="authentication")),
+    # Incluir URLs de la app de usuarios
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
     path('shop/', include('shop.urls')),
     path('cart/', include('cart.urls')),
@@ -54,6 +55,7 @@ urlpatterns = [
     path('auth/', include('social_django.urls', namespace='social')),  # Include URLs for social authentication
     path('gallery/', include('gallery.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
+    path('formbuilder/', include('formbuilder.urls')),
 
 ]
 

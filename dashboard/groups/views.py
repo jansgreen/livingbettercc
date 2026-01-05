@@ -100,7 +100,16 @@ class InviteFriendView(View):
     def get(self, request):
         if not _is_staff(request.user):
             return redirect('login')
-        form = self.form_class()
+        initial = {}
+        group_param = (request.GET.get('group') or '').strip()
+        if group_param:
+            try:
+                from django.contrib.auth.models import Group
+                g = Group.objects.get(name__iexact=group_param)
+                initial['group'] = g.id
+            except Group.DoesNotExist:
+                pass
+        form = self.form_class(initial=initial)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):

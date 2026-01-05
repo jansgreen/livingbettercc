@@ -227,14 +227,14 @@
                                             {% endfor %}
                                     {% endif %}
                                 {% endfor %}
-                              <li><a class="nav-link text-light" href="{% url 'logout' %}">Logout</a></li>
+                              <li><a class="nav-link text-light" href="{% url 'authentication:logout' %}">Logout</a></li>
                             </ul>
 
                         </div>
                     </li>
                 {% else %}
                     <li class="nav-item me-5">
-                        <a class="nav-link" href="{% url 'login' %}">Iniciar Sesión</a>
+                        <a class="nav-link" href="{% url 'authentication:login' %}">Iniciar Sesión</a>
                     </li>
                 {% endif %}
         </ul>

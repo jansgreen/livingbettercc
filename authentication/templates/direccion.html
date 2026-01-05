@@ -1,77 +1,58 @@
 {% extends 'address/addressBase.html' %}
 {% load static %}
 {% block content %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-9 col-xl-8">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-header bg-body-tertiary border-0 rounded-top-4 p-4">
+            {% if address_type == 'laboral' %}
+              <p class="text-muted mb-0">Coloca la dirección del Centro Estudiantil al que pertenece.</p>
+            {% elif address_type == 'residencial' %}
+              <p class="text-muted mb-0">Coloca tu dirección de residencia.</p>
+            {% else %}
+              <p class="text-muted mb-0">Ahora agrega tu dirección {{address_type}}.</p>
+            {% endif %}
+          </div>
 
-  <div class="bg-body-tertiary p-5 rounded">
-    <div class="col-sm-8 py-5 mx-auto">
-      <div class="card">
-        <div class="card-header">
-          {% if address_type == 'laboral' %}
-          <h2>{{ user|capfirst }}</h2>
-          <p>Coloca la direccion del Centro Estudiantil a la que pertenece.</p>
-          {% elif address_type == 'residencial' %}
-          <h2>{{ user|capfirst }}</h2>
-          <p>Coloca tu direccion de residencia.</p>
-          {% else %}
-          <h2>{{ user|capfirst }} Ahora tu direccion de envio</h2>
-          <p> A continuacion coloca tu direccion.</p>
-          {% endif %}
-        </div>
-        <div class="card-body">
-          <p>Email: {{ user.email }}</p>
-          {% if user.profile.image %}
-            <img src="{{ user.profile.image.url }}" alt="Profile Image" width="300" class="rounded me-2" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'" />
-          {% else %}
-            <img src="{% static 'profiles/default.webp' %}" alt="Profile Image" width="300" class="rounded me-2" />
-          {% endif %}
-          {% for data in profile %}
-            <p>{{ data.direccion }}</p>
-          {% endfor %}
-          <form method="POST" class="mt-5" action="{% url 'address_create' address_type=address_type %}" enctype="multipart/form-data" id="myForm">
-            {% csrf_token %}  
+          <div class="card-body p-4 p-md-5">
+            <form method="POST" action="{% url 'authentication:address_create' address_type=address_type pk=user_id %}" class="needs-validation" enctype="multipart/form-data">
 
-            <div class="mb-3">
-              <label for="exampleInputEmail1" class="form-label">Calle</label>
-              <input type="text" class="form-control" name="street" id="exampleInputEmail1" aria-describedby="emailHelp">
-            </div>
-            <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">Barrio o sector</label>
-              <input type="text" class="form-control" name="neighborhood" id="exampleInputPassword1">
-            </div>
+              {% csrf_token %}
 
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Calle</label>
+                  <input type="text" class="form-control" name="street" autocomplete="address-line1">
+                </div>
 
+                <div class="col-md-6">
+                  <label class="form-label">Barrio o sector</label>
+                  <input type="text" class="form-control" name="neighborhood" autocomplete="address-line2">
+                </div>
 
-            <!-- Recorre todos los campos del formulario -->
+                <div class="col-12">
+                  {% include 'provincia_municipios.html' %}
+                </div>
 
-            {% for field in form %}
-              <div class="row">
-                {% if field.label != 'Municipio' and field.label != 'Provincia' and field.label != 'Codigo postal' %}
-                  {{ field.label }}
-                {% endif %}
-                {{ field }}
+                <div class="col-12 d-flex gap-2 pt-2">
+                  <button type="submit" class="btn btn-success px-4">
+                    Guardar
+                  </button>
+                  <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    Cancelar
+                  </a>
+                </div>
               </div>
-            {% endfor %}
-            <div class="row mb-5">
-              {% include 'provincia_municipios.html' %}
-            </div>
-            <button type="submit" class="btn btn-success" id="addFieldsButton">Guardar</button>
-          </form>
+            </form>
+
+          </div>
         </div>
+
       </div>
     </div>
   </div>
 {% endblock %}
-
 {% block extra_js %}
   <script>
     const provincias = {

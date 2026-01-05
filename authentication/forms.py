@@ -1,14 +1,13 @@
 from django import forms
-from django import forms
 from .models.address import Address
 from .models.profiles import Profiles
 from .models.customers import Customers
 from .models.students import Students
 from .models.staffs import Staffs
 from .models.directives import Directives
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-
+from django.contrib.auth.models import User, Group
+from .models.address import Address
 
 def _append_css_class(widget, css_class: str) -> None:
     existing = (widget.attrs.get('class') or '').split()
@@ -16,54 +15,7 @@ def _append_css_class(widget, css_class: str) -> None:
         if c and c not in existing:
             existing.append(c)
     widget.attrs['class'] = ' '.join(existing).strip()
-
-class FacilitadorRegistrationForm(forms.Form):
-    def clean_username(self):
-        from django.contrib.auth.models import User
-        username = self.cleaned_data['username']
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError(f'El usuario "{username}" ya existe. Por favor elige otro nombre de usuario.')
-        return username
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    distrito = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Distrito')
-    # Dirección: se usará AddressForm embebido
-    street = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Calle y número')
-    neighborhood = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Barrio o sector')
-    city = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Ciudad/Provincia')
-    state = forms.CharField(max_length=255, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Municipio/Estado')
-    zip_code = forms.CharField(max_length=10, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Código postal', required=False)
-
-    def save(self):
-        from django.contrib.auth.models import User, Group
-        from .models.address import Address
-        # Crear usuario
-        user = User.objects.create_user(
-            username=self.cleaned_data['username'],
-            password=self.cleaned_data['password'],
-            email=self.cleaned_data['email'],
-            first_name=self.cleaned_data['first_name'],
-            last_name=self.cleaned_data['last_name'],
-        )
-        # Asignar grupo facilitador si no existe
-        group, created = Group.objects.get_or_create(name='facilitador')
-        if not user.groups.filter(name='facilitador').exists():
-            user.groups.add(group)
-        # Crear dirección
-        address = Address.objects.create(
-            user=user,
-            address_type='residencial',
-            street=self.cleaned_data['street'],
-            neighborhood=self.cleaned_data['neighborhood'],
-            city=self.cleaned_data['city'],
-            state=self.cleaned_data['state'],
-            zip_code=self.cleaned_data['zip_code'],
-        )
-        # Retornar usuario, distrito y dirección
-        return user, self.cleaned_data['distrito'], address
+   
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Address

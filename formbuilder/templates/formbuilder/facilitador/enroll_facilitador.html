@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+  <h1>Inscribir Facilitador</h1>
+  <p>Rellene los campos del formulario para inscribirse como un facilitador.</p>
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Siguiente</button>
+  </form>
+
+{% endblock %}

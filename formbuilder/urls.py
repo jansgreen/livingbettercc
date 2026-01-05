@@ -4,6 +4,7 @@ from . import views
 app_name = 'formbuilder'
 
 urlpatterns = [
+    # crear plantilla de formulario
     path('', views.form_list, name='form_list'),
     path('create/', views.form_create, name='form_create'),
     path('<int:pk>/', views.form_detail, name='form_detail'),
@@ -18,10 +19,12 @@ urlpatterns = [
 
     # Completed Forms Views - All Users
     path('facilitador/facilitador_list_view/', views.facilitador_list_view, name='facilitador_list_view'),
-
+    path('facilitador/enroll_facilitador/', views.enroll_facilitador, name='enroll_facilitador'),
+    path("facilitador/pending/", views.pending_forms, name="pending_forms"),
+    path('facilitador/edit_forms/', views.edit_forms, name='edit_forms'),
 
     # Completed Forms Views
-    path('completed/completed_forms/', views.completed_forms_list, name='completed_forms_list'),
+    path('completed/completed_forms_list/', views.completed_forms_list, name='completed_forms_list'),
     path('completed/completed_forms_detail/<int:pk>/', views.completed_forms_detail, name='completed_forms_detail'),
     path('completed/completed_forms_edit/<int:pk>/edit/', views.completed_forms_edit, name='completed_forms_edit'),
     path('completed/<int:pk>/share/', views.share_with_facilitadores, name='share_with_facilitadores'),

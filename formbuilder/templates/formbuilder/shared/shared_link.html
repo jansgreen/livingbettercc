@@ -10,6 +10,7 @@
   <p>
     <a href="{{ share_url }}" target="_blank" class="btn btn-primary">Abrir enlace (prueba)</a>
     <a href="{% url 'formbuilder:completed_forms_list' %}" class="btn btn-link">Volver a listados</a>
+
   </p>
 
   <script>
@@ -18,7 +19,7 @@
       copyBtn.addEventListener('click', function () {
         const input = document.getElementById('shareUrl');
         input.select();
-        input.setSelectionRange(0, 99999); // For mobile
+        input.setSelectionRange(0, 99999);
         try {
           document.execCommand('copy');
           copyBtn.innerText = 'Copiado';

@@ -1,4 +1,3 @@
-from .forms import FacilitadorRegistrationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
@@ -13,12 +12,17 @@ from authentication.models.directives import Directives
 from authentication.models.address import Address
 from authentication.models.students import Students
 
+from formbuilder.forms import FacilitadorRegistrationForm
+
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import get_backends
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from dashboard.groups.models import Invitation
+from django.contrib.auth import login, get_backends
+from django.urls import reverse
 
 
 def _dedupe_student_groups(user):
@@ -32,14 +36,12 @@ def _dedupe_student_groups(user):
         except Group.DoesNotExist:
             return
 
-
 def _apply_pending_invitation(request, user):
     token = request.session.get('pending_invitation_token')
     if not token or not user or not user.is_authenticated:
         return False
 
     try:
-        from dashboard.groups.models import Invitation
         invitation = Invitation.objects.select_related('group').get(token=token)
     except Exception:
         request.session.pop('pending_invitation_token', None)
@@ -72,8 +74,6 @@ def _apply_pending_invitation(request, user):
     messages.success(request, 'Invitación aceptada correctamente.')
     return True
 
-
-
 # identifico si el usuario es studiante, customer o staff ..
 
 def facilitador_register_view(request):
@@ -83,11 +83,9 @@ def facilitador_register_view(request):
         if form.is_valid():
             user, distrito, address = form.save()
             # Asignar grupo facilitador
-            from django.contrib.auth.models import Group
             group, _ = Group.objects.get_or_create(name='facilitador')
             user.groups.add(group)
             # Autenticar usuario
-            from django.contrib.auth import login, get_backends
             backend = get_backends()[0]
             user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
             login(request, user)
@@ -95,14 +93,12 @@ def facilitador_register_view(request):
             if next_url:
                 return redirect(next_url)
             else:
-                from django.urls import reverse
                 return redirect(reverse('dashboard'))
         else:
             messages.error(request, "Por favor verifica los datos del formulario.")
     else:
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
-
 
 def tecnico_register_view(request):
     """
@@ -398,7 +394,6 @@ def profile_view(request):
     }
     return render(request, 'authentication/profile_detail.html', context)
 
-
 @csrf_exempt
 def customer_view(request):
     if request.method == 'POST':
@@ -478,41 +473,40 @@ def address_detail(request, pk):
     address = get_object_or_404(Address, pk=pk, user=request.user)
     return render(request, 'authentication/address_detail.html', {'address': address})
 
-@login_required
-def address_create(request, address_type):
+# ...existing code...
+def address_create(request, address_type, pk):
     """
-    Crea o actualiza una dirección del tipo especificado para el usuario actual.
-    Si ya existe una dirección de ese tipo, la actualiza.
+        Esta funcion actua como un core en direccion, primero se creara el usuario y luego viene redirijido aqui para crear su direccion
+        desde la funcion de origen enviara el tipo de direccion, el grupo de accesso y el id de usuario.
     """
     # Obtener dirección existente si existe
-    address_instance = Address.objects.filter(user=request.user, address_type=address_type).first()
-    
+    address_instance = Address.objects.filter(user__id=pk, address_type=address_type).first()
+
     if request.method == 'POST':
         form = AddressForm(request.POST, instance=address_instance)
         if form.is_valid():
             address = form.save(commit=False)
-            address.user = request.user
+            # Vincular al usuario indicado por pk (ya debería estar autenticado)
+            address.user_id = pk
             address.address_type = address_type
             address.save()
-            
             messages.success(request, f'Dirección {address.get_address_type_display()} guardada exitosamente.')
-            
             # Redirigir según el contexto (puede personalizarse)
-            next_url = request.GET.get('next', 'courses:course_list')
+            next_url = request.GET.get('next', 'authentication:login')
             return redirect(next_url)
         else:
             messages.error(request, 'Por favor corrige los errores en el formulario.')
     else:
         form = AddressForm(instance=address_instance)
-    
+
     context = {
         'form': form,
         'address_type': address_type,
         'address_type_display': dict(Address.a_type).get(address_type, address_type),
+        'user_id': pk,
     }
     return render(request, 'direccion.html', context)
-
-
+# ...existing code...
 @login_required
 def address_update(request, pk):
     address = get_object_or_404(Address, pk=pk, user=request.user)
@@ -553,10 +547,7 @@ def DirectivesCreate(request):
         'directives_form': directives_form,
     })
 
-
 # CRUD de la Directiva
-
-
 @login_required
 def directives_list(request):
     directives = Directives.objects.all()

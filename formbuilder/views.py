@@ -1,12 +1,11 @@
 from django.shortcuts import render
 from django.http import Http404
-from django.urls import reverse_lazy, reverse, NoReverseMatch
-from django.conf import settings
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
 from .models import FormDefinition, FormField, CompletedForm
-from .forms import FormDefinitionForm, FormFieldForm
+from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 # formbuilder/views.py
@@ -14,22 +13,97 @@ from django.shortcuts import render, redirect
 from .utils import generate_dynamic_form, build_ordered_responses
 from django.contrib import messages
 from django.urls import reverse
-
-# Safe reverse helper to avoid NoReverseMatch 500s in production
-def reverse_safe(name: str, *, args=None, kwargs=None, default: str = "/") -> str:
-    try:
-        if args is not None:
-            return reverse(name, args=args)
-        if kwargs is not None:
-            return reverse(name, kwargs=kwargs)
-        return reverse(name)
-    except NoReverseMatch:
-        return default
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.files.storage import default_storage
+from django.contrib.auth import login, get_backends
 from django.utils.text import slugify
 import os
 
+
+def pending_forms(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    # Aquí puedes implementar la lógica para obtener los formularios pendientes
+    # Por simplicidad, asumiremos que todos los formularios están pendientes
+    pending_forms = FormDefinition.objects.all()
+    # Adjuntar el pk del último formulario completado por el usuario para cada definición,
+    # de modo que el botón "Editar" pueda apuntar al recurso correcto.
+    for f in pending_forms:
+        f.user_completed_pk = (
+            CompletedForm.objects
+            .filter(user=request.user, form_name=f.name)
+            .order_by('-submitted_at')
+            .values_list('pk', flat=True)
+            .first()
+        )
+    
+    context = {
+        'pending_forms': pending_forms
+    }
+    return render(request, 'formbuilder/pending_forms.html', context)
+
+def edit_forms(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    # Aquí puedes implementar la lógica para obtener los formularios que el usuario puede editar
+    # Por simplicidad, asumiremos que todos los formularios pueden ser editados
+    editable_forms = FormDefinition.objects.all()
+    
+    context = {
+        'editable_forms': editable_forms
+    }
+    return render(request, 'formbuilder/edit_forms.html', context)
+
+@require_http_methods(["GET", "POST"])
+def enroll_facilitador(request):
+    form = FacilitadorRegistrationForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            # FIX: handle both return types (User or tuple)
+            result = form.save()
+            user = None
+            distrito = ''
+            address = None
+            if isinstance(result, tuple):
+                # Expected: (user, distrito, address) or shorter
+                user = result[0] if len(result) > 0 else None
+                distrito = result[1] if len(result) > 1 else ''
+                address = result[2] if len(result) > 2 else None
+            elif isinstance(result, User):
+                user = result
+            else:
+                # Fallback for custom object with attributes
+                user = getattr(result, 'user', None)
+                distrito = getattr(result, 'distrito', '')
+                address = getattr(result, 'address', None)
+
+            if not isinstance(user, User) or user is None:
+                messages.error(request, 'No se pudo crear el usuario del facilitador.')
+                return render(request, 'formbuilder/facilitador/enroll_facilitador.html', {'form': form})
+
+            # Asignar grupo facilitador
+            group, _ = Group.objects.get_or_create(name='facilitador')
+            user.groups.add(group)
+
+            # Log in so address_create can bind address.user = request.user
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            login(request, user)
+
+            messages.success(request, 'Facilitador registrado exitosamente.')
+
+            # Redirigir a address_create con kwargs correctos (address_type y pk)
+            next_url = reverse('authentication:address_create', kwargs={
+                'address_type': 'residencial',
+                'pk': user.id,
+            })
+            return redirect(next_url)
+        else:
+            messages.error(request, f'{form.errors} Por favor corrige los errores en el formulario.')
+    context = {'form': form}
+    return render(request, 'formbuilder/facilitador/enroll_facilitador.html', context)
 
 def facilitador_list_view(request):
     facilitadores = User.objects.filter(groups__name='facilitador')
@@ -123,10 +197,7 @@ def render_form(request, form_name):
         if request.GET.get('facilitador'):
             request.session['assign_facilitador'] = True
         next_url = request.get_full_path()
-        register_url = reverse_safe(
-            'facilitador_register',
-            default=getattr(settings, 'LOGIN_URL', '/accounts/login/')
-        )
+        register_url = reverse('facilitador_register')
         return redirect(f"{register_url}?next={next_url}")
 
     subtitle = (form_obj.description or '').strip()
@@ -210,7 +281,7 @@ def completed_forms_list(request):
     is_tecnico = request.user.groups.filter(name='tecnico').exists() if request.user.is_authenticated else False
     if not request.user.is_authenticated or (not is_tecnico and not request.user.is_staff):
         next_url = request.get_full_path()
-        register_url = reverse_safe('tecnico_register', default=getattr(settings, 'LOGIN_URL', '/accounts/login/'))
+        register_url = reverse('tecnico_register')
         return redirect(f"{register_url}?next={next_url}")
 
     completed_forms = CompletedForm.objects.all()
@@ -316,7 +387,6 @@ def facilitadores_por_formulario(request):
     }
     return render(request, 'formbuilder/completed_facilitadores_por_formulario.html', context)
 
-
 @require_http_methods(["POST"])
 def share_with_facilitadores(request, pk):
     """Handle 'share with facilitadores' action for a CompletedForm.
@@ -331,11 +401,7 @@ def share_with_facilitadores(request, pk):
         raise Http404("No encontrado")
 
     # Build a short, shareable URL that redirects to the completed form detail.
-    share_path = reverse_safe(
-        'formbuilder:shared_completed_form',
-        args=[completed_form.pk],
-        default=reverse_safe('shared_completed_form', args=[completed_form.pk], default=f"/formbuilder/completed/shared/{completed_form.pk}/")
-    )
+    share_path = reverse('formbuilder:shared_completed_form', args=[completed_form.pk])
     share_url = request.build_absolute_uri(share_path)
 
     # Render a small page that shows the shareable link and a copy-to-clipboard button.
@@ -345,7 +411,6 @@ def share_with_facilitadores(request, pk):
     }
     return render(request, 'formbuilder/shared/shared_link.html', context)
 
-
 def shared_completed_form(request, pk):
     """Public short link. If the visitor is authenticated and allowed, redirect
     to the completed form detail. If not authenticated, redirect to the
@@ -353,11 +418,7 @@ def shared_completed_form(request, pk):
     registering.
     """
     completed_form = get_object_or_404(CompletedForm, pk=pk)
-    detail_path = reverse_safe(
-        'formbuilder:completed_forms_detail',
-        args=[completed_form.pk],
-        default=reverse_safe('completed_forms_detail', args=[completed_form.pk], default=f"/formbuilder/completed/completed_forms_detail/{completed_form.pk}/")
-    )
+    detail_path = reverse('formbuilder:completed_forms_detail', args=[completed_form.pk])
 
     # If user is authenticated and authorized, redirect to detail
     if request.user.is_authenticated:
@@ -368,7 +429,7 @@ def shared_completed_form(request, pk):
         raise Http404("No encontrado")
 
     # Not authenticated: redirect to tecnico registration with next=detail_path
-    register_url = reverse_safe('tecnico_register', default=getattr(settings, 'LOGIN_URL', '/accounts/login/'))
+    register_url = reverse('tecnico_register')
     return redirect(f"{register_url}?next={detail_path}")
 
 def my_user_complete_forms(request):

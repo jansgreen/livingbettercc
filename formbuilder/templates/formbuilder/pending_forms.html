@@ -1,0 +1,26 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+
+<div class="pending-forms-container">
+    <h1>Pending Forms</h1>
+    {% if pending_forms %}
+        <ul class="list-group">
+            {% for form in pending_forms %}
+            <li class="list-group-item">
+                <div class="form-info">
+                    <h4>{{ form.name }}</h4>
+                    <p>{{ form.description|safe|truncatewords:15 }}</p>
+                </div>
+                <a href="{% url 'formbuilder:render_form' form.name %}" class="btn btn-primary btn-sm">View</a>
+                {% if form.user_completed_pk %}
+                <a href="{% url 'formbuilder:completed_forms_edit' form.user_completed_pk %}" class="btn btn-primary btn-sm">Edit</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-state">No pending forms available.</p>
+    {% endif %}
+</div>
+{% endblock %}

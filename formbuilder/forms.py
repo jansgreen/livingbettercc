@@ -61,3 +61,29 @@ class FormFieldForm(forms.ModelForm):
             return slugify(label)
         # normalize provided name
         return slugify(name)
+
+
+class FacilitadorRegistrationForm(forms.Form):
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError(f'El usuario "{username}" ya existe. Por favor elige otro nombre de usuario.')
+        return username
+    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    distrito = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control'}), label='Distrito')
+
+    def save(self):
+        # Crear usuario
+        user = User.objects.create_user(
+            username=self.cleaned_data['username'],
+            password=self.cleaned_data['password'],
+            email=self.cleaned_data['email'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name'],
+        )
+        return user
+ 

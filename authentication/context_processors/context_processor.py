@@ -4,6 +4,8 @@ import logging
 from django.urls import reverse
 from authentication.models import Directives
 from core.menu_builder import build_menu, safe_id
+from django.urls import NoReverseMatch
+
 logger = logging.getLogger(__name__)
 
 def obtener_menu_auth(request):
@@ -37,52 +39,8 @@ def obtener_menu_auth(request):
 
     menu = build_menu(request.user, 'Profile', submenus, url='#')
     return {'menu_auth': [menu] if menu else []}
-    
-
-def obtener_formbuilder_menu(request):
-    from django.urls import NoReverseMatch
-    if not request.user.is_authenticated:
-        return {'formbuilder_menu': []}
-
-    is_staff = request.user.is_staff or request.user.is_superuser
-    is_tecnico = request.user.groups.filter(name='tecnico').exists()
-    is_facilitador = request.user.groups.filter(name='facilitador').exists()
-
-    submenus = []
-
-    try:
-        # Staff/admin: acceso total
-        if is_staff:
-            submenus.append({'nombre': 'Formbuilder', 'url': reverse('formbuilder:form_list')})
-            submenus.append({'nombre': 'Crear Formulario', 'url': reverse('formbuilder:form_create')})
-            submenus.append({'nombre': 'Lista Formularios Completados', 'url': reverse('formbuilder:completed_forms_list')})
-            submenus.append({'nombre': 'Lista de Facilitadores', 'url': reverse('formbuilder:facilitador_list_view')})
-            submenus.append({'nombre': 'Mis Formularios Completados', 'url': reverse('formbuilder:my_user_completed_forms')})
-        # Técnico: solo ver completados y facilitadores
-        elif is_tecnico:
-            submenus.append({'nombre': 'Lista Formularios Completados', 'url': reverse('formbuilder:completed_forms_list')})
-            submenus.append({'nombre': 'Lista de Facilitadores', 'url': reverse('formbuilder:facilitador_list_view')})
-        # Facilitador: solo ver y llenar formularios, ver sus completados
-        elif is_facilitador:
-            submenus.append({'nombre': 'Formbuilder', 'url': reverse('formbuilder:form_list')})
-            submenus.append({'nombre': 'Mis Formularios Completados', 'url': reverse('formbuilder:my_user_completed_forms')})
-        # Otros usuarios autenticados: solo ver sus completados
-        else:
-            submenus.append({'nombre': 'Mis Formularios Completados', 'url': reverse('formbuilder:my_user_completed_forms')})
-    except NoReverseMatch:
-        # Fallback: menú mínimo si reverse falla
-        submenus.append({'nombre': 'Formbuilder', 'url': '/auth/formbuilder/'})
-
-    menu = build_menu(request.user, 'Form Builder', submenus, url='#')
-    logger.warning(f"[CTX] obtener_formbuilder_menu => {type(menu)} | {menu}")
-    return {'formbuilder_menu': [menu] if menu else []}
-
-
-# authentication/context_processors/context_processor.py
-
 
 def obtener_menu_directives(request):
-    from django.urls import NoReverseMatch
     if not request.user.is_authenticated:
         return {'menu_directives': []}
 
@@ -109,7 +67,6 @@ def obtener_menu_directives(request):
 
     menu = build_menu(request.user, 'Directiva', submenus, url='#')
     return {'menu_directives': [menu] if menu else []}
-
 
 def safe_id(text: str) -> str:
     # Deprecated: use core.menu_builder.safe_id instead (kept for backward compat if imported elsewhere)

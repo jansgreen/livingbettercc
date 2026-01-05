@@ -128,7 +128,7 @@ INSTALLED_APPS = [
     'classroom.certifications',
     'authentication',
     'authentication.students',
-    'authentication.formbuilder',
+    'formbuilder',
     'shop',
     'shop.checkout',
     'gallery',
@@ -208,8 +208,10 @@ TEMPLATES = [
 
                 # authentication
                 'authentication.context_processors.context_processor.obtener_menu_auth',
-                'authentication.context_processors.context_processor.obtener_formbuilder_menu',
                 'authentication.context_processors.context_processor.obtener_menu_directives',
+
+                # formbuilder
+                'formbuilder.context_processors.context_processor.obtener_formbuilder_menu',
 
                 #shop and cart
                 'shop.context_processors.context_processor.obtener_menu_shop',

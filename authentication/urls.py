@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 
+app_name = 'authentication'
 
 urlpatterns = [
     path('facilitador_register/', views.facilitador_register_view, name='facilitador_register'),
@@ -19,7 +20,6 @@ urlpatterns = [
     # Aqui identifico la categoria a la que se le asignara al usuario
     path('prepare_register/<int:pk>/<str:role>/', views.prepare_register, name='prepare_register'),
 
-
     #usuarios clientes
     path('customer_form/', views.customer_view, name='customer_form'),
     path('customers/', views.customer_list_view, name='customer_list'),
@@ -30,7 +30,7 @@ urlpatterns = [
     # Address CRUD views
     path('addresses/', views.address_list, name='address_list'),
     path('addresses/<int:pk>/', views.address_detail, name='address_detail'),
-    path('addresses/create/<str:address_type>/', views.address_create, name='address_create'),
+    path('addresses/create/<str:address_type>/<int:pk>/', views.address_create, name='address_create'),
     path('addresses/<int:pk>/update/', views.address_update, name='address_update'),
     path('addresses/<int:pk>/delete/', views.address_delete, name='address_delete'),
 
@@ -40,11 +40,7 @@ urlpatterns = [
     path('directives/<int:pk>/edit/', views.directives_update, name='directives_update'),
     path('directives/<int:pk>/delete/', views.directives_delete, name='directives_delete'),
     
-
-
     # students registration
     path('students/', include('authentication.students.urls')),
-    path('formbuilder/', include('authentication.formbuilder.urls')),
-
 
 ]

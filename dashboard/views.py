@@ -37,7 +37,7 @@ from django.forms import NumberInput, TextInput
 
 # Import app models used for dashboard counts
 from authentication.models.students import Students
-from authentication.formbuilder.models import FormDefinition
+from formbuilder.models import FormDefinition
 from classroom.courses.models import Course
 from classroom.courses.models import CourseYearStat
 from classroom.courses.models import Program
