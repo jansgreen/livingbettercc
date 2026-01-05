@@ -8,6 +8,8 @@ from .models import Course, Module, Lesson
 from .forms import CourseForm, ModuleForm, LessonForm
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.conf import settings
 
 import json
 from django.http import JsonResponse
@@ -53,7 +55,8 @@ def quicktest_view(request, module_id):
             messages.error(request, 'No aprobaste el test. Repasa la lección antes de continuar.')
             return redirect('courses:module_detail', pk=module_id)
 
-    return render(request, 'courses/quicktest.html', {'module': module, 'test': test})
+    # Template resides under classroom; adjust path if needed later
+    return render(request, 'classroom/quicktest.html', {'module': module, 'test': test})
 
 def course_enroll(request, pk):
     """Permite a un usuario inscribirse en un curso."""
@@ -78,7 +81,7 @@ def course_enroll(request, pk):
             }
             request.session['pending_beca'] = pending
         messages.warning(request, 'Debes iniciar sesión o registrarte para inscribirte en un curso.')
-        return redirect('register')
+        return redirect('authentication:register')
 
     user = request.user
     course = get_object_or_404(Course, pk=pk)
@@ -95,7 +98,7 @@ def course_enroll(request, pk):
     profile = Profiles.objects.filter(user=user).first()
     if not profile:
         messages.info(request, 'Por favor, crea tu perfil antes de inscribirte.')
-        return redirect('profile_create')
+        return redirect('authentication:profile_create')
 
     # Si el usuario aplica a beca Minerd (POST con cedula y exequatur)
     if request.method == 'POST' and 'cedula' in request.POST and 'exequatur' in request.POST:
@@ -144,20 +147,38 @@ def course_enroll(request, pk):
             distrito_escolar=distrito_escolar,
             address=address
         )
-        # Crear o recuperar matrícula
+        # Crear o recuperar matrícula y marcar estado pendiente de aprobación
         enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
+        enrollment.status = Enrollment.Status.PENDING_APPROVAL
+        enrollment.save()
         if created:
-            messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada correctamente.')
+            messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada y está en revisión.')
         else:
-            messages.info(request, f'Ya tienes una aplicación/matrícula para este curso.')
+            messages.info(request, f'Tu matrícula está en revisión para la beca.')
+        # Email de confirmación de solicitud en revisión
+        try:
+            if user.email:
+                EmailMessage(
+                    subject='Solicitud de beca en revisión',
+                    body=f'Hemos recibido tu solicitud de beca para {course.title}. Pronto te notificaremos el resultado.',
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
+                    to=[user.email],
+                ).send(fail_silently=True)
+        except Exception:
+            pass
         return redirect('courses:my_course')
 
     # Inscripción normal (pago)
     enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
-    if created:
-        messages.success(request, f'Te has matriculado con éxito en {course.title}.')
+    if course.price and float(course.price) > 0:
+        enrollment.status = Enrollment.Status.PENDING_PAYMENT
+        enrollment.save()
+        msg = f'Registrado en {course.title}. Completa el pago para activar tu acceso.'
     else:
-        messages.info(request, f'Ya estás matriculado en {course.title}.')
+        enrollment.status = Enrollment.Status.ACTIVE
+        enrollment.save()
+        msg = f'Te has matriculado con éxito en {course.title}.'
+    messages.success(request, msg if created else f'Ya estás matriculado en {course.title}.')
 
     return redirect('courses:my_course')
 
@@ -168,7 +189,7 @@ def course_list(request):
         'courses': courses,
         'can_access_module': can_access_module,
     }
-    return render(request, 'courses/course_list.html', context)
+    return render(request, 'classroom/course_list.html', context)
 
 def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
@@ -181,13 +202,13 @@ def course_detail(request, pk):
         from classroom.enrollments.models import BecaApplication
         beca_app = BecaApplication.objects.filter(user=request.user, course=course).order_by('-fecha_aplicacion').first()
         if beca_app:
-            beca_status = beca_app.estado
+            beca_status = beca_app.status
     context = {
         'course': course,
         'is_enrolled': is_enrolled,
         'beca_status': beca_status,
     }
-    return render(request, 'courses/course_detail.html', context)
+    return render(request, 'classroom/course_detail.html', context)
 
 @login_required
 def my_course(request):
@@ -206,9 +227,11 @@ def my_course(request):
         'courses': courses,
         'modules': modules,
         'is_completed': completed_ids,
+        'has_active': any(e.status == Enrollment.Status.ACTIVE for e in enrollments),
 
     }
-    return render(request, 'courses/my_course.html', context)
+    # Map to existing template name in Spanish
+    return render(request, 'classroom/curso_principal.html', context)
 
 @login_required
 def course_create(request):
@@ -221,7 +244,7 @@ def course_create(request):
             return redirect('courses:course_list')
     else:
         form = CourseForm()
-    return render(request, 'courses/course_form.html', {'form': form})
+    return render(request, 'classroom/course_form.html', {'form': form})
 
 @login_required
 def course_update(request, pk):
@@ -234,7 +257,7 @@ def course_update(request, pk):
             return redirect('courses:course_list')
     else:
         form = CourseForm(instance=course)
-    return render(request, 'courses/course_form.html', {'form': form, 'object': course})
+    return render(request, 'classroom/course_form.html', {'form': form, 'object': course})
 
 @login_required
 def course_delete(request, pk):
@@ -247,7 +270,7 @@ def course_delete(request, pk):
         'object': course,
         'course': course,
     }
-    return render(request, 'courses/course_confirm_delete.html', context)
+    return render(request, 'classroom/course_confirm_delete.html', context)
 
 # modules funciones
 @login_required
@@ -270,7 +293,7 @@ def module_create(request):
         'form': form,
         'courses': Course.objects.all()
     }
-    return render(request, 'module/module_form.html', context)
+    return render(request, 'classroom/module_form.html', context)
 
 @login_required
 def module_list(request):
@@ -280,7 +303,7 @@ def module_list(request):
         'modules': modules,
         'lessons': lessons,
     }
-    return render(request, 'module/module_list.html', context)
+    return render(request, 'classroom/module_list.html', context)
 
 @login_required
 def module_update(request, pk):
@@ -301,7 +324,7 @@ def module_update(request, pk):
         'module': module,
         'object': True,
     }
-    return render(request, 'module/module_form.html', context)
+    return render(request, 'classroom/module_form.html', context)
 
 @login_required
 def module_detail(request, pk):
@@ -316,7 +339,7 @@ def module_detail(request, pk):
         'lessons': lessons,
         'quicktest_result': quicktest_result,
     }
-    return render(request, 'module/module_detail.html', context)
+    return render(request, 'classroom/module_detail.html', context)
 
 @login_required
 def module_delete(request, pk):
@@ -328,7 +351,7 @@ def module_delete(request, pk):
     context = {
         'module': module,
     }
-    return render(request, 'module/module_confirm_delete.html', context)
+    return render(request, 'classroom/module_confirm_delete.html', context)
 
 # 🔹 Lecciones funciones
 @login_required
@@ -337,7 +360,7 @@ def lesson_list(request):
     context = {
         'lessons': lessons,
     }
-    return render(request, 'lesson/lesson_list.html', context)
+    return render(request, 'classroom/lesson_list.html', context)
 
 @login_required
 def lesson_create(request):
@@ -362,7 +385,7 @@ def lesson_create(request):
         'courses': Course.objects.all(),
         'object': False,  # Indica que no es una edición
     }
-    return render(request, 'lesson/lesson_form.html', context)
+    return render(request, 'classroom/lesson_form.html', context)
 
 @login_required
 def lesson_update(request, pk):
@@ -380,7 +403,7 @@ def lesson_update(request, pk):
         'lesson': lesson,
         'object': True,
     }
-    return render(request, 'lesson/lesson_form.html', context)
+    return render(request, 'classroom/lesson_form.html', context)
 
 @login_required
 def lesson_detail(request, pk):
@@ -388,7 +411,8 @@ def lesson_detail(request, pk):
     context = {
         'lessons': lesson,
     }
-    return render(request, 'lesson/lesson_detail.html', context)
+    # Existing template name uses Spanish naming
+    return render(request, 'classroom/leccion_detalle.html', context)
 
 @login_required
 def lesson_delete(request, pk):

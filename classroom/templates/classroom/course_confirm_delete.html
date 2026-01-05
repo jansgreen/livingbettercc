@@ -1,0 +1,12 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<div class="container mt-3">
+  <h2>Eliminar curso</h2>
+  <p>¿Seguro que deseas eliminar "{{ course.title }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Eliminar</button>
+    <a href="{% url 'courses:course_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

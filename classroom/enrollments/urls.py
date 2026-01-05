@@ -12,4 +12,7 @@ urlpatterns = [
     path('<int:pk>/delete/', views.enrollment_delete, name='enrollment-delete'),
     path('mark_module_complete/<int:module_id>/', views.mark_module_complete, name='mark_module_complete'),
     path('mark_lesson_complete/<int:lesson_id>/', views.mark_lesson_complete, name='mark_lesson_complete'),
+    # Payments
+    path('payment/create-session/<int:enrollment_id>/', views.create_checkout_session, name='create_checkout_session'),
+    path('stripe/webhook/', views.stripe_webhook, name='stripe_webhook'),
 ]

@@ -50,6 +50,9 @@ GOOGLE_OAUTH2_CLIENT_SECRETS_JSON = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_OAUTH2_SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 GOOGLE_CLIENT_SECRETS_FILE = os.path.join(BASE_DIR, "client_secret.json")
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_ESCRITORIO_APP')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
 def _parse_hosts_csv(value: str) -> list[str]:
     hosts: list[str] = []
@@ -177,6 +180,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'classroom.middleware.RequireActiveEnrollmentMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware', 
     'allauth.account.middleware.AccountMiddleware',

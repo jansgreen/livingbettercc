@@ -311,7 +311,7 @@ def register_view(request):
 
 def logout_view(request):
     auth_logout(request)
-    return redirect('login')  # Redirect to login after logout
+    return redirect('authentication:login')  # Redirect to login after logout
 
 def prepare_register(request, pk, role):
     # Store the user's intention in session so after register/login we can continue
@@ -335,7 +335,7 @@ def prepare_register(request, pk, role):
 
         return redirect('courses:my_course')
 
-    return redirect('register')
+    return redirect('authentication:register')
 
 def profile_create_view(request):
     if request.method == 'POST':
@@ -387,7 +387,7 @@ def profile_view(request):
     from classroom.enrollments.models import BecaApplication
     beca_app = BecaApplication.objects.filter(user=request.user).order_by('-fecha_aplicacion').first()
     if beca_app:
-        beca_status = beca_app.estado
+        beca_status = beca_app.status
     context = {
         'profile': profile,
         'beca_status': beca_status,
