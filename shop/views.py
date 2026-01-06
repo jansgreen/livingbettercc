@@ -1,5 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from .models import Product, Cart, CartItem, Category, SubCategory
 from .forms import ProductForm, CategoryForm, SubCategoryForm
 from django.conf import settings
@@ -185,3 +187,62 @@ def subcategory_create(request, category_id):
 
 def thanks(request):
     return render(request, 'thanks.html')
+
+
+@login_required
+def order_detail(request, order_id: int):
+    from shop.models import Order
+    order = get_object_or_404(Order, id=order_id)
+    if not (request.user.is_staff or order.user_id == request.user.id):
+        return redirect('product_list')
+
+    items = order.items.select_related('product').all()
+    receipt = None
+    try:
+        from payments.models import Payment
+        p = (
+            Payment.objects.filter(
+                purpose=Payment.PURPOSE_SHOP_ORDER,
+                reference_id=str(order.id),
+                status=Payment.STATUS_PAID,
+            )
+            .order_by('-created_at')
+            .first()
+        )
+        if p and hasattr(p, 'receipt'):
+            receipt = p.receipt
+    except Exception:
+        pass
+
+    ctx = {
+        'order': order,
+        'items': items,
+        'receipt': receipt,
+    }
+    return render(request, 'shop/order_detail.html', ctx)
+
+
+def order_return(request):
+    """Landing page after successful payment; link to last order if available."""
+    order_id = request.session.get('last_order_id')
+    has_order = bool(order_id)
+    from django.urls import reverse
+    fallback_url = reverse('product_list')
+    return render(request, 'shop/order_return.html', {
+        'order_id': order_id,
+        'has_order': has_order,
+        'fallback_url': fallback_url,
+    })
+
+
+def order_cancel(request):
+    """Landing page after cancelled payment; link to resume payment or view order."""
+    order_id = request.session.get('last_order_id')
+    has_order = bool(order_id)
+    from django.urls import reverse
+    fallback_url = reverse('product_list')
+    return render(request, 'shop/order_cancel.html', {
+        'order_id': order_id,
+        'has_order': has_order,
+        'fallback_url': fallback_url,
+    })

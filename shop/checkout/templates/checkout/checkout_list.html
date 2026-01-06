@@ -3,6 +3,25 @@
 
 {% block content %}
 <h1>Checkout</h1>
+{% if request.session.last_order_id %}
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+    <div>Tu orden fue creada. Puedes revisarla en cualquier momento.</div>
+    <div>
+        <a class="btn btn-sm btn-primary" href="{% url 'shop:order_detail' order_id=request.session.last_order_id %}">Ver mi orden</a>
+        {% if last_order and last_order.status == 'pending_payment' %}
+            <a class="btn btn-sm btn-success ms-2" href="{% url 'payments:start_order_checkout' order_id=request.session.last_order_id %}">Pagar ahora</a>
+        {% endif %}
+    </div>
+ </div>
+{% endif %}
+    {% if user.is_authenticated and products and not request.session.last_order_id %}
+    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+        <div>Tienes artículos en el carrito. Crea tu orden para pagar ahora.</div>
+        <div>
+            <a class="btn btn-sm btn-success" href="{% url 'checkout:checkout_pay' %}">Pagar ahora</a>
+        </div>
+    </div>
+    {% endif %}
 <table class="table table-light table-striped-columns">
     <thead>
         <tr>
@@ -37,7 +56,12 @@
         <p class="lead">
         Cada vez que eliges uno de nuestros libros, no solo estás invirtiendo en conocimiento, también estás colaborando directamente con la misión de Living Better Community Center: construir una comunidad más fuerte, saludable y con oportunidades para todos.
         Tu compra es más que un libro... es un paso hacia una vida mejor para muchos. 💚
-        </p>
+                    </a>
+                    {% if request.session.last_order_id %}
+                        <div class="mt-3">
+                            <a class="btn btn-outline-secondary" href="{% url 'shop:order_detail' order_id=request.session.last_order_id %}">Ver mi orden</a>
+                        </div>
+                    {% endif %}
    
         <a href="https://a.co/d/f9eTjyk" target="_blank" style="text-decoration:none;">
             <button style="background-color:#ff9900; color:white; padding:10px 20px; border:none; border-radius:5px;">
@@ -47,7 +71,7 @@
           
     </div>
 {% else %}
-    <a href="{% url 'customer_form' %}" class="btn btn-warning">Complete Checkout</a>
+    <a href="{% url 'authentication:customer_form' %}" class="btn btn-warning">Complete Checkout</a>
 {% endif %}
 
 {% endblock %}

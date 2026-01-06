@@ -1,5 +1,5 @@
 from django import forms
-from .models.address import Address
+from authentication.address.models import Address
 from .models.profiles import Profiles
 from .models.customers import Customers
 from .models.students import Students
@@ -7,7 +7,7 @@ from .models.staffs import Staffs
 from .models.directives import Directives
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
-from .models.address import Address
+from authentication.address.models import Address
 
 def _append_css_class(widget, css_class: str) -> None:
     existing = (widget.attrs.get('class') or '').split()
@@ -16,25 +16,6 @@ def _append_css_class(widget, css_class: str) -> None:
             existing.append(c)
     widget.attrs['class'] = ' '.join(existing).strip()
    
-class AddressForm(forms.ModelForm):
-    class Meta:
-        model = Address
-        fields = ['street', 'neighborhood', 'city', 'state', 'zip_code']  # Campos editables por el usuario
-        # 'user' y 'address_type' se asignan en la vista
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Aplicar clase Bootstrap a todos los campos
-        for field in self.fields.values():
-            _append_css_class(field.widget, 'form-control')
-        
-        # Etiquetas en español
-        self.fields['street'].label = 'Calle y número'
-        self.fields['neighborhood'].label = 'Barrio o sector'
-        self.fields['city'].label = 'Ciudad/Provincia'
-        self.fields['state'].label = 'Municipio/Estado'
-        self.fields['zip_code'].label = 'Código postal'
 class ProfileForm(forms.ModelForm):
 
 

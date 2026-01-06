@@ -5,11 +5,12 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from classroom.enrollments.models import Enrollment, LessonCompletion
 
-from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, AddressForm, DirectivesForm
+from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm
+from authentication.address.forms import AddressForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
 from authentication.models.directives import Directives
-from authentication.models.address import Address
+from authentication.address.models import Address
 from authentication.models.students import Students
 
 from formbuilder.forms import FacilitadorRegistrationForm
@@ -23,7 +24,7 @@ from django.urls import reverse_lazy
 from dashboard.groups.models import Invitation
 from django.contrib.auth import login, get_backends
 from django.urls import reverse
-
+from django.shortcuts import redirect
 
 def _dedupe_student_groups(user):
     """If both 'student' and 'students' are present, keep only 'students'."""
@@ -140,59 +141,18 @@ def login_view(request):
             auth_login(request, user)
             invite_applied = _apply_pending_invitation(request, user)
             _dedupe_student_groups(user)
-            # Si hay intención previa almacenada (inscribirse en un curso), respetarla
-            role = request.session.get('post_register_role', None)
-            item_id = request.session.get('selected_item', None)
-            pending_beca = request.session.get('pending_beca')
-            if pending_beca and role == 'student' and item_id:
-                try:
-                    # Procesar la solicitud de beca guardada en sesión
-                    from authentication.models.students import Students
-                    from authentication.models.address import Address
-                    from classroom.enrollments.models import BecaApplication, Enrollment
-                    from classroom.courses.models import Course
-                    # Crear matrícula
-                    Enrollment.objects.get_or_create(user=user, course_id=item_id)
-                    # Guardar student y address
-                    student, _ = Students.objects.get_or_create(user=user)
-                    student.cedula = pending_beca.get('cedula')
-                    student.certification = pending_beca.get('exequatur')
-                    student.save()
-                    address = Address.objects.create(
-                        user=user,
-                        address_type='laboral',
-                        street=pending_beca.get('street',''),
-                        neighborhood=pending_beca.get('neighborhood',''),
-                        city=pending_beca.get('city',''),
-                        state=pending_beca.get('state',''),
-                        zip_code=pending_beca.get('zip_code','')
-                    )
-                    course_obj = Course.objects.get(pk=item_id)
-                    BecaApplication.objects.create(
-                        user=user,
-                        course=course_obj,
-                        cedula=pending_beca.get('cedula',''),
-                        exequatur=pending_beca.get('exequatur',''),
-                        centro_educativo=pending_beca.get('centro_educativo',''),
-                        distrito_escolar=pending_beca.get('distrito_escolar',''),
-                        address=address
-                    )
-                    messages.success(request, f'Tu aplicación a la beca Minerd para {course_obj.title} fue procesada correctamente.')
-                except Exception:
-                    messages.warning(request, 'No se pudo procesar automáticamente la solicitud de beca después del inicio de sesión.')
-                finally:
-                    request.session.pop('pending_beca', None)
-                    request.session.pop('post_register_role', None)
-                    request.session.pop('selected_item', None)
-                return redirect('courses:course_detail', pk=item_id)
-            if role == 'student' and item_id:
-                # Limpiar sesiones y redirigir al flujo de inscripción
+            # Reanudar intención: delegar al flujo de Classroom
+            role = request.session.get('post_register_role')
+            item_id = request.session.get('selected_item')
+            if item_id:
+                if role:
+                    group, _ = Group.objects.get_or_create(name=role)
+                    user.groups.add(group)
                 request.session.pop('post_register_role', None)
-                request.session.pop('selected_item', None)
-                return redirect('courses:course_enroll', pk=item_id)
+                return redirect('courses:start_course_payment', pk=item_id)
             if invite_applied:
                 return redirect('dashboard')
-            return redirect('home')  # Default
+            return redirect('home')
     else:
         form = AuthenticationForm()
 
@@ -234,50 +194,9 @@ def register_view(request):
 
             # Si venía para tomar un curso y registrarse como estudiante
             if role == 'student' and item_id:
-                Enrollment.objects.get_or_create(user=user, course_id=item_id)
-                # Si había una solicitud de beca pendiente, procesarla ahora
-                pending_beca = request.session.get('pending_beca')
-                if pending_beca:
-                    try:
-                        # Guardar datos en Students y Address y crear BecaApplication
-                        student, _ = Students.objects.get_or_create(user=user)
-                        student.cedula = pending_beca.get('cedula')
-                        student.certification = pending_beca.get('exequatur')
-                        student.save()
-                        from authentication.models.address import Address
-                        address = Address.objects.create(
-                            user=user,
-                            address_type='laboral',
-                            street=pending_beca.get('street',''),
-                            neighborhood=pending_beca.get('neighborhood',''),
-                            city=pending_beca.get('city',''),
-                            state=pending_beca.get('state',''),
-                            zip_code=pending_beca.get('zip_code','')
-                        )
-                        from classroom.enrollments.models import BecaApplication
-                        from classroom.courses.models import Course
-                        course_obj = Course.objects.get(pk=item_id)
-                        BecaApplication.objects.create(
-                            user=user,
-                            course=course_obj,
-                            cedula=pending_beca.get('cedula',''),
-                            exequatur=pending_beca.get('exequatur',''),
-                            centro_educativo=pending_beca.get('centro_educativo',''),
-                            distrito_escolar=pending_beca.get('distrito_escolar',''),
-                            address=address
-                        )
-                        messages.success(request, f'Tu aplicación a la beca Minerd para {course_obj.title} fue enviada correctamente.')
-                    except Exception:
-                        # No interrumpimos el flujo si algo falla; informar más adelante
-                        messages.warning(request, 'No se pudo procesar completamente la solicitud de beca automáticamente.')
-                    finally:
-                        request.session.pop('pending_beca', None)
-
-                # Limpiar variables temporales
+                # No crear Enrollment aquí; delegar a Classroom
                 request.session.pop('post_register_role', None)
-                request.session.pop('selected_item', None)
-                messages.success(request, 'Tu cuenta ha sido creada y estás inscrito en el curso.')
-                return redirect('courses:course_detail', pk=item_id)
+                return redirect('courses:start_course_payment', pk=item_id)
 
             # Estudiante que viene por Distrito Educativo
             elif role == 'student' and student_mode == 'district':
@@ -288,7 +207,7 @@ def register_view(request):
 
             # Si venía como cliente comprando algo
             elif role == 'customer' and item_id:
-                cart = request.session.get('cart', [])
+                # Flujo de tienda no aplica a cursos
                 request.session.pop('cart', None)
 
             # Si el rol es facilitador (docente, staff educativo)
@@ -313,29 +232,22 @@ def logout_view(request):
     auth_logout(request)
     return redirect('authentication:login')  # Redirect to login after logout
 
+
 def prepare_register(request, pk, role):
-    # Store the user's intention in session so after register/login we can continue
+    # Solo guardar intención en sesión y asegurar grupo; no crear Enrollment aquí
     request.session['post_register_role'] = role
-    request.session['selected_item'] = pk
+    request.session['selected_item'] = int(pk)
 
     if request.user.is_authenticated:
-        # Ensure the group exists and add the user to it (idempotent)
+        # Asegurar grupo idempotente
         group, _ = Group.objects.get_or_create(name=role)
         request.user.groups.add(group)
+        # Redirigir al flujo de Classroom para decidir Enrollment/estado/pago
+        return redirect('courses:start_course_payment', pk=pk)
 
-        # Ensure enrollment exists; use get_or_create so it's saved and returned
-        enrollment, created = Enrollment.objects.get_or_create(user=request.user, course_id=pk)
-
-        # Store a lightweight reference (id) in session instead of the model instance
-        try:
-            request.session['post_register_info_id'] = int(enrollment.id)
-        except Exception:
-            # Fallback: store course id so frontend can still find context
-            request.session['selected_item'] = pk
-
-        return redirect('courses:my_course')
-
-    return redirect('authentication:register')
+    # Usuario no autenticado: continuar con registro/login con next; luego reanudar desde sesión
+    next_url = reverse('courses:start_course_payment', kwargs={'pk': pk})
+    return redirect(f"{reverse('authentication:register')}?next={next_url}")
 
 def profile_create_view(request):
     if request.method == 'POST':
@@ -344,14 +256,14 @@ def profile_create_view(request):
             profile = form.save(commit=False)
             profile.user = request.user  # Set the user to the currently logged-in user
             profile.old_cart = ''  # Initialize old_cart or set as needed
-            if not Address.objects.filter(user=request.user, address_type='Residencial').exists():
-                address, created = Address.objects.get_or_create(user=request.user, address_type='Residencial')
+            if not Address.objects.filter(user=request.user, address_type='residencial').exists():
+                address, created = Address.objects.get_or_create(user=request.user, address_type='residencial')
                 profile.direccion = address
                 profile.save()
                 if created:
-                    return redirect('address_create', address_type='Residencial')
+                    return redirect('address_create', address_type='residencial')
             if not profile.direccion:
-                return redirect('address_create', address_type='Residencial')  # Redirect to address creation if direccion is not set
+                return redirect('address_create', address_type='residencial')  # Redirect to address creation if direccion is not set
             return redirect('profile_list')  # Redirect to profile list after creation
     else:
         form = ProfileForm()
@@ -361,6 +273,20 @@ def profile_list_view(request):
     object_list = User.objects.all()
     context = {'object_list': object_list}
     return render(request, 'authentication/profile_list.html', context)
+
+@login_required
+def profile_view(request):
+    profile = Profiles.objects.filter(user=request.user)
+    beca_status = None
+    from classroom.enrollments.models import BecaApplication
+    beca_app = BecaApplication.objects.filter(user=request.user).order_by('-fecha_aplicacion').first()
+    if beca_app:
+        beca_status = beca_app.status
+    context = {
+        'profile': profile,
+        'beca_status': beca_status,
+    }
+    return render(request, 'authentication/profile_detail.html', context)
 
 def profile_update_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
@@ -379,57 +305,6 @@ def profile_delete_view(request, pk):
         profile.delete()
         return redirect('profile_list')  # Redirect to profile list after deletion
     return render(request, 'authentication/profile_delete.html', {'profile': profile})
-
-@login_required
-def profile_view(request):
-    profile = Profiles.objects.filter(user=request.user)
-    beca_status = None
-    from classroom.enrollments.models import BecaApplication
-    beca_app = BecaApplication.objects.filter(user=request.user).order_by('-fecha_aplicacion').first()
-    if beca_app:
-        beca_status = beca_app.status
-    context = {
-        'profile': profile,
-        'beca_status': beca_status,
-    }
-    return render(request, 'authentication/profile_detail.html', context)
-
-@csrf_exempt
-def customer_view(request):
-    if request.method == 'POST':
-        form = CustomerForm(request.POST)
-        if form.is_valid():
-            # Check if the user already exists
-            username = form.cleaned_data.get('username')
-            if User.objects.filter(username=username).exists():
-                messages.error(request, 'El usuario ya existe. Por favor, elige otro nombre de usuario.')
-                return redirect('login')  # Redirect to the same page or another appropriate page
-            
-            # Save the user
-            user = form.save(commit=False)
-            user.save()
-
-            # Save the address
-            Address.objects.create(
-                user=user,
-                street=request.POST.get('street'),
-                neighborhood=request.POST.get('neighborhood'),
-                city=request.POST.get('city'),
-                state=request.POST.get('state'),
-                zip_code=request.POST.get('zip_code'),
-            )
-
-            # Authenticate and log in the user
-            backend = get_backends()[0]
-            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
-            auth_login(request, user)
-            return redirect('checkout_list')  # Redirect to the next stage
-        else:
-            messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
-            return redirect('shop:checkout')  # Redirect to the next stage
-    else:
-        form = CustomerForm()
-    return render(request, 'customers/customers.html', {'form': form})
 
 def customer_list_view(request):
     customers = Customers.objects.all()
@@ -463,69 +338,41 @@ def customer_delete_view(request, pk):
         return redirect('customer_list')  # Redirect to customer list after deletion
     return render(request, 'customers/customer_delete.html', {'customer': customer})
 
-@login_required
-def address_list(request):
-    addresses = Address.objects.filter(user=request.user)
-    return render(request, 'authentication/address_list.html', {'addresses': addresses})
-
-@login_required
-def address_detail(request, pk):
-    address = get_object_or_404(Address, pk=pk, user=request.user)
-    return render(request, 'authentication/address_detail.html', {'address': address})
-
-# ...existing code...
-def address_create(request, address_type, pk):
-    """
-        Esta funcion actua como un core en direccion, primero se creara el usuario y luego viene redirijido aqui para crear su direccion
-        desde la funcion de origen enviara el tipo de direccion, el grupo de accesso y el id de usuario.
-    """
-    # Obtener dirección existente si existe
-    address_instance = Address.objects.filter(user__id=pk, address_type=address_type).first()
-
+@csrf_exempt
+def customer_view(request):
     if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address_instance)
+        form = CustomerForm(request.POST)
         if form.is_valid():
-            address = form.save(commit=False)
-            # Vincular al usuario indicado por pk (ya debería estar autenticado)
-            address.user_id = pk
-            address.address_type = address_type
-            address.save()
-            messages.success(request, f'Dirección {address.get_address_type_display()} guardada exitosamente.')
-            # Redirigir según el contexto (puede personalizarse)
-            next_url = request.GET.get('next', 'authentication:login')
-            return redirect(next_url)
+            # Check if the user already exists
+            username = form.cleaned_data.get('username')
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'El usuario ya existe. Por favor, elige otro nombre de usuario.')
+                return redirect('login')
+            # Save the user
+            user = form.save(commit=False)
+            user.save()
+
+            # Save the address
+            Address.objects.create(
+                user=user,
+                street=request.POST.get('street'),
+                neighborhood=request.POST.get('neighborhood'),
+                city=request.POST.get('city'),
+                state=request.POST.get('state'),
+                zip_code=request.POST.get('zip_code'),
+            )
+
+            # Authenticate and log in the user
+            backend = get_backends()[0]
+            user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
+            auth_login(request, user)
+            return redirect('checkout_list')  # Redirect to the next stage
         else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
+            return redirect('shop:checkout')
     else:
-        form = AddressForm(instance=address_instance)
-
-    context = {
-        'form': form,
-        'address_type': address_type,
-        'address_type_display': dict(Address.a_type).get(address_type, address_type),
-        'user_id': pk,
-    }
-    return render(request, 'direccion.html', context)
-# ...existing code...
-@login_required
-def address_update(request, pk):
-    address = get_object_or_404(Address, pk=pk, user=request.user)
-    if request.method == 'POST':
-        form = AddressForm(request.POST, instance=address)
-        if form.is_valid():
-            form.save()
-            return redirect('address_list')
-    else:
-        form = AddressForm(instance=address)
-    return render(request, 'authentication/address_form.html', {'form': form})
-
-@login_required
-def address_delete(request, pk):
-    address = get_object_or_404(Address, pk=pk, user=request.user)
-    if request.method == 'POST':
-        address.delete()
-        return redirect('address_list')
-    return render(request, 'authentication/address_confirm_delete.html', {'address': address})
+        form = CustomerForm()
+    return render(request, 'customers/customers.html', {'form': form})
 
 def DirectivesCreate(request):
 
@@ -589,3 +436,19 @@ def directives_delete(request, pk):
         directive.delete()
         return redirect("directives_list")
     return render(request, "directivas/directives_confirm_delete.html", {"directive": directive})
+
+# Address view aliases for legacy URL patterns
+def address_list(request):
+    return redirect('authentication:address_list')
+
+def address_detail(request, pk):
+    return redirect('authentication:address_detail', pk=pk)
+
+def address_create(request, address_type, pk):
+    return redirect('authentication:address_create', address_type=address_type, pk=pk)
+
+def address_update(request, pk):
+    return redirect('authentication:address_update', pk=pk)
+
+def address_delete(request, pk):
+    return redirect('authentication:address_delete', pk=pk)

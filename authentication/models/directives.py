@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group  # Import Group
 from django.apps import apps  # Importa apps para usar get_model
-from .address import Address
+from authentication.address.models import Address
 from .profiles import Profiles
 from django_ckeditor_5.fields import CKEditor5Field
 

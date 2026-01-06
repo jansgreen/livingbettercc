@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
-from .address import Address
+from authentication.address.models import Address
 from .profiles import Profiles
 
 class Customers(models.Model):

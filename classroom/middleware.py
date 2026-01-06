@@ -30,7 +30,7 @@ class RequireActiveEnrollmentMiddleware(MiddlewareMixin):
             return None
         if settings.MEDIA_URL and path.startswith(settings.MEDIA_URL):
             return None
-        if url_name == 'enrollments:stripe_webhook':
+        if url_name in ('enrollments:stripe_webhook', 'payments:stripe_webhook'):
             return None
 
         protected = {

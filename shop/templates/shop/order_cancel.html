@@ -1,0 +1,14 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container py-4">
+  <h1 class="mb-3">Pago cancelado</h1>
+  {% if has_order %}
+    <p>Puedes retomar el pago o revisar tu orden.</p>
+    <a class="btn btn-outline-primary" href="{% url 'shop:order_detail' order_id=order_id %}">Ver mi orden</a>
+    <a class="btn btn-primary" href="{% url 'payments:start_order_checkout' order_id=order_id %}">Pagar ahora</a>
+  {% else %}
+    <p>No encontramos una orden reciente en esta sesión.</p>
+    <a class="btn btn-primary" href="{{ fallback_url }}">Volver a la tienda</a>
+  {% endif %}
+</div>
+{% endblock %}

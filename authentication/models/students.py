@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User, Group  # Import Group
-from .address import Address
+from authentication.address.models import Address
 
 
 class Certification(models.Model):

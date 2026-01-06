@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from django.conf.urls.static import static
 from django.conf import settings
+from authentication.views import login_view, register_view
 
 
 def certifications_in_person_alias(request):
@@ -41,6 +42,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('home.urls')),
     path('auth/',include(("authentication.urls", "authentication"), namespace="authentication")),
+    # Compatibility aliases for tests and login_required default
+    path('accounts/login/', login_view),
+    path('authentication/register/', register_view),
     # Incluir URLs de la app de usuarios
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
     path('shop/', include('shop.urls')),
@@ -56,6 +60,7 @@ urlpatterns = [
     path('gallery/', include('gallery.urls')),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
     path('formbuilder/', include('formbuilder.urls')),
+    path('payments/', include('payments.urls')),
 
 ]
 

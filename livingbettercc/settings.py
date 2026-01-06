@@ -131,9 +131,9 @@ INSTALLED_APPS = [
     'classroom.certifications',
     'authentication',
     'authentication.students',
+    'authentication.address',
     'formbuilder',
     'shop',
-    'shop.checkout',
     'gallery',
     'cart',
     'core',
@@ -148,6 +148,7 @@ INSTALLED_APPS = [
     'dashboard.groups',
     'dashboard.contents',
     'django_ckeditor_5',
+    'payments',
 
 ]
 

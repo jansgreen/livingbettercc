@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
-from authentication.models import Profiles, Students, Address
-from authentication.forms import ProfileForm, AddressForm
+from authentication.models import Profiles, Students
+from authentication.address.forms import AddressForm
+from authentication.forms import ProfileForm
 from .forms import StudentByDistrictForm
 from authentication.forms import BootstrapUserCreationForm
 from django.contrib import messages

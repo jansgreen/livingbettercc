@@ -1,7 +1,7 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
-from .address import Address
+from authentication.address.models import Address
 from django.core.exceptions import ValidationError
 from django_ckeditor_5.fields import CKEditor5Field
 

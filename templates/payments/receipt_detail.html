@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recibo {{ receipt.receipt_number }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+</head>
+<body class="bg-light">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <h5 class="mb-0">Recibo de Pago</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <strong>Número:</strong> {{ receipt.receipt_number }}
+            </div>
+            <div class="mb-3">
+              <strong>Usuario:</strong> {{ payment.user.username }} ({{ payment.user.email }})
+            </div>
+            <div class="mb-3">
+              <strong>Fecha:</strong> {{ receipt.issued_at|date:"Y-m-d H:i" }}
+            </div>
+            <div class="mb-3">
+              <strong>Monto:</strong> {{ receipt.amount_cents|floatformat:0 }} {{ receipt.currency|upper }}
+            </div>
+            <div class="mb-3">
+              <strong>Referencia:</strong>
+              {% if payment.purpose == 'classroom_enrollment' %}
+                Inscripción #{{ payment.reference_id }}
+              {% elif payment.purpose == 'shop_order' %}
+                Orden #{{ payment.reference_id }}
+              {% else %}
+                {{ payment.purpose }} #{{ payment.reference_id }}
+              {% endif %}
+            </div>
+            <div class="mb-3">
+              <strong>Estado:</strong> {{ payment.status|title }}
+            </div>
+            <p class="text-muted">Este recibo es válido como constancia de pago.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
+from authentication.address.models import Address
 
 
 class FormDefinition(models.Model):
@@ -51,7 +52,7 @@ class CompletedForm(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     form_data = models.JSONField()
     distrito = models.CharField(max_length=100, blank=True, null=True, help_text="Distrito del facilitador")
-    address = models.ForeignKey('authentication.Address', on_delete=models.SET_NULL, blank=True, null=True, help_text="Dirección del facilitador")
+    address = models.ForeignKey(Address, on_delete=models.SET_NULL, blank=True, null=True, help_text="Dirección del facilitador")
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

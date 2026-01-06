@@ -25,4 +25,7 @@ urlpatterns = [
     # Checkout
     path('checkout/', include('shop.checkout.urls')),
     path('thanks/', views.thanks, name="thanks"),
+    path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('order/return/', views.order_return, name='order_return'),
+    path('order/cancel/', views.order_cancel, name='order_cancel'),
 ]

@@ -13,11 +13,17 @@
     {% if is_enrolled and user.is_authenticated %}
         <small class="text-success">Ya estás inscrito en este curso.</small>
         <a href="{% url 'courses:my_course' %}" class="btn btn-primary"> Continuar ...</a>
+        {% if is_enrolled.status != 'active' and is_enrolled.status != 'completed' and course.price|floatformat:2 != '0.00' %}
+          <a href="{% url 'courses:start_course_payment' pk=course.pk %}" class="btn btn-warning ms-2">💳 Pagar ahora</a>
+        {% endif %}
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
-      <a href="{% url 'prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
+      <a href="{% url 'authentication:prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
       <!-- Botón para aplicar a beca Minerd -->
       <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#becaMinerdModal">Aplicar a beca Minerd</button>
+      {% if user.is_authenticated and course.price|floatformat:2 != '0.00' %}
+        <a href="{% url 'courses:start_course_payment' pk=course.pk %}" class="btn btn-warning ms-2">💳 Pagar ahora</a>
+      {% endif %}
 
       <!-- Modal Beca Minerd -->
       <div class="modal fade" id="becaMinerdModal" tabindex="-1" aria-labelledby="becaMinerdLabel" aria-hidden="true">

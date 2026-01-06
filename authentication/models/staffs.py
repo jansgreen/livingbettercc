@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from .address import Address
+from authentication.address.models import Address
 from .profiles import Profiles
 from django.db.models.signals import post_save
 from django.dispatch import receiver

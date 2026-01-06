@@ -62,12 +62,12 @@
                           <div style="position: relative; height: 210px; overflow: hidden;">
                             <img
                               src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
-                              class="w-100 h-100"
+                              class="w-100 h-100 mb-2"
                               style="object-fit: cover;"
                               alt="{{ impact.course.title }}"
                             >
 
-                            <div class="position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
+                            <div class="mt-2 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
                                  style="background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); box-shadow: 0 8px 18px rgba(0,0,0,.18);">
                               {{ impact.issued_date|date:'M d, Y' }}
                             </div>

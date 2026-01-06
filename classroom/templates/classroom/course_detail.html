@@ -11,6 +11,9 @@
   {% else %}
     <p><strong>Precio:</strong> ${{ course.price }}</p>
     <a href="{% url 'authentication:prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
+    <button type="button" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#becaModal">
+      Aplicar a beca Minerd
+    </button>
   {% endif %}
 
   {% if beca_status %}
@@ -30,4 +33,77 @@
     {% endfor %}
   </ul>
 </div>
+
+<!-- Modal: Aplicación a Beca Minerd -->
+<div class="modal fade" id="becaModal" tabindex="-1" aria-labelledby="becaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="becaModalLabel">Aplicar a beca Minerd</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'courses:course_enroll' course.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="enroll_type" value="beca">
+        <div class="modal-body">
+          <div class="alert alert-info">
+            Completa los datos para enviar tu solicitud de beca. Si no has iniciado sesión, te pediremos registrarte y retomaremos esta solicitud automáticamente.
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Cédula</label>
+              <input type="text" name="cedula" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Exequatur</label>
+              <input type="text" name="exequatur" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Centro educativo</label>
+              <input type="text" name="centro_educativo" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Distrito escolar</label>
+              <input type="text" name="distrito_escolar" class="form-control" required>
+            </div>
+
+            <div class="col-12"><hr></div>
+            <div class="col-md-6">
+              <label class="form-label">Calle (laboral)</label>
+              <input type="text" name="street" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Sector/Barrio</label>
+              <input type="text" name="neighborhood" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Provincia</label>
+              <input type="text" name="provincia" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Municipio</label>
+              <input type="text" name="municipio" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Código postal</label>
+              <input type="text" name="zip_code" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Ciudad</label>
+              <input type="text" name="city" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Estado/Provincia</label>
+              <input type="text" name="state" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </div>
 {% endblock %}

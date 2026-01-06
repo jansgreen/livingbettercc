@@ -2,7 +2,7 @@ from .models import Module, Question, QuickTestResult
 from classroom.certifications.views import create_certificate_for_user
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.decorators import login_required
 from .models import Course, Module, Lesson
 from .forms import CourseForm, ModuleForm, LessonForm
@@ -96,12 +96,92 @@ def course_enroll(request, pk):
 
     # Verificar si el usuario tiene perfil
     profile = Profiles.objects.filter(user=user).first()
-    if not profile:
-        messages.info(request, 'Por favor, crea tu perfil antes de inscribirte.')
-        return redirect('authentication:profile_create')
+
+    # Si existe una solicitud de beca almacenada en sesión (usuario se autenticó luego), procesarla aquí
+    pending_beca = request.session.get('pending_beca')
+    if pending_beca:
+        # Requiere perfil para beca Minerd
+        if not profile:
+            return redirect(reverse('authentication:profile_create'))
+        cedula = pending_beca.get('cedula', '').strip()
+        exequatur = pending_beca.get('exequatur', '').strip()
+        centro_educativo = pending_beca.get('centro_educativo', '').strip()
+        distrito_escolar = pending_beca.get('distrito_escolar', '').strip()
+        street = pending_beca.get('street', '').strip()
+        neighborhood = pending_beca.get('neighborhood', '').strip()
+        provincia = pending_beca.get('provincia', '').strip()
+        municipio = pending_beca.get('municipio', '').strip()
+        zip_code = pending_beca.get('zip_code', '').strip()
+        city = pending_beca.get('city', '').strip()
+        state = pending_beca.get('state', '').strip()
+        # Validación básica
+        if not profile.profesion:
+            messages.error(request, 'Debes tener una profesión registrada en tu perfil para aplicar a la beca Minerd.')
+            return redirect('courses:course_detail', pk=pk)
+        if not cedula or not exequatur or not centro_educativo or not distrito_escolar:
+            messages.error(request, 'Debes completar todos los campos para aplicar a la beca Minerd.')
+            return redirect('courses:course_detail', pk=pk)
+        # Guardar datos en Students
+        student.cedula = cedula
+        student.certification = exequatur
+        student.save()
+        # Dirección laboral
+        from authentication.address.models import Address
+        address = Address.objects.create(
+            user=user,
+            address_type='laboral',
+            street=street,
+            neighborhood=neighborhood,
+            city=city,
+            state=state,
+            zip_code=zip_code
+        )
+        # Guardar aplicación a beca
+        from classroom.enrollments.models import BecaApplication
+        beca_app, beca_created = BecaApplication.objects.get_or_create(
+            user=user,
+            course=course,
+            defaults={
+                'cedula': cedula,
+                'exequatur': exequatur,
+                'centro_educativo': centro_educativo,
+                'distrito_escolar': distrito_escolar,
+                'address': address,
+                'status': 'submitted',
+            }
+        )
+        if not beca_created:
+            beca_app.cedula = cedula
+            beca_app.exequatur = exequatur
+            beca_app.centro_educativo = centro_educativo
+            beca_app.distrito_escolar = distrito_escolar
+            beca_app.address = address
+            beca_app.status = 'submitted'
+            beca_app.save()
+        enrollment, _ = Enrollment.objects.get_or_create(user=user, course=course)
+        enrollment.status = Enrollment.Status.PENDING_APPROVAL
+        enrollment.save()
+        # Email de confirmación
+        try:
+            if user.email:
+                EmailMessage(
+                    subject='Solicitud de beca en revisión',
+                    body=f'Hemos recibido tu solicitud de beca para {course.title}. Pronto te notificaremos el resultado.',
+                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
+                    to=[user.email],
+                ).send(fail_silently=True)
+        except Exception:
+            pass
+        # Limpiar sesión al completar
+        request.session.pop('pending_beca', None)
+        messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada y está en revisión.')
+        return redirect('courses:my_course')
 
     # Si el usuario aplica a beca Minerd (POST con cedula y exequatur)
     if request.method == 'POST' and 'cedula' in request.POST and 'exequatur' in request.POST:
+        # Requiere perfil para beca Minerd
+        if not profile:
+            return redirect(reverse('authentication:profile_create'))
         cedula = request.POST.get('cedula', '').strip()
         exequatur = request.POST.get('exequatur', '').strip()
         centro_educativo = request.POST.get('centro_educativo', '').strip()
@@ -126,7 +206,7 @@ def course_enroll(request, pk):
         student.certification = exequatur
         student.save()
         # Guardar dirección laboral
-        from authentication.models.address import Address
+        from authentication.address.models import Address
         address = Address.objects.create(
             user=user,
             address_type='laboral',
@@ -138,15 +218,26 @@ def course_enroll(request, pk):
         )
         # Guardar aplicación a beca
         from classroom.enrollments.models import BecaApplication
-        BecaApplication.objects.create(
+        beca_app, beca_created = BecaApplication.objects.get_or_create(
             user=user,
             course=course,
-            cedula=cedula,
-            exequatur=exequatur,
-            centro_educativo=centro_educativo,
-            distrito_escolar=distrito_escolar,
-            address=address
+            defaults={
+                'cedula': cedula,
+                'exequatur': exequatur,
+                'centro_educativo': centro_educativo,
+                'distrito_escolar': distrito_escolar,
+                'address': address,
+                'status': 'submitted',
+            }
         )
+        if not beca_created:
+            beca_app.cedula = cedula
+            beca_app.exequatur = exequatur
+            beca_app.centro_educativo = centro_educativo
+            beca_app.distrito_escolar = distrito_escolar
+            beca_app.address = address
+            beca_app.status = 'submitted'
+            beca_app.save()
         # Crear o recuperar matrícula y marcar estado pendiente de aprobación
         enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
         enrollment.status = Enrollment.Status.PENDING_APPROVAL
@@ -209,6 +300,55 @@ def course_detail(request, pk):
         'beca_status': beca_status,
     }
     return render(request, 'classroom/course_detail.html', context)
+
+@login_required
+def start_course_payment(request, pk):
+    """
+    Allow user to pay immediately from course detail.
+    - Ensures profile if required, redirecting to profile creation with next.
+    - get_or_create Enrollment(user, course)
+    - If ACTIVE/COMPLETED -> redirect my_course
+    - If PENDING_APPROVAL -> redirect my_course with message
+    - Else set PENDING_PAYMENT for paid courses and delegate to enrollments:create_checkout_session
+    """
+    course = get_object_or_404(Course, pk=pk)
+
+    # Optional profile requirement: if project requires a Profile to proceed with payment
+    try:
+        from authentication.models.profiles import Profiles
+        profile = Profiles.objects.filter(user=request.user).first()
+    except Exception:
+        profile = None
+
+    if not profile:
+        # Redirect to profile create with next back to this pay route
+        next_url = request.get_full_path()
+        return redirect(f"{reverse('authentication:profile_create')}?next={next_url}")
+
+    enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
+
+    # For paid courses, even a newly created enrollment should go to pending_payment
+    if course.price and float(course.price) > 0:
+        if enrollment.status != Enrollment.Status.COMPLETED:
+            if enrollment.status != Enrollment.Status.PENDING_PAYMENT:
+                enrollment.status = Enrollment.Status.PENDING_PAYMENT
+                enrollment.save(update_fields=['status'])
+            return redirect(reverse('enrollments:create_checkout_session', kwargs={'enrollment_id': enrollment.id}))
+        # Completed remains as-is
+        return redirect('courses:my_course')
+
+    # Free courses:
+    if enrollment.status in (Enrollment.Status.ACTIVE, Enrollment.Status.COMPLETED):
+        return redirect('courses:my_course')
+
+    if enrollment.status == Enrollment.Status.PENDING_APPROVAL:
+        messages.info(request, 'Tu matrícula está en revisión (beca).')
+        return redirect('courses:my_course')
+
+    # Free course: activate and go to my_course
+    enrollment.status = Enrollment.Status.ACTIVE
+    enrollment.save(update_fields=['status'])
+    return redirect('courses:my_course')
 
 @login_required
 def my_course(request):

@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from authentication.models.address import Address
+from authentication.address.models import Address
 from django.contrib.auth import get_user_model
 
 class BecaApplication(models.Model):
