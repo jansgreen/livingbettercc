@@ -1,6 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from .models import Course, CourseYearStat, Program, ProgramYearStat, Module, Lesson, Test, Question
+from .models import Course, CourseYearStat, Program, ProgramYearStat, Module, Lesson
 
 class LessonInline(admin.TabularInline):
     model = Lesson
@@ -20,9 +20,6 @@ class ProgramYearStatInline(admin.TabularInline):
     model = ProgramYearStat
     extra = 0
 
-class QuestionInline(admin.TabularInline):
-    model = Question
-    extra = 1
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
@@ -56,18 +53,4 @@ class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'module', 'order')
     search_fields = ('title',)
 
-
-@admin.register(Test)
-class TestAdmin(admin.ModelAdmin):
-    inlines = [QuestionInline]
-    list_display = ('title', 'module')
-    search_fields = ('title',)
-    list_filter = ('module',)   
-
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'test', 'correct_option')
-    search_fields = ('text',)
-    list_filter = ('test',)
-
-
+ 

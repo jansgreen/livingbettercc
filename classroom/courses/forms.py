@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Module, Lesson, Test, Question
+from .models import Course, Module, Lesson
 
 
 def _append_css_class(widget, css_class: str) -> None:
@@ -41,27 +41,4 @@ class LessonForm(forms.ModelForm):
         for field in self.fields:
             _append_css_class(self.fields[field].widget, 'form-control')
 
-class TestForm(forms.ModelForm):
-    class Meta:
-        model = Test
-        fields = ['module', 'title']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            _append_css_class(self.fields[field].widget, 'form-control')
-
-class QuestionForm(forms.ModelForm):
-    class Meta:
-        model = Question
-        fields = ['test', 'text', 'option_a', 'option_b']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields:
-            _append_css_class(self.fields[field].widget, 'form-control')
-        if 'text' in self.fields:
-            _append_css_class(self.fields['text'].widget, 'rich-text')
-        for name in ['option_a', 'option_b', 'option_c', 'option_d', 'correct_option']:
-            if name in self.fields:
-                _append_css_class(self.fields[name].widget, 'form-control')
+# Removed legacy Test/Question forms; questions now live in quicktest app

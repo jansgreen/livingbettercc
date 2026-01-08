@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Address
+from .forms import AddressForm
 
 # Create your views here.
 @login_required
@@ -55,7 +56,7 @@ def address_update(request, pk):
         form = AddressForm(request.POST, instance=address)
         if form.is_valid():
             form.save()
-            return redirect('address_list')
+            return redirect('authentication:address:address_list')
     else:
         form = AddressForm(instance=address)
     return render(request, 'authentication/address_form.html', {'form': form})
@@ -65,5 +66,5 @@ def address_delete(request, pk):
     address = get_object_or_404(Address, pk=pk, user=request.user)
     if request.method == 'POST':
         address.delete()
-        return redirect('address_list')
+        return redirect('authentication:address:address_list')
     return render(request, 'authentication/address_confirm_delete.html', {'address': address})

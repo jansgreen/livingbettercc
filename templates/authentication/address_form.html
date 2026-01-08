@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block content %}
-<h1>{{ form.instance.pk|yesno:"Update Address,Create Address" }}</h1>
+<h1>{{ form.instance.pk|yesno:"Actualizar dirección,Crear dirección" }}</h1>
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save</button>
-</form>
-<a href="{% url 'address_list' %}">Cancel</a>
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a class="btn btn-outline-secondary" href="{% url 'authentication:address:address_list' %}">Cancelar</a>
+    </form>
 {% endblock %}

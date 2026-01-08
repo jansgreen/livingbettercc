@@ -2,17 +2,8 @@
 {% block content %}
 {% load static %}
 <div class="container mt-4">
-  <h1>{{ object.title }}</h1>
-  {% if object.image %}
-    <img src="{{ object.image.url }}" class="img-fluid mb-3" alt="{{ object.title }}">
-  {% endif %}
-  <p>{{ object.description }}</p>
-  <p><strong>Precio:</strong> ${{ object.price }}</p>
-
-  {% if user.is_authenticated and user == object.instructor %}
-    <a href="{% url 'courses:module_update' object.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:module_delete' object.pk %}" class="btn btn-danger">Eliminar</a>
-  {% endif %}
+  <h1>{{ module.title }}</h1>
+  <p>{{ module.description }}</p>
 </div>
 
   <!-- ✅ TEST -->
@@ -23,10 +14,10 @@
         <a href="{% url 'courses:next_module' module.id %}" class="btn btn-success">Ir al siguiente módulo</a>
       {% else %}
         <div class="alert alert-danger">No aprobaste el test. Repasa la lección y vuelve a intentarlo.</div>
-        <a href="{% url 'courses:quicktest' module.id %}" class="btn btn-warning">Reintentar test rápido</a>
+        <a href="{% url 'courses:quicktest' module.id %}" class="btn btn-warning">Tomar test</a>
       {% endif %}
     {% else %}
-      <a href="{% url 'courses:quicktest' module.id %}" class="btn btn-primary">Realizar test rápido del módulo</a>
+      <a href="{% url 'courses:quicktest' module.id %}" class="btn btn-primary">Tomar test</a>
     {% endif %}
   {% else %}
     <p>No hay test para este módulo.</p>
@@ -36,48 +27,6 @@
 {% endblock %}
 
 
-{% block "extra_js" %}
-<script>
-  function submitTest() {
-    let correct = 0;
-    let total = {{ module.test.questions.count }};
-    let questions = {{ module.test.questions.all|json_script:"questions-data" }};
-    questions = JSON.parse(document.getElementById("questions-data").textContent);
 
-    questions.forEach(q => {
-      let selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-      if (selected && selected.value === q.correct_option) {
-        correct++;
-      }
-    });
-
-    let score = (correct / total) * 100;
-
-    // Mostrar resultado
-    document.getElementById('test-result').innerHTML = `<p>Puntuación: ${score.toFixed(2)}%</p>`;
-
-    // Enviar vía AJAX
-    fetch("{% url 'courses:save-test-result' %}", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}"
-      },
-      body: JSON.stringify({
-        module_id: {{ module.id }},
-        score: score
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if(data.status === "success") {
-        document.getElementById('test-result').innerHTML += `<p>Resultado guardado. Progreso actualizado.</p>`;
-      } else {
-        document.getElementById('test-result').innerHTML += `<p>Error guardando resultado.</p>`;
-      }
-    });
-  }
-</script>
-{% endblock %}
 
 

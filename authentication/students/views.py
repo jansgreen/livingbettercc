@@ -104,7 +104,9 @@ def student_by_district(request):
                 student.save()
             student.save()
             messages.success(request, 'Ya casi falta poco.')
-            return redirect('address_create', address_type='laboral')
+            addr_url = reverse('authentication:address:address_create', kwargs={'address_type': 'laboral', 'pk': request.user.id})
+            next_url = reverse('courses:my_course')
+            return redirect(f"{addr_url}?next={next_url}")
         else:
             messages.error(request, f'Por favor corrija los siguientes errores: {form.errors}')
             return render(request, "by_district_form.html", {'form': form})

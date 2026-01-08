@@ -1,22 +1,106 @@
-{% extends "classroom/classroom.html" %}
+{% extends 'dashboard.html' %}
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-  <h2>Test rápido del módulo: {{ module.title }}</h2>
-  <form method="post">
-    {% csrf_token %}
-    {% for question in test.questions.all %}
-      <div class="mb-3">
-        <label class="form-label">{{ question.text|safe }}</label>
-        <div>
-          <label><input type="radio" name="question_{{ question.id }}" value="A"> {{ question.option_a }}</label><br>
-          <label><input type="radio" name="question_{{ question.id }}" value="B"> {{ question.option_b }}</label><br>
-          <label><input type="radio" name="question_{{ question.id }}" value="C"> {{ question.option_c }}</label><br>
-          <label><input type="radio" name="question_{{ question.id }}" value="D"> {{ question.option_d }}</label>
+
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <h2 class="mb-0">Test rápido del módulo: {{ module.title }}</h2>
+
+    {# Botón siempre visible #}
+    <a href="{% url 'courses:my_course' %}" class="btn btn-outline-secondary btn-sm">
+      Volver al curso
+    </a>
+  </div>
+
+  <hr>
+
+  {# RESULTADOS (aparecen después del POST si tu view pasa "result") #}
+  {% if result %}
+    {% if result.passed %}
+      <div class="alert alert-success">
+        <strong>¡Aprobaste!</strong>
+        <div class="mt-1">
+          Calificación: <strong>{{ result.score }}%</strong> ({{ result.correct }}/{{ result.total }})
         </div>
       </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Enviar respuestas</button>
-  </form>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ course:my_course }}" class="btn btn-success">
+          Ir al siguiente módulo
+        </a>
+        <a href="{{ back_to_course_url }}" class="btn btn-secondary">
+          Volver al curso
+        </a>
+      </div>
+
+    {% else %}
+      <div class="alert alert-danger">
+        <strong>No aprobaste.</strong>
+        <div class="mt-1">
+          Calificación: <strong>{{ result.score }}%</strong> ({{ result.correct }}/{{ result.total }})
+        </div>
+        <div class="mt-2">
+          Repasa las lecciones e inténtalo de nuevo.
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ retry_url }}" class="btn btn-primary">
+          Reintentar test
+        </a>
+        <a href="{{ back_to_course_url }}" class="btn btn-secondary">
+          Volver al curso
+        </a>
+      </div>
+    {% endif %}
+
+    <hr>
+  {% endif %}
+
+  {# FORMULARIO: se muestra solo si todavía no hay result #}
+  {% if not result %}
+    <form method="post">
+      {% csrf_token %}
+
+      {% for question in test.questions.all %}
+        <div class="mb-4 p-3 border rounded">
+          <label class="form-label fw-bold">{{ forloop.counter }}. {{ question.text|safe }}</label>
+
+          <div class="mt-2">
+            <label class="d-block mb-1">
+              <input type="radio" name="question_{{ question.id }}" value="A" required>
+              {{ question.option_a }}
+            </label>
+
+            <label class="d-block mb-1">
+              <input type="radio" name="question_{{ question.id }}" value="B" required>
+              {{ question.option_b }}
+            </label>
+
+            <label class="d-block mb-1">
+              <input type="radio" name="question_{{ question.id }}" value="C" required>
+              {{ question.option_c }}
+            </label>
+
+            <label class="d-block">
+              <input type="radio" name="question_{{ question.id }}" value="D" required>
+              {{ question.option_d }}
+            </label>
+          </div>
+        </div>
+      {% empty %}
+        <div class="alert alert-warning">
+          Este módulo no tiene preguntas configuradas todavía.
+        </div>
+      {% endfor %}
+
+      {% if test.questions.count %}
+        <button type="submit" class="btn btn-primary">
+          Enviar respuestas
+        </button>
+      {% endif %}
+    </form>
+  {% endif %}
+
 </div>
 {% endblock %}

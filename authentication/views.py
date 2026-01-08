@@ -261,9 +261,14 @@ def profile_create_view(request):
                 profile.direccion = address
                 profile.save()
                 if created:
-                    return redirect('address_create', address_type='residencial')
+                    # After creating initial residencial address record, direct user to complete details
+                    addr_url = reverse('authentication:address:address_create', kwargs={'address_type': 'residencial', 'pk': request.user.id})
+                    next_url = reverse('authentication:profile_list')
+                    return redirect(f"{addr_url}?next={next_url}")
             if not profile.direccion:
-                return redirect('address_create', address_type='residencial')  # Redirect to address creation if direccion is not set
+                addr_url = reverse('authentication:address:address_create', kwargs={'address_type': 'residencial', 'pk': request.user.id})
+                next_url = reverse('authentication:profile_list')
+                return redirect(f"{addr_url}?next={next_url}")  # Redirect to address creation if direccion is not set
             return redirect('profile_list')  # Redirect to profile list after creation
     else:
         form = ProfileForm()
@@ -439,16 +444,16 @@ def directives_delete(request, pk):
 
 # Address view aliases for legacy URL patterns
 def address_list(request):
-    return redirect('authentication:address_list')
+    return redirect('authentication:address:address_list')
 
 def address_detail(request, pk):
-    return redirect('authentication:address_detail', pk=pk)
+    return redirect('authentication:address:address_detail', pk=pk)
 
 def address_create(request, address_type, pk):
-    return redirect('authentication:address_create', address_type=address_type, pk=pk)
+    return redirect('authentication:address:address_create', address_type=address_type, pk=pk)
 
 def address_update(request, pk):
-    return redirect('authentication:address_update', pk=pk)
+    return redirect('authentication:address:address_update', pk=pk)
 
 def address_delete(request, pk):
-    return redirect('authentication:address_delete', pk=pk)
+    return redirect('authentication:address:address_delete', pk=pk)

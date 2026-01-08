@@ -5,7 +5,7 @@
 <h2>Profile Detail</h2>
 {% if profile %}
     {% for field in profile %}
-        <p><strong>{{ field.username.label }}:</strong> {{ field.user.username }}</p>
+        <p><strong>{{ field.label }}:</strong> {{ field.user.username }}</p>
         <p><strong>{{ field.first_name.label }}:</strong> {{ field.first_name }}</p>
         <p><strong>{{ field.last_name.label }}:</strong> {{ field.last_name }}</p>
         <p><strong>{{ field.email.label }}:</strong> {{ field.email }}</p>
@@ -31,8 +31,9 @@
         {% endif %}
       </div>
     {% endif %}
-    <a href="{% url 'profile_list' %}">Back to Profile List</a>
 {% else %}
 <p>No profile found.</p>
 {% endif %}
 {% endblock %}
+    <a href="{% url 'profile_list' %}">Back to Profile List</a>
+

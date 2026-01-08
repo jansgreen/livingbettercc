@@ -55,10 +55,10 @@
                 {% endif %}
                 <td>
                     {% if not profile.user.addresses.exists %}
-                        <a href="{% url 'address_create' 'residencial' %}" class="btn btn-sm btn-success">Agregar Dirección</a>
+                        <a href="{% url 'authentication:address:address_create' address_type='residencial' pk=obj.id %}?next={% url 'authentication:profile_list' %}" class="btn btn-sm btn-success">Agregar Dirección</a>
                     {% else %}
                         {% with first_address=profile.user.addresses.first %}
-                            <a href="{% url 'address_update' first_address.pk %}">Ver Direcciones</a>
+                            <a href="{% url 'authentication:address:address_update' first_address.pk %}">Ver Direcciones</a>
                         {% endwith %}
                     {% endif %}
                 </td>

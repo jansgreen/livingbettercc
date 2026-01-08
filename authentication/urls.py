@@ -27,13 +27,6 @@ urlpatterns = [
     path('customers/<int:pk>/update/', views.customer_update_view, name='customer_update'),
     path('customers/<int:pk>/delete/', views.customer_delete_view, name='customer_delete'),
 
-    # Address CRUD views
-    path('addresses/', views.address_list, name='address_list'),
-    path('addresses/<int:pk>/', views.address_detail, name='address_detail'),
-    path('addresses/create/<str:address_type>/<int:pk>/', views.address_create, name='address_create'),
-    path('addresses/<int:pk>/update/', views.address_update, name='address_update'),
-    path('addresses/<int:pk>/delete/', views.address_delete, name='address_delete'),
-
     # Directives CRUD views
     path('directives/', views.directives_list, name='directives_list'),
     path('directives/create/', views.directives_create, name='directives_create'),

@@ -234,7 +234,10 @@ TEMPLATES = [
                 'dashboard.context_processors.context_processor.obtener_menu_dashboard',
                 
                 # Gallery
-                'gallery.context_processors.context_processor.obtener_gallery_img'
+                'gallery.context_processors.context_processor.obtener_gallery_img',
+
+                # QuickTest
+                'classroom.quicktest.context_proccessors.context_proccessor.obtener_menu_quicktest',
 
 
             ],

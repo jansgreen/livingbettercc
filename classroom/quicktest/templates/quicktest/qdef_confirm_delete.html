@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-3">
+  <h2>Eliminar QuickTest</h2>
+  <p>¿Seguro que deseas eliminar "{{ qdef.title }}" para el módulo "{{ qdef.module.title }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'quicktest:qdef_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

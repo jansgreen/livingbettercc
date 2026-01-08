@@ -16,7 +16,7 @@
           </div>
 
           <div class="card-body p-4 p-md-5">
-            <form method="POST" action="{% url 'authentication:address_create' address_type=address_type pk=user_id %}" class="needs-validation" enctype="multipart/form-data">
+            <form method="POST" action="{% url 'authentication:address:address_create' address_type=address_type pk=user_id %}" class="needs-validation" enctype="multipart/form-data">
 
               {% csrf_token %}
 

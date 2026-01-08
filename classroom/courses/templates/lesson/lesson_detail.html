@@ -1,21 +1,20 @@
 {% extends "classroom/classroom.html" %}
 {% block content %}
 <div class="container mt-4">
-  <h1>{{ lessons.title|capfirst }}</h1>
-  {% if lessons.image %}
-    <img src="{{ lessons.image.url }}" class="img-fluid mb-3" alt="{{ lessons.title }}">
-  {% endif %}
-  <p>{{ lessons.content|safe|capfirst }}</p>
-  {% if lessons.video %}
+  <h1>{{ lesson.title|capfirst }}</h1>
+  <p>{{ lesson.content|safe|capfirst }}</p>
+  {% if lesson.video_url %}
     <h3>Video de la Lección</h3>
-    <video src="{{ lessons.video.url }}" class="object-fit-contain" autoplay></video>
+    <div class="ratio ratio-16x9">
+      <iframe src="{{ lesson.video_url }}" class="w-100 h-100" allowfullscreen></iframe>
+    </div>
   {% endif %}
 
-    <a href="{% url 'enrollments:mark_lesson_complete' lessons.pk %}" class="btn btn-primary">Continuar</a>
+    <a href="{% url 'enrollments:mark_lesson_complete' lesson.pk %}" class="btn btn-primary">Continuar</a>
 
-  {% if user.is_authenticated and user == lessons.instructor %}
-    <a href="{% url 'courses:lesson_update' lessons.pk %}" class="btn btn-warning">Editar</a>
-    <a href="{% url 'courses:lesson_delete' lessons.pk %}" class="btn btn-danger">Eliminar</a>
+  {% if user.is_authenticated and user == lesson.instructor %}
+    <a href="{% url 'courses:lesson_update' lesson.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'courses:lesson_delete' lesson.pk %}" class="btn btn-danger">Eliminar</a>
   {% endif %}
 </div>
 {% endblock %}

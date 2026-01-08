@@ -16,7 +16,6 @@ class Program(models.Model):
     def __str__(self):
         return self.name
 
-
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = CKEditor5Field('course description')
@@ -46,7 +45,6 @@ class Course(models.Model):
         manual_year = self.year_stats.aggregate(total=Coalesce(Sum('manual_certified_add'), 0)).get('total') or 0
         return int(self.certified_auto_count) + int(self.manual_certified_add) + int(manual_year)
 
-
 class CourseYearStat(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='year_stats')
     year = models.PositiveIntegerField()
@@ -59,7 +57,6 @@ class CourseYearStat(models.Model):
 
     def __str__(self):
         return f"{self.course.title} - {self.year} (+{self.manual_certified_add})"
-
 
 class ProgramYearStat(models.Model):
     program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='year_stats')
@@ -88,7 +85,6 @@ class Module(models.Model):
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
-
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title = models.CharField(max_length=255)
@@ -101,41 +97,4 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.module.title} - {self.title}"
-
-
-# test.py
-
-class Test(models.Model):
-    module = models.OneToOneField(Module, on_delete=models.CASCADE, related_name='test')
-    title = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"Test for {self.module.title}"
-
-class Question(models.Model):
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name='questions')
-    text = CKEditor5Field('questions')
-    option_a = models.CharField(max_length=255)
-    option_b = models.CharField(max_length=255)
-    option_c = models.CharField(max_length=255)
-    option_d = models.CharField(max_length=255)
-    correct_option = models.CharField(max_length=1, choices=[
-        ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')
-    ])
-
-    def __str__(self):
-        return self.text
-
-class QuickTestResult(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    score = models.DecimalField(max_digits=5, decimal_places=2)
-    passed = models.BooleanField(default=False)
-    completed_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('user', 'module')
-
-    def __str__(self):
-        return f"QuickTest {self.module.title} - {self.user.username} ({'Aprobado' if self.passed else 'No aprobado'})"
 

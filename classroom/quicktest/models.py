@@ -11,3 +11,26 @@ class QuickTest(models.Model):
 
     def __str__(self):
         return f"QuickTest {self.module.title} - {self.user.username} ({self.score})"
+
+
+class QuickTestDefinition(models.Model):
+    module = models.OneToOneField(Module, on_delete=models.CASCADE, related_name='quicktest_definition')
+    title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"QuickTestDef for {self.module.title}"
+
+
+class QuickTestQuestion(models.Model):
+    definition = models.ForeignKey(QuickTestDefinition, on_delete=models.CASCADE, related_name='questions')
+    text = models.TextField()
+    option_a = models.CharField(max_length=255)
+    option_b = models.CharField(max_length=255)
+    option_c = models.CharField(max_length=255)
+    option_d = models.CharField(max_length=255)
+    correct_option = models.CharField(max_length=1, choices=[
+        ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')
+    ])
+
+    def __str__(self):
+        return f"Q: {self.text[:40]}..."

@@ -1,0 +1,12 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-3">
+  <h2>Eliminar pregunta</h2>
+  <p>¿Seguro que deseas eliminar esta pregunta?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'quicktest:q_list' question.definition.id %}" class="btn btn-outline-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

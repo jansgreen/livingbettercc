@@ -1,0 +1,12 @@
+{% extends "frontend.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Confirmar eliminación</h1>
+<p>¿Seguro que deseas eliminar esta dirección?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+    <a class="btn btn-outline-secondary" href="{% url 'authentication:address:address_list' %}">Cancelar</a>
+  </form>
+{% endblock %}

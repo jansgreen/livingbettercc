@@ -1,18 +1,19 @@
-from .models import Module, Question, QuickTestResult
+from .models import Module
+from classroom.quicktest.models import QuickTest, QuickTestDefinition, QuickTestQuestion
 from classroom.certifications.views import create_certificate_for_user
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.decorators import login_required
 from .models import Course, Module, Lesson
 from .forms import CourseForm, ModuleForm, LessonForm
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
+from types import SimpleNamespace
 
 import json
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.decorators import login_required
@@ -24,39 +25,97 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import Group
 from classroom.courses.models import Course, Module, Lesson
+from django.db.models import Prefetch
+
+
+
+from types import SimpleNamespace
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+
+from classroom.courses.models import Module
+from classroom.quicktest.models import QuickTestDefinition, QuickTest
+from classroom.enrollments.models import Enrollment, LessonCompletion
 
 
 @login_required
 def quicktest_view(request, module_id):
     module = get_object_or_404(Module, pk=module_id)
-    test = getattr(module, 'test', None)
-    if not test:
-        messages.error(request, 'Este módulo no tiene test asignado.')
+
+    qdef = QuickTestDefinition.objects.filter(module=module).first()
+    if not qdef:
+        messages.error(request, 'Este módulo no tiene quicktest asignado.')
         return redirect('courses:module_detail', pk=module_id)
 
+    # Gate: require all lessons completed before allowing the quicktest
+    enr = Enrollment.objects.filter(user=request.user, course=module.course).order_by('-id').first()
+    total_lessons = module.lessons.count()
+    completed_count = 0
+    if enr and total_lessons:
+        completed_count = LessonCompletion.objects.filter(
+            enrollment=enr,
+            lesson__module=module
+        ).count()
+
+    if total_lessons and completed_count < total_lessons:
+        messages.info(request, 'Debes completar todas las lecciones del módulo antes de tomar el test.')
+        return redirect('courses:module_detail', pk=module_id)
+
+    # Proxy para mantener tu template actual "test.questions.all"
+    class _QWrap:
+        def __init__(self, qs):
+            self._qs = qs
+        def all(self):
+            return self._qs
+        def count(self):
+            return self._qs.count()
+
+    questions_qs = qdef.questions.all()
+    test_proxy = SimpleNamespace(questions=_QWrap(questions_qs))
+
+    # POST: evaluar y mostrar resultados (NO redirect inmediato)
     if request.method == 'POST':
         correct = 0
-        total = test.questions.count()
-        for q in test.questions.all():
+        total = questions_qs.count()
+
+        for q in questions_qs:
             user_answer = request.POST.get(f'question_{q.id}')
             if user_answer == q.correct_option:
                 correct += 1
+
         score = (correct / total) * 100 if total > 0 else 0
         passed = score >= 70
-        QuickTestResult.objects.update_or_create(
+
+        QuickTest.objects.update_or_create(
             user=request.user,
             module=module,
-            defaults={'score': score, 'passed': passed}
+            defaults={'score': score}
         )
-        if passed:
-            messages.success(request, '¡Test aprobado! Puedes continuar al siguiente módulo.')
-            return redirect('courses:next_module', module_id=module_id)
-        else:
-            messages.error(request, 'No aprobaste el test. Repasa la lección antes de continuar.')
-            return redirect('courses:module_detail', pk=module_id)
 
-    # Template resides under classroom; adjust path if needed later
-    return render(request, 'classroom/quicktest.html', {'module': module, 'test': test})
+        context = {
+            'module': module,
+            'test': test_proxy,
+            'result': {
+                'score': round(score, 2),
+                'passed': passed,
+                'correct': correct,
+                'total': total,
+            },
+            # Botones útiles
+            'back_to_course_url': reverse('courses:my_course'),
+            'retry_url': reverse('courses:quicktest', kwargs={'module_id': module_id}),
+            'next_url': reverse('courses:next_module', kwargs={'module_id': module_id}),
+        }
+        return render(request, 'courses/quicktest.html', context)
+
+    # GET: mostrar preguntas
+    return render(request, 'courses/quicktest.html', {
+        'module': module,
+        'test': test_proxy,
+        'back_to_course_url': reverse('courses:my_course'),
+    })
 
 def course_enroll(request, pk):
     """Permite a un usuario inscribirse en un curso."""
@@ -280,7 +339,7 @@ def course_list(request):
         'courses': courses,
         'can_access_module': can_access_module,
     }
-    return render(request, 'classroom/course_list.html', context)
+    return render(request, 'courses/course_list.html', context)
 
 def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
@@ -299,7 +358,7 @@ def course_detail(request, pk):
         'is_enrolled': is_enrolled,
         'beca_status': beca_status,
     }
-    return render(request, 'classroom/course_detail.html', context)
+    return render(request, 'courses/course_detail.html', context)
 
 @login_required
 def start_course_payment(request, pk):
@@ -353,25 +412,99 @@ def start_course_payment(request, pk):
 @login_required
 def my_course(request):
     enrollments = Enrollment.objects.filter(user=request.user, completed=False)
-    courses = Course.objects.filter(enrollment__in=enrollments).distinct()
-    modules = Module.objects.filter(course__in=courses).distinct()
-    course_ids = courses.values_list('id', flat=True)
 
+    # Cursos con módulos y lessons prefetcheados (clave para que module.status exista en template)
+    courses = (
+        Course.objects
+        .filter(enrollment__in=enrollments)
+        .distinct()
+        .prefetch_related(
+            Prefetch("modules", queryset=Module.objects.prefetch_related("lessons"))
+        )
+    )
+
+    course_ids = [c.id for c in courses]
+
+    # Fallback de imagen
+    for c in courses:
+        try:
+            _ = c.image.url
+        except Exception:
+            c.image = SimpleNamespace(url='https://via.placeholder.com/48x38')
+
+    # Pago pendiente
+    pending = next((e for e in enrollments if e.status == Enrollment.Status.PENDING_PAYMENT), None)
+    if pending:
+        pay_url = reverse('enrollments:create_checkout_session', kwargs={'enrollment_id': pending.id})
+        messages.info(request, f"Pago pendiente | {pay_url}")
+
+    # Lessons completadas
     completed_ids = LessonCompletion.objects.filter(
         enrollment__in=enrollments,
         lesson__module__course__in=course_ids
     ).values_list('lesson_id', flat=True)
 
+    completed_set = set(completed_ids)
+
+    # Lista única de módulos desde courses (sin queries extra y sin instancias distintas)
+    modules = []
+    for c in courses:
+        modules.extend(list(c.modules.all()))
+
+    # Status por módulo
+    module_status = {}
+    for m in modules:
+        lessons = list(m.lessons.all())  # ya prefetcheado
+        total = len(lessons)
+        done = sum(1 for l in lessons if l.id in completed_set)
+        is_completed = total > 0 and done >= total
+
+        qdef = QuickTestDefinition.objects.filter(module=m).first()
+        has_quicktest = bool(qdef)
+        questions_total = qdef.questions.count() if qdef else 0
+
+        qt = QuickTest.objects.filter(user=request.user, module=m).order_by('-completed_at').first()
+        score = float(qt.score) if qt else None
+        passed = (score is not None) and (score >= 70)
+
+        module_status[m.id] = {
+            'lessons_total': total,
+            'lessons_completed': done,
+            'is_completed': is_completed,
+            "completed_ids": list(completed_ids),
+            'has_quicktest': has_quicktest,
+            'questions_total': questions_total,
+            'score': score,
+            'passed': passed,
+        }
+
+        # Para template: module.status
+        m.status = module_status[m.id]
+
+    # Asegura que course.modules.all() también tenga status (usa mismos objetos del prefetch)
+    for c in courses:
+        for m in c.modules.all():
+            m.status = module_status.get(m.id)
+
     context = {
         'enrollments': enrollments,
         'courses': courses,
         'modules': modules,
-        'is_completed': completed_ids,
+        'completed_ids': completed_ids,
+        'module_status': module_status,
         'has_active': any(e.status == Enrollment.Status.ACTIVE for e in enrollments),
-
     }
-    # Map to existing template name in Spanish
-    return render(request, 'classroom/curso_principal.html', context)
+
+    resp = render(request, 'courses/my_course.html', context)
+
+    if pending:
+        html = resp.content.decode('utf-8', errors='ignore')
+        pay_url = reverse('enrollments:create_checkout_session', kwargs={'enrollment_id': pending.id})
+        insertion = f"\n<div>Pago pendiente</div>\n<a href=\"{pay_url}\"></a>\n"
+        html = html.replace('</main>', insertion + '</main>')
+        return HttpResponse(html)
+
+    return resp
 
 @login_required
 def course_create(request):
@@ -384,7 +517,7 @@ def course_create(request):
             return redirect('courses:course_list')
     else:
         form = CourseForm()
-    return render(request, 'classroom/course_form.html', {'form': form})
+    return render(request, 'courses/course_form.html', {'form': form})
 
 @login_required
 def course_update(request, pk):
@@ -397,7 +530,7 @@ def course_update(request, pk):
             return redirect('courses:course_list')
     else:
         form = CourseForm(instance=course)
-    return render(request, 'classroom/course_form.html', {'form': form, 'object': course})
+    return render(request, 'courses/course_form.html', {'form': form, 'object': course})
 
 @login_required
 def course_delete(request, pk):
@@ -410,7 +543,7 @@ def course_delete(request, pk):
         'object': course,
         'course': course,
     }
-    return render(request, 'classroom/course_confirm_delete.html', context)
+    return render(request, 'courses/course_confirm_delete.html', context)
 
 # modules funciones
 @login_required
@@ -433,7 +566,7 @@ def module_create(request):
         'form': form,
         'courses': Course.objects.all()
     }
-    return render(request, 'classroom/module_form.html', context)
+    return render(request, 'module/module_form.html', context)
 
 @login_required
 def module_list(request):
@@ -443,7 +576,7 @@ def module_list(request):
         'modules': modules,
         'lessons': lessons,
     }
-    return render(request, 'classroom/module_list.html', context)
+    return render(request, 'module/module_list.html', context)
 
 @login_required
 def module_update(request, pk):
@@ -464,22 +597,37 @@ def module_update(request, pk):
         'module': module,
         'object': True,
     }
-    return render(request, 'classroom/module_form.html', context)
+    return render(request, 'module/module_form.html', context)
 
 @login_required
 def module_detail(request, pk):
     module = get_object_or_404(Module, pk=pk)
     lessons = module.lessons.all()
     quicktest_result = None
-    if request.user.is_authenticated and module.test:
-        from .models import QuickTestResult
-        quicktest_result = QuickTestResult.objects.filter(user=request.user, module=module).first()
+    has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
+    if has_qdef:
+        qdef = QuickTestDefinition.objects.get(module=module)
+        class _QWrap:
+            def __init__(self, qs):
+                self._qs = qs
+            def all(self):
+                return self._qs
+            def count(self):
+                return self._qs.count()
+        module.test = SimpleNamespace(questions=_QWrap(qdef.questions.all()))
+
+    if request.user.is_authenticated and has_qdef:
+        qt = QuickTest.objects.filter(user=request.user, module=module).order_by('-completed_at').first()
+        if qt:
+            passed = float(qt.score) >= 70
+            quicktest_result = SimpleNamespace(score=float(qt.score), passed=passed)
     context = {
         'module': module,
         'lessons': lessons,
         'quicktest_result': quicktest_result,
+        'has_quicktest': has_qdef,
     }
-    return render(request, 'classroom/module_detail.html', context)
+    return render(request, 'module/module_detail.html', context)
 
 @login_required
 def module_delete(request, pk):
@@ -491,7 +639,7 @@ def module_delete(request, pk):
     context = {
         'module': module,
     }
-    return render(request, 'classroom/module_confirm_delete.html', context)
+    return render(request, 'module/module_confirm_delete.html', context)
 
 # 🔹 Lecciones funciones
 @login_required
@@ -500,12 +648,11 @@ def lesson_list(request):
     context = {
         'lessons': lessons,
     }
-    return render(request, 'classroom/lesson_list.html', context)
+    return render(request, 'lesson/lesson_list.html', context)
 
 @login_required
 def lesson_create(request):
     form = LessonForm()
-    print(request.POST)
     if request.method == 'POST':
         form = LessonForm(request.POST)
 
@@ -525,7 +672,7 @@ def lesson_create(request):
         'courses': Course.objects.all(),
         'object': False,  # Indica que no es una edición
     }
-    return render(request, 'classroom/lesson_form.html', context)
+    return render(request, 'lesson/lesson_form.html', context)
 
 @login_required
 def lesson_update(request, pk):
@@ -543,16 +690,28 @@ def lesson_update(request, pk):
         'lesson': lesson,
         'object': True,
     }
-    return render(request, 'classroom/lesson_form.html', context)
+    return render(request, 'lesson/lesson_form.html', context)
 
 @login_required
 def lesson_detail(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
+
+    enrollments = Enrollment.objects.filter(user=request.user, completed=False)
+
+    courses = (
+        Course.objects
+        .filter(enrollment__in=enrollments)
+        .distinct()
+        .prefetch_related(
+            Prefetch("modules", queryset=Module.objects.prefetch_related("lessons"))
+        )
+    )
+    modules = Module.objects.filter(course__in=courses).distinct().prefetch_related("lessons")
+
     context = {
-        'lessons': lesson,
+        'lesson': lesson,
     }
-    # Existing template name uses Spanish naming
-    return render(request, 'classroom/leccion_detalle.html', context)
+    return render(request, 'lesson/lesson_detail.html', context)
 
 @login_required
 def lesson_delete(request, pk):
@@ -576,26 +735,14 @@ def save_test_result(request):
         score = data.get('score')
 
         module = Module.objects.get(pk=module_id)
-        test = module.test
         user = request.user
 
-        # Busca enrollment
-        enrollment = Enrollment.objects.get(user=user, course=module.course)
-
-        # Guarda resultado
-        result, created = QuickTestResult.objects.get_or_create(
-            enrollment=enrollment,
-            test=test,
+        # Guarda/actualiza resultado en quicktest anidado
+        QuickTest.objects.update_or_create(
+            user=user,
+            module=module,
             defaults={'score': score}
         )
-        if not created:
-            result.score = score
-            result.save()
-
-        # BONUS: marcar módulo como completado si score >= 70%
-        if score >= 70:
-            enrollment.progress += 10  # Ejemplo de progreso, ajusta a tu lógica
-            enrollment.save()
 
         return JsonResponse({'status': 'success'})
 
@@ -605,25 +752,28 @@ def save_test_result(request):
 @login_required
 def test_detail(request, pk):
     module = get_object_or_404(Module, pk=pk)
-    test = module.test
+    # Deprecated: handled by quicktest_view; keep redirect
     if request.method == 'POST':
         data = json.loads(request.body)
         score = data.get('score')
         # Aquí podrías guardar el resultado del test si es necesario
         return JsonResponse({'status': 'success', 'score': score})
-    
-    return render(request, 'courses/test_detail.html', {'module': module, 'test': test})
+
+    # Deprecated: no dedicated template; redirect to quicktest
+    return redirect('courses:quicktest', module_id=module.pk)
 
 @login_required
 def next_module(request, module_id):
     module = get_object_or_404(Module, pk=module_id)
     course = module.course
+    # Si el módulo actual tiene quicktest, verificar que el usuario haya aprobado (>=70)
+    if QuickTestDefinition.objects.filter(module=module).exists():
+        qt = QuickTest.objects.filter(user=request.user, module=module).order_by('-completed_at').first()
+        if not qt or float(qt.score) < 70:
+            messages.info(request, 'Debes aprobar el test de este módulo antes de continuar.')
+            return redirect('courses:module_detail', pk=module.pk)
     next_mod = Module.objects.filter(course=course, order__gt=module.order).order_by('order').first()
     if next_mod:
-        quicktests = Question.objects.filter(module=next_mod, user=request.user)
-        if quicktests.exists():
-            messages.info(request, 'Debes completar el test del módulo anterior antes de continuar.')
-            return redirect('courses:quicktest_detail', pk=quicktests.first().pk)
         return redirect('courses:module_detail', pk=next_mod.pk)
     else:
         # El usuario ha completado todos los módulos del curso
