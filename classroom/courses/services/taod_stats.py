@@ -1,15 +1,19 @@
+# classroom/courses/services/taod_status.py
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
 
-from django.db.models import Count, F, Sum
+from django.db.models import Count, Sum
 from django.db.models.functions import Coalesce
+from django.db.models import IntegerField
+from django.db.models.functions import ExtractYear
 from django.utils import timezone
 
-from classroom.certifications.models import Certificate, InPersonCertificateIssue
-from classroom.courses.models import Course, Program, ProgramYearStat
+from classroom.certifications.models import Certificate
+from classroom.courses.models import Course, Program
 
+from home.models import ReportActivity
 
 TAOD_PROGRAM_NAME = "TAOD"
 
@@ -21,14 +25,20 @@ class TaodStatsResult:
     top_courses: list[dict[str, Any]]
 
 
-def get_taod_stats(*, top_n: int = 10) -> TaodStatsResult:
-    """Compute TAOD impact stats from Certificates + manual in-person per year.
+def _clamp_pct(v: int) -> int:
+    return max(0, min(100, int(v)))
 
-    Online certificates are authoritative from Certificate rows.
-    Presencial / impacted / notes come from ProgramYearStat.
+
+def get_taod_stats(*, top_n: int = 10, limit_years: int = 6) -> TaodStatsResult:
+    """
+    TAOD impact stats basados en:
+      - Online: Certificate (count por año)
+      - Presencial: ReportActivity (sum quantity por año)
+      - Imagen/nota representativa por año: desde ReportActivity (última con image/description)
     """
 
-    current_year = timezone.now().year
+    current_year = int(timezone.now().year)
+    min_year = current_year - max(0, int(limit_years) - 1)
 
     program = Program.objects.filter(name=TAOD_PROGRAM_NAME).first()
     if not program:
@@ -38,154 +48,176 @@ def get_taod_stats(*, top_n: int = 10) -> TaodStatsResult:
                 "current_year_total": 0,
                 "online": 0,
                 "in_person": 0,
-                "current_year": int(current_year),
+                "current_year": current_year,
             },
             taod_years=[],
             top_courses=[],
         )
 
-    # --- TAOD online counts by year ---
-    online_rows = (
-        Certificate.objects.filter(course__program=program)
-        .exclude(issued_date__isnull=True)
-        .values("issued_date__year")
-        .annotate(online=Count("id"))
+    # Cursos TAOD (para filtrar ReportActivity también)
+    taod_course_ids = list(
+        Course.objects.filter(program=program).values_list("id", flat=True)
     )
+
+    # -----------------------
+    # ONLINE (Certificate)
+    # -----------------------
+    online_rows = (
+        Certificate.objects
+        .filter(course__program=program, issued_date__isnull=False)
+        .filter(issued_date__year__gte=min_year)
+        .annotate(y=ExtractYear("issued_date"))
+        .values("y")
+        .annotate(online=Count("id"))
+        .order_by("-y")
+    )
+
     online_by_year: dict[int, int] = {}
     for row in online_rows:
-        year = row.get("issued_date__year")
-        if year is None:
+        y = row.get("y")
+        if y is None:
             continue
-        online_by_year[int(year)] = int(row["online"])
+        online_by_year[int(y)] = int(row.get("online") or 0)
 
-    # --- TAOD in-person (presencial) by year from district entries ---
-    in_person_rows = (
-        InPersonCertificateIssue.objects.filter(course__program=program)
-        .exclude(issued_date__isnull=True)
-        .values('issued_date__year')
-        .annotate(in_person=Coalesce(Sum('quantity'), 0))
+    # -----------------------
+    # IN-PERSON (ReportActivity)
+    # -----------------------
+    inperson_rows = (
+        ReportActivity.objects
+        .filter(course_id__in=taod_course_ids)
+        .filter(issued_year__gte=min_year)
+        .values("issued_year")
+        .annotate(in_person=Coalesce(Sum("quantity"), 0))
+        .order_by("-issued_year")
     )
+
     in_person_by_year: dict[int, int] = {}
-    for row in in_person_rows:
-        year = row.get('issued_date__year')
-        if year is None:
+    for row in inperson_rows:
+        y = row.get("issued_year")
+        if y is None:
             continue
-        in_person_by_year[int(year)] = int(row.get('in_person') or 0)
+        in_person_by_year[int(y)] = int(row.get("in_person") or 0)
 
-    # --- Representative image per year (latest uploaded in-person image for that year) ---
+    # -----------------------
+    # Imagen/nota representativa por año (última por issued_year)
+    # -----------------------
     image_by_year: dict[int, str] = {}
-    for issue in (
-        InPersonCertificateIssue.objects.filter(course__program=program)
-        .exclude(issued_date__isnull=True)
-        .exclude(image__isnull=True)
-        .exclude(image='')
-        .order_by('-issued_date', '-updated_at', '-id')
-    ):
-        year = getattr(issue.issued_date, 'year', None)
-        if not year or int(year) in image_by_year:
+    note_by_year: dict[int, str] = {}
+
+    rep_qs = (
+        ReportActivity.objects
+        .filter(course_id__in=taod_course_ids)
+        .filter(issued_year__gte=min_year)
+        .order_by("-issued_year", "-created_at", "-id")
+    )
+
+    for obj in rep_qs:
+        y = int(obj.issued_year)
+        if y not in image_by_year:
+            if getattr(obj, "image", None):
+                try:
+                    image_by_year[y] = obj.image.url
+                except Exception:
+                    image_by_year[y] = ""
+            else:
+                image_by_year[y] = ""
+
+        if y not in note_by_year:
+            note_by_year[y] = str(obj.description or "")
+
+        # si ya tenemos ambos para ese año, seguimos
+        if y in image_by_year and y in note_by_year:
             continue
-        try:
-            image_by_year[int(year)] = issue.image.url
-        except Exception:
-            image_by_year[int(year)] = ''
 
-    # --- TAOD manual impacted / notes by year ---
-    manual_rows = ProgramYearStat.objects.filter(program=program)
-    manual_by_year: dict[int, ProgramYearStat] = {int(r.year): r for r in manual_rows}
-
-    years = sorted(set(online_by_year.keys()) | set(in_person_by_year.keys()) | set(manual_by_year.keys()), reverse=True)
+    # -----------------------
+    # Merge años
+    # -----------------------
+    years = sorted(
+        set(online_by_year.keys()) | set(in_person_by_year.keys()),
+        reverse=True
+    )
 
     taod_years: list[dict[str, Any]] = []
-    for year in years:
-        online = int(online_by_year.get(year, 0))
-        manual = manual_by_year.get(year)
-        # Prefer district-based in-person entries when present for that year; else fallback to legacy ProgramYearStat.in_person_certified
-        if year in in_person_by_year:
-            in_person = int(in_person_by_year.get(year, 0))
-        else:
-            in_person = int(manual.in_person_certified) if manual else 0
-        impacted = int(manual.estimated_children_impacted) if manual else 0
-        notes = str(manual.notes) if (manual and manual.notes) else ""
+    for y in years:
+        online = int(online_by_year.get(y, 0))
+        in_person = int(in_person_by_year.get(y, 0))
 
         taod_years.append(
             {
-                "year": int(year),
+                "year": int(y),
                 "online": online,
                 "in_person": in_person,
                 "total": online + in_person,
-                "impacted": impacted,
-                "notes": notes,
-                "image_url": image_by_year.get(int(year), ''),
+                "impacted": 0,  # si luego quieres estimaciones, lo añadimos aquí
+                "notes": note_by_year.get(int(y), ""),
+                "image_url": image_by_year.get(int(y), ""),
             }
         )
 
-    max_year_total = max((y["total"] for y in taod_years), default=0)
-    for y in taod_years:
-        total = int(y["total"])
-        online = int(y["online"])
-        in_person = int(y["in_person"])
+    # % bars
+    max_year_total = max((int(r["total"]) for r in taod_years), default=0)
+    for r in taod_years:
+        total = int(r["total"])
+        online = int(r["online"])
+        in_person = int(r["in_person"])
 
-        y["pct_total"] = int(round((total / max_year_total) * 100)) if max_year_total else 0
+        r["pct_total"] = int(round((total / max_year_total) * 100)) if max_year_total else 0
+        r["pct_total"] = _clamp_pct(r["pct_total"])
         if total:
-            y["pct_online"] = int(round((online / total) * 100))
-            y["pct_in_person"] = max(0, 100 - int(y["pct_online"]))
+            r["pct_online"] = _clamp_pct(int(round((online / total) * 100)))
+            r["pct_in_person"] = _clamp_pct(100 - int(r["pct_online"]))
         else:
-            y["pct_online"] = 0
-            y["pct_in_person"] = 0
+            r["pct_online"] = 0
+            r["pct_in_person"] = 0
 
-    # Year-over-year change (compare to next item, since list is sorted desc)
-    for i, y in enumerate(taod_years):
+    # YoY change (lista desc)
+    for i, r in enumerate(taod_years):
         prev = taod_years[i + 1] if i + 1 < len(taod_years) else None
-        y["prev_year"] = int(prev["year"]) if prev else None
+        r["prev_year"] = int(prev["year"]) if prev else None
         if not prev:
-            y["delta_total"] = 0
-            y["pct_change_total"] = 0
+            r["delta_total"] = 0
+            r["pct_change_total"] = 0
             continue
 
-        delta = int(y["total"]) - int(prev["total"])
-        y["delta_total"] = int(delta)
+        delta = int(r["total"]) - int(prev["total"])
+        r["delta_total"] = int(delta)
         prev_total = int(prev["total"])
-        if prev_total:
-            y["pct_change_total"] = int(round((delta / prev_total) * 100))
-        else:
-            y["pct_change_total"] = 0
+        r["pct_change_total"] = int(round((delta / prev_total) * 100)) if prev_total else 0
 
-    online_total = sum(y["online"] for y in taod_years)
-    in_person_total = sum(y["in_person"] for y in taod_years)
-    total_all = sum(y["total"] for y in taod_years)
+    # KPIs
+    online_total = sum(int(r["online"]) for r in taod_years)
+    in_person_total = sum(int(r["in_person"]) for r in taod_years)
+    total_all = sum(int(r["total"]) for r in taod_years)
 
-    current_year_row = next((y for y in taod_years if y["year"] == int(current_year)), None)
+    current_year_row = next((r for r in taod_years if int(r["year"]) == current_year), None)
     current_year_total = int(current_year_row["total"]) if current_year_row else 0
 
-    # --- Top courses (overall, not only TAOD) ---
+    # -----------------------
+    # Top courses (solo TAOD o global)
+    # Aquí lo haré TAOD por coherencia.
+    # -----------------------
     top_qs = (
-        Course.objects.filter(published=True)
+        Course.objects.filter(program=program, published=True)
         .annotate(
             online_certified_count=Count("certificates", distinct=True),
-            total_certified_count=(
-                Coalesce(F("manual_certified_add"), 0)
-                + Coalesce(Sum("year_stats__manual_certified_add"), 0)
-                + Count("certificates", distinct=True)
-            ),
         )
-        .order_by("-total_certified_count", "title")
+        .order_by("-online_certified_count", "title")
     )
 
     top_courses_raw = list(top_qs[: max(1, int(top_n))])
-    top_total = int(top_courses_raw[0].certified_total) if top_courses_raw else 0
+    top_total = int(top_courses_raw[0].online_certified_count) if top_courses_raw else 0
 
     top_courses: list[dict[str, Any]] = []
-    for course in top_courses_raw:
-        total = int(course.certified_total)
+    for c in top_courses_raw:
+        total = int(c.online_certified_count or 0)
         percent = int(round((total / top_total) * 100)) if top_total else 0
         top_courses.append(
             {
-                "pk": course.pk,
-                "title": course.title,
+                "pk": c.pk,
+                "title": c.title,
                 "certified_total": total,
-                "manual_certified_add": int(course.manual_certified_add or 0),
-                "blurb": course.description,
-                "percent": max(0, min(100, percent)),
+                "blurb": c.description,
+                "percent": _clamp_pct(percent),
             }
         )
 

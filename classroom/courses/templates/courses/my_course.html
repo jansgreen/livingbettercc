@@ -1,81 +1,158 @@
 {% extends 'dashboards/dashboard.html' %}
+{% load static %}
 {% load dict_extras %}
+
 {% block content %}
-<main class="container">
+<main class="container py-4">
 
-  {% for course in courses %}
-    <div class="d-flex align-items-center p-3 my-3 text-white bg-purple rounded shadow-sm">
-      <img src="{{ course.image.url }}" class="me-3" alt="{{ course.title }}" width="48" height="38">
-      <div class="lh-1">
-        <h1 class="h6 mb-0 text-dark lh-1">{{ course.title|capfirst }}</h1>
+  {% if courses %}
+    {% for course in courses %}
+      <!-- Course header -->
+      <div class="d-flex align-items-center p-3 my-3 bg-white rounded shadow-sm">
+        {% if course.image %}
+          <img src="{{ course.image.url }}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
+        {% else %}
+          <img src="{% static 'profiles/default.webp' %}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
+        {% endif %}
+
+        <div class="lh-1">
+          <h1 class="h6 mb-0 text-dark lh-1">{{ course.title|capfirst }}</h1>
+          <small class="text-muted">Tu progreso por módulos y lecciones</small>
+        </div>
       </div>
-    </div>
 
-    {% for module in course.modules.all %}
-      {% with st=module_status|get_item:module.id %}
-        <div class="my-3 p-3 bg-body rounded shadow-sm">
-          <h6 class="border-bottom pb-2 mb-0">{{ module.title|capfirst }}</h6>
+      {% for module in course.modules.all %}
+        {% with st=module_status|get_item:module.id %}
+          <div class="my-3 p-3 bg-body rounded shadow-sm">
 
-          <div class="d-flex text-body-secondary pt-3">
-            <ul class="list-group list-group-flush w-100">
+            <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-2">
+              <h6 class="mb-0">{{ module.title|capfirst }}</h6>
+
+              {% if st %}
+                <small class="text-muted">
+                  Progreso: <b>{{ st.lessons_completed }}</b>/<b>{{ st.lessons_total }}</b>
+                </small>
+              {% endif %}
+            </div>
+
+            <ul class="list-group list-group-flush">
               {% for lesson in module.lessons.all %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
+
+                    {# 1) COMPLETADA -> verde + link #}
                     {% if lesson.id in completed_ids %}
                       <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
-                           xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
+                          xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                         <rect width="100%" height="100%" fill="#00981c"></rect>
                       </svg>
-                    {% else %}
+                      <a class="text-decoration-none fw-semibold" href="{% url 'courses:lesson_detail' lesson.pk %}">
+                        {{ lesson.title|capfirst }}
+                      </a>
+
+                    {# 2) SIGUIENTE PERMITIDA -> gris + link #}
+                    {% elif st and lesson.id == st.next_lesson_id %}
                       <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
-                           xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
+                          xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                         <rect width="100%" height="100%" fill="#6c757d"></rect>
                       </svg>
+                      <a class="text-decoration-none" href="{% url 'courses:lesson_detail' lesson.pk %}">
+                        {{ lesson.title|capfirst }}
+                      </a>
+
+                    {# 3) BLOQUEADA -> gris + sin link #}
+                    {% else %}
+                      <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
+                          xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
+                        <rect width="100%" height="100%" fill="#6c757d"></rect>
+                      </svg>
+                      <span class="text-muted">{{ lesson.title|capfirst }} 🔒</span>
                     {% endif %}
-                    <a href="{% url 'courses:lesson_detail' lesson.pk %}">{{ lesson.title|capfirst }}</a>
+
                   </div>
 
+                  {# Badges #}
                   {% if lesson.id in completed_ids %}
                     <span class="badge bg-success">Completado</span>
+                  {% elif st and lesson.id == st.next_lesson_id %}
+                    <span class="badge bg-primary">Siguiente</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Bloqueado</span>
                   {% endif %}
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">
+                  Este módulo no tiene lecciones todavía.
                 </li>
               {% endfor %}
             </ul>
+
+            {# QuickTest + Continuar #}
+            <div class="mt-3 d-flex flex-column flex-md-row gap-2 align-items-md-center justify-content-between">
+
+              <div>
+                {% if st and st.has_quicktest %}
+                  {# ✅ regla correcta: si terminó lecciones y NO ha aprobado => mostrar test #}
+                  {% if st.is_completed and not st.passed %}
+                    <a href="{% url 'quicktest:quicktest_create' module.id %}" class="btn btn-primary btn-sm">
+                      Tomar test{% if st.questions_total %} ({{ st.questions_total }} preguntas){% endif %}
+                    </a>
+                    {% if st.score %}
+                      <small class="text-muted ms-2">Última puntuación: {{ st.score }}</small>
+                    {% endif %}
+
+                  {% elif st.is_completed and st.passed %}
+                    <div class="alert alert-success mb-0 py-2 px-3 d-inline-block">
+                      ✅ Test aprobado.
+                      {% if st.score %}<span class="ms-2">Puntuación: <b>{{ st.score }}</b></span>{% endif %}
+                    </div>
+
+                  {% else %}
+                    <button class="btn btn-secondary btn-sm" disabled>
+                      Completa las lecciones para desbloquear el test
+                    </button>
+                  {% endif %}
+                {% else %}
+                  <small class="text-muted">No hay test para este módulo.</small>
+                {% endif %}
+              </div>
+
+              {# Botón continuar: solo si puede avanzar #}
+              <div>
+                {% if st %}
+                  {% if st.has_quicktest %}
+                    {% if st.is_completed and st.passed %}
+                      <a href="{% url 'courses:next_module' module.id %}" class="btn btn-outline-primary btn-sm">
+                        Continuar
+                      </a>
+                    {% elif st.is_completed and not st.passed %}
+                      {# no mostrar continuar, debe tomar test #}
+                    {% else %}
+                      {# no mostrar continuar, módulo no completado #}
+                    {% endif %}
+                  {% else %}
+                    {# sin test: puede continuar cuando el módulo está completo #}
+                    {% if st.is_completed %}
+                      <a href="{% url 'courses:next_module' module.id %}" class="btn btn-outline-primary btn-sm">
+                        Continuar
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              </div>
+
+            </div>
+
           </div>
+        {% endwith %}
+      {% endfor %}
 
-          <div class="mt-3">
-            <small>Progreso del módulo: {{ st.lessons_completed }}/{{ st.lessons_total }}</small>
-          </div>
-
-          {% if st and st.has_quicktest %}
-            {% if st.is_completed %}
-              {% if st.passed %}
-                <div class="alert alert-success mt-2">
-                  Test aprobado. Puedes continuar al siguiente módulo.
-                </div>
-              {% else %}
-                <a href="{% url 'courses:quicktest' module.id %}" class="btn btn-primary btn-sm mt-2">
-                  Tomar test{% if st.questions_total %} ({{ st.questions_total }} preguntas){% endif %}
-                </a>
-              {% endif %}
-            {% else %}
-              <button class="btn btn-secondary btn-sm mt-2" disabled>
-                Completa las lecciones para desbloquear el test
-              </button>
-            {% endif %}
-          {% else %}
-            <div class="text-muted mt-2"><small>No hay test para este módulo.</small></div>
-          {% endif %}
-
-        </div>
-      {% endwith %}
     {% endfor %}
-
-  {% empty %}
+  {% else %}
     <div class="alert alert-warning mt-4">
       No estás inscrito en ningún curso aún.
     </div>
-  {% endfor %}
+  {% endif %}
 
 </main>
 {% endblock %}

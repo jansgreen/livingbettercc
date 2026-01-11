@@ -125,9 +125,9 @@ Uso en templates:
                     <span class="badge bg-secondary">{{ course_data.years|length }}</span>
                   </td>
                   <td class="text-end pe-4">
-                    <a href="{% url 'certifications:inperson_list' %}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                    <span class="btn btn-sm btn-outline-secondary disabled" title="Detalles no disponibles">
                       <i class="bi bi-eye"></i>
-                    </a>
+                    </span>
                   </td>
                 </tr>
                 {% endfor %}
@@ -135,9 +135,10 @@ Uso en templates:
             </table>
           </div>
           <div class="card-footer bg-light border-0 rounded-bottom-3 p-4">
-            <a href="{% url 'certifications:inperson_list' %}" class="btn btn-primary">
-              <i class="bi bi-list-check me-2"></i>Ver Listado Completo
-            </a>
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-2"></i>
+              Resumen basado en ReportActivity
+            </small>
           </div>
         </div>
       </div>

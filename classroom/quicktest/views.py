@@ -15,14 +15,51 @@ def quicktest_detail(request, pk):
     test = get_object_or_404(QuickTest, pk=pk, user=request.user)
     return render(request, 'quicktest/quicktest_detail.html', {'test': test})
 
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+
+from classroom.courses.models import Module
+from classroom.enrollments.models import Enrollment
+from .models import QuickTest, QuickTestDefinition
+
+PASSING_SCORE = 70
+
 @login_required
 def quicktest_create(request, module_id):
     module = get_object_or_404(Module, id=module_id)
-    if request.method == 'POST':
-        score = request.POST.get('score')
+
+    # Bloquear si no está inscrito o no está ACTIVE
+    enrollment = Enrollment.objects.filter(user=request.user, course=module.course).first()
+    if not enrollment:
+        messages.error(request, "No estás inscrito en este curso.")
+        return redirect("courses:course_detail", pk=module.course_id)
+
+    if enrollment.status != Enrollment.Status.ACTIVE:
+        messages.error(request, "Debes completar el pago o esperar aprobación para tomar el test.")
+        return redirect("courses:my_course")
+
+    # Verifica que el módulo realmente tenga definición (si no, no hay test que tomar)
+    if not QuickTestDefinition.objects.filter(module=module).exists():
+        messages.info(request, "Este módulo no tiene test. Puedes continuar.")
+        return redirect("courses:next_module", module_id=module.id)
+
+    if request.method == "POST":
+        try:
+            score = float(request.POST.get("score") or 0)
+        except ValueError:
+            score = 0
+
         QuickTest.objects.create(module=module, user=request.user, score=score)
-        return redirect('quicktest_list')
-    return render(request, 'quicktest/quicktest_form.html', {'module': module})
+
+        if score >= PASSING_SCORE:
+            messages.success(request, "✅ Test aprobado. Continuando...")
+            return redirect("courses:next_module", module_id=module.id)
+
+        messages.warning(request, f"❌ No aprobaste (mínimo {PASSING_SCORE}). Intenta de nuevo.")
+        return redirect("quicktest:quicktest_create", module_id=module.id)
+
+    return render(request, "quicktest/quicktest_form.html", {"module": module, "passing_score": PASSING_SCORE})
 
 @login_required
 def quicktest_update(request, pk):

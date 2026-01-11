@@ -1,0 +1,30 @@
+{% extends "frontend.html" %}
+{% block content %}
+<div class="container py-4">
+  <h3 class="mb-3">Mis Certificados</h3>
+
+  <div class="row g-3">
+    {% for c in certificates %}
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <div class="small text-muted">Cert No.</div>
+            <div class="fw-bold">{{ c.cert_no }}</div>
+            <div class="mt-2">{{ c.course.title }}</div>
+            <div class="small text-muted">{{ c.issued_date }}</div>
+          </div>
+          <div class="card-footer bg-transparent">
+            <a class="btn btn-sm btn-primary w-100" href="{% url 'certifications:my_certificate_detail' c.uuid %}">
+              Ver Certificado
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-warning">Aún no tienes certificados.</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

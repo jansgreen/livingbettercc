@@ -22,20 +22,7 @@ from django.conf import settings
 from authentication.views import login_view, register_view
 
 
-def certifications_in_person_alias(request):
-    return redirect('certifications:inperson_list')
-
-
-def certifications_in_person_new_alias(request):
-    return redirect('certifications:inperson_create')
-
-
-def certifications_in_person_edit_alias(request, pk: int):
-    return redirect('certifications:inperson_update', pk=pk)
-
-
-def certifications_in_person_delete_alias(request, pk: int):
-    return redirect('certifications:inperson_delete', pk=pk)
+# Deprecated: in-person certifications aliases removed. ReportActivity is handled in 'home' app.
 
 
 urlpatterns = [
@@ -49,11 +36,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
     path('shop/', include('shop.urls')),
     path('cart/', include('cart.urls')),
-    # Alias corto para certificados presenciales (evita duplicar namespace 'certifications')
-    path('certifications/in-person/', certifications_in_person_alias),
-    path('certifications/in-person/new/', certifications_in_person_new_alias),
-    path('certifications/in-person/<int:pk>/edit/', certifications_in_person_edit_alias),
-    path('certifications/in-person/<int:pk>/delete/', certifications_in_person_delete_alias),
+    # In-person certifications routes removed; use 'home' ReportActivity views if needed.
     path('classroom/', include('classroom.urls')),
     path('google/auth/', include('googleauth.urls')),  # Maneja el login de Google
     path('auth/', include('social_django.urls', namespace='social')),  # Include URLs for social authentication

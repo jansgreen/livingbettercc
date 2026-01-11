@@ -5,19 +5,31 @@ from . import views
 app_name = 'certifications'
 
 urlpatterns = [
-    path('list/', views.listar_certificados, name='certificate_list'),
-    path('certificate/<uuid:uuid>/', views.certificate_public_view, name='certificate_public_view'),
-    path('certificate/<uuid:uuid>/download/', views.certificate_pdf_download, name='certificate_pdf_download'),
 
-    # Presenciales (manual por distrito)
-    path('in-person/', views.inperson_list, name='inperson_list'),
-    path('in-person/new/', views.inperson_create, name='inperson_create'),
-    path('in-person/<int:pk>/edit/', views.inperson_update, name='inperson_update'),
-    path('in-person/<int:pk>/delete/', views.inperson_delete, name='inperson_delete'),
+    # CRUD for certificates admin/staff views
+    path('certificate/new/', views.CertificateCreateView.as_view(), name='certificate_create'),
+    path('certificate/<int:pk>/edit/', views.CertificateUpdateView.as_view(), name='certificate_edit'),
+    path('certificate/<int:pk>/delete/', views.CertificateDeleteView.as_view(), name='certificate_delete'),
+   
+    # UUID-based aliases used by templates
+    path('certificate/<uuid:uuid>/edit/', views.CertificateUpdateByUUIDView.as_view(), name='certificate_update'),
+    path('certificate/<uuid:uuid>/delete/', views.CertificateDeleteByUUIDView.as_view(), name='certificate_delete'),
+    path('certificates/', views.CertificateListView.as_view(), name='certificate_list'),
 
-    # In-person categories
-    path("inperson/categories/", views.InPersonCategoryListView.as_view(), name="inperson_category_list"),
-    path("inperson/categories/create/", views.InPersonCategoryCreateView.as_view(), name="inperson_category_create"),
-    path("inperson/categories/<int:pk>/update/", views.InPersonCategoryUpdateView.as_view(), name="inperson_category_update"),
-    path("inperson/categories/<int:pk>/delete/", views.InPersonCategoryDeleteView.as_view(), name="inperson_category_delete"),
+    # User-specific certificate views
+    path('my-certificates/', views.UserCertificateListView.as_view(), name='my_certificates_list'),
+    # Optional alias to accept a UUID param even if unused by the view (matches template usage)
+    path('my-certificates/<uuid:uuid>/', views.UserCertificateListView.as_view(), name='my_certificates'),
+    path('certificates/details/<int:pk>/', views.UserCertificateDetailView.as_view(), name='user_certificate_detail'),
+    path('my-certificates/details/<uuid:uuid>/', views.UserCertificateDetailByUUIDView.as_view(), name='my_certificate_detail'),
+    
+    # Shared certificates view and management
+    path('shared-certificates/', views.SharedCertificateListView.as_view(), name='shared_certificates_list'),
+
+    # Public certificate view and PDF download
+    path('certificate/public/<uuid:uuid>/', views.certificate_public_view, name='certificate_public_view'),
+    path('certificate/public/<uuid:uuid>/pdf/', views.certificate_pdf_download, name='certificate_pdf_download'),
+
+    # In-person certificates routes removed; using ReportActivity via home app.
+
 ]

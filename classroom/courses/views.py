@@ -1,44 +1,31 @@
+from classroom.certifications.models import Certificate
 from .models import Module
 from classroom.quicktest.models import QuickTest, QuickTestDefinition, QuickTestQuestion
 from classroom.certifications.views import create_certificate_for_user
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
-from .models import Course, Module, Lesson
 from .forms import CourseForm, ModuleForm, LessonForm
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.conf import settings
 from types import SimpleNamespace
-
 import json
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from django.contrib.auth.decorators import login_required
-from .models import Course
 from authentication.models.students import Students  # Ajusta el import según tu estructura
 from authentication.models.profiles import Profiles
-
-from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.models import Group
 from classroom.courses.models import Course, Module, Lesson
 from django.db.models import Prefetch
 
 
-
-from types import SimpleNamespace
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 
-from classroom.courses.models import Module
-from classroom.quicktest.models import QuickTestDefinition, QuickTest
-from classroom.enrollments.models import Enrollment, LessonCompletion
-
+from classroom.enrollments.models import Enrollment, ModuleCompletion
 
 @login_required
 def quicktest_view(request, module_id):
@@ -413,7 +400,6 @@ def start_course_payment(request, pk):
 def my_course(request):
     enrollments = Enrollment.objects.filter(user=request.user, completed=False)
 
-    # Cursos con módulos y lessons prefetcheados (clave para que module.status exista en template)
     courses = (
         Course.objects
         .filter(enrollment__in=enrollments)
@@ -438,26 +424,34 @@ def my_course(request):
         pay_url = reverse('enrollments:create_checkout_session', kwargs={'enrollment_id': pending.id})
         messages.info(request, f"Pago pendiente | {pay_url}")
 
-    # Lessons completadas
-    completed_ids = LessonCompletion.objects.filter(
+    # Lessons completadas (IMPORTANTE: conviértelo a LISTA UNA VEZ)
+    completed_ids_qs = LessonCompletion.objects.filter(
         enrollment__in=enrollments,
         lesson__module__course__in=course_ids
     ).values_list('lesson_id', flat=True)
 
-    completed_set = set(completed_ids)
+    completed_ids = list(completed_ids_qs)   # ✅ lista real para el template
+    completed_set = set(completed_ids)       # ✅ set para cálculos rápidos en Python
 
-    # Lista única de módulos desde courses (sin queries extra y sin instancias distintas)
+    # Lista única de módulos desde courses (usa mismos objetos del prefetch)
     modules = []
     for c in courses:
         modules.extend(list(c.modules.all()))
 
-    # Status por módulo
     module_status = {}
     for m in modules:
-        lessons = list(m.lessons.all())  # ya prefetcheado
+        lessons = list(m.lessons.all())  # ya prefetcheado + ordenado por Meta ordering
         total = len(lessons)
         done = sum(1 for l in lessons if l.id in completed_set)
         is_completed = total > 0 and done >= total
+
+        # ✅ next_lesson_id: si no hay completadas, la primera siempre se habilita
+        if total == 0:
+            next_lesson_id = None
+        elif done == 0:
+            next_lesson_id = lessons[0].id
+        else:
+            next_lesson_id = next((l.id for l in lessons if l.id not in completed_set), None)
 
         qdef = QuickTestDefinition.objects.filter(module=m).first()
         has_quicktest = bool(qdef)
@@ -471,7 +465,7 @@ def my_course(request):
             'lessons_total': total,
             'lessons_completed': done,
             'is_completed': is_completed,
-            "completed_ids": list(completed_ids),
+            'next_lesson_id': next_lesson_id,   # ✅ clave para habilitar la primera / siguiente
             'has_quicktest': has_quicktest,
             'questions_total': questions_total,
             'score': score,
@@ -481,7 +475,7 @@ def my_course(request):
         # Para template: module.status
         m.status = module_status[m.id]
 
-    # Asegura que course.modules.all() también tenga status (usa mismos objetos del prefetch)
+    # Asegura status dentro de course.modules.all()
     for c in courses:
         for m in c.modules.all():
             m.status = module_status.get(m.id)
@@ -490,7 +484,7 @@ def my_course(request):
         'enrollments': enrollments,
         'courses': courses,
         'modules': modules,
-        'completed_ids': completed_ids,
+        'completed_ids': completed_ids,   # ✅ lista
         'module_status': module_status,
         'has_active': any(e.status == Enrollment.Status.ACTIVE for e in enrollments),
     }
@@ -692,26 +686,56 @@ def lesson_update(request, pk):
     }
     return render(request, 'lesson/lesson_form.html', context)
 
+
 @login_required
 def lesson_detail(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
+    module = lesson.module
+    course = module.course
 
-    enrollments = Enrollment.objects.filter(user=request.user, completed=False)
+    enr = Enrollment.objects.filter(
+        user=request.user,
+        course=course,
+        status=Enrollment.Status.ACTIVE,
+        completed=False
+    ).first()
 
-    courses = (
-        Course.objects
-        .filter(enrollment__in=enrollments)
-        .distinct()
-        .prefetch_related(
-            Prefetch("modules", queryset=Module.objects.prefetch_related("lessons"))
+    if not enr:
+        messages.error(request, "No tienes acceso a este curso (inscripción inactiva o pendiente).")
+        return redirect("courses:my_course")
+
+    # Orden real de lessons (usa Meta ordering + id para estabilidad)
+    ordered_lessons = list(module.lessons.order_by("order", "id"))
+
+    # Index de la lección actual
+    try:
+        idx = next(i for i, l in enumerate(ordered_lessons) if l.id == lesson.id)
+    except StopIteration:
+        messages.error(request, "Lección inválida para este módulo.")
+        return redirect("courses:my_course")
+
+    # Todas las previas deben estar completadas
+    prev_lessons = ordered_lessons[:idx]
+    prev_ids = [l.id for l in prev_lessons]
+
+    if prev_ids:
+        completed_prev_ids = set(
+            LessonCompletion.objects.filter(
+                enrollment=enr,
+                lesson_id__in=prev_ids
+            ).values_list("lesson_id", flat=True)
         )
-    )
-    modules = Module.objects.filter(course__in=courses).distinct().prefetch_related("lessons")
 
-    context = {
-        'lesson': lesson,
-    }
-    return render(request, 'lesson/lesson_detail.html', context)
+        if len(completed_prev_ids) < len(prev_ids):
+            # primera pendiente (en el orden real)
+            first_pending = next((l for l in prev_lessons if l.id not in completed_prev_ids), None)
+
+            messages.warning(request, "Debes completar las lecciones en orden.")
+            if first_pending:
+                return redirect("courses:lesson_detail", pk=first_pending.id)
+            return redirect("courses:my_course")
+
+    return render(request, "lesson/lesson_detail.html", {"lesson": lesson})
 
 @login_required
 def lesson_delete(request, pk):
@@ -723,7 +747,6 @@ def lesson_delete(request, pk):
     else:
         messages.error(request, 'Error deleting lesson.')
         return redirect('courses:module_list')
-
 
 # guarda los resultados del test 
 @csrf_exempt
@@ -762,31 +785,115 @@ def test_detail(request, pk):
     # Deprecated: no dedicated template; redirect to quicktest
     return redirect('courses:quicktest', module_id=module.pk)
 
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.db import transaction
+
+from classroom.courses.models import Module
+from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
+from classroom.quicktest.models import QuickTest, QuickTestDefinition
+from classroom.certifications.models import Certificate
+
+PASSING_SCORE = 70
+
+
+def _module_lessons_completed(*, enrollment: Enrollment, module: Module) -> bool:
+    lesson_ids = list(module.lessons.values_list("id", flat=True))
+    if not lesson_ids:
+        return True  # módulo sin lecciones => lo tratamos como completo
+    done = LessonCompletion.objects.filter(enrollment=enrollment, lesson_id__in=lesson_ids).count()
+    return done >= len(lesson_ids)
+
+
+def _module_quicktest_passed(*, user, module: Module) -> bool:
+    has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
+    if not has_qdef:
+        return True
+    qt = (
+        QuickTest.objects
+        .filter(user=user, module=module)
+        .order_by("-completed_at")
+        .first()
+    )
+    return bool(qt and float(qt.score) >= PASSING_SCORE)
+
+PASSING_SCORE = 70
+
+def _passed_quicktest(user, module) -> bool:
+    """True if module has no test OR user has latest score >= PASSING_SCORE."""
+    has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
+    if not has_qdef:
+        return True
+    qt = QuickTest.objects.filter(user=user, module=module).order_by("-completed_at").first()
+    return bool(qt and float(qt.score) >= PASSING_SCORE)
+
 @login_required
 def next_module(request, module_id):
     module = get_object_or_404(Module, pk=module_id)
     course = module.course
-    # Si el módulo actual tiene quicktest, verificar que el usuario haya aprobado (>=70)
-    if QuickTestDefinition.objects.filter(module=module).exists():
-        qt = QuickTest.objects.filter(user=request.user, module=module).order_by('-completed_at').first()
-        if not qt or float(qt.score) < 70:
-            messages.info(request, 'Debes aprobar el test de este módulo antes de continuar.')
-            return redirect('courses:module_detail', pk=module.pk)
-    next_mod = Module.objects.filter(course=course, order__gt=module.order).order_by('order').first()
+
+    enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+    if not enrollment:
+        messages.error(request, "No estás inscrito en este curso.")
+        return redirect("courses:course_list")
+
+    if enrollment.status != Enrollment.Status.ACTIVE:
+        messages.error(request, "Debes completar el pago o esperar aprobación para avanzar en el curso.")
+        return redirect("courses:my_course")
+
+    # 1) Exigir aprobar test del módulo actual (si existe)
+    if not _passed_quicktest(request.user, module):
+        messages.info(request, "Debes aprobar el test de este módulo antes de continuar.")
+        return redirect("courses:module_detail", pk=module.pk)
+
+    # 2) Marcar el módulo como completado (idempotente)
+    ModuleCompletion.objects.get_or_create(enrollment=enrollment, module=module)
+
+    # 3) Calcular progreso del curso basado en módulos completados
+    total_modules = course.modules.count()
+    completed_modules = ModuleCompletion.objects.filter(enrollment=enrollment).count()
+    progress = (completed_modules / total_modules) * 100 if total_modules else 0
+    enrollment.progress = round(progress, 2)
+    enrollment.save(update_fields=["progress"])
+
+    # 4) Encontrar siguiente módulo de forma robusta
+    modules = list(course.modules.all().order_by("order", "id"))
+    try:
+        idx = next(i for i, m in enumerate(modules) if m.id == module.id)
+    except StopIteration:
+        messages.error(request, "Módulo inválido.")
+        return redirect("courses:my_course")
+
+    next_mod = modules[idx + 1] if (idx + 1) < len(modules) else None
     if next_mod:
-        return redirect('courses:module_detail', pk=next_mod.pk)
-    else:
-        # El usuario ha completado todos los módulos del curso
-        # Marcar la matrícula como completada
-        enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
-        if enrollment:
-            enrollment.completed = True
-            enrollment.save()
-        create_certificate_for_user(request.user, course)
-        messages.success(request, '¡Has completado todos los módulos de este curso! Se ha generado tu certificado.')
-        return redirect('courses:my_course')
+        return redirect("courses:module_detail", pk=next_mod.pk)
 
+    # ======= ÚLTIMO MÓDULO: VALIDAR TODO Y FINALIZAR =======
 
+    # 5a) Todas las lecciones del curso completas
+    total_lessons = Lesson.objects.filter(module__course=course).count()
+    completed_lessons = LessonCompletion.objects.filter(enrollment=enrollment).count()
+    if completed_lessons < total_lessons:
+        messages.warning(request, "Aún te faltan lecciones por completar antes de finalizar el curso.")
+        return redirect("courses:my_course")
 
+    # 5b) Todos los quicktests aprobados (para módulos que tengan test)
+    not_passed = [m for m in modules if not _passed_quicktest(request.user, m)]
+    if not_passed:
+        messages.warning(request, "Te falta aprobar al menos un test antes de finalizar el curso.")
+        return redirect("courses:module_detail", pk=not_passed[0].pk)
 
+    # 6) Finalizar enrollment + generar certificado (atómico)
+    with transaction.atomic():
+        enrollment.completed = True
+        enrollment.status = Enrollment.Status.COMPLETED
+        enrollment.progress = 100
+        enrollment.save(update_fields=["completed", "status", "progress"])
 
+        cert, _ = Certificate.objects.get_or_create(user=request.user, course=course)
+        cert.save()  # genera cert_no si faltaba
+
+    messages.success(request, "¡Curso completado! Tu certificado está disponible.")
+    return redirect("certifications:my_certificate_detail", uuid=cert.uuid)

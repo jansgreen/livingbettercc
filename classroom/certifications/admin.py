@@ -1,27 +1,10 @@
 from django.contrib import admin
 
-from .models import Certificate, InPersonCategory, InPersonCertificateIssue
+from .models import Certificate
 
 @admin.register(Certificate)
 class CertificateAdmin(admin.ModelAdmin):
-	list_display = ('user', 'course', 'certificate_number', 'issued_date', 'public_uuid')
-	search_fields = ('user__username', 'course__title', 'certificate_number')
-	list_filter = ('issued_date', 'course')
-	readonly_fields = ('certificate_number', 'issued_date', 'public_uuid')
-	ordering = ('-issued_date',)
+	list_display = ('cert_no', 'user', 'course', 'issued_date')
+	search_fields = ('cert_no', 'user__username', 'course__title')
+	list_filter = ('issued_date',)
 
-
-@admin.register(InPersonCertificateIssue)
-class InPersonCertificateIssueAdmin(admin.ModelAdmin):
-	list_display = ('course', 'issued_date', 'district', 'quantity', 'created_by')
-	search_fields = ('course__title', 'district', 'created_by__username')
-	list_filter = ('issued_date', 'course', 'district')
-	ordering = ('-issued_date',)
-
-
-@admin.register(InPersonCategory)
-class InPersonCategoryAdmin(admin.ModelAdmin):
-	list_display = ("name", "created_at", "updated_at")
-	search_fields = ("name", "description")
-	list_filter = ("created_at", "updated_at")
-	ordering = ("name",)

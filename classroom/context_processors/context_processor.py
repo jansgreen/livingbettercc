@@ -1,4 +1,5 @@
-from django.urls import reverse
+from importlib.resources import path
+from django.urls import reverse, NoReverseMatch
 from classroom.courses.models import Course, Module, Lesson
 from django.db.models import Prefetch
 from django.shortcuts import render, get_object_or_404, redirect
@@ -13,15 +14,49 @@ from core.menu_builder import build_menu, safe_id
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
         submenus = []
+
+        def safe_reverse(name: str, *args, **kwargs):
+            try:
+                return reverse(name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                return None
+            except Exception:
+                return None
+
         # Admin/staff actions gated by permission
-        submenus.append({'nombre': 'Crear Curso', 'url': reverse('courses:course_create'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Lista de Cursos', 'url': reverse('courses:course_list'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Crear Modulo', 'url': reverse('courses:module_create'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Modulos', 'url': reverse('courses:module_list'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Lecciones', 'url': reverse('courses:lesson_list'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Crear Lección', 'url': reverse('courses:lesson_create'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Certificados Presenciales', 'url': reverse('certifications:inperson_list'), 'perm': 'groups.access_module'})
-        submenus.append({'nombre': 'Registrar Presencial', 'url': reverse('certifications:inperson_create'), 'perm': 'groups.access_module'})
+        url_course_create = safe_reverse('courses:course_create')
+        if url_course_create:
+            submenus.append({'nombre': 'Crear Curso', 'url': url_course_create, 'perm': 'groups.access_module'})
+
+        url_course_list = safe_reverse('courses:course_list')
+        if url_course_list:
+            submenus.append({'nombre': 'Lista de Cursos', 'url': url_course_list, 'perm': 'groups.access_module'})
+
+        url_module_create = safe_reverse('courses:module_create')
+        if url_module_create:
+            submenus.append({'nombre': 'Crear Modulo', 'url': url_module_create, 'perm': 'groups.access_module'})
+
+        url_module_list = safe_reverse('courses:module_list')
+        if url_module_list:
+            submenus.append({'nombre': 'Modulos', 'url': url_module_list, 'perm': 'groups.access_module'})
+
+        url_lesson_list = safe_reverse('courses:lesson_list')
+        if url_lesson_list:
+            submenus.append({'nombre': 'Lecciones', 'url': url_lesson_list, 'perm': 'groups.access_module'})
+
+        url_lesson_create = safe_reverse('courses:lesson_create')
+        if url_lesson_create:
+            submenus.append({'nombre': 'Crear Lección', 'url': url_lesson_create, 'perm': 'groups.access_module'})
+
+        # In-person links removed; ReportActivity is managed in 'home' app.
+
+        url_my_certs = safe_reverse('certifications:my_certificates_list')
+        if url_my_certs:
+            submenus.append({'nombre': 'Mis Certificados', 'url': url_my_certs, 'perm': 'groups.access_module'})
+
+        url_users_certs = safe_reverse('certifications:users_certificate_list')
+        if url_users_certs:
+            submenus.append({'nombre': 'Lista de Certificados de usuarios', 'url': url_users_certs, 'perm': 'groups.access_module'})
 
         # Student menu (added only if user is in student group)
         try:
@@ -29,10 +64,22 @@ def obtener_menu_classroom(request):
         except Exception:
             is_student = False
         if is_student:
-            submenus.append({'nombre': 'Mis Cursos', 'url': reverse('courses:my_course')})
-            submenus.append({'nombre': 'Cursos Disponibles', 'url': reverse('courses:course_list')})
-            submenus.append({'nombre': 'Progreso y Certificados', 'url': reverse('courses:my_course')})
-            submenus.append({'nombre': 'Mis Calificaciones', 'url': reverse('courses:my_course')})
+            url_my_course = safe_reverse('courses:my_course')
+            if url_my_course:
+                submenus.append({'nombre': 'Mis Cursos', 'url': url_my_course})
+
+            if url_course_list:
+                submenus.append({'nombre': 'Cursos Disponibles', 'url': url_course_list})
+
+            if url_my_course:
+                submenus.append({'nombre': 'Progreso y Certificados', 'url': url_my_course})
+
+            if url_my_course:
+                submenus.append({'nombre': 'Mis Calificaciones', 'url': url_my_course})
+
+            if url_my_certs:
+                submenus.append({'nombre': 'Mis Certificados', 'url': url_my_certs})
+
 
         menu = build_menu(request.user, 'Classroom', submenus, url='#')
         return {'menu_classroom': [menu] if menu else []}
@@ -160,3 +207,43 @@ def obtener_certificados_usuario(request):
         })
     logger.warning(f"[CTX] obtener_certificados_usuario => {type(certificados)} | {certificados}")
     return {'certificados_usuario': certificados}
+
+def obtener_quicktest_manager(request):
+    if request.user.is_authenticated:
+        submenus = []
+
+        def safe_reverse(name: str, *args, **kwargs):
+            try:
+                return reverse(name, args=args, kwargs=kwargs)
+            except NoReverseMatch:
+                return None
+            except Exception:
+                return None
+        
+        # QuickTest management
+        url_quicktest_list = safe_reverse('quicktest:quicktest_list')
+        if url_quicktest_list:
+            submenus.append({'nombre': 'Lista de QuickTests', 'url': url_quicktest_list, 'perm': 'groups.access_module'})
+
+        url_quicktest_create = safe_reverse('quicktest:quicktest_create')
+        if url_quicktest_create:
+            submenus.append({'nombre': 'Crear QuickTest', 'url': url_quicktest_create, 'perm': 'groups.access_module'})
+
+        # QuickTest Definitions
+        url_qdef_list = safe_reverse('quicktest:qdef_list')
+        if url_qdef_list:
+            submenus.append({'nombre': 'Definiciones de QuickTest', 'url': url_qdef_list, 'perm': 'groups.access_module'})
+
+        url_qdef_create = safe_reverse('quicktest:qdef_create')
+        if url_qdef_create:
+            submenus.append({'nombre': 'Crear Definición', 'url': url_qdef_create, 'perm': 'groups.access_module'})
+
+        # QuickTest Questions
+        url_q_list = safe_reverse('quicktest:q_list', kwargs={'def_id': 0})
+        if url_q_list:
+            submenus.append({'nombre': 'Preguntas de QuickTest', 'url': url_q_list, 'perm': 'groups.access_module'})
+
+        menu = build_menu(request.user, 'QuickTest', submenus, url='#')
+        return {'menu_quicktest': [menu] if menu else []}
+    else:
+        return {'menu_quicktest': []}

@@ -1,29 +1,24 @@
-from __future__ import annotations
-
 from django import forms
+from .models import Certificate
 
-from classroom.courses.models import Course
+class CertificateForm(forms.ModelForm):
+	class Meta:
+		model = Certificate
+		fields = ["user", "course", "issued_date"]
+		widgets = {
+			"issued_date": forms.DateInput(attrs={"type": "date"}),
+		}
 
-from .models import InPersonCategory, InPersonCertificateIssue
-
-
-class InPersonCertificateIssueForm(forms.ModelForm):
-    class Meta:
-        model = InPersonCertificateIssue
-        fields = ('course', 'category', 'issued_date', 'district', 'in_person_total', 'impact', 'quantity', 'image', 'note')
-        widgets = {
-            'course': forms.Select(attrs={'class': 'form-select'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'issued_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'district': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 01-01'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'in_person_total': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'impact': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
-            'note': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['course'].queryset = Course.objects.order_by('title')
-        self.fields['category'].queryset = InPersonCategory.objects.order_by('name')
+	def clean(self):
+		cleaned = super().clean()
+		# Enforce unique user + course per model constraint with a user-friendly error
+		user = cleaned.get("user")
+		course = cleaned.get("course")
+		if user and course:
+			qs = Certificate.objects.filter(user=user, course=course)
+			# Exclude current instance on update
+			if self.instance and self.instance.pk:
+				qs = qs.exclude(pk=self.instance.pk)
+			if qs.exists():
+				raise forms.ValidationError("Este usuario ya tiene certificado para este curso.")
+		return cleaned

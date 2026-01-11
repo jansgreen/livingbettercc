@@ -1,0 +1,14 @@
+{% extends "frontend.html" %}
+{% block content %}
+<div class="container py-4" style="max-width:720px;">
+  <h3 class="mb-3">Delete Certificate</h3>
+  <div class="alert alert-warning">
+    Delete certificate <b>{{ certificate.cert_no }}</b> for <b>{{ certificate.user }}</b>?
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Delete</button>
+    <a class="btn btn-outline-secondary" href="{% url 'courses:my_course' %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

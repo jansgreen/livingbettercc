@@ -1,0 +1,172 @@
+{# templates/certifications/my_certificates.html #}
+{% extends "frontend.html" %}
+{% load static %}
+{% block content %}
+<style>
+  .page-wrap{ padding: 28px 0 60px; }
+  .page-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:16px; margin-bottom:18px;
+  }
+  .page-title{ margin:0; font-weight:900; letter-spacing:.2px; }
+  .page-sub{ margin:6px 0 0; color:#6b7280; font-weight:600; }
+
+  .card-cert{
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 18px;
+    overflow:hidden;
+    box-shadow: 0 10px 24px rgba(0,0,0,.06);
+  }
+  .card-cert .card-body{ padding: 16px 16px 14px; }
+  .meta{
+    display:flex; flex-wrap:wrap; gap:10px 14px;
+    color:#6b7280; font-size: 0.92rem; font-weight:600;
+  }
+  .meta span{ display:inline-flex; gap:8px; align-items:center; }
+
+  .thumb{
+    width:100%;
+    aspect-ratio: 16 / 9;
+    background:
+      radial-gradient(800px 450px at 20% 10%, rgba(255,255,255,.22), rgba(255,255,255,0) 60%),
+      linear-gradient(135deg, #0b1026 0%, #121f49 40%, #0f1738 75%, #0b1026 100%);
+    position:relative;
+  }
+  .thumb::after{
+    content:"";
+    position:absolute; inset:12px;
+    border-radius: 14px;
+    border: 1px solid rgba(231,204,134,.55);
+    box-shadow: inset 0 0 0 4px rgba(202,162,74,.18);
+  }
+  .thumb .tag{
+    position:absolute; left:14px; top:14px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 900;
+    letter-spacing:.4px;
+    color:#fff;
+    background: rgba(0,0,0,.35);
+    border: 1px solid rgba(255,255,255,.18);
+    backdrop-filter: blur(6px);
+  }
+
+  .cert-actions{
+    display:flex; flex-wrap:wrap; gap:10px;
+    padding: 0 16px 16px;
+  }
+
+  .btn-soft{
+    border-radius: 12px;
+    font-weight: 800;
+    padding: 10px 12px;
+  }
+  .btn-soft-primary{
+    background: linear-gradient(180deg, #121f49, #0f1738);
+    border: 1px solid #0b1026;
+    color:#fff;
+  }
+  .btn-soft-outline{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.14);
+    color:#111827;
+  }
+  .btn-soft-outline:hover{ border-color: rgba(0,0,0,.24); }
+
+  .empty{
+    border: 1px dashed rgba(0,0,0,.18);
+    border-radius: 18px;
+    padding: 22px;
+    background: #fff;
+  }
+</style>
+
+<div class="container page-wrap">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Mis certificados</h1>
+      <p class="page-sub">Aquí puedes ver, imprimir y compartir tus certificados.</p>
+    </div>
+    <a class="btn btn-soft btn-soft-outline" href="{% url 'courses:my_course' %}">
+      Volver a mis cursos
+    </a>
+  </div>
+
+  <div class="row g-3">
+    {% for certificado in certificados %}
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="card-cert bg-white">
+          <div class="thumb">
+            <div class="tag">LBCC</div>
+          </div>
+
+          <div class="card-body">
+            <h5 class="mb-2 fw-bold">
+              <a href="{% url 'certifications:certificate_public_view' certificado.public_uuid %}">
+                {{ certificado.course.title|default:"Certificado" }}
+              </a>
+            </h5>
+
+            <div class="meta">
+              <span>📅 {{ certificado.issued_date|date:"d/m/Y" }}</span>
+              <span>🔢 {{ certificado.cert_no|default:"—" }}</span>
+            </div>
+          </div>
+
+          <div class="cert-actions">
+            {# Vista privada (para imprimir) - ajusta el name según tus urls #}
+            <a class="btn btn-soft btn-soft-primary"
+               href="{% url 'certifications:certificate_public_view' certificado.public_uuid %}">
+              Ver / Imprimir
+            </a>
+
+            {# Vista pública - usa public_uuid #}
+            <a class="btn btn-soft btn-soft-outline"
+               href="{% url 'certifications:certificate_public_view' certificado.public_uuid %}"
+               target="_blank" rel="noopener">
+              Enlace público
+            </a>
+
+            <button class="btn btn-soft btn-soft-outline"
+                    type="button"
+                    onclick="copyLink('{{ request.scheme }}://{{ request.get_host }}{% url 'certifications:certificate_public_view' certificado.public_uuid %}' | safe)">
+              Copiar enlace
+            </button>
+            <a class="btn btn-soft btn-soft-outline"
+               href="{% url 'certifications:certificate_pdf_download' certificado.public_uuid %}">
+              Descargar PDF
+            </a>
+            
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="empty">
+          <h5 class="fw-bold mb-1">Aún no tienes certificados</h5>
+          <div class="text-muted mb-3">Completa un curso para que tu certificado aparezca aquí.</div>
+          <a class="btn btn-soft btn-soft-primary" href="{% url 'courses:my_course' %}">Ir a mis cursos</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function copyLink(url){
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(()=>{
+      alert("Enlace copiado ✅");
+    }).catch(()=>{
+      // fallback
+      const t = document.createElement("textarea");
+      t.value = url;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand("copy");
+      document.body.removeChild(t);
+      alert("Enlace copiado ✅");
+    });
+  }
+</script>
+{% endblock %}
