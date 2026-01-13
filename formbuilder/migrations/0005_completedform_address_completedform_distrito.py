@@ -7,6 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('address', '0001_initial'),
         ('authentication', '0022_alter_address_options_alter_customers_options_and_more'),
         ('formbuilder', '0004_completedform_descripcion_completedform_titulo'),
     ]
@@ -15,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='completedform',
             name='address',
-            field=models.ForeignKey(blank=True, help_text='Dirección del facilitador', null=True, on_delete=django.db.models.deletion.SET_NULL, to='authentication.address'),
+            field=models.ForeignKey(blank=True, help_text='Dirección del facilitador', null=True, on_delete=django.db.models.deletion.SET_NULL, to='address.address'),
         ),
         migrations.AddField(
             model_name='completedform',

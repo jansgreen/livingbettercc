@@ -8,6 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('address', '0001_initial'),
         ('authentication', '0022_alter_address_options_alter_customers_options_and_more'),
         ('courses', '0001_initial'),
         ('enrollments', '0002_lessoncompletion_modulecompletion'),
@@ -25,7 +26,7 @@ class Migration(migrations.Migration):
                 ('distrito_escolar', models.CharField(max_length=100)),
                 ('fecha_aplicacion', models.DateTimeField(auto_now_add=True)),
                 ('estado', models.CharField(choices=[('pendiente', 'Pendiente'), ('aprobada', 'Aprobada'), ('rechazada', 'Rechazada')], default='pendiente', max_length=20)),
-                ('address', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='beca_applications', to='authentication.address')),
+                ('address', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='beca_applications', to='address.address')),
                 ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='courses.course')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
