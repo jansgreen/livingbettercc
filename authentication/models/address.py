@@ -10,5 +10,5 @@ class Address(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = "authentication_address"  # importante si antes existía esa tabla
-        managed = True
+        db_table = "authentication_address"  # legado
+        managed = False  # no gestionar tabla; usar authentication.address.Address
