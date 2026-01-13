@@ -94,7 +94,7 @@
                 {% if st and st.has_quicktest %}
                   {# ✅ regla correcta: si terminó lecciones y NO ha aprobado => mostrar test #}
                   {% if st.is_completed and not st.passed %}
-                    <a href="{% url 'quicktest:quicktest_create' module.id %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'quicktest:quicktest_taking' module.id %}" class="btn btn-primary btn-sm">
                       Tomar test{% if st.questions_total %} ({{ st.questions_total }} preguntas){% endif %}
                     </a>
                     {% if st.score %}

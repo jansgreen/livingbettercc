@@ -7,7 +7,7 @@ urlpatterns = [
     # Student results (existing minimal endpoints)
     path('', views.quicktest_list, name='quicktest_list'),
     path('<int:pk>/', views.quicktest_detail, name='quicktest_detail'),
-    path('create/<int:module_id>/', views.quicktest_create, name='quicktest_create'),
+    path('taking/<int:module_id>/', views.quicktest_taking, name='quicktest_taking'),
     path('update/<int:pk>/', views.quicktest_update, name='quicktest_update'),
     path('delete/<int:pk>/', views.quicktest_delete, name='quicktest_delete'),
 

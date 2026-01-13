@@ -19,13 +19,20 @@ from authentication.models.profiles import Profiles
 from django.contrib.auth.models import Group
 from classroom.courses.models import Course, Module, Lesson
 from django.db.models import Prefetch
-
-
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
-
 from classroom.enrollments.models import Enrollment, ModuleCompletion
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+from django.db import transaction
+
+from classroom.courses.models import Module
+from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
+from classroom.quicktest.models import QuickTest, QuickTestDefinition
+from classroom.certifications.models import Certificate
+
 
 @login_required
 def quicktest_view(request, module_id):
@@ -786,18 +793,7 @@ def test_detail(request, pk):
     return redirect('courses:quicktest', module_id=module.pk)
 
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from django.db import transaction
-
-from classroom.courses.models import Module
-from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
-from classroom.quicktest.models import QuickTest, QuickTestDefinition
-from classroom.certifications.models import Certificate
-
 PASSING_SCORE = 70
-
 
 def _module_lessons_completed(*, enrollment: Enrollment, module: Module) -> bool:
     lesson_ids = list(module.lessons.values_list("id", flat=True))
@@ -805,7 +801,6 @@ def _module_lessons_completed(*, enrollment: Enrollment, module: Module) -> bool
         return True  # módulo sin lecciones => lo tratamos como completo
     done = LessonCompletion.objects.filter(enrollment=enrollment, lesson_id__in=lesson_ids).count()
     return done >= len(lesson_ids)
-
 
 def _module_quicktest_passed(*, user, module: Module) -> bool:
     has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
