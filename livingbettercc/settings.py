@@ -131,7 +131,7 @@ INSTALLED_APPS = [
     'classroom.certifications',
     'authentication',
     'authentication.students',
-    'authentication.address',
+    'authentication.address.apps.AddressConfig',
     'formbuilder',
     'shop',
     'gallery',
