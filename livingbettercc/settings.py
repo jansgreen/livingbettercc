@@ -72,6 +72,7 @@ def _parse_hosts_csv(value: str) -> list[str]:
 if not DEBUG:
     # Si HOSTS está definido en Heroku, úsalo; pero siempre agrega defaults seguros.
     _env_hosts = _parse_hosts_csv(os.getenv("HOSTS", ""))
+    _additional_hosts = _parse_hosts_csv(os.getenv("ADDITIONAL_ALLOWED_HOSTS", ""))
     _required_hosts = [
         "livingbettercc.herokuapp.com",
         # Acepta cualquier subdominio de herokuapp (p.ej. livingbettercc-xxxx.herokuapp.com)
@@ -93,7 +94,7 @@ if not DEBUG:
         ".livingbettercc.org",
         ".livingbettercc.xyz",
     ]
-    ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
+    ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_additional_hosts, *_required_hosts]))
 
     CSRF_TRUSTED_ORIGINS = [
         "https://livingbettercc.herokuapp.com",
