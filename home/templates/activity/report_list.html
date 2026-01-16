@@ -1,0 +1,50 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Lista de Reportes de Actividad</h2>
+  <a href="{% url 'report_create' %}" class="btn btn-primary mb-3">Crear Nuevo Reporte</a>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Curso</th>
+        <th>Año</th>
+        <th>Distrito</th>
+        <th>Cantidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for report in reports %}
+      <tr>
+        <td>{{ report.course }}</td>
+        <td>{{ report.issued_year }}</td>
+        <td>{{ report.district }}</td>
+        <td>{{ report.quantity }}</td>
+        <td>
+          <a href="{% url 'report_detail' report.pk %}" class="btn btn-info btn-sm">Ver</a>
+          <a href="{% url 'report_update' report.pk %}" class="btn btn-warning btn-sm">Editar</a>
+          <a href="{% url 'report_delete' report.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">No hay reportes disponibles.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <nav aria-label="Paginación">
+    <ul class="pagination justify-content-center">
+      {% if reports.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ reports.previous_page_number }}">Anterior</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+      {% endif %}
+      <li class="page-item active"><span class="page-link">{{ reports.number }}</span></li>
+      {% if reports.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ reports.next_page_number }}">Siguiente</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

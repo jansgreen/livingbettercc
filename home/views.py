@@ -16,7 +16,11 @@ from django.db.models.functions import ExtractYear
 from collections import OrderedDict
 from shop.cart import Cart
 from collections import defaultdict
-from .models import ReportActivity
+from .models import ReportActivity, ReportCategories
+from .forms import ReportActivityForm, ReportCategoriesForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 
 def home(request):
     category = ContentCategory.objects.filter(slug="home").first()
@@ -49,7 +53,6 @@ def home(request):
         "online_by_year": online_by_year,
     }
     return render(request, "index.html", context)
-
 
 def quienes_somos(request):
     category = ContentCategory.objects.filter(slug="quienes_somos").first()
@@ -142,5 +145,142 @@ def view_bio(request, pk):
     }
     return render(request, 'leer_bio.html', context)
 
-# Reportes de certificaciones presencialess
-# certifications/utils.py (o donde tengas helpers)
+# Reportes  de actividades CRUD
+
+def report_create(request):
+    form = ReportActivityForm()
+    if request.method == "POST":
+        form = ReportActivityForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reporte creado exitosamente.")
+            return redirect('report_list')
+        else:
+            messages.error(request, f"{form.errors}, Por favor corrige los errores en el formulario.")
+    context = {
+        'form': form
+        }
+    return render(request, 'activity/report_form.html', context)
+
+def report_list(request):
+    reports_qs = ReportActivity.objects.select_related('course').order_by('-created_at')
+    page = request.GET.get('page', 1)
+    per_page = 10  # Puedes ajustar este valor
+    paginator = Paginator(reports_qs, per_page)
+    try:
+        reports = paginator.page(page)
+    except PageNotAnInteger:
+        reports = paginator.page(1)
+    except EmptyPage:
+        reports = paginator.page(paginator.num_pages)
+
+    context = {
+        'reports': reports,
+        'fields': ['course', 'issued_year', 'district', 'quantity'],
+    }
+    return render(request, 'activity/report_list.html', context)
+
+def report_detail(request, pk):
+    report = get_object_or_404(ReportActivity, pk=pk)
+    return render(request, 'activity/report_detail.html', {'report': report})
+
+def report_update(request, pk):
+    report = get_object_or_404(ReportActivity, pk=pk)
+    form = ReportActivityForm(instance=report)
+    if request.method == "POST":
+        form = ReportActivityForm(request.POST, request.FILES, instance=report)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reporte actualizado exitosamente.")
+            return redirect('report_detail', pk=report.pk)
+        else:
+            messages.error(request, f'{form.errors}, Por favor corrige los errores en el formulario.')
+            form = ReportActivityForm(instance=report)
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'activity/report_form.html', context)
+
+def report_delete(request, pk):
+    report = get_object_or_404(ReportActivity, pk=pk)
+    if request.method == "POST":
+        report.delete()
+        messages.success(request, "Reporte eliminado exitosamente.")
+        return redirect('report_list')
+    
+    context = {
+        'report': report
+    }
+
+    return render(request, 'activity/report_confirm_delete.html', context)
+
+ 
+# Report Activity Category CRUD
+
+def report_categories_create(request):
+    if request.method == "POST":
+        form = ReportCategoriesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Categoría creada exitosamente.")
+            return redirect('report_categories_list')
+        else:
+            messages.error(request, f"{form.errors}, Por favor corrige los errores en el formulario.")
+    else:
+        form = ReportCategoriesForm()
+    context = {'form': form}
+    return render(request, 'activity/category_report_form.html', context)
+
+def report_categories_list(request):
+    # Filtros
+    search_query = request.GET.get('q', '')
+    categories_qs = ReportCategories.objects.all()
+    if search_query:
+        categories_qs = categories_qs.filter(name__icontains=search_query)
+
+    # Paginación
+    page = request.GET.get('page', 1)
+    per_page = 10  # Puedes ajustar este valor
+    paginator = Paginator(categories_qs.order_by('name'), per_page)
+    try:
+        categories = paginator.page(page)
+    except PageNotAnInteger:
+        categories = paginator.page(1)
+    except EmptyPage:
+        categories = paginator.page(paginator.num_pages)
+
+    context = {
+        'categories': categories,
+        'search_query': search_query,
+    }
+    return render(request, 'activity/category_report_list.html', context)
+
+def report_categories_detail(request, pk):
+    category = get_object_or_404(ReportCategories, pk=pk)
+    context = {'category': category}
+    return render(request, 'activity/category_report_detail.html', context)
+
+def report_categories_update(request, pk):
+    category = get_object_or_404(ReportCategories, pk=pk)
+    if request.method == "POST":
+        form = ReportCategoriesForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Categoría actualizada exitosamente.")
+            return redirect('report_categories_detail', pk=category.pk)
+        else:
+            messages.error(request, f"{form.errors}, Por favor corrige los errores en el formulario.")
+    else:
+        form = ReportCategoriesForm(instance=category)
+    context = {'form': form, 'category': category}
+    return render(request, 'activity/category_report_form.html', context)
+
+def report_categories_delete(request, pk):
+    category = get_object_or_404(ReportCategories, pk=pk)
+    if request.method == "POST":
+        category.delete()
+        messages.success(request, "Categoría eliminada exitosamente.")
+        return redirect('report_categories_list')
+    context = {'category': category}
+    return render(request, 'activity/category_report_confirm_delete.html', context)

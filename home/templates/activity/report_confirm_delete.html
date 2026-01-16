@@ -1,0 +1,18 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Confirmar Eliminación de Reporte</h2>
+  <div class="alert alert-danger">¿Estás seguro que deseas eliminar este reporte?</div>
+  <table class="table table-bordered">
+    <tr><th>Curso</th><td>{{ report.course }}</td></tr>
+    <tr><th>Año</th><td>{{ report.issued_year }}</td></tr>
+    <tr><th>Distrito</th><td>{{ report.district }}</td></tr>
+    <tr><th>Cantidad</th><td>{{ report.quantity }}</td></tr>
+  </table>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="{% url 'report_list' %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

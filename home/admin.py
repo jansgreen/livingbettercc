@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ReportActivity
+from .models import ReportActivity, ReportCategories
 
 
 @admin.register(ReportActivity)
@@ -9,3 +9,10 @@ class ReportActivityAdmin(admin.ModelAdmin):
     list_filter = ('issued_year', 'course')
     ordering = ('-issued_year', 'course')
     readonly_fields = ('created_at',)
+
+@admin.register(ReportCategories)
+class ReportCategoriesAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')
+    search_fields = ('name',)
+    ordering = ('name',)
+    readonly_fields = ('name',)

@@ -100,7 +100,6 @@ class UserCertificateDetailView(LoginRequiredMixin, DetailView):
         ctx["course_title"] = ctx["certificate"].course.title
         return ctx
 
-
 class SharedCertificateListView(LoginRequiredMixin, ListView):
     model = Certificate
     template_name = "certifications/user_certificate_list.html"
@@ -109,7 +108,6 @@ class SharedCertificateListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Placeholder: without an explicit 'shared' flag, reuse global list
         return Certificate.objects.select_related("user", "course").order_by("-issued_date")
-
 
 # ---- Helpers / Public Views ----
 def create_certificate_for_user(user, course):
@@ -125,27 +123,22 @@ def create_certificate_for_user(user, course):
             cert = Certificate.objects.get(user=user, course=course)
     return cert
 
-
 def certificate_public_view(request, uuid):
     cert = get_object_or_404(Certificate, uuid=uuid)
     return render(request, "certifications/certificate.html", {"certificate": cert})
-
 
 def certificate_pdf_download(request, uuid):
     # Stub: render the same template; swap to real PDF generation if needed
     cert = get_object_or_404(Certificate, uuid=uuid)
     return render(request, "certifications/certificate.html", {"certificate": cert})
 
-
 class CertificateUpdateByUUIDView(CertificateUpdateView):
     def get_object(self, queryset=None):
         return get_object_or_404(Certificate, uuid=self.kwargs.get("uuid"))
 
-
 class CertificateDeleteByUUIDView(CertificateDeleteView):
     def get_object(self, queryset=None):
         return get_object_or_404(Certificate, uuid=self.kwargs.get("uuid"))
-
 
 class UserCertificateDetailByUUIDView(UserCertificateDetailView):
     def get_object(self, queryset=None):

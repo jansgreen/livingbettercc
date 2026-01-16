@@ -12,10 +12,10 @@
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
           <div>
             <h2 class="h4 mb-0 fw-bold text-dark">Impacto de Nuestras Actividades</h2>
-            <small class="text-muted">Visualiza el impacto por programa</small>
+            <small class="text-muted">Visualiza el impacto por categoría</small>
           </div>
 
-          <!-- TABS: cursos dinámicos -->
+          <!-- TABS: categorías dinámicas -->
           <ul class="nav nav-pills" id="impactTabs" role="tablist">
             {% for cat_id, cat_name in tabs %}
               <li class="nav-item" role="presentation">
@@ -37,7 +37,7 @@
       </div>
 
       <!-- BODY -->
-      <div class="card-body bg-primary p-4 p-md-5">
+      <div class="card-body bg-primary p-4 p-md-5 mt-3">
         <div class="tab-content" id="impactTabsContent">
 
           {% for cat_id, cat_name in tabs %}
@@ -59,33 +59,32 @@
                              style="transition: transform .2s ease, box-shadow .2s ease;">
 
                           <!-- Imagen -->
-                          <div style="position: relative; height: 210px; overflow: hidden;">
+                          <div style="position: relative; height: 210px; overflow: hidden;" class="mb-5">
                             <img
                               src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
-                              class="w-100 h-100 mb-2"
+                              class="w-100 h-100"
                               style="object-fit: cover;"
-                              alt="{{ impact.course.title }}"
+                              alt="{{ cat_name }}"
                             >
 
                             <div class="mt-2 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
                                  style="background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); box-shadow: 0 8px 18px rgba(0,0,0,.18);">
-                              Año {{ impact.issued_year }}
+                              Año {{ impact.issued_date.year }}
                             </div>
                           </div>
 
                           <!-- Contenido -->
-                          <div class="card-body d-flex flex-column p-4">
+                          <div class="card-body d-flex flex-column p-4 mt-5">
 
-                            <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
-                              <div>
-                                <div class="text-muted small">Año</div>
-                                <div class="fw-bold">{{ impact.issued_year }}</div>
-                              </div>
+                              <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                                <div class="text-muted small"><strong>Año {{ impact.issued_date.year }}</strong></div>
+                                  <div class="fw-bold">
+                                    <span class="badge text-bg-primary text-wrap mb-2">
+                                      {{ impact.course.title }}
+                                    </span>
+                                  </div>
+                                </div>  
 
-                              <span class="badge bg-dark bg-opacity-10 text-dark rounded-pill px-3 py-2 text-wrap">
-                                {{ impact.course.title }}
-                              </span>
-                            </div>
 
                             <p class="text-muted small mb-3">
                               📍 Distrito/Regionales: <span class="fw-semibold">{{ impact.district }}</span>
@@ -96,15 +95,13 @@
                                 <i class="bi bi-person-fill"></i> {{ impact.quantity|intcomma }} Presencial
                               </span>
 
-                              {# ONLINE: opcional (si en tu vista calculas online_count para ese item) #}
-                              {% if impact.online_count is not None %}
+                              {% if impact.impact is not None %}
                                 <span class="badge bg-info rounded-pill px-3 py-2">
-                                  <i class="bi bi-computer"></i> {{ impact.online_count|intcomma }} Online
+                                  <i class="bi bi-computer"></i> {{ impact.impact|intcomma }} Online
                                 </span>
                               {% endif %}
                             </div>
 
-                            {# PROGRESO: opcional (si en tu vista calculas pct_total para ese item) #}
                             {% if impact.pct_total is not None %}
                               <div class="mb-3">
                                 <div class="d-flex justify-content-between small text-muted mb-1">
@@ -114,7 +111,7 @@
 
                                 <div class="progress"
                                      role="progressbar"
-                                     aria-label="Total {{ impact.issued_year }}"
+                                     aria-label="Total {{ impact.issued_date.year }}"
                                      aria-valuenow="{{ impact.pct_total|default:0 }}"
                                      aria-valuemin="0"
                                      aria-valuemax="100"
@@ -127,7 +124,6 @@
                               </div>
                             {% endif %}
 
-                            {# TOTALES DESDE: opcional (si en tu vista calculas desde_presencial_total y prev_year) #}
                             {% if impact.desde_presencial_total is not None %}
                               <div class="p-3 rounded-3 bg-light mb-3">
                                 <p class="card-text fw-bold text-dark mb-1">
@@ -145,9 +141,9 @@
                             {% endif %}
 
                             <!-- Descripción -->
-                            {% if impact.description %}
+                            {% if impact.note %}
                               <p class="card-text text-muted small flex-grow-1 mb-3">
-                                {{ impact.description }}
+                                {{ impact.note }}
                               </p>
                             {% else %}
                               <p class="card-text text-muted small flex-grow-1 mb-3">
@@ -156,7 +152,7 @@
                             {% endif %}
 
                             <small class="text-muted d-block pt-3 border-top">
-                              📅 Registrado: {{ impact.created_at|date:'d/m/Y' }}
+                              📅 Registrado: {{ impact.updated_at|date:'d/m/Y' }}
                             </small>
 
                           </div>
@@ -169,7 +165,7 @@
                 {% else %}
                   <div class="bg-white rounded-4 p-4 p-md-5 shadow-sm text-center">
                     <div class="display-6 mb-2">—</div>
-                    <p class="mb-0 text-muted">No hay registros para este programa.</p>
+                    <p class="mb-0 text-muted">No hay registros para esta categoría.</p>
                   </div>
                 {% endif %}
               {% endwith %}

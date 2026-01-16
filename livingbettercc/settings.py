@@ -211,6 +211,7 @@ TEMPLATES = [
                 
                 'home.context_processors.context_processor.bootstrap_css',
                 'home.context_processors.context_processor.bootstrap_js',
+                'home.context_processors.context_processor.obtener_menu_report_activity',
 
                 # authentication
                 'authentication.context_processors.context_processor.obtener_menu_auth',

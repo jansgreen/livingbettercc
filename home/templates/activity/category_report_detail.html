@@ -1,0 +1,13 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Detalle de Categoría</h2>
+  <ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Nombre:</strong> {{ category.name }}</li>
+    <li class="list-group-item"><strong>Descripción:</strong> {{ category.Description }}</li>
+  </ul>
+    <a href="{% url 'report_categories_update' category.pk %}" class="btn btn-primary">Editar</a>
+    <a href="{% url 'report_categories_delete' category.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'report_categories_list' %}" class="btn btn-secondary">Volver a la lista</a>
+</div>
+{% endblock %}

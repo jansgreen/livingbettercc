@@ -1,0 +1,49 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Categorías de Reporte</h2>
+  <form method="get" class="mb-3">
+    <input type="text" name="q" value="{{ search_query }}" placeholder="Buscar categoría..." class="form-control" style="max-width:300px;display:inline-block;">
+    <button type="submit" class="btn btn-primary btn-sm">Buscar</button>
+      <a href="{% url 'report_categories_create' %}" class="btn btn-success btn-sm float-end">Nueva Categoría</a>
+  </form>
+  <table class="table table-striped">
+    <thead>
+      <tr> 
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+          <td><a href="{% url 'report_categories_detail' category.pk %}">{{ category.name }}</a></td>
+        <td>{{ category.Description }}</td>
+        <td>
+           <a href="{% url 'report_categories_update' category.pk %}" class="btn btn-primary btn-sm">Editar</a>
+           <a href="{% url 'report_categories_delete' category.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3">No hay categorías.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <nav>
+    <ul class="pagination">
+      {% if categories.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ categories.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&laquo;</a></li>
+      {% endif %}
+      {% for num in categories.paginator.page_range %}
+        <li class="page-item {% if categories.number == num %}active{% endif %}">
+          <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}">{{ num }}</a>
+        </li>
+      {% endfor %}
+      {% if categories.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ categories.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">&raquo;</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endblock %}

@@ -12,7 +12,7 @@ from django.db.models.functions import ExtractYear
 from django.utils import timezone
 
 from classroom.certifications.models import Certificate
-from home.models import ReportActivity  # ajusta al path real
+from home.models import ReportActivity, ReportCategories
 from decimal import Decimal
 
 
@@ -21,7 +21,7 @@ def _clamp_pct(v: int) -> int:
 
 def get_report_activity_grouped_for_tabs(*, limit_years: int = 6) -> Tuple[List[Tuple[str, str]], Dict[str, List[Dict[str, Any]]]]:
     """
-    Tabs por curso.
+    Tabs por categoría.
     Cada tab muestra impactos por año/distrito, combinando:
       - Presencial (ReportActivity.quantity)
       - Digital/Online (count de Certificate por curso y año)
@@ -37,7 +37,7 @@ def get_report_activity_grouped_for_tabs(*, limit_years: int = 6) -> Tuple[List[
     # Presencial
     ra_qs = (
         ReportActivity.objects
-        .select_related("course")
+        .select_related("course", "categories")
         .filter(issued_year__gte=min_year)
         .order_by("-issued_year", "district")
     )
@@ -57,106 +57,115 @@ def get_report_activity_grouped_for_tabs(*, limit_years: int = 6) -> Tuple[List[
         if r.get("course_id") is not None and r.get("y") is not None
     }
 
-    # Tabs: cursos que tengan presencial o digital
-    course_map: Dict[int, Any] = {}
-
+    # Tabs: categorías que tengan presencial o digital
+    category_map: Dict[int, Any] = {}
     for ra in ra_qs:
-        if ra.course_id:
-            course_map[ra.course_id] = ra.course
+        if ra.categories_id:
+            category_map[ra.categories_id] = ra.categories
 
-    for (course_id, _year), _total in digital_by_course_year.items():
-        if course_id not in course_map:
-            # Para no hacer query por cada uno, buscamos un certificado cualquiera del curso
-            c = Certificate.objects.filter(course_id=course_id).select_related("course").first()
-            if c:
-                course_map[course_id] = c.course
-
-    # Orden de tabs por nombre de curso
-    courses = sorted(course_map.values(), key=lambda x: (x.title or "").lower())
-
-    tabs: List[Tuple[str, str]] = [(str(c.id), c.title) for c in courses]
+    categories = sorted(category_map.values(), key=lambda x: (x.name or "").lower())
+    tabs: List[Tuple[str, str]] = [(str(cat.id), cat.name) for cat in categories]
     issues_by_cat: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
     # Precálculo: totales acumulados por curso/año
-    presencial_sum_by_course_year = defaultdict(int)
+    presencial_qty_by_course_year = defaultdict(int)
+    years_by_course = defaultdict(set)
     for ra in ra_qs:
-        presencial_sum_by_course_year[(ra.course_id, ra.issued_year)] += int(ra.quantity or 0)
+        presencial_qty_by_course_year[(ra.course_id, ra.issued_year)] += int(ra.quantity or 0)
+        years_by_course[ra.course_id].add(ra.issued_year)
 
-    # Helper: acumulado desde prev_year
-    def sum_presencial_desde(course_id: int, start_year: int) -> int:
-        return sum(v for (cid, y), v in presencial_sum_by_course_year.items() if cid == course_id and y >= start_year)
+    presencial_sum_by_course_year = defaultdict(int)  # acumulado hasta ese año (ascendente)
+    for course_id, years in years_by_course.items():
+        running = 0
+        for y in sorted(years):  # ascendente para acumular
+            running += presencial_qty_by_course_year[(course_id, y)]
+            presencial_sum_by_course_year[(course_id, y)] = running
 
-    def sum_digital_desde(course_id: int, start_year: int) -> int:
-        return sum(v for (cid, y), v in digital_by_course_year.items() if cid == course_id and y >= start_year)
+    # ✅ FIX: "Total Presencial desde {año}" en tu UX realmente es acumulado HASTA ese año:
+    # 2021 -> 29
+    # 2022 -> 29+88
+    # 2023 -> 29+88+1325 ...
+    def sum_presencial_hasta(course_id: int, year: int) -> int:
+        return sum(
+            v for (cid, y), v in presencial_qty_by_course_year.items()
+            if cid == course_id and y <= year
+        )
 
-    # Para cada curso/tab, creamos items por ReportActivity
+    def sum_digital_hasta(course_id: int, year: int) -> int:
+        return sum(
+            v for (cid, y), v in digital_by_course_year.items()
+            if cid == course_id and y <= year
+        )
+
+    # Para cada categoría/tab, creamos items por ReportActivity
     # Y añadimos digital en el mismo “impact row”
-    for course in courses:
-        tab_id = str(course.id)
+    for cat in categories:
+        tab_id = str(cat.id)
 
-        # group presencial rows by year
-        pres_rows = [ra for ra in ra_qs if ra.course_id == course.id]
-        years_present = sorted({ra.issued_year for ra in pres_rows}, reverse=True)
+        # Filtrar reportes de esta categoría
+        pres_rows = [ra for ra in ra_qs if ra.categories_id == cat.id]
+        course_ids = {ra.course_id for ra in pres_rows if ra.course_id}
 
-        # si hay digital y no hay presencial en ese año, igual queremos mostrar el año
-        digital_years = sorted({y for (cid, y), v in digital_by_course_year.items() if cid == course.id and v > 0}, reverse=True)
+        # Agrupar por curso dentro de la categoría
+        for course_id in course_ids:
+            course = None
+            for ra in pres_rows:
+                if ra.course_id == course_id:
+                    course = ra.course
+                    break
 
-        all_years = sorted(set(years_present) | set(digital_years), reverse=True)[:max(1, limit_years)]
+            years_present = sorted({ra.issued_year for ra in pres_rows if ra.course_id == course_id}, reverse=True)
+            digital_years = sorted({y for (cid, y), v in digital_by_course_year.items() if cid == course_id and v > 0}, reverse=True)
+            all_years = sorted(set(years_present) | set(digital_years), reverse=True)[:max(1, limit_years)]
 
-        # para pct_total (relativo al máximo de ese curso)
-        max_total_for_course = 0
-        totals_for_course_year = {}
-        for y in all_years:
-            pres_total = int(presencial_sum_by_course_year.get((course.id, y), 0))
-            dig_total = int(digital_by_course_year.get((course.id, y), 0))
-            tot = pres_total + dig_total
-            totals_for_course_year[y] = tot
-            max_total_for_course = max(max_total_for_course, tot)
+            max_total_for_course = 0
+            totals_for_course_year = {}
 
-        # Creamos una fila por año.
-        # Si hay varios distritos en el mismo año, se muestran como filas separadas, pero con el mismo digital.
-        # (Esto se ajusta perfecto a tu template actual)
-        for y in all_years:
-            rows_this_year = [ra for ra in pres_rows if ra.issued_year == y]
+            for y in all_years:
+                pres_total = int(presencial_sum_by_course_year.get((course_id, y), 0))
+                dig_total = int(digital_by_course_year.get((course_id, y), 0))
+                tot = pres_total + dig_total
+                totals_for_course_year[y] = tot
+                max_total_for_course = max(max_total_for_course, tot)
 
-            # Si no hay presencial ese año, creamos un “row virtual” para mostrar digital.
-            if not rows_this_year:
-                rows_this_year = [None]
+            for y in all_years:
+                rows_this_year = [ra for ra in pres_rows if ra.course_id == course_id and ra.issued_year == y]
+                if not rows_this_year:
+                    rows_this_year = [None]
 
-            for ra in rows_this_year:
-                presencial_qty = int(getattr(ra, "quantity", 0) or 0)
-                digital_qty = int(digital_by_course_year.get((course.id, y), 0))
+                for ra in rows_this_year:
+                    presencial_qty = int(getattr(ra, "quantity", 0) or 0)
+                    digital_qty = int(digital_by_course_year.get((course_id, y), 0))
 
-                total_year = int(totals_for_course_year.get(y, presencial_qty + digital_qty))
-                pct_total = 0
-                if max_total_for_course > 0:
-                    pct_total = int(round((total_year / max_total_for_course) * 100))
-                    pct_total = _clamp_pct(pct_total)
-                    if total_year > 0 and pct_total == 0:
-                        pct_total = 1
+                    total_year = int(totals_for_course_year.get(y, presencial_qty + digital_qty))
+                    pct_total = 0
+                    if max_total_for_course > 0:
+                        pct_total = int(round((total_year / max_total_for_course) * 100))
+                        pct_total = _clamp_pct(pct_total)
+                        if total_year > 0 and pct_total == 0:
+                            pct_total = 1
 
-                prev_year = y  # para tu texto “desde”
-                desde_pres = sum_presencial_desde(course.id, prev_year)
-                desde_dig = sum_digital_desde(course.id, prev_year)
+                    prev_year = y
+                    # ✅ FIX AQUI: usar acumulado hasta el año (<= y), no desde el año (>= y)
+                    desde_pres = sum_presencial_hasta(course_id, prev_year)
+                    desde_dig = sum_digital_hasta(course_id, prev_year)
 
-                issues_by_cat[tab_id].append(
-                    {
-                        "course": course,
-                        # para filtros date del template
-                        "issued_date": date(y, 1, 1),
-                        "district": getattr(ra, "district", "—") if ra else "—",
-                        # tu template:
-                        "quantity": presencial_qty,   # Presencial
-                        "impact": digital_qty,        # Online/Digital
-                        "pct_total": pct_total,
-                        "prev_year": prev_year,
-                        "desde_presencial_total": desde_pres,
-                        "desde_online_total": desde_dig,
-                        "image": getattr(ra, "image", None) if ra else None,
-                        "note": getattr(ra, "description", "") if ra else "",
-                        "updated_at": getattr(ra, "created_at", None) if ra else None,
-                    }
-                )
+                    issues_by_cat[tab_id].append(
+                        {
+                            "course": course,
+                            "issued_date": date(y, 1, 1),
+                            "district": getattr(ra, "district", "—") if ra else "—",
+                            "quantity": presencial_qty,
+                            "impact": digital_qty,
+                            "pct_total": pct_total,
+                            "prev_year": prev_year,
+                            "desde_presencial_total": desde_pres,
+                            "desde_online_total": desde_dig,
+                            "image": getattr(ra, "image", None) if ra else None,
+                            "note": getattr(ra, "description", "") if ra else "",
+                            "updated_at": getattr(ra, "created_at", None) if ra else None,
+                        }
+                    )
 
     return tabs, dict(issues_by_cat)
 

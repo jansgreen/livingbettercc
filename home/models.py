@@ -57,11 +57,20 @@ class ReportActivity(models.Model):
         verbose_name="actualizado",
     )
 
+    categories = models.ForeignKey(
+        "home.ReportCategories",
+        on_delete=models.CASCADE,
+        related_name="report_activities",
+        verbose_name="categoría",
+        default=None,  # <-- aquí el cambio
+
+    )
+
     class Meta:
         ordering = ("-issued_year", "district")
         constraints = [
             models.UniqueConstraint(
-                fields=["course", "issued_year", "district"],
+                fields=["course", "issued_year", "district", "categories"],
                 name="unique_reportactivity_course_year_district",
             ),
         ]
@@ -70,3 +79,11 @@ class ReportActivity(models.Model):
 
     def __str__(self):
         return f"{self.course} | {self.issued_year} | {self.district} | {self.quantity}"
+
+class ReportCategories(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nombre")
+    description = models.TextField(blank=True, null=True, verbose_name="Descripción")
+
+    def __str__(self):
+        return self.name
+    

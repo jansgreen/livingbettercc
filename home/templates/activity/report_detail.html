@@ -1,0 +1,15 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Detalle del Reporte</h2>
+  <table class="table table-bordered">
+    <tr><th>Curso</th><td>{{ report.course }}</td></tr>
+    <tr><th>Año</th><td>{{ report.issued_year }}</td></tr>
+    <tr><th>Distrito</th><td>{{ report.district }}</td></tr>
+    <tr><th>Cantidad</th><td>{{ report.quantity }}</td></tr>
+  </table>
+    <a href="{% url 'report_update' report.pk %}" class="btn btn-warning">Editar</a>
+    <a href="{% url 'report_delete' report.pk %}" class="btn btn-danger">Eliminar</a>
+    <a href="{% url 'report_list' %}" class="btn btn-secondary">Volver a la lista</a>
+</div>
+{% endblock %}

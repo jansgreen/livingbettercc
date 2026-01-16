@@ -6,10 +6,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
 from classroom.certifications.models import Certificate
 import logging
+from core.menu_builder import build_menu, safe_id
 
 logger = logging.getLogger(__name__)
-
-from core.menu_builder import build_menu, safe_id
 
 def obtener_menu_classroom(request):
     if request.user.is_authenticated:
