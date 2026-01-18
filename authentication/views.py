@@ -101,6 +101,7 @@ def facilitador_register_view(request):
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
+@login_required
 def tecnico_register_view(request):
     """
     Registro para técnicos. Igual que el registro de facilitador pero asigna
@@ -133,6 +134,7 @@ def tecnico_register_view(request):
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
+@login_required
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -232,8 +234,7 @@ def logout_view(request):
     auth_logout(request)
     return redirect('authentication:login')  # Redirect to login after logout
 
-
-def prepare_register(request, pk, role):
+def prepare_register(request, pk, role): 
     # Solo guardar intención en sesión y asegurar grupo; no crear Enrollment aquí
     request.session['post_register_role'] = role
     request.session['selected_item'] = int(pk)
@@ -256,6 +257,7 @@ def profile_create_view(request):
             profile = form.save(commit=False)
             profile.user = request.user  # Set the user to the currently logged-in user
             profile.old_cart = ''  # Initialize old_cart or set as needed
+            profile.save()
             if not Address.objects.filter(user=request.user, address_type='residencial').exists():
                 address, created = Address.objects.get_or_create(user=request.user, address_type='residencial')
                 profile.direccion = address
@@ -270,6 +272,8 @@ def profile_create_view(request):
                 next_url = reverse('authentication:profile_list')
                 return redirect(f"{addr_url}?next={next_url}")  # Redirect to address creation if direccion is not set
             return redirect('profile_list')  # Redirect to profile list after creation
+        else:
+            messages.error(request, f'{{form.errors}}, Por favor verifica los datos del formulario: {form.errors}')
     else:
         form = ProfileForm()
     return render(request, 'authentication/profile_create.html', {'form': form})
@@ -398,13 +402,11 @@ def DirectivesCreate(request):
     return render(request, 'directivas/create_directives.html', {
         'directives_form': directives_form,
     })
-
 # CRUD de la Directiva
 @login_required
 def directives_list(request):
     directives = Directives.objects.all()
     return render(request, "directivas/directives_list.html", {"directives": directives})
-
 
 @login_required
 def directives_create(request):
@@ -420,7 +422,6 @@ def directives_create(request):
         form = DirectivesForm()
     return render(request, "directivas/directives_form.html", {"form": form, "title": "Crear Directivo"})
 
-
 @login_required
 def directives_update(request, pk):
     directive = get_object_or_404(Directives, pk=pk)
@@ -433,7 +434,6 @@ def directives_update(request, pk):
         form = DirectivesForm(instance=directive)
     return render(request, "directivas/directives_form.html", {"form": form, "title": "Editar Directivo"})
 
-
 @login_required
 def directives_delete(request, pk):
     directive = get_object_or_404(Directives, pk=pk)
@@ -441,7 +441,6 @@ def directives_delete(request, pk):
         directive.delete()
         return redirect("directives_list")
     return render(request, "directivas/directives_confirm_delete.html", {"directive": directive})
-
 # Address view aliases for legacy URL patterns
 def address_list(request):
     return redirect('authentication:address:address_list')

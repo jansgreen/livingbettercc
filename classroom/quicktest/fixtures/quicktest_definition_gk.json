@@ -1,0 +1,10 @@
+[
+  {
+    "model": "quicktest.quicktestdefinition",
+    "pk": 201,
+    "fields": {
+      "module": 1,
+      "title": "GENERAL KNOWLEDGE — Module QuickTest"
+    }
+  }
+]

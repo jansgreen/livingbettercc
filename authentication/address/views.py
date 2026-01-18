@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from urllib3 import request
+
+from authentication.models import address
 from .models import Address
 from .forms import AddressForm
 
@@ -19,36 +22,43 @@ def address_detail(request, pk):
 @login_required
 def address_create(request, address_type, pk):
     """
-        Esta funcion actua como un core en direccion, primero se creara el usuario y luego viene redirijido aqui para crear su direccion
-        desde la funcion de origen enviara el tipo de direccion, el grupo de accesso y el id de usuario.
+    Crear/editar dirección del usuario autenticado.
     """
-    # Obtener dirección existente si existe
-    address_instance = Address.objects.filter(user__id=pk, address_type=address_type).first()
 
-    if request.method == 'POST':
+    # Seguridad: no permitir editar direcciones de otro usuario por URL
+    if int(pk) != request.user.id:
+        messages.error(request, "No tienes permiso para editar la dirección de otro usuario.")
+        return redirect("dashboard")
+
+    address_instance = Address.objects.filter(user=request.user, address_type=address_type).first()
+
+    if request.method == "POST":
         form = AddressForm(request.POST, instance=address_instance)
         if form.is_valid():
             address = form.save(commit=False)
-            # Vincular al usuario indicado por pk (ya debería estar autenticado)
-            address.user_id = pk
+            address.user = request.user
             address.address_type = address_type
             address.save()
-            messages.success(request, f'Dirección {address.get_address_type_display()} guardada exitosamente.')
-            # Redirigir según el contexto (puede personalizarse)
-            next_url = request.GET.get('next', 'authentication:login')
-            return redirect(next_url)
-        else:
-            messages.error(request, 'Por favor corrige los errores en el formulario.')
+
+            messages.success(
+                request,
+                f"Dirección {address.get_address_type_display()} guardada exitosamente."
+            )
+
+            next_url = request.GET.get("next")
+            return redirect(next_url or "dashboard")
+
+        messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
         form = AddressForm(instance=address_instance)
 
     context = {
-        'form': form,
-        'address_type': address_type,
-        'address_type_display': dict(Address.a_type).get(address_type, address_type),
-        'user_id': pk,
+        "form": form,
+        "address_type": address_type,
+        "address_type_display": dict(Address.a_type).get(address_type, address_type),
+        "user_id": request.user.id,
     }
-    return render(request, 'direccion.html', context)
+    return render(request, "direccion.html", context)
 @login_required
 def address_update(request, pk):
     address = get_object_or_404(Address, pk=pk, user=request.user)

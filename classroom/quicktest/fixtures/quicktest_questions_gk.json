@@ -1,0 +1,106 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3001,
+    "fields": {
+      "definition": 201,
+      "text": "EN: As blood alcohol concentration (BAC) goes up, what happens?\nES: A medida que sube la concentración de alcohol en sangre (BAC), ¿qué sucede?",
+      "option_a": "EN: Vision improves | ES: Mejora la visión",
+      "option_b": "EN: Judgment and self-control are affected | ES: Se afectan el juicio y el autocontrol",
+      "option_c": "EN: Reaction time improves | ES: Mejora el tiempo de reacción",
+      "option_d": "EN: Driving skills remain the same | ES: Las habilidades de manejo no cambian",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3002,
+    "fields": {
+      "definition": 201,
+      "text": "EN: Why is alcohol especially dangerous for CDL drivers?\nES: ¿Por qué el alcohol es especialmente peligroso para conductores CDL?",
+      "option_a": "EN: It mainly affects physical strength | ES: Afecta principalmente la fuerza física",
+      "option_b": "EN: It affects judgment before physical control | ES: Afecta el juicio antes del control físico",
+      "option_c": "EN: It only affects vision | ES: Solo afecta la visión",
+      "option_d": "EN: It has no effect at low levels | ES: No tiene efecto en niveles bajos",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3003,
+    "fields": {
+      "definition": 201,
+      "text": "EN: Implied consent means:\nES: El consentimiento implícito significa:",
+      "option_a": "EN: You may refuse alcohol testing | ES: Puedes negarte a la prueba de alcohol",
+      "option_b": "EN: You consent only after an accident | ES: Solo aceptas después de un accidente",
+      "option_c": "EN: You have already agreed to alcohol testing | ES: Ya diste tu consentimiento para pruebas de alcohol",
+      "option_d": "EN: Testing is optional for CDL drivers | ES: Las pruebas son opcionales para CDL",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3004,
+    "fields": {
+      "definition": 201,
+      "text": "EN: How does alcohol affect reaction time?\nES: ¿Cómo afecta el alcohol el tiempo de reacción?",
+      "option_a": "EN: It shortens reaction time | ES: Lo reduce",
+      "option_b": "EN: It has no effect | ES: No lo afecta",
+      "option_c": "EN: It increases reaction time | ES: Lo aumenta",
+      "option_d": "EN: It only affects steering | ES: Solo afecta el volante",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3005,
+    "fields": {
+      "definition": 201,
+      "text": "EN: Which statement about over-the-counter cold medicines is true?\nES: ¿Cuál afirmación sobre medicamentos de venta libre para resfriado es verdadera?",
+      "option_a": "EN: They are always safe for driving | ES: Siempre son seguros para manejar",
+      "option_b": "EN: They can cause drowsiness and slow reaction | ES: Pueden causar sueño y lentitud",
+      "option_c": "EN: CDL drivers are exempt from their effects | ES: No afectan a conductores CDL",
+      "option_d": "EN: They only affect elderly drivers | ES: Solo afectan a personas mayores",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3006,
+    "fields": {
+      "definition": 201,
+      "text": "EN: Which statement about drug use is true?\nES: ¿Cuál afirmación sobre el uso de drogas es verdadera?",
+      "option_a": "EN: Legal drugs never affect driving | ES: Las drogas legales nunca afectan la conducción",
+      "option_b": "EN: Drug use can lead to accidents and arrest | ES: El uso de drogas puede causar accidentes y arrestos",
+      "option_c": "EN: Only illegal drugs are tested | ES: Solo se examinan drogas ilegales",
+      "option_d": "EN: Prescription drugs are always allowed | ES: Las recetadas siempre están permitidas",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3007,
+    "fields": {
+      "definition": 201,
+      "text": "EN: Why does a CDL driver have greater legal responsibility?\nES: ¿Por qué un conductor CDL tiene mayor responsabilidad legal?",
+      "option_a": "EN: They drive more often | ES: Maneja con más frecuencia",
+      "option_b": "EN: They operate heavier and more dangerous vehicles | ES: Opera vehículos más grandes y peligrosos",
+      "option_c": "EN: They receive higher pay | ES: Gana más dinero",
+      "option_d": "EN: They drive longer distances | ES: Maneja distancias más largas",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3008,
+    "fields": {
+      "definition": 201,
+      "text": "EN: If you have been drinking alcohol, you should:\nES: Si has bebido alcohol, debes:",
+      "option_a": "EN: Drink coffee | ES: Tomar café",
+      "option_b": "EN: Drive slowly | ES: Manejar despacio",
+      "option_c": "EN: Wait for it to wear off | ES: Esperar a que se pase",
+      "option_d": "EN: Eat food | ES: Comer",
+      "correct_option": "C"
+    }
+  }
+]

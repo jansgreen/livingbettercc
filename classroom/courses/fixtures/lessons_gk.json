@@ -1,0 +1,13 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1001,
+    "fields": {
+      "module": 1,
+      "title": "LECCIÓN GK-01 — Alcohol, Drogas y Responsabilidad del Conductor CDL",
+      "content": "<h2>LECCIÓN GK-01 — Alcohol, Drogas y Responsabilidad del Conductor CDL</h2>\n\n<h3>BAC y sus efectos</h3>\n<p>El BAC (Blood Alcohol Concentration) es la concentración de alcohol en la sangre. A medida que sube, el alcohol afecta el cerebro y la conducción segura.</p>\n<ul>\n  <li>Se deteriora el juicio y el autocontrol.</li>\n  <li>Se incrementa el riesgo de decisiones peligrosas.</li>\n</ul>\n\n<h3>Juicio y autocontrol</h3>\n<p>El alcohol afecta primero la capacidad de tomar decisiones. El conductor puede subestimar riesgos y sobreestimar sus habilidades.</p>\n\n<h3>Consentimiento implícito</h3>\n<p>Al conducir con licencia (especialmente CDL), el conductor acepta someterse a pruebas de alcohol/drogas cuando la ley lo requiera. Negarse puede tener consecuencias severas.</p>\n\n<h3>Alcohol y tiempo de reacción</h3>\n<p>El alcohol aumenta el tiempo de reacción: tarda más en reconocer un peligro y actuar. En vehículos comerciales esto aumenta el riesgo debido a la mayor distancia de parada.</p>\n\n<h3>Medicamentos de venta libre</h3>\n<p>Medicamentos para resfriado/alergias pueden causar somnolencia o mareos. Aunque sean legales, pueden hacer inseguro conducir.</p>\n\n<h3>Drogas legales e ilegales</h3>\n<p>Drogas ilegales o algunos medicamentos recetados pueden afectar atención, coordinación y juicio. Su uso puede provocar accidentes y arrestos.</p>\n\n<h3>Responsabilidad legal del conductor CDL</h3>\n<p>El conductor CDL debe estar apto para conducir, cumplir regulaciones y evitar sustancias que afecten la seguridad.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  }
+]

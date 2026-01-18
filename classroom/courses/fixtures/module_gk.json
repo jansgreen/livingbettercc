@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 1,
+    "fields": {
+      "course": 125,
+      "title": "GENERAL KNOWLEDGE",
+      "description": "<h2>GENERAL KNOWLEDGE</h2><p>Contenido base del CDL: conducción segura, leyes básicas, alcohol/drogas, emergencias, clima, fatiga, horas de servicio y prácticas defensivas.</p>",
+      "order": 1
+    }
+  }
+]
