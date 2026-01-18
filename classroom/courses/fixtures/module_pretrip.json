@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 102,
+    "fields": {
+      "course": 125,
+      "title": "PRE-TRIP INSPECTION",
+      "description": "<h2>PRE-TRIP INSPECTION</h2><p>Este módulo cubre la inspección previa al viaje requerida para el CDL. Incluye revisión del vehículo, sistemas de seguridad, frenos, luces, neumáticos, suspensión y componentes críticos antes de operar un vehículo comercial.</p>",
+      "order": 2
+    }
+  }
+]
