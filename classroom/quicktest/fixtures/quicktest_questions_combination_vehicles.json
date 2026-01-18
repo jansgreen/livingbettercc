@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3301,
+    "fields": {
+      "definition": 204,
+      "text": "EN: What is a combination vehicle?\nES: ¿Qué es un vehículo combinado?",
+      "option_a": "EN: A single vehicle with no trailer | ES: Un solo vehículo sin remolque",
+      "option_b": "EN: A tractor and one or more trailers | ES: Un tractor y uno o más remolques",
+      "option_c": "EN: A motorcycle with a sidecar | ES: Una moto con sidecar",
+      "option_d": "EN: A car with roof rack | ES: Un carro con baca",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3302,
+    "fields": {
+      "definition": 204,
+      "text": "EN: Why is weight distribution important?\nES: ¿Por qué es importante la distribución de peso?",
+      "option_a": "EN: It improves radio signal | ES: Mejora la señal de radio",
+      "option_b": "EN: It prevents loss of traction and trailer swing | ES: Evita pérdida de tracción y balanceo",
+      "option_c": "EN: It makes the truck faster | ES: Hace el camión más rápido",
+      "option_d": "EN: It reduces mirror size | ES: Reduce el tamaño de espejos",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3303,
+    "fields": {
+      "definition": 204,
+      "text": "EN: What is a pull test used for?\nES: ¿Para qué se usa la prueba de tirón (pull test)?",
+      "option_a": "EN: To check if the fifth wheel is locked | ES: Para verificar que la quinta rueda está asegurada",
+      "option_b": "EN: To test the horn volume | ES: Para probar el claxon",
+      "option_c": "EN: To warm up tires | ES: Para calentar neumáticos",
+      "option_d": "EN: To check fuel quality | ES: Para revisar calidad del combustible",
+      "correct_option": "A"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3304,
+    "fields": {
+      "definition": 204,
+      "text": "EN: What is a common coupling mistake?\nES: ¿Cuál es un error común al acoplar?",
+      "option_a": "EN: Checking the lock jaws visually | ES: Revisar visualmente el cierre",
+      "option_b": "EN: Connecting air lines | ES: Conectar líneas de aire",
+      "option_c": "EN: Incomplete coupling | ES: Acoplamiento incompleto",
+      "option_d": "EN: Performing a pull test | ES: Hacer prueba de tirón",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3305,
+    "fields": {
+      "definition": 204,
+      "text": "EN: Why do combination vehicles need more stopping distance?\nES: ¿Por qué los vehículos combinados necesitan más distancia de frenado?",
+      "option_a": "EN: They are heavier and longer | ES: Son más pesados y largos",
+      "option_b": "EN: They have smaller brakes | ES: Tienen frenos más pequeños",
+      "option_c": "EN: They drive slower | ES: Manejan más lento",
+      "option_d": "EN: They have fewer tires | ES: Tienen menos llantas",
+      "correct_option": "A"
+    }
+  }
+]

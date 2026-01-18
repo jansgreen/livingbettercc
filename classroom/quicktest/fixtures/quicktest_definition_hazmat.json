@@ -1,0 +1,10 @@
+[
+  {
+    "model": "quicktest.quicktestdefinition",
+    "pk": 208,
+    "fields": {
+      "module": 108,
+      "title": "HAZARDOUS MATERIALS (HAZMAT) — Module QuickTest"
+    }
+  }
+]

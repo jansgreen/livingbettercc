@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3101,
+    "fields": {
+      "definition": 202,
+      "text": "EN: Why is a pre-trip inspection important?\nES: ¿Por qué es importante la inspección previa al viaje?",
+      "option_a": "EN: To save fuel | ES: Para ahorrar combustible",
+      "option_b": "EN: To find mechanical problems | ES: Para detectar problemas mecánicos",
+      "option_c": "EN: To improve driving speed | ES: Para aumentar la velocidad",
+      "option_d": "EN: To avoid paperwork | ES: Para evitar papeleo",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3102,
+    "fields": {
+      "definition": 202,
+      "text": "EN: Who is responsible for the vehicle's condition?\nES: ¿Quién es responsable del estado del vehículo?",
+      "option_a": "EN: The mechanic | ES: El mecánico",
+      "option_b": "EN: The company | ES: La empresa",
+      "option_c": "EN: The driver | ES: El conductor",
+      "option_d": "EN: The dispatcher | ES: El despachador",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3103,
+    "fields": {
+      "definition": 202,
+      "text": "EN: When should a pre-trip inspection be performed?\nES: ¿Cuándo debe realizarse la inspección previa?",
+      "option_a": "EN: Once a week | ES: Una vez por semana",
+      "option_b": "EN: Only after an accident | ES: Solo después de un accidente",
+      "option_c": "EN: Before each trip | ES: Antes de cada viaje",
+      "option_d": "EN: Only in bad weather | ES: Solo en mal clima",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3104,
+    "fields": {
+      "definition": 202,
+      "text": "EN: What should be done if a defect is found?\nES: ¿Qué debe hacerse si se encuentra un defecto?",
+      "option_a": "EN: Ignore it | ES: Ignorarlo",
+      "option_b": "EN: Report and fix it | ES: Reportarlo y corregirlo",
+      "option_c": "EN: Drive carefully | ES: Manejar con cuidado",
+      "option_d": "EN: Note it later | ES: Anotarlo después",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3105,
+    "fields": {
+      "definition": 202,
+      "text": "EN: Which system is critical during pre-trip inspection?\nES: ¿Qué sistema es crítico durante la inspección previa?",
+      "option_a": "EN: Sound system | ES: Sistema de sonido",
+      "option_b": "EN: Brake system | ES: Sistema de frenos",
+      "option_c": "EN: Air conditioning | ES: Aire acondicionado",
+      "option_d": "EN: Radio | ES: Radio",
+      "correct_option": "B"
+    }
+  }
+]

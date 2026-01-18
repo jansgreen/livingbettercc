@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1501,
+    "fields": {
+      "module": 106,
+      "title": "LECCIÓN TC-01 — Distribución y Sujeción de la Carga",
+      "content": "<h2>Distribución de la Carga</h2><p>La carga debe distribuirse de manera uniforme para mantener la estabilidad del vehículo.</p><ul><li>Evitar sobrecargar ejes.</li><li>Colocar la carga más pesada abajo.</li><li>Equilibrar el peso de lado a lado.</li></ul><h3>Sujeción adecuada</h3><p>La carga debe asegurarse con correas, cadenas o amarres certificados.</p><p>Una carga mal asegurada puede moverse y causar pérdida de control o volcadura.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1502,
+    "fields": {
+      "module": 106,
+      "title": "LECCIÓN TC-02 — Inspección de Carga y Revisión en Ruta",
+      "content": "<h2>Inspección de la Carga</h2><p>El conductor debe inspeccionar la carga antes de salir y durante el viaje.</p><h3>Cuándo revisar</h3><ul><li>Antes de iniciar el viaje</li><li>Después de las primeras 50 millas</li><li>Cada 150 millas o 3 horas</li></ul><h3>Responsabilidad legal</h3><p>El conductor es responsable de que la carga permanezca segura durante todo el trayecto.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

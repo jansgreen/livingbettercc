@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 106,
+    "fields": {
+      "course": 125,
+      "title": "TRANSPORTING CARGO SAFELY",
+      "description": "<h2>TRANSPORTING CARGO SAFELY</h2><p>Este módulo cubre la carga segura, distribución del peso, sujeción adecuada, inspección de amarres y prevención de desplazamiento de la carga durante el transporte.</p>",
+      "order": 6
+    }
+  }
+]

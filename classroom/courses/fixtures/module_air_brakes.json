@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 103,
+    "fields": {
+      "course": 125,
+      "title": "AIR BRAKES",
+      "description": "<h2>AIR BRAKES</h2><p>Este módulo cubre el funcionamiento del sistema de frenos de aire, componentes principales, presiones seguras, advertencias, pruebas requeridas y procedimientos de seguridad para vehículos comerciales.</p>",
+      "order": 3
+    }
+  }
+]

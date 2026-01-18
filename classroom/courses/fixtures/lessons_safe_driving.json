@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1401,
+    "fields": {
+      "module": 105,
+      "title": "LECCIÓN SD-01 — Conducción Defensiva y Manejo del Espacio",
+      "content": "<h2>Conducción Defensiva</h2><p>La conducción defensiva significa anticipar peligros, mantener el control y reducir riesgos antes de que ocurran incidentes.</p><h3>Claves de manejo del espacio</h3><ul><li>Dejar distancia suficiente de seguimiento</li><li>Evitar permanecer en puntos ciegos de otros</li><li>Mantener una ruta de escape</li></ul><h3>Distancia de seguimiento</h3><p>Vehículos comerciales requieren más distancia para frenar. Aumenta la distancia en lluvia, nieve o baja visibilidad.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1402,
+    "fields": {
+      "module": 105,
+      "title": "LECCIÓN SD-02 — Velocidad Segura, Puntos Ciegos y Conducción Nocturna",
+      "content": "<h2>Velocidad Segura</h2><p>La velocidad segura depende del peso, la pendiente, el clima, el tráfico y la visibilidad.</p><h3>Puntos ciegos</h3><p>Los camiones tienen zonas sin visibilidad alrededor del vehículo. Ajusta espejos y evita movimientos bruscos.</p><h3>Conducción nocturna</h3><ul><li>Reduce la velocidad</li><li>Aumenta distancia</li><li>Mantén luces y parabrisas limpios</li></ul><p>Si estás cansado, detente: el cansancio es un factor de alto riesgo.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

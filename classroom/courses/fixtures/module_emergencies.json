@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 107,
+    "fields": {
+      "course": 125,
+      "title": "EMERGENCIES & ACCIDENT PROCEDURES",
+      "description": "<h2>EMERGENCIES & ACCIDENT PROCEDURES</h2><p>Este módulo cubre respuesta a emergencias, control del vehículo ante fallas, procedimientos en accidentes, protección de la escena, comunicación, primeros pasos y manejo seguro hasta que llegue ayuda.</p>",
+      "order": 7
+    }
+  }
+]

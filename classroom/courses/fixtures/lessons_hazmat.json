@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1701,
+    "fields": {
+      "module": 108,
+      "title": "LECCIÓN HM-01 — Conceptos Básicos, Clases y Etiquetado (Placards)",
+      "content": "<h2>HazMat: Conceptos Básicos</h2><p>Los materiales peligrosos (HazMat) son sustancias que pueden representar riesgo para la salud, la seguridad o el medio ambiente durante su transporte.</p><h3>Clases generales</h3><ul><li>Explosivos</li><li>Gases</li><li>Líquidos inflamables</li><li>Sólidos inflamables</li><li>Oxidantes y peróxidos</li><li>Tóxicos e infecciosos</li><li>Radiactivos</li><li>Corrosivos</li><li>Misceláneos</li></ul><h3>Placards</h3><p>Los placards (rótulos) advierten a otros conductores y a los equipos de emergencia sobre el tipo de material peligroso transportado.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1702,
+    "fields": {
+      "module": 108,
+      "title": "LECCIÓN HM-02 — Documentación, Seguridad y Responsabilidad del Conductor",
+      "content": "<h2>Documentación y Seguridad</h2><p>El transporte de HazMat requiere documentos correctos y procedimientos estrictos.</p><h3>Responsabilidades clave</h3><ul><li>Revisar shipping papers (papeles de envío)</li><li>Verificar placards correctos</li><li>Inspección del vehículo y de la carga</li><li>Evitar fumar o fuentes de ignición donde aplique</li><li>Conocer rutas y restricciones</li></ul><h3>Emergencias</h3><p>En un incidente, sigue el procedimiento de seguridad: proteger la escena, avisar a autoridades y seguir guías de emergencia.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

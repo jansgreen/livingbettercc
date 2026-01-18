@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 108,
+    "fields": {
+      "course": 125,
+      "title": "HAZARDOUS MATERIALS (HAZMAT)",
+      "description": "<h2>HAZARDOUS MATERIALS (HAZMAT)</h2><p>Este módulo cubre fundamentos de materiales peligrosos, clases, etiquetas/placards, documentación, responsabilidad del conductor y prácticas de seguridad para transporte y manejo.</p>",
+      "order": 8
+    }
+  }
+]

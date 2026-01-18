@@ -1,0 +1,10 @@
+[
+  {
+    "model": "quicktest.quicktestdefinition",
+    "pk": 204,
+    "fields": {
+      "module": 104,
+      "title": "COMBINATION VEHICLES — Module QuickTest"
+    }
+  }
+]

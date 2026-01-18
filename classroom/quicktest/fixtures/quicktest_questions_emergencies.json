@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3601,
+    "fields": {
+      "definition": 207,
+      "text": "EN: What is the first priority in an emergency?\nES: ¿Cuál es la primera prioridad en una emergencia?",
+      "option_a": "EN: Finish delivery | ES: Terminar la entrega",
+      "option_b": "EN: Safety and control | ES: Seguridad y control",
+      "option_c": "EN: Call your dispatcher first | ES: Llamar al despachador primero",
+      "option_d": "EN: Speed up | ES: Acelerar",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3602,
+    "fields": {
+      "definition": 207,
+      "text": "EN: During a tire blowout, you should:\nES: Durante un reventón de neumático, debes:",
+      "option_a": "EN: Brake hard immediately | ES: Frenar fuerte inmediatamente",
+      "option_b": "EN: Hold the wheel firmly and slow down gradually | ES: Sujetar el volante y reducir gradualmente",
+      "option_c": "EN: Turn sharply to the shoulder | ES: Girar bruscamente a la orilla",
+      "option_d": "EN: Turn off the engine | ES: Apagar el motor",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3603,
+    "fields": {
+      "definition": 207,
+      "text": "EN: After an accident, you should:\nES: Después de un accidente, debes:",
+      "option_a": "EN: Leave the scene | ES: Irte del lugar",
+      "option_b": "EN: Protect the scene and prevent another crash | ES: Proteger la escena y evitar otro choque",
+      "option_c": "EN: Move injured people immediately | ES: Mover heridos de inmediato",
+      "option_d": "EN: Keep driving if the truck runs | ES: Seguir si el camión prende",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3604,
+    "fields": {
+      "definition": 207,
+      "text": "EN: What should you use to warn other drivers after stopping?\nES: ¿Qué debes usar para advertir a otros conductores después de detenerte?",
+      "option_a": "EN: Music | ES: Música",
+      "option_b": "EN: Warning devices (triangles/reflectors) | ES: Dispositivos de advertencia (triángulos/reflectores)",
+      "option_c": "EN: High speed | ES: Alta velocidad",
+      "option_d": "EN: Headlights off | ES: Luces apagadas",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3605,
+    "fields": {
+      "definition": 207,
+      "text": "EN: Injured people should be moved only if:\nES: Los heridos deben moverse solo si:",
+      "option_a": "EN: They ask to move | ES: Piden moverse",
+      "option_b": "EN: There is immediate danger | ES: Hay peligro inmediato",
+      "option_c": "EN: Traffic is slow | ES: El tráfico está lento",
+      "option_d": "EN: Your dispatcher says so | ES: Lo dice el despachador",
+      "correct_option": "B"
+    }
+  }
+]

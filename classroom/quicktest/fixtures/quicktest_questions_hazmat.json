@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3701,
+    "fields": {
+      "definition": 208,
+      "text": "EN: What are hazardous materials (HazMat)?\nES: ¿Qué son materiales peligrosos (HazMat)?",
+      "option_a": "EN: Any cargo in boxes | ES: Cualquier carga en cajas",
+      "option_b": "EN: Substances that can pose a risk to health/safety/environment | ES: Sustancias que pueden representar riesgo a salud/seguridad/ambiente",
+      "option_c": "EN: Only food products | ES: Solo productos de comida",
+      "option_d": "EN: Only liquids | ES: Solo líquidos",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3702,
+    "fields": {
+      "definition": 208,
+      "text": "EN: What is the purpose of placards?\nES: ¿Cuál es el propósito de los placards (rótulos)?",
+      "option_a": "EN: To decorate the trailer | ES: Decorar el remolque",
+      "option_b": "EN: To warn others about HazMat type | ES: Advertir sobre el tipo de material peligroso",
+      "option_c": "EN: To show fuel level | ES: Mostrar nivel de combustible",
+      "option_d": "EN: To reduce braking distance | ES: Reducir distancia de frenado",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3703,
+    "fields": {
+      "definition": 208,
+      "text": "EN: What should a driver verify before transporting HazMat?\nES: ¿Qué debe verificar un conductor antes de transportar HazMat?",
+      "option_a": "EN: Only tire pressure | ES: Solo presión de llantas",
+      "option_b": "EN: Shipping papers and correct placards | ES: Papeles de envío y rótulos correctos",
+      "option_c": "EN: Radio station | ES: Estación de radio",
+      "option_d": "EN: Seat color | ES: Color del asiento",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3704,
+    "fields": {
+      "definition": 208,
+      "text": "EN: Which is a driver responsibility for HazMat?\nES: ¿Cuál es una responsabilidad del conductor en HazMat?",
+      "option_a": "EN: Ignore route restrictions | ES: Ignorar restricciones de ruta",
+      "option_b": "EN: Know routes and restrictions | ES: Conocer rutas y restricciones",
+      "option_c": "EN: Smoke near cargo | ES: Fumar cerca de la carga",
+      "option_d": "EN: Skip inspections | ES: Saltarse inspecciones",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3705,
+    "fields": {
+      "definition": 208,
+      "text": "EN: In a HazMat incident, you should first:\nES: En un incidente HazMat, primero debes:",
+      "option_a": "EN: Leave without reporting | ES: Irte sin reportar",
+      "option_b": "EN: Protect the scene and notify authorities | ES: Proteger la escena y notificar a autoridades",
+      "option_c": "EN: Wash the spill with water | ES: Lavar el derrame con agua",
+      "option_d": "EN: Keep driving | ES: Seguir manejando",
+      "correct_option": "B"
+    }
+  }
+]

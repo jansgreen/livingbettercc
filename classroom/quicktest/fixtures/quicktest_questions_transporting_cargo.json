@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3501,
+    "fields": {
+      "definition": 206,
+      "text": "EN: Why is proper cargo distribution important?\nES: ¿Por qué es importante la correcta distribución de la carga?",
+      "option_a": "EN: To increase speed | ES: Para aumentar la velocidad",
+      "option_b": "EN: To maintain vehicle stability | ES: Para mantener la estabilidad del vehículo",
+      "option_c": "EN: To reduce paperwork | ES: Para reducir papeleo",
+      "option_d": "EN: To improve fuel taste | ES: Para mejorar el combustible",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3502,
+    "fields": {
+      "definition": 206,
+      "text": "EN: Who is responsible for securing the cargo?\nES: ¿Quién es responsable de asegurar la carga?",
+      "option_a": "EN: The shipper | ES: El remitente",
+      "option_b": "EN: The driver | ES: El conductor",
+      "option_c": "EN: The mechanic | ES: El mecánico",
+      "option_d": "EN: The dispatcher | ES: El despachador",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3503,
+    "fields": {
+      "definition": 206,
+      "text": "EN: When should cargo be inspected during a trip?\nES: ¿Cuándo debe inspeccionarse la carga durante el viaje?",
+      "option_a": "EN: Only at destination | ES: Solo al llegar",
+      "option_b": "EN: After first 50 miles and periodically | ES: Después de 50 millas y periódicamente",
+      "option_c": "EN: Only before departure | ES: Solo antes de salir",
+      "option_d": "EN: Only if it shifts | ES: Solo si se mueve",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3504,
+    "fields": {
+      "definition": 206,
+      "text": "EN: What can happen if cargo is not secured?\nES: ¿Qué puede pasar si la carga no está asegurada?",
+      "option_a": "EN: Better fuel economy | ES: Mejor consumo",
+      "option_b": "EN: Loss of control or rollover | ES: Pérdida de control o volcadura",
+      "option_c": "EN: Faster delivery | ES: Entrega más rápida",
+      "option_d": "EN: Less braking | ES: Menos frenado",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3505,
+    "fields": {
+      "definition": 206,
+      "text": "EN: How often should cargo be checked?\nES: ¿Con qué frecuencia debe revisarse la carga?",
+      "option_a": "EN: Every 10 miles | ES: Cada 10 millas",
+      "option_b": "EN: After first 50 miles and every 150 miles or 3 hours | ES: A las 50 millas y cada 150 millas o 3 horas",
+      "option_c": "EN: Only once per day | ES: Una vez al día",
+      "option_d": "EN: Never if secured | ES: Nunca si está asegurada",
+      "correct_option": "B"
+    }
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1201,
+    "fields": {
+      "module": 103,
+      "title": "LECCIÓN AB-01 — Fundamentos del Sistema de Frenos de Aire",
+      "content": "<h2>Fundamentos del Sistema de Frenos de Aire</h2><p>Los frenos de aire utilizan aire comprimido para accionar los frenos del vehículo comercial.</p><h3>Componentes principales</h3><ul><li>Compresor de aire</li><li>Tanques (reservorios)</li><li>Válvulas</li><li>Cámaras de freno</li><li>Secador de aire</li></ul><h3>Ventajas</h3><p>Mayor potencia de frenado y seguridad para vehículos pesados.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1202,
+    "fields": {
+      "module": 103,
+      "title": "LECCIÓN AB-02 — Presión, Advertencias y Pruebas del Sistema",
+      "content": "<h2>Presión y Advertencias</h2><p>El sistema debe operar dentro de rangos de presión seguros.</p><ul><li>Presión normal: 100–125 PSI</li><li>Advertencia de baja presión: ~60 PSI</li><li>Frenos de emergencia se activan ~20–45 PSI</li></ul><h3>Pruebas requeridas</h3><p>Pruebas de fuga, compresor, válvulas y freno de estacionamiento son obligatorias para el CDL.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

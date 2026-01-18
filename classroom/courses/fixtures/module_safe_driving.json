@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 105,
+    "fields": {
+      "course": 125,
+      "title": "SAFE DRIVING",
+      "description": "<h2>SAFE DRIVING</h2><p>Este módulo cubre conducción defensiva, manejo del espacio, velocidad segura, distancias, puntos ciegos, control del vehículo, conducción nocturna y técnicas para reducir riesgos y evitar colisiones.</p>",
+      "order": 5
+    }
+  }
+]

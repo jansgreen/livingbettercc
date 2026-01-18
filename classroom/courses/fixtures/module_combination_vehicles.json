@@ -1,0 +1,12 @@
+[
+  {
+    "model": "courses.module",
+    "pk": 104,
+    "fields": {
+      "course": 125,
+      "title": "COMBINATION VEHICLES",
+      "description": "<h2>COMBINATION VEHICLES</h2><p>Este módulo cubre operación segura de vehículos combinados (tractor-trailer), acoplamiento/desacoplamiento, quinta rueda, remolque, estabilidad, distancia de frenado y riesgos comunes.</p>",
+      "order": 4
+    }
+  }
+]

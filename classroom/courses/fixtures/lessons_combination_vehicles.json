@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1301,
+    "fields": {
+      "module": 104,
+      "title": "LECCIÓN CV-01 — Fundamentos de Vehículos Combinados",
+      "content": "<h2>Fundamentos</h2><p>Un vehículo combinado incluye un tractor y uno o más remolques. La estabilidad y el control dependen del acoplamiento correcto y de una conducción preventiva.</p><h3>Riesgos principales</h3><ul><li>Mayor distancia de frenado</li><li>Efecto \"offtracking\" en curvas</li><li>Riesgo de volcadura por maniobras bruscas</li></ul><h3>Distribución de peso</h3><p>El peso debe estar bien distribuido para evitar pérdida de tracción y balanceo del remolque.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1302,
+    "fields": {
+      "module": 104,
+      "title": "LECCIÓN CV-02 — Acoplamiento y Desacoplamiento (Quinta Rueda)",
+      "content": "<h2>Acoplamiento y Desacoplamiento</h2><p>El acoplamiento correcto evita desprendimientos y accidentes graves.</p><h3>Pasos esenciales</h3><ul><li>Verificar la altura del remolque</li><li>Alinear tractor y remolque</li><li>Enganche completo de la quinta rueda</li><li>Inspección visual del cierre (lock jaws)</li><li>Conectar líneas de aire y cable eléctrico</li><li>Prueba de tirón (pull test) y revisar freno de remolque</li></ul><h3>Errores comunes</h3><p>Acoplamiento incompleto, mangueras mal conectadas o quinta rueda sin asegurar.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

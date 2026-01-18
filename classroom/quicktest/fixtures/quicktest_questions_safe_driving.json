@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3401,
+    "fields": {
+      "definition": 205,
+      "text": "EN: What is defensive driving?\nES: ¿Qué es conducción defensiva?",
+      "option_a": "EN: Driving as fast as possible | ES: Manejar lo más rápido posible",
+      "option_b": "EN: Anticipating hazards and reducing risk | ES: Anticipar peligros y reducir riesgos",
+      "option_c": "EN: Honking to warn others | ES: Tocar bocina para advertir",
+      "option_d": "EN: Following closely | ES: Manejar pegado",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3402,
+    "fields": {
+      "definition": 205,
+      "text": "EN: Why do CMVs need more following distance?\nES: ¿Por qué los vehículos comerciales necesitan más distancia?",
+      "option_a": "EN: They are lighter | ES: Son más livianos",
+      "option_b": "EN: They require longer stopping distance | ES: Requieren más distancia para frenar",
+      "option_c": "EN: They have better brakes always | ES: Siempre tienen mejores frenos",
+      "option_d": "EN: They stop instantly | ES: Se detienen instantáneamente",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3403,
+    "fields": {
+      "definition": 205,
+      "text": "EN: What should you do at night?\nES: ¿Qué debes hacer al conducir de noche?",
+      "option_a": "EN: Increase speed | ES: Aumentar velocidad",
+      "option_b": "EN: Reduce speed and increase following distance | ES: Reducir velocidad y aumentar distancia",
+      "option_c": "EN: Turn off lights | ES: Apagar luces",
+      "option_d": "EN: Follow closer to see better | ES: Ir más cerca para ver mejor",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3404,
+    "fields": {
+      "definition": 205,
+      "text": "EN: What is a key rule for managing space?\nES: ¿Cuál es una regla clave para manejar el espacio?",
+      "option_a": "EN: Stay in other drivers' blind spots | ES: Mantenerse en puntos ciegos",
+      "option_b": "EN: Keep an escape route | ES: Mantener una ruta de escape",
+      "option_c": "EN: Tailgate to save time | ES: Pegarse para ahorrar tiempo",
+      "option_d": "EN: Use high beams always | ES: Usar luces altas siempre",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3405,
+    "fields": {
+      "definition": 205,
+      "text": "EN: If you feel fatigued, you should:\nES: Si te sientes cansado, debes:",
+      "option_a": "EN: Keep driving | ES: Seguir manejando",
+      "option_b": "EN: Stop and rest | ES: Detenerte y descansar",
+      "option_c": "EN: Turn up music | ES: Subir música",
+      "option_d": "EN: Drive faster to finish | ES: Manejar más rápido para terminar",
+      "correct_option": "B"
+    }
+  }
+]

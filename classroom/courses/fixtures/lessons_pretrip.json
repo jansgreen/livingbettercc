@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1101,
+    "fields": {
+      "module": 102,
+      "title": "LECCIÓN PT-01 — Inspección Previa al Viaje (Conceptos Básicos)",
+      "content": "<h2>Inspección Previa al Viaje</h2><p>La inspección previa al viaje es una revisión obligatoria que el conductor CDL debe realizar antes de operar un vehículo comercial.</p><ul><li>Detecta fallas mecánicas.</li><li>Previene accidentes.</li><li>Es requerida por ley.</li></ul><h3>Responsabilidad del conductor</h3><p>El conductor es legalmente responsable del estado seguro del vehículo antes de iniciar el viaje.</p><h3>Cuándo realizarla</h3><p>Debe hacerse antes de cada viaje y después de que el vehículo haya estado estacionado por un período prolongado.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1102,
+    "fields": {
+      "module": 102,
+      "title": "LECCIÓN PT-02 — Componentes Críticos a Revisar",
+      "content": "<h2>Componentes Críticos</h2><p>Durante la pre-inspección se deben revisar los sistemas principales del vehículo.</p><h3>Sistemas clave</h3><ul><li>Frenos (aire o hidráulicos)</li><li>Luces y señales</li><li>Neumáticos y ruedas</li><li>Dirección y suspensión</li><li>Acoplamientos</li></ul><h3>Reporte de defectos</h3><p>Cualquier defecto debe ser reportado y corregido antes de operar el vehículo.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]

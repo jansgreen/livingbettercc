@@ -1,0 +1,67 @@
+[
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3201,
+    "fields": {
+      "definition": 203,
+      "text": "EN: What powers air brakes?\nES: ¿Qué acciona los frenos de aire?",
+      "option_a": "EN: Hydraulic fluid | ES: Fluido hidráulico",
+      "option_b": "EN: Compressed air | ES: Aire comprimido",
+      "option_c": "EN: Electricity | ES: Electricidad",
+      "option_d": "EN: Vacuum | ES: Vacío",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3202,
+    "fields": {
+      "definition": 203,
+      "text": "EN: What is the normal operating air pressure?\nES: ¿Cuál es la presión normal de operación?",
+      "option_a": "EN: 50–70 PSI | ES: 50–70 PSI",
+      "option_b": "EN: 80–90 PSI | ES: 80–90 PSI",
+      "option_c": "EN: 100–125 PSI | ES: 100–125 PSI",
+      "option_d": "EN: 140–160 PSI | ES: 140–160 PSI",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3203,
+    "fields": {
+      "definition": 203,
+      "text": "EN: When does the low air pressure warning activate?\nES: ¿Cuándo se activa la advertencia de baja presión?",
+      "option_a": "EN: Around 90 PSI | ES: Alrededor de 90 PSI",
+      "option_b": "EN: Around 60 PSI | ES: Alrededor de 60 PSI",
+      "option_c": "EN: Around 40 PSI | ES: Alrededor de 40 PSI",
+      "option_d": "EN: Around 20 PSI | ES: Alrededor de 20 PSI",
+      "correct_option": "B"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3204,
+    "fields": {
+      "definition": 203,
+      "text": "EN: What happens if air pressure gets too low?\nES: ¿Qué sucede si la presión baja demasiado?",
+      "option_a": "EN: Brakes work better | ES: Frenan mejor",
+      "option_b": "EN: Nothing happens | ES: No pasa nada",
+      "option_c": "EN: Emergency brakes apply | ES: Se activan los frenos de emergencia",
+      "option_d": "EN: Engine shuts off | ES: El motor se apaga",
+      "correct_option": "C"
+    }
+  },
+  {
+    "model": "quicktest.quicktestquestion",
+    "pk": 3205,
+    "fields": {
+      "definition": 203,
+      "text": "EN: Why must air brake tests be performed?\nES: ¿Por qué deben realizarse pruebas de frenos de aire?",
+      "option_a": "EN: For comfort | ES: Por comodidad",
+      "option_b": "EN: To meet CDL requirements | ES: Para cumplir requisitos CDL",
+      "option_c": "EN: To save fuel | ES: Para ahorrar combustible",
+      "option_d": "EN: To increase speed | ES: Para aumentar velocidad",
+      "correct_option": "B"
+    }
+  }
+]

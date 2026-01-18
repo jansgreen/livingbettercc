@@ -1,0 +1,10 @@
+[
+  {
+    "model": "quicktest.quicktestdefinition",
+    "pk": 206,
+    "fields": {
+      "module": 106,
+      "title": "TRANSPORTING CARGO SAFELY — Module QuickTest"
+    }
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "model": "courses.lesson",
+    "pk": 1601,
+    "fields": {
+      "module": 107,
+      "title": "LECCIÓN EA-01 — Respuesta Inicial y Control del Vehículo en Emergencias",
+      "content": "<h2>Respuesta Inicial</h2><p>Ante una emergencia, mantén la calma y actúa con prioridad en la seguridad.</p><h3>Acciones inmediatas</h3><ul><li>Reducir velocidad de forma controlada</li><li>Señalizar y moverse a un lugar seguro</li><li>Evitar maniobras bruscas</li></ul><h3>Fallas comunes</h3><ul><li>Reventón de neumático</li><li>Falla de frenos</li><li>Falla de dirección</li></ul><p>En reventón, sujeta firme el volante, no frenes fuerte, y reduce gradualmente.</p>",
+      "video_url": "",
+      "order": 1
+    }
+  },
+  {
+    "model": "courses.lesson",
+    "pk": 1602,
+    "fields": {
+      "module": 107,
+      "title": "LECCIÓN EA-02 — Procedimientos en Accidentes y Protección de la Escena",
+      "content": "<h2>Procedimientos en Accidentes</h2><p>Tu prioridad es evitar un segundo accidente y proteger vidas.</p><h3>Pasos clave</h3><ol><li>Detenerse en un lugar seguro si es posible</li><li>Activar luces de emergencia</li><li>Colocar triángulos/reflectores según reglas</li><li>Llamar a servicios de emergencia</li><li>No mover heridos salvo peligro inmediato</li></ol><h3>Comunicación y reporte</h3><p>Informa a la empresa/autoridades y documenta lo ocurrido según procedimiento.</p>",
+      "video_url": "",
+      "order": 2
+    }
+  }
+]
