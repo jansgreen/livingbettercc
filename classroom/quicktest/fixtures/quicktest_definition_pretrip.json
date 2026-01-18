@@ -1,0 +1,10 @@
+[
+  {
+    "model": "quicktest.quicktestdefinition",
+    "pk": 202,
+    "fields": {
+      "module": 102,
+      "title": "PRE-TRIP INSPECTION — Module QuickTest"
+    }
+  }
+]
