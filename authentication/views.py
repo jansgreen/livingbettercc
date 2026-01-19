@@ -157,7 +157,7 @@ def login_view(request):
                 messages.error(request, "No se pudo aplicar la invitación pendiente; por favor contactece con soporte técnico.")
                 return redirect('contact')
         else:
-            messages.error(request, f"{form.errors|safe } Por favor verifica los datos del formulario.")
+            messages.error(request, f"{form.errors} Por favor verifica los datos del formulario.")
             return redirect('authentication:login')
     return render(request, 'authentication/login.html', {'form': form})
 
