@@ -155,7 +155,7 @@ def login_view(request):
                 return redirect('dashboard')
             else:
                 messages.error(request, "No se pudo aplicar la invitación pendiente; por favor contactece con soporte técnico.")
-                return redirect('shop')
+                return redirect('home:contact')
         else:
             messages.error(request, f"{form.errors} Por favor verifica los datos del formulario.")
             return redirect('authentication:login') 
