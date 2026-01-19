@@ -134,8 +134,9 @@ def tecnico_register_view(request):
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
 def login_view(request):
+    form = BootstrapUserCreationForm()
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)
+        form = BootstrapUserCreationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
@@ -153,8 +154,6 @@ def login_view(request):
             if invite_applied:
                 return redirect('dashboard')
             return redirect('home')
-    else:
-        form = AuthenticationForm()
 
     # Add 'form-control' class to all fields in the form
     for field in form.fields.values():
