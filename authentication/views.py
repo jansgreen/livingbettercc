@@ -12,6 +12,7 @@ from authentication.models.customers import Customers
 from authentication.models.directives import Directives
 from authentication.address.models import Address
 from authentication.models.students import Students
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from formbuilder.forms import FacilitadorRegistrationForm
 
