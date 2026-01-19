@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from classroom.enrollments.models import Enrollment, LessonCompletion
 
-from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm
+from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm, BootstrapAuthenticationForm
 from authentication.address.forms import AddressForm
 from authentication.models.profiles import Profiles 
 from authentication.models.customers import Customers
@@ -134,9 +134,9 @@ def tecnico_register_view(request):
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
 def login_view(request):
-    form = BootstrapUserCreationForm()
+    form = BootstrapAuthenticationForm()
     if request.method == 'POST':
-        form = BootstrapUserCreationForm(data=request.POST)
+        form = BootstrapAuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
@@ -153,16 +153,15 @@ def login_view(request):
                 return redirect('courses:start_course_payment', pk=item_id)
             if invite_applied:
                 return redirect('dashboard')
-            return redirect('home')
-
-    # Add 'form-control' class to all fields in the form
-    for field in form.fields.values():
-        field.widget.attrs.update({'class': 'form-control'})
-
+            else:
+                messages.error(request, "No se pudo aplicar la invitación pendiente; por favor contactece con soporte técnico.")
+                return redirect('contact')
+        else:
+            messages.error(request, f"{form.errors|safe } Por favor verifica los datos del formulario.")
+            return redirect('authentication:login')
     return render(request, 'authentication/login.html', {'form': form})
 
 def register_view(request):
-    
     if request.method == 'POST':
         form = BootstrapUserCreationForm(request.POST)
         if form.is_valid():
@@ -228,8 +227,8 @@ def register_view(request):
     return render(request, 'authentication/register.html', {'form': form})
 
 def logout_view(request):
-    auth_logout(request)
-    return redirect('authentication:login')  # Redirect to login after logout
+    auth_logout(request)   
+    return redirect('shop')  # Redirect to login after logout
 
 def prepare_register(request, pk, role): 
     # Solo guardar intención en sesión y asegurar grupo; no crear Enrollment aquí
