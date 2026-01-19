@@ -101,7 +101,6 @@ def facilitador_register_view(request):
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
-@login_required
 def tecnico_register_view(request):
     """
     Registro para técnicos. Igual que el registro de facilitador pero asigna
@@ -134,7 +133,6 @@ def tecnico_register_view(request):
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
-@login_required
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)

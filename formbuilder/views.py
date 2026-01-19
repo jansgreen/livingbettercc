@@ -21,12 +21,13 @@ from .models import FormDefinition, FormShareLink
 from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
+from django.contrib.auth.views import redirect_to_login
+
 
 
 def pending_forms(request):
     if not request.user.is_authenticated:
-        return redirect('login')
-    
+        return redirect_to_login(request.get_full_path(), login_url=reverse('authentication:login'))
     # Aquí puedes implementar la lógica para obtener los formularios pendientes
     # Por simplicidad, asumiremos que todos los formularios están pendientes
     pending_forms = FormDefinition.objects.all()
