@@ -18,7 +18,7 @@ from django.core.files.storage import default_storage
 from django.contrib.auth import login, get_backends
 from django.utils.text import slugify
 import os
-
+from .models import FormDefinition, FormShareLink
 
 def pending_forms(request):
     if not request.user.is_authenticated:
@@ -431,6 +431,58 @@ def shared_completed_form(request, pk):
     # Not authenticated: redirect to tecnico registration with next=detail_path
     register_url = reverse('tecnico_register')
     return redirect(f"{register_url}?next={detail_path}")
+
+# shared form definition view UUID
+
+def share_form_definition(request, pk):
+    """
+    Genera un link compartible para un FormDefinition (plantilla).
+    Recomendado: solo permitir a staff / tecnico / owner (según tu lógica).
+    """
+    if not request.user.is_authenticated:
+        next_url = request.get_full_path()
+        return redirect(f"{reverse('authentication:login')}?next={next_url}")
+
+    form_obj = get_object_or_404(FormDefinition, pk=pk)
+
+    # TODO: aquí validas permisos reales (staff/tecnico/etc)
+    # Ejemplo mínimo:
+    # if not request.user.is_staff and not request.user.groups.filter(name="tecnico").exists():
+    #     raise Http404("No encontrado")
+
+    link = FormShareLink.objects.create(form=form_obj, created_by=request.user)
+
+    share_url = request.build_absolute_uri(
+        reverse("formbuilder:shared_form_definition", kwargs={"token": link.token})
+    )
+
+    return render(request, "formbuilder/shared/shared_link.html", {
+        "share_url": share_url,
+        "form_obj": form_obj,
+    })
+
+def shared_form_definition(request, token):
+    """
+    Link público (token). Si no está autenticado → login/registro con next a este mismo link.
+    Si está autenticado → redirige a render_form del form.
+    """
+    link = get_object_or_404(FormShareLink, token=token, is_active=True)
+    form_obj = link.form
+
+    # Si NO está autenticado, mandarlo a login o register con next=este mismo link
+    if not request.user.is_authenticated:
+        next_url = request.get_full_path()
+        # usa login o register, según tu flujo
+        return redirect(f"{reverse('authentication:login')}?next={next_url}")
+
+    # Si necesitas forzar grupo "facilitador", aquí es donde lo manejas:
+    # if not request.user.groups.filter(name="facilitador").exists() and not request.user.is_staff:
+    #     messages.info(request, "Necesitas cuenta de facilitador para completar este formulario.")
+    #     next_url = request.get_full_path()
+    #     return redirect(f"{reverse('authentication:register')}?next={next_url}")
+
+    # Ya autenticado y autorizado → render_form normal
+    return redirect(reverse("formbuilder:render_form", kwargs={"form_name": form_obj.name}))
 
 def my_user_complete_forms(request):
     completed_forms = CompletedForm.objects.filter(user=request.user)

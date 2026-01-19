@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import FormDefinition, FormField
+from .models import FormDefinition, FormField, FormShareLink
 
 class FormFieldInline(admin.TabularInline):
     model = FormField
@@ -9,7 +9,12 @@ class FormFieldInline(admin.TabularInline):
 class FormDefinitionAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at')
     inlines = [FormFieldInline]
-
+    
+@admin.register(FormShareLink)
+class FormShareLinkAdmin(admin.ModelAdmin):
+    list_display = ('form', 'token', 'created_by', 'is_active', 'created_at')
+    list_filter = ('form', 'is_active', 'created_at')
+    
 @admin.register(FormField)
 class FormFieldAdmin(admin.ModelAdmin):
     list_display = ('label', 'form', 'field_type', 'order')
