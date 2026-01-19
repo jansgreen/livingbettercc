@@ -134,32 +134,66 @@ def tecnico_register_view(request):
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
 def login_view(request):
-    form = BootstrapAuthenticationForm()
-    if request.method == 'POST':
-        form = BootstrapAuthenticationForm(data=request.POST)
+    form = BootstrapAuthenticationForm(request=request)
+
+    if request.method == "POST":
+        form = BootstrapAuthenticationForm(request=request, data=request.POST)
+
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            invite_applied = _apply_pending_invitation(request, user)
+
             _dedupe_student_groups(user)
-            # Reanudar intención: delegar al flujo de Classroom
-            role = request.session.get('post_register_role')
-            item_id = request.session.get('selected_item')
+
+            # 1) Reanudar intención: si venía a pagar/inscribirse en un curso
+            role = request.session.get("post_register_role")
+            item_id = request.session.get("selected_item")
+
             if item_id:
                 if role:
                     group, _ = Group.objects.get_or_create(name=role)
                     user.groups.add(group)
-                request.session.pop('post_register_role', None)
-                return redirect('courses:start_course_payment', pk=item_id)
-            if invite_applied:
-                return redirect('dashboard')
-            else:
-                messages.error(request, "No se pudo aplicar la invitación pendiente; por favor contactece con soporte técnico.")
-                return redirect('contactanos')
-        else:
-            messages.error(request, f"{form.errors} Por favor verifica los datos del formulario.")
-            return redirect('authentication:login') 
-    return render(request, 'authentication/login.html', {'form': form})
+
+                request.session.pop("post_register_role", None)
+                # si lo usas en otros flujos, no lo borres aquí; si es solo cursos, bórralo también:
+                # request.session.pop("selected_item", None)
+
+                return redirect("courses:start_course_payment", pk=item_id)
+
+            # 2) Invitación: SOLO si hay invitación pendiente (ajusta keys a tu implementación real)
+            has_invite = bool(
+                request.session.get("pending_invitation_id")
+                or request.session.get("pending_invitation_token")
+                or request.session.get("assign_facilitador")  # si usas esto como bandera
+            )
+
+            if has_invite:
+                invite_applied = _apply_pending_invitation(request, user)
+                if invite_applied:
+                    # si quieres, limpia banderas aquí
+                    request.session.pop("assign_facilitador", None)
+                    return redirect("dashboard")
+
+                messages.error(
+                    request,
+                    "No se pudo aplicar la invitación pendiente; por favor contacta con soporte técnico.",
+                )
+                return redirect("contactanos")
+
+            # 3) Login normal (sin invitación): respetar next si es seguro
+            next_url = request.POST.get("next") or request.GET.get("next")
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+            ):
+                return redirect(next_url)
+
+            return redirect("dashboard")
+
+        # Form inválido: NO uses |safe aquí (eso es de templates)
+        messages.error(request, f"{form.errors} Por favor verifica los datos del formulario.")
+        return redirect("authentication:login")
+
+    return render(request, "authentication/login.html", {"form": form})
 
 def register_view(request):
     if request.method == 'POST':
