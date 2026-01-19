@@ -6,10 +6,9 @@ from django.views.generic import (
 )
 from .models import FormDefinition, FormField, CompletedForm
 from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm
-from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_http_methods
 # formbuilder/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .utils import generate_dynamic_form, build_ordered_responses
 from django.contrib import messages
 from django.urls import reverse
@@ -19,6 +18,10 @@ from django.contrib.auth import login, get_backends
 from django.utils.text import slugify
 import os
 from .models import FormDefinition, FormShareLink
+from django.contrib.auth.decorators import login_required
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
+
 
 def pending_forms(request):
     if not request.user.is_authenticated:
@@ -189,31 +192,77 @@ def field_delete(request, pk):
     return render(request, 'formbuilder/field_confirm_delete.html', {'object': instance})
 
 def render_form(request, form_name):
+    """
+    Renderiza y procesa un FormDefinition dinámico.
+    - Si el usuario no está autenticado: redirige a registro/login preservando `next`.
+    - Evita loops de `next` apuntando al login.
+    - En POST: guarda CompletedForm con data JSON-safe (incluye URLs de archivos subidos).
+    """
+    import os
+    from urllib.parse import urlencode
+
+    from django.conf import settings
+    from django.contrib import messages
+    from django.core.files.storage import default_storage
+    from django.shortcuts import get_object_or_404, redirect, render
+    from django.urls import reverse
+    from django.utils.text import slugify
+    from django.utils.http import url_has_allowed_host_and_scheme
+
     form_obj = get_object_or_404(FormDefinition, name=form_name)
+
     DynamicForm = generate_dynamic_form(form_name)
     if not DynamicForm:
-        return render(request, 'formbuilder/not_found.html', {'form_name': form_name})
-    if not request.user.is_authenticated:
-        if request.GET.get('facilitador'):
-            request.session['assign_facilitador'] = True
-        next_url = request.get_full_path()
-        register_url = reverse('facilitador_register')
-        return redirect(f"{register_url}?next={next_url}")
+        return render(request, "formbuilder/not_found.html", {"form_name": form_name})
 
-    subtitle = (form_obj.description or '').strip()
+    # ---------------------------------------------------------------------
+    # Auth gate (aplica tanto GET como POST)
+    # ---------------------------------------------------------------------
+    if not request.user.is_authenticated:
+        # Si viene marcado como facilitador, guarda flag en sesión
+        if request.GET.get("facilitador"):
+            request.session["assign_facilitador"] = True
+
+        next_url = request.get_full_path()
+
+        # Previene next inseguro / externo
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = "/"
+
+        # Previene loop: si el next ya es el login/register, lo mandamos a home
+        login_url = settings.LOGIN_URL or "/accounts/login/"
+        register_url = reverse("facilitador_register")
+
+        if next_url.startswith(login_url) or next_url.startswith(register_url):
+            next_url = "/"
+
+        # Redirige a registro (o cambia a tu login si prefieres)
+        qs = urlencode({"next": next_url})
+        return redirect(f"{register_url}?{qs}")
+
+    # ---------------------------------------------------------------------
+    # Datos del formulario / campos especiales
+    # ---------------------------------------------------------------------
+    subtitle = (form_obj.description or "").strip()
 
     file_field_names = set(
-        form_obj.fields.filter(field_type='files').values_list('name', flat=True)
+        form_obj.fields.filter(field_type="files").values_list("name", flat=True)
     )
 
-    def _save_uploaded_files(uploaded_files, *, user_id: int, form_name: str, field_name: str) -> list[str]:
+    def _save_uploaded_files(
+        uploaded_files, *, user_id: int, form_name: str, field_name: str
+    ) -> list[str]:
         saved_urls: list[str] = []
         if not uploaded_files:
             return saved_urls
 
-        safe_form = slugify(form_name)[:60] or 'form'
-        safe_field = slugify(field_name)[:60] or 'files'
-        base_dir = os.path.join('form_uploads', safe_form, str(user_id), safe_field)
+        safe_form = slugify(form_name)[:60] or "form"
+        safe_field = slugify(field_name)[:60] or "files"
+        base_dir = os.path.join("form_uploads", safe_form, str(user_id), safe_field)
 
         for f in uploaded_files:
             filename = f.name
@@ -221,25 +270,33 @@ def render_form(request, form_name):
             saved_urls.append(default_storage.url(path))
         return saved_urls
 
-    if request.method == 'POST':
+    # ---------------------------------------------------------------------
+    # POST (guardar)
+    # ---------------------------------------------------------------------
+    if request.method == "POST":
         post_data = request.POST
 
-        # If the form includes the 'objetivo_razon_motivo' field, we use the
-        # FormDefinition.description as its fixed value (subtitle).
-        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
-            if 'objetivo_razon_motivo' not in post_data:
+        # Si existe el campo objetivo_razon_motivo, fija el valor con description
+        if (
+            subtitle
+            and hasattr(DynamicForm, "base_fields")
+            and "objetivo_razon_motivo" in DynamicForm.base_fields
+        ):
+            if "objetivo_razon_motivo" not in post_data:
                 post_data = post_data.copy()
-                post_data['objetivo_razon_motivo'] = subtitle
+                post_data["objetivo_razon_motivo"] = subtitle
 
         form = DynamicForm(post_data, request.FILES)
+
         if form.is_valid():
             json_safe_data = dict(form.cleaned_data)
 
-            # Persist uploaded files and store URLs (JSON-safe) instead of UploadedFile objects.
+            # Guardar archivos subidos como URLs (JSON-safe)
             for field_name in file_field_names:
                 uploaded_list = form.cleaned_data.get(field_name) or []
                 if uploaded_list and not isinstance(uploaded_list, (list, tuple)):
                     uploaded_list = [uploaded_list]
+
                 json_safe_data[field_name] = _save_uploaded_files(
                     uploaded_list,
                     user_id=request.user.id,
@@ -247,30 +304,38 @@ def render_form(request, form_name):
                     field_name=field_name,
                 )
 
-            # Aqui tengo que guardar los datos del form y en un nuevo model CRUD, para los formularios ya completados.
-            completed_form = CompletedForm.objects.create(
+            CompletedForm.objects.create(
                 user=request.user,
                 form_name=form_name,
-                titulo=form.cleaned_data.get('titulo', ''),
-                descripcion=subtitle or form.cleaned_data.get('descripcion', ''),
-                form_data=json_safe_data
+                titulo=form.cleaned_data.get("titulo", ""),
+                descripcion=subtitle or form.cleaned_data.get("descripcion", ""),
+                form_data=json_safe_data,
             )
-            completed_form.save()
-            messages.success(request, f'Formulario guardado con éxito.')
-            return render(request, 'formbuilder/success.html')
+
+            messages.success(request, "Formulario guardado con éxito.")
+            return render(request, "formbuilder/success.html", {"form_obj": form_obj})
+
+        # Si no es válido, cae al render final con errores
+
+    # ---------------------------------------------------------------------
+    # GET (inicial)
+    # ---------------------------------------------------------------------
     else:
         initial = {}
-        if subtitle and hasattr(DynamicForm, 'base_fields') and 'objetivo_razon_motivo' in DynamicForm.base_fields:
-            initial['objetivo_razon_motivo'] = subtitle
+        if (
+            subtitle
+            and hasattr(DynamicForm, "base_fields")
+            and "objetivo_razon_motivo" in DynamicForm.base_fields
+        ):
+            initial["objetivo_razon_motivo"] = subtitle
         form = DynamicForm(initial=initial)
-    context={
-        'form_obj': form_obj,
-        'form': form, 
-        'form_name': form_name
 
+    context = {
+        "form_obj": form_obj,
+        "form": form,
+        "form_name": form_name,
     }
-
-    return render(request, 'formbuilder/render_form.html', context)
+    return render(request, "formbuilder/render_form.html", context)
 
 # Completed Forms Views
 def completed_forms_list(request):
@@ -483,6 +548,37 @@ def shared_form_definition(request, token):
 
     # Ya autenticado y autorizado → render_form normal
     return redirect(reverse("formbuilder:render_form", kwargs={"form_name": form_obj.name}))
+
+def shared_form_entry(request, token):
+    link = get_object_or_404(FormShareLink, token=token, is_active=True)
+
+    if not link.is_valid():
+        # puedes renderizar template "link expirado"
+        return redirect("home")  # o 404
+
+    # Si NO está autenticado => enviar a login/registro con next seguro
+    if not request.user.is_authenticated:
+        next_url = request.get_full_path()
+
+        # protección anti-loop: si next apunta al login, lo reseteas
+        login_path = reverse("account_login") if "account_login" in [u.name for u in request.resolver_match.namespace_dict.values()] else settings.LOGIN_URL
+        if next_url.startswith(login_path):
+            next_url = reverse("home")
+
+        # Valida que next sea seguro
+        if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+            next_url = reverse("home")
+
+        # elige uno: login o signup
+        return redirect(f"{reverse('account_login')}?next={next_url}")
+        # o: return redirect(f"{reverse('account_signup')}?next={next_url}")
+
+    # Ya autenticado: aquí validas rol/grupo (facilitador)
+    if not request.user.groups.filter(name="Facilitador").exists() and not request.user.is_superuser:
+        return redirect("home")  # o 403
+
+    # Redirige al form real (sin exponer ID público si no quieres)
+    return redirect("render_form", form_name=link.form.name)
 
 def my_user_complete_forms(request):
     completed_forms = CompletedForm.objects.filter(user=request.user)
