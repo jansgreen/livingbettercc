@@ -1,6 +1,10 @@
+import uuid
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
 from authentication.address.models import Address
+from django.conf import settings
+from django.db import models
+
 
 
 class FormDefinition(models.Model):
@@ -57,3 +61,14 @@ class CompletedForm(models.Model):
 
     def __str__(self):
         return f"CompletedForm by {self.user.username} for {self.form_name} at {self.submitted_at}"
+    
+
+class FormShareLink(models.Model):
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    form = models.ForeignKey("FormDefinition", on_delete=models.CASCADE, related_name="share_links")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.form.name} ({self.token})"

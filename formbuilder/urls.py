@@ -33,7 +33,13 @@ urlpatterns = [
     path('completed/my_user_complete_forms/', views.my_user_complete_forms, name='my_user_completed_forms'),
 
     # Share completed forms with facilitators
+<<<<<<< HEAD
     # formbuilder/urls.py
+=======
+    path("share/form/<int:pk>/", views.share_form_definition, name="share_form_definition"),
+    path("s/<uuid:token>/", views.shared_form_definition, name="shared_form_definition"),
+    path("shared/<uuid:token>/", views.shared_form_entry, name="shared_form_entry"),
+>>>>>>> dev
 
 ]
 

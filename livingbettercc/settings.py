@@ -113,7 +113,6 @@ else:
     ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
 
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -381,7 +380,7 @@ EMAIL_HOST_DEST = os.getenv('EMAIL_HOST_DEST')
 # En settings.py
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/shop/'
-
+LOGIN_URL = '/auth/login/'  # si tu url real es authentication/login/
 
 PAYPAL_CLIENT_ID = 'tu_client_id'
 PAYPAL_CLIENT_SECRET = 'tu_client_secret'

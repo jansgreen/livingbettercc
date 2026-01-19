@@ -111,7 +111,11 @@
           <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary">Enviar</button>
             <a class="btn btn-outline-secondary" href="{% url 'formbuilder:form_list' %}">Volver</a>
+<<<<<<< HEAD
             <a class="btn btn-outline-primary" href="{% url 'formbuilder:share_with_facilitadores' form_obj.id %}">Compartir</a>
+=======
+            <a class="btn btn-outline-info" href="{% url 'formbuilder:share_form_definition' form_obj.id %}">Compartir</a>
+>>>>>>> dev
           </div>
         </form>
       </div>

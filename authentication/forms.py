@@ -5,7 +5,7 @@ from .models.customers import Customers
 from .models.students import Students
 from .models.staffs import Staffs
 from .models.directives import Directives
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User, Group
 from authentication.address.models import Address
 
@@ -108,3 +108,13 @@ class BootstrapUserCreationForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         for field in self.fields:
             _append_css_class(self.fields[field].widget, 'form-control')
+
+class BootstrapAuthenticationForm(AuthenticationForm):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            _append_css_class(field.widget, 'form-control')
