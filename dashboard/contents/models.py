@@ -7,7 +7,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 User = get_user_model()
 
-class ContentCategory(models.Model):
+class ContentCategory(models.Model): 
     name = models.CharField(max_length=100, unique=True, verbose_name="Nombre de la Categoría")
     slug = models.SlugField(max_length=120, unique=True, blank=True, null=True, verbose_name="Slug")
     description = models.TextField(blank=True, null=True, verbose_name="Descripción")
@@ -24,7 +24,6 @@ class ContentCategory(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class ContentPost(models.Model):
     STATUS_CHOICES = [

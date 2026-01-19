@@ -6,7 +6,6 @@ urlpatterns = [
     path('view_bio/<int:pk>/', views.view_bio, name='view_bio'),
     path('quienes_somos/', views.quienes_somos, name='quienes_somos'),
     path('contactanos/', views.contactanos, name='contactanos'),
-    path('single_page/<int:pk>', views.single_page, name='single_page'), 
 
     # Reportes de actividades CRUD
     path('report_activity/new/', views.report_create, name='report_create'),

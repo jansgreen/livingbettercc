@@ -2,9 +2,12 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import ContentCategory, ContentPost
 from .forms import ContentCategoryForm, ContentPostForm
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+
+@login_required
 def ContentListView(request):
     contents = ContentPost.objects.all()
     context = {'contents': contents}
@@ -26,6 +29,7 @@ def ContentDetailView(request, pk):
     context = {'content': content, 'tags_list': tags_list, 'related_contents': related_contents}
     return render(request, 'contents/content_detail.html', context)
 
+@login_required
 def ContentCreateView(request):
     if request.method == "POST":
         form = ContentPostForm(request.POST, request.FILES)
@@ -39,6 +43,7 @@ def ContentCreateView(request):
         form = ContentPostForm()
     return render(request, 'contents/content_form.html', {'form': form})
 
+@login_required
 def ContentUpdateView(request, pk):
     content = get_object_or_404(ContentPost, pk=pk)
     if request.method == "POST":
@@ -54,6 +59,7 @@ def ContentUpdateView(request, pk):
         form = ContentPostForm(instance=content)
     return render(request, 'contents/content_form.html', {'form': form})
 
+@login_required
 def ContentDeleteView(request, pk):
     content = get_object_or_404(ContentPost, pk=pk)
     if request.method == "POST":
@@ -64,11 +70,13 @@ def ContentDeleteView(request, pk):
     return render(request, 'contents/content_confirm_delete.html', {'content': content})
 
 # CRUD para Categorías de Contenido
+@login_required
 def CategoryListView(request):
     categories = ContentCategory.objects.all()
     context = {'categories': categories}
     return render(request, 'contents/category_list.html', context)
 
+@login_required
 def CategoryCreateView(request):
     if request.method == "POST":
         form = ContentCategoryForm(request.POST)
@@ -83,6 +91,7 @@ def CategoryCreateView(request):
     context = {'form': form}
     return render(request, 'contents/category_form.html', context)
 
+@login_required
 def CategoryUpdateView(request, pk):
     category = get_object_or_404(ContentCategory, pk=pk)
     if request.method == "POST":
@@ -98,6 +107,7 @@ def CategoryUpdateView(request, pk):
     context = {'form': form}
     return render(request, 'dashboard/contents/category_form.html', context)
 
+@login_required
 def CategoryDeleteView(request, pk):
     category = get_object_or_404(ContentCategory, pk=pk)
     if request.method == "POST":

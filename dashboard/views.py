@@ -104,7 +104,6 @@ def beca_applications_list(request):
         {"beca_applications": qs, "estado": estado},
     )
 
-
 # -----------------------------
 # Dashboard principal
 # -----------------------------

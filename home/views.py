@@ -19,6 +19,9 @@ from collections import defaultdict
 from .models import ReportActivity, ReportCategories
 from .forms import ReportActivityForm, ReportCategoriesForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from dashboard.contents.models import ContentCategory, ContentPost
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -120,16 +123,6 @@ def contactanos(request):
 
     return render(request, 'contact_us.html', {'form': form})
 
-def single_page(request, pk):
-    article = get_object_or_404(PageContent, pk=pk)
-    related_articles = PageContent.objects.filter(category=article.category).exclude(pk=article.pk)[:3]
-    
-    # Renderizar el template con el contexto
-    return render(request, 'leerpageweb.html', {
-        'article': article,
-        'related_articles': related_articles,
-    })
-
 def view_bio(request, pk):
     directives_list = Directives.objects.annotate(
     prioridad=Case( 
@@ -146,7 +139,7 @@ def view_bio(request, pk):
     return render(request, 'leer_bio.html', context)
 
 # Reportes  de actividades CRUD
-
+@login_required
 def report_create(request):
     form = ReportActivityForm()
     if request.method == "POST":
@@ -162,6 +155,7 @@ def report_create(request):
         }
     return render(request, 'activity/report_form.html', context)
 
+@login_required
 def report_list(request):
     reports_qs = ReportActivity.objects.select_related('course').order_by('-created_at')
     page = request.GET.get('page', 1)
@@ -183,7 +177,7 @@ def report_list(request):
 def report_detail(request, pk):
     report = get_object_or_404(ReportActivity, pk=pk)
     return render(request, 'activity/report_detail.html', {'report': report})
-
+@login_required
 def report_update(request, pk):
     report = get_object_or_404(ReportActivity, pk=pk)
     form = ReportActivityForm(instance=report)
@@ -202,6 +196,7 @@ def report_update(request, pk):
     }
     return render(request, 'activity/report_form.html', context)
 
+@login_required
 def report_delete(request, pk):
     report = get_object_or_404(ReportActivity, pk=pk)
     if request.method == "POST":
@@ -215,9 +210,8 @@ def report_delete(request, pk):
 
     return render(request, 'activity/report_confirm_delete.html', context)
 
- 
-# Report Activity Category CRUD
-
+ # Report Activity Category CRUD
+@login_required
 def report_categories_create(request):
     if request.method == "POST":
         form = ReportCategoriesForm(request.POST)
@@ -231,7 +225,7 @@ def report_categories_create(request):
         form = ReportCategoriesForm()
     context = {'form': form}
     return render(request, 'activity/category_report_form.html', context)
-
+@login_required
 def report_categories_list(request):
     # Filtros
     search_query = request.GET.get('q', '')
@@ -255,12 +249,13 @@ def report_categories_list(request):
         'search_query': search_query,
     }
     return render(request, 'activity/category_report_list.html', context)
-
+@login_required
 def report_categories_detail(request, pk):
     category = get_object_or_404(ReportCategories, pk=pk)
     context = {'category': category}
     return render(request, 'activity/category_report_detail.html', context)
 
+@login_required
 def report_categories_update(request, pk):
     category = get_object_or_404(ReportCategories, pk=pk)
     if request.method == "POST":
@@ -275,7 +270,7 @@ def report_categories_update(request, pk):
         form = ReportCategoriesForm(instance=category)
     context = {'form': form, 'category': category}
     return render(request, 'activity/category_report_form.html', context)
-
+@login_required
 def report_categories_delete(request, pk):
     category = get_object_or_404(ReportCategories, pk=pk)
     if request.method == "POST":
