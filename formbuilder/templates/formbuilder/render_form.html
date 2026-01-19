@@ -111,6 +111,7 @@
           <div class="d-flex gap-2 mt-4">
             <button type="submit" class="btn btn-primary">Enviar</button>
             <a class="btn btn-outline-secondary" href="{% url 'formbuilder:form_list' %}">Volver</a>
+            <a class="btn btn-outline-primary" href="{% url 'formbuilder:share_with_facilitadores' form_obj.id %}">Compartir</a>
           </div>
         </form>
       </div>

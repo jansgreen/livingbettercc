@@ -17,22 +17,41 @@
 
           <!-- TABS: categorías dinámicas -->
           <ul class="nav nav-pills" id="impactTabs" role="tablist">
+
             {% for cat_id, cat_name in tabs %}
-              <li class="nav-item" role="presentation">
-                <button
-                  class="nav-link {% if forloop.first %}active{% endif %} fw-semibold"
-                  id="tab-cat-{{ cat_id }}"
-                  data-bs-toggle="tab"
-                  data-bs-target="#pane-cat-{{ cat_id }}"
-                  type="button"
-                  role="tab"
-                  aria-controls="pane-cat-{{ cat_id }}"
-                  aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                  {{ cat_name }}
-                </button>
-              </li>
+              {% if cat_name == "TAOD" %}
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link active fw-semibold"
+                    id="tab-cat-{{ cat_id }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#pane-cat-{{ cat_id }}"
+                    type="button"
+                    role="tab"
+                    aria-selected="true">
+                    {{ cat_name }}
+                  </button>
+                </li>
+              {% endif %}
+            {% endfor %}
+            {% for cat_id, cat_name in tabs %}
+              {% if cat_name != "TAOD" %}
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link fw-semibold"
+                    id="tab-cat-{{ cat_id }}"
+                    data-bs-toggle="tab"
+                    data-bs-target="#pane-cat-{{ cat_id }}"
+                    type="button"
+                    role="tab"
+                    aria-selected="false">
+                    {{ cat_name }}
+                  </button>
+                </li>
+              {% endif %}
             {% endfor %}
           </ul>
+
         </div>
       </div>
 
