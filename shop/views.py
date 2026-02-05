@@ -81,7 +81,6 @@ def category_list(request):
     return render(request, 'category_Shop_list.html', {'categories': categories})
 
 #Create category
-
 def category_create(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
@@ -184,10 +183,8 @@ def subcategory_create(request, category_id):
             })
     return redirect('category_list')
 
-
 def thanks(request):
     return render(request, 'thanks.html')
-
 
 @login_required
 def order_detail(request, order_id: int):
@@ -220,7 +217,6 @@ def order_detail(request, order_id: int):
         'receipt': receipt,
     }
     return render(request, 'shop/order_detail.html', ctx)
-
 
 def order_return(request):
     """Landing page after successful payment; link to last order if available."""

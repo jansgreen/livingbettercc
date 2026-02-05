@@ -18,7 +18,7 @@
         {% endif %}
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
-      <a href="{% url 'authentication:prepare_register' course.pk 'student' %}" class="btn btn-success">Inscribirse</a>
+      <a href="{% url 'courses:session_enroll_students' course.pk%}" class="btn btn-success">Inscribirse</a>
       <!-- Botón para aplicar a beca Minerd -->
       <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#becaMinerdModal">Aplicar a beca Minerd</button>
       {% if user.is_authenticated and course.price|floatformat:2 != '0.00' %}

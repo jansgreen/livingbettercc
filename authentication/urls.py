@@ -17,9 +17,6 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
 
-    # Aqui identifico la categoria a la que se le asignara al usuario
-    path('prepare_register/<int:pk>/<str:role>/', views.prepare_register, name='prepare_register'),
-
     #usuarios clientes
     path('customer_form/', views.customer_view, name='customer_form'),
     path('customers/', views.customer_list_view, name='customer_list'),

@@ -32,7 +32,32 @@ from classroom.courses.models import Module
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
 from classroom.quicktest.models import QuickTest, QuickTestDefinition
 from classroom.certifications.models import Certificate
+from django.utils.http import url_has_allowed_host_and_scheme
 
+
+
+# incribiendo el nuevo estudiants
+
+def session_enroll_students(request, pk):
+    # Si NO está autenticado: guarda intención y manda a register
+    if not request.user.is_authenticated:
+        next_url = request.get_full_path()
+
+        # Seguridad: evita next a dominios externos o urls raras
+        if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            next_url = "/"
+
+        request.session["auth_intent"] = {
+            "source": "classroom",
+            "role": "Student",
+            "course_id": pk,
+            "next": next_url,
+        }
+
+        return redirect("authentication:register")
+
+    # Si YA está autenticado: sigue el flujo normal
+    return redirect("courses:start_course_payment", pk=pk)
 
 @login_required
 def quicktest_view(request, module_id):
