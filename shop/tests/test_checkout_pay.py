@@ -22,7 +22,7 @@ class CheckoutPayTests(TestCase):
         self.client.login(username='buyer', password='pass')
         self._seed_cart_session(qty=2)
 
-        r = self.client.get(reverse('checkout:checkout_pay'))
+        r = self.client.get(reverse('shop:checkout:checkout_pay'))
         self.assertEqual(r.status_code, 302)
 
         order = Order.objects.filter(user=user).order_by('-id').first()
@@ -43,14 +43,14 @@ class CheckoutPayTests(TestCase):
         self.client.login(username='buyer2', password='pass2')
         self._seed_cart_session(qty=1)
 
-        r1 = self.client.get(reverse('checkout:checkout_pay'))
+        r1 = self.client.get(reverse('shop:checkout:checkout_pay'))
         self.assertEqual(r1.status_code, 302)
         order = Order.objects.filter(user=user).order_by('-id').first()
         self.assertIsNotNone(order)
         self.assertEqual(order.status, Order.Status.PENDING_PAYMENT)
 
         # Call again; should reuse the same pending order via session
-        r2 = self.client.get(reverse('checkout:checkout_pay'))
+        r2 = self.client.get(reverse('shop:checkout:checkout_pay'))
         self.assertEqual(r2.status_code, 302)
         self.assertEqual(Order.objects.filter(user=user, status=Order.Status.PENDING_PAYMENT).count(), 1)
 
@@ -61,7 +61,7 @@ class CheckoutPayTests(TestCase):
     def test_checkout_pay_requires_login(self):
         # Seed cart without logging in
         self._seed_cart_session(qty=1)
-        r = self.client.get(reverse('checkout:checkout_pay'))
+        r = self.client.get(reverse('shop:checkout:checkout_pay'))
         self.assertEqual(r.status_code, 302)
         # login_required should redirect to accounts login with next
         self.assertIn('/accounts/login/', r.headers.get('Location', ''))

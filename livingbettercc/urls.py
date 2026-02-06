@@ -34,7 +34,7 @@ urlpatterns = [
     path('authentication/register/', register_view),
     # Incluir URLs de la app de usuarios
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout
-    path('shop/', include('shop.urls')),
+    path('shop/', include(('shop.urls', 'shop'), namespace='shop')),
     path('cart/', include('cart.urls')),
     # In-person certifications routes removed; use 'home' ReportActivity views if needed.
     path('classroom/', include('classroom.urls')),

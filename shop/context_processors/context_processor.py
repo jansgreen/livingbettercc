@@ -1,9 +1,10 @@
+from django.urls import reverse
 from core.menu_builder import build_menu, safe_id
 
 def obtener_menu_shop(request):
     submenus = []
     # Public submenu
-    submenus.append({'nombre': 'Shop', 'url': '/shop/product_list/'})
+    submenus.append({'nombre': 'Shop', 'url': reverse('shop:product_list')})
 
     if request.user.is_authenticated:
         # Use actual perms on submenus so helper can filter

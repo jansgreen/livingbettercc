@@ -26,6 +26,7 @@ class Course(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
     manual_certified_add = models.PositiveIntegerField(default=0)
+    payment_required = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

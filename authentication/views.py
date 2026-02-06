@@ -222,6 +222,12 @@ def register_view(request):
                 backend_path = settings.AUTHENTICATION_BACKENDS[0]
                 auth_login(request, user, backend=backend_path)
 
+            # Aplicar invitación pendiente si existe (flujo de registro)
+            try:
+                _apply_pending_invitation(request, user)
+            except Exception:
+                pass
+
             # ✅ NO consumimos auth_intent aquí.
             # Lo dejamos en sesión para que profile_create lo use después.
             request.session["post_register_next"] = next_url
@@ -276,6 +282,7 @@ def login_view(request):
             source = intent.get("source")
             role = intent.get("role")
             item = intent.get("item") or {}
+            legacy_course_id = intent.get("course_id")
 
             # Asignar grupo por rol (si es parte de tu estrategia)
             if role:
@@ -284,8 +291,11 @@ def login_view(request):
 
             # ---- Resolver intención ----
             # Classroom: delegar al flujo real
-            if source == "classroom" and item.get("type") == "course" and item.get("id"):
-                return redirect("courses:start_course_payment", pk=item["id"])
+            if source == "classroom":
+                if item.get("type") == "course" and item.get("id"):
+                    return redirect("courses:start_course_payment", pk=item["id"])
+                if legacy_course_id:
+                    return redirect("courses:start_course_payment", pk=legacy_course_id)
 
             # Shop: normalmente vuelves al next (checkout/cart)
             if source == "shop":
@@ -308,16 +318,9 @@ def login_view(request):
 
 def logout_view(request):
     auth_logout(request)   
-    return redirect('product_list')  # Redirect to login after logout
+    return redirect('shop:product_list')  # Redirect to login after logout
 
 # CRUD de Profile
-
-def _safe_next_url(request, raw_next: str | None, fallback_name: str = "dashboard") -> str:
-    if not raw_next:
-        return reverse(fallback_name)
-    if url_has_allowed_host_and_scheme(raw_next, allowed_hosts={request.get_host()}):
-        return raw_next
-    return reverse(fallback_name)
 
 def _resolve_intent_redirect(request, fallback_name="dashboard"):
     """
@@ -327,9 +330,13 @@ def _resolve_intent_redirect(request, fallback_name="dashboard"):
     intent = request.session.pop("auth_intent", None) or {}
     source = intent.get("source")
     item = intent.get("item") or {}
+    legacy_course_id = intent.get("course_id")
 
-    if source == "classroom" and item.get("type") == "course" and item.get("id"):
-        return redirect("courses:start_course_payment", pk=item["id"])
+    if source == "classroom":
+        if item.get("type") == "course" and item.get("id"):
+            return redirect("courses:start_course_payment", pk=item["id"])
+        if legacy_course_id:
+            return redirect("courses:start_course_payment", pk=legacy_course_id)
 
     if source == "shop":
         # si tienes un flujo específico, ponlo aquí
@@ -342,7 +349,17 @@ def _resolve_intent_redirect(request, fallback_name="dashboard"):
 
     # por defecto, respetar next si existe
     raw_next = intent.get("next")
-    return redirect(_safe_next_url(request, raw_next, fallback_name=fallback_name))
+    if raw_next:
+        return redirect(_safe_next_url(request, raw_next, fallback_name=fallback_name))
+
+    # registro normal desde navbar: usa post_register_next si existe
+    post_register_next = request.session.pop("post_register_next", None)
+    if post_register_next:
+        return redirect(_safe_next_url(request, post_register_next, fallback_name=fallback_name))
+
+    return redirect(reverse(fallback_name))
+
+
 
 @login_required
 def profile_create_view(request):
@@ -505,10 +522,10 @@ def customer_view(request):
             backend = get_backends()[0]
             user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
             auth_login(request, user)
-            return redirect('checkout_list')  # Redirect to the next stage
+            return redirect('shop:checkout:checkout_list')  # Redirect to the next stage
         else:
             messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
-            return redirect('shop:checkout')
+            return redirect('shop:checkout:checkout_list')
     else:
         form = CustomerForm()
     return render(request, 'customers/customers.html', {'form': form})

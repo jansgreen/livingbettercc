@@ -1,0 +1,132 @@
+{% extends "frontend.html" %}
+{% load static %}
+{% load dict_extras %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h3 fw-semibold mb-1 text-primary">Checkout</h1>
+            <p class="text-muted mb-0">Confirma tu pedido y completa tus datos.</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'shop:cart_summary' %}" class="btn btn-outline-primary">Volver al carrito</a>
+        </div>
+    </div>
+
+    {% if request.session.last_order_id %}
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <div>Tu orden fue creada. Puedes revisarla en cualquier momento.</div>
+        <div>
+            <a class="btn btn-sm btn-primary" href="{% url 'shop:order_detail' order_id=request.session.last_order_id %}">Ver mi orden</a>
+            {% if last_order and last_order.status == 'pending_payment' %}
+                <a class="btn btn-sm btn-success ms-2" href="{% url 'payments:start_order_checkout' order_id=request.session.last_order_id %}">Pagar ahora</a>
+            {% endif %}
+        </div>
+     </div>
+    {% endif %}
+
+    {% if not user.is_authenticated %}
+        <div class="alert alert-warning">
+            Necesitas una cuenta para continuar. Crea tu perfil y dirección para finalizar la compra.
+            <div class="mt-3">
+                <a class="btn btn-primary" href="{{ checkout_pay_url }}">Crear cuenta</a>
+                <a class="btn btn-outline-primary ms-2" href="{{ login_url }}">Iniciar sesión</a>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% if profile_missing or address_missing %}
+            <div class="alert alert-warning">
+                Para pagar, completa tu perfil y dirección residencial.
+                <div class="mt-3">
+                    <a class="btn btn-primary" href="{{ profile_url }}">Completar datos</a>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            {% if product.image %}
+                                                <img src="{{ product.image.url }}" alt="{{ product.name }}" width="56" height="56" class="rounded me-3 object-fit-cover">
+                                            {% else %}
+                                                <img src="{% static 'profiles/default.webp' %}" alt="{{ product.name }}" width="56" height="56" class="rounded me-3">
+                                            {% endif %}
+                                            <div>
+                                                <div class="fw-semibold">{{ product.name }}</div>
+                                                <div class="text-muted small">${{ product.price|floatformat:2 }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        {{ quantities|get_item:product.id }}
+                                    </td>
+                                    <td class="text-end fw-semibold">
+                                        ${{ line_totals|get_item:product.id|floatformat:2 }}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% if not products %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">No hay productos en el carrito.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="h6 text-uppercase text-muted">Resumen</h2>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total</span>
+                        <span class="fw-semibold">${{ total|floatformat:2 }}</span>
+                    </div>
+
+                    {% if user.is_authenticated and not profile_missing and not address_missing and products %}
+                        <div class="d-grid mt-3">
+                            <a class="btn btn-primary" href="{% url 'shop:checkout:checkout_pay' %}">Continuar al pago</a>
+                        </div>
+                    {% else %}
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-secondary" disabled>Completa tus datos para pagar</button>
+                        </div>
+                    {% endif %}
+
+                    <div class="border-top pt-3 mt-3">
+                        <div class="text-muted small">Dirección de envío</div>
+                        {% if address and not address_missing %}
+                            <div class="fw-semibold">{{ address.street }}</div>
+                            <div class="text-muted small">{{ address.city }} {{ address.state }} {{ address.zip_code }}</div>
+                        {% else %}
+                            <div class="text-muted small">No registrada</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

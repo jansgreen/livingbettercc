@@ -1,18 +1,86 @@
 {% extends 'frontend.html' %}
 {% load static %}
+{% load dict_extras %}
 
 {% block content %}
-<h1>Carrito de Compras</h1>
-{% if cart_items %}
-    <ul>
-        {% for item in cart_items %}
-            <li>
-                {{ item.product.name }} x {{ item.quantity }} - ${{ item.get_total_price }}
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'checkout' %}">Proceder al checkout</a>
-{% else %}
-    <p>Tu carrito está vacío.</p>
-{% endif %}
+<section class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h3 fw-semibold mb-1 text-primary">Carrito de Compras</h1>
+            <p class="text-muted mb-0">Revisa tus artículos antes de continuar al pago.</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'shop:product_list' %}" class="btn btn-outline-primary">Seguir comprando</a>
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-center">Cantidad</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                {% if product.image %}
+                                                    <img src="{{ product.image.url }}" alt="{{ product.name }}" width="56" height="56" class="rounded me-3 object-fit-cover">
+                                                {% else %}
+                                                    <img src="{% static 'profiles/default.webp' %}" alt="{{ product.name }}" width="56" height="56" class="rounded me-3">
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-semibold">{{ product.name }}</div>
+                                                    <div class="text-muted small">${{ product.price|floatformat:2 }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            {{ quantities|get_item:product.id }}
+                                        </td>
+                                        <td class="text-end fw-semibold">
+                                            ${{ line_totals|get_item:product.id|floatformat:2 }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h2 class="h6 text-uppercase text-muted">Resumen</h2>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total</span>
+                            <span class="fw-semibold">${{ total|floatformat:2 }}</span>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <a href="{% url 'shop:checkout:checkout_list' %}" class="btn btn-primary">Ir a Checkout</a>
+                        </div>
+                        <p class="text-muted small mt-3 mb-0">Los impuestos y envíos se calculan en el siguiente paso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-light border text-center py-5">
+            <h2 class="h5 mb-2">Tu carrito está vacío</h2>
+            <p class="text-muted mb-3">Explora la tienda y agrega productos para comenzar.</p>
+            <a href="{% url 'shop:product_list' %}" class="btn btn-primary">Ver productos</a>
+        </div>
+    {% endif %}
+</section>
 {% endblock %}

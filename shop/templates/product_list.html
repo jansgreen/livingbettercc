@@ -2,170 +2,129 @@
 {% load static %}
 
 {% block content %}
-    <div class="album py-5 bg-light">
-        <div class="container">
-            <!-- Barra de búsqueda -->
-            <form method="get" class="mb-5">
-                <div class="input-group input-group-lg">
+<section class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h1 class="h3 fw-semibold text-primary mb-1">Tienda Living Better</h1>
+            <p class="text-muted mb-0">Cursos y libros seleccionados para tu crecimiento profesional.</p>
+        </div>
+        <div class="col-12 col-md-5 mt-3 mt-md-0">
+            <form method="get">
+                <div class="input-group">
                     <input type="text" name="q" class="form-control" placeholder="Buscar cursos o libros..." value="{{ search_query }}">
                     <button class="btn btn-primary" type="submit">Buscar</button>
                 </div>
             </form>
+        </div>
+    </div>
 
-            <!-- Lista de cursos y productos -->
-             {% if courses or products %}
-                <h1 class="mb-4 text-center fw-bold text-primary"><i class="fa-solid fa-graduation-cap"></i> Cursos Disponibles</h1>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                <style>
-                    .card-curso {
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-                        border-radius: 1rem;
-                        transition: box-shadow 0.2s;
-                    }
-                    .card-curso:hover {
-                        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-                        border-color: #0d6efd;
-                    }
-                    .curso-title {
-                        font-size: 1.1rem;
-                        font-weight: 600;
-                        color: #0d6efd;
-                    }
-                    .badge-curso {
-                        background: #7ec8ff;
-                        color: #052c65;
-                        font-size: 0.9rem;
-                        border-radius: 0.5rem;
-                        padding: 0.2rem 0.7rem;
-                    }
-                </style>
-                <div class="row g-4">
-                    {% if courses %}
-                        {% for course in courses %}
-                            <div class="col-12 col-md-6 col-lg-4">
-                                <div class="card card-curso h-100 animate__animated animate__fadeInUp">
-                                    {% if course.image %}
-                                        <img src="{{ course.image.url }}" class="card-img-top object-fit-cover" style="height:220px;" alt="{{ course.title }}">
-                                    {% else %}
-                                        <div class="bg-secondary d-flex align-items-center justify-content-center" style="height:220px;">
-                                            <span class="text-white">Sin imagen</span>
-                                        </div>
-                                    {% endif %}
-                                    <div class="card-body d-flex flex-column">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="fa-solid fa-graduation-cap fa-lg text-primary me-2"></i>
-                                            <span class="curso-title">{{ course.title }}</span>
-                                        </div>
-                                        <p class="mb-2 text-muted">{{ course.description|safe|truncatewords:20 }}</p>
-                                        <div class="mb-2">
-                                            <span class="badge badge-curso">{{ course.price|default:"Gratis" }} USD</span>
-                                        </div>
-                                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                                            <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-outline-primary btn-sm"><i class="fa fa-eye"></i> Ver</a>
-                                            <small class="text-body-secondary"><i class="fa fa-calendar"></i> {{ course.created_at|date:"d M Y" }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="col">
-                            <div class="alert alert-info">No hay cursos disponibles.</div>
-                        </div>
-                    {% endif %}
-
-                    <!-- Paginación cursos -->
-                    {% if courses.has_other_pages %}
-                        <nav aria-label="Paginación cursos" class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                {% if courses.has_previous %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?q={{ search_query }}&course_page={{ courses.previous_page_number }}&product_page={{ products.number }}">Anterior</a>
-                                    </li>
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-body">
+            <h2 class="h5 text-primary mb-3">Cursos Disponibles</h2>
+            <div class="row g-4">
+                {% if courses %}
+                    {% for course in courses %}
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                {% if course.image %}
+                                    <img src="{{ course.image.url }}" class="card-img-top object-fit-cover" style="height:200px;" alt="{{ course.title }}">
                                 {% else %}
-                                    <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-                                {% endif %}
-                                {% for num in courses.paginator.page_range %}
-                                    <li class="page-item {% if courses.number == num %}active{% endif %}">
-                                        <a class="page-link" href="?q={{ search_query }}&course_page={{ num }}&product_page={{ products.number }}">{{ num }}</a>
-                                    </li>
-                                {% endfor %}
-                                {% if courses.has_next %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?q={{ search_query }}&course_page={{ courses.next_page_number }}&product_page={{ products.number }}">Siguiente</a>
-                                    </li>
-                                {% else %}
-                                    <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    {% endif %}
-                </div>
-            {% endif %}
-
-            <hr class="my-5">
-            <h1 class="mb-4 text-center fw-bold text-success">Libros Disponibles</h1>
-            <p class="text-center text-muted mb-4">
-                Por cada libro que adquieras, estás ayudando a que nuestra misión continúe.<br>¡Gracias por tu apoyo!
-            </p>
-            <style>
-                .product-card {
-                    transition: transform .12s ease, box-shadow .12s ease;
-                }
-                .product-card:hover {
-                    transform: translateY(-6px);
-                    box-shadow: 0 8px 30px rgba(0,0,0,.08);
-                }
-                .product-img {
-                    height: 220px;
-                    object-fit: cover;
-                }
-                .price-badge {
-                    position: absolute;
-                    top: 0.5rem;
-                    right: 0.5rem;
-                    z-index: 2;
-                    font-weight: 600;
-                }
-                .stock-badge {
-                    font-size: .75rem;
-                }
-                .card-description {
-                    min-height: 3.6rem; /* keep cards aligned */
-                }
-            </style>
-
-
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                {% if products %}
-                    {% for product in products %}
-                        <div class="col">
-                            <div class="card h-100 shadow border-0">
-                                {% if product.image %}
-                                    <img src="{{ product.image.url }}" class="card-img-top object-fit-cover" style="height:220px;" alt="{{ product.title }}">
-                                {% else %}
-                                    <div class="bg-secondary d-flex align-items-center justify-content-center" style="height:220px;">
-                                        <span class="text-white">Sin imagen</span>
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                                        <span class="text-muted">Sin imagen</span>
                                     </div>
                                 {% endif %}
                                 <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title text-truncate">{{ product.title }}</h5>
-                                    <p class="card-text small text-muted">{{ product.description|safe|truncatewords:20 }}</p>
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h3 class="h6 fw-semibold mb-0 text-primary">{{ course.title }}</h3>
+                                        <span class="badge text-bg-primary">
+                                            {{ course.price|default:"Gratis" }} USD
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-3">{{ course.description|safe|truncatewords:18 }}</p>
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
-                                        <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-success btn-sm">Ver</a>
-                                        <small class="text-body-secondary">{{ product.created_at|date:"d M Y" }}</small>
+                                        <a href="{% url 'courses:course_detail' course.id %}" class="btn btn-outline-primary btn-sm">Ver detalle</a>
+                                        <small class="text-muted">{{ course.created_at|date:"d M Y" }}</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
                 {% else %}
-                    <div class="col"><div class="alert alert-info">No hay libros disponibles.</div></div>
+                    <div class="col">
+                        <div class="alert alert-light border">No hay cursos disponibles.</div>
+                    </div>
                 {% endif %}
+            </div>
 
-            <!-- Paginación productos -->
+            {% if courses.has_other_pages %}
+                <nav class="mt-4" aria-label="Paginación cursos">
+                    <ul class="pagination justify-content-center">
+                        {% if courses.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ search_query }}&course_page={{ courses.previous_page_number }}&product_page={{ products.number }}">Anterior</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                        {% endif %}
+                        {% for num in courses.paginator.page_range %}
+                            <li class="page-item {% if courses.number == num %}active{% endif %}">
+                                <a class="page-link" href="?q={{ search_query }}&course_page={{ num }}&product_page={{ products.number }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if courses.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ search_query }}&course_page={{ courses.next_page_number }}&product_page={{ products.number }}">Siguiente</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="h5 text-success mb-1">Libros Disponibles</h2>
+                    <p class="text-muted mb-0">Cada compra apoya la misión de Living Better Community Center.</p>
+                </div>
+                <a href="{% url 'shop:cart_summary' %}" class="btn btn-outline-success btn-sm">Ver carrito</a>
+            </div>
+            <div class="row g-4">
+                {% if products %}
+                    {% for product in products %}
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="card-img-top object-fit-cover" style="height:200px;" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:200px;">
+                                        <span class="text-muted">Sin imagen</span>
+                                    </div>
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h3 class="h6 fw-semibold mb-1">{{ product.name }}</h3>
+                                    <p class="text-muted small mb-3">{{ product.description|safe|truncatewords:16 }}</p>
+                                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                                        <a href="{% url 'shop:product_detail' product.id %}" class="btn btn-outline-success btn-sm">Ver detalle</a>
+                                        <span class="fw-semibold text-success">${{ product.price|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col">
+                        <div class="alert alert-light border">No hay libros disponibles.</div>
+                    </div>
+                {% endif %}
+            </div>
+
             {% if products.has_other_pages %}
-                <nav aria-label="Paginación productos" class="mt-4">
+                <nav class="mt-4" aria-label="Paginación productos">
                     <ul class="pagination justify-content-center">
                         {% if products.has_previous %}
                             <li class="page-item">
@@ -191,4 +150,5 @@
             {% endif %}
         </div>
     </div>
+</section>
 {% endblock %}

@@ -40,6 +40,7 @@ def create_checkout_session(payment: Payment, request):
 
     session = stripe.checkout.Session.create(
         mode="payment",
+        payment_method_types=["card"],
         line_items=[
             {
                 "price_data": {

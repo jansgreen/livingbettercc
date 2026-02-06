@@ -10,7 +10,7 @@
         <ul class="navbar-nav ml-auto">
             <li class="nav-item me-3"><a class="nav-link" href="{% url 'quienes_somos'%}">Quienes Somos</a></li>
             <li class="nav-item me-3"><a class="nav-link" href="{% url 'contactanos'%}">Contactanos</a></li>
-            <li class="nav-item me-3"><a class="nav-link" href="{% url 'product_list'%}">Tienda</a></li>
+            <li class="nav-item me-3"><a class="nav-link" href="{% url 'shop:product_list'%}">Tienda</a></li>
 
             {% if navbar_menuitems %}
                 {% for  menu in navbar_menuitems %}
@@ -205,7 +205,7 @@
             {% endif %}
             {% if menu_cart %}
             <li>
-                <a class="text-decoration-none text-white me-3" href="{% url 'checkout:checkout_list' %}">
+                <a class="text-decoration-none text-white me-3" href="{% url 'shop:checkout:checkout_list' %}">
                     <i class="bi bi-cart4 text-warning">{{ cart_length }}</i>
                 </a>
             </li>

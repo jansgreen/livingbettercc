@@ -45,7 +45,7 @@ def product_create(request):
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('product_list')
+            return redirect('shop:product_list')
     else:
         form = ProductForm()
     return render(request, 'product_form.html', {'form': form})
@@ -56,7 +56,7 @@ def product_update(request, pk):
         form = ProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('product_list')
+            return redirect('shop:product_list')
     else:
         form = ProductForm(instance=product)
     return render(request, 'product_form.html', {'form': form})
@@ -65,7 +65,7 @@ def product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
         product.delete()
-        return redirect('product_list')
+        return redirect('shop:product_list')
     return render(request, 'product_confirm_delete.html', {'product': product})
 
 def product_detail(request, pk):
@@ -117,7 +117,7 @@ def cart_add(request, product_id, product_qty):
     product = get_object_or_404(Product, id=product_id)
     cart.add(product_id=product_id, product_qty=product_qty)
     messages.success(request, f"{product.name} added to cart.")
-    return redirect('product_list')
+    return redirect('shop:product_list')
 
 # View to remove a product from the cart
 def cart_delete(request, product_id):
@@ -125,19 +125,33 @@ def cart_delete(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart.remove(product)
     messages.success(request, f"{product.name} removed from cart.")
-    return redirect('cart_summary')
+    return redirect('shop:cart_summary')
 
 # View to display cart details
 def cart_summary(request):
     cart = sc(request)
-    return render(request, 'cart.html', {'cart': cart})
+    products = cart.get_prods()
+    quantities = cart.get_quants()
+    total = cart.cart_total()
+    line_totals = {}
+    for product in products:
+        qty = int(quantities.get(str(product.id), 0))
+        line_totals[product.id] = product.price * qty
+    context = {
+        'cart': cart,
+        'products': products,
+        'quantities': quantities,
+        'line_totals': line_totals,
+        'total': total,
+    }
+    return render(request, 'cart.html', context)
 
 # View to clear the cart
 def clear_cart(request):
     cart = sc(request)
     cart.clear()
     messages.success(request, "Cart cleared.")
-    return redirect('product_list')
+    return redirect('shop:product_list')
 
 # View to update the quantity of a product in the cart
 def cart_update(request, product_id):
@@ -153,7 +167,7 @@ def cart_update(request, product_id):
             messages.error(request, "Quantity must be greater than zero.")
     except ValueError:
         messages.error(request, "Invalid quantity.")
-    return redirect('cart_summary')
+    return redirect('shop:cart_summary')
 
 # View to create a subcategory
 def subcategory_create(request, category_id):
@@ -191,9 +205,17 @@ def order_detail(request, order_id: int):
     from shop.models import Order
     order = get_object_or_404(Order, id=order_id)
     if not (request.user.is_staff or order.user_id == request.user.id):
-        return redirect('product_list')
+        return redirect('shop:product_list')
 
     items = order.items.select_related('product').all()
+    item_lines = []
+    for item in items:
+        line_total_cents = item.qty * item.unit_price_cents
+        item_lines.append({
+            "item": item,
+            "unit_price": item.unit_price_cents / 100,
+            "line_total": line_total_cents / 100,
+        })
     receipt = None
     try:
         from payments.models import Payment
@@ -214,6 +236,8 @@ def order_detail(request, order_id: int):
     ctx = {
         'order': order,
         'items': items,
+        'item_lines': item_lines,
+        'total_amount': order.total_cents / 100,
         'receipt': receipt,
     }
     return render(request, 'shop/order_detail.html', ctx)
@@ -223,7 +247,7 @@ def order_return(request):
     order_id = request.session.get('last_order_id')
     has_order = bool(order_id)
     from django.urls import reverse
-    fallback_url = reverse('product_list')
+    fallback_url = reverse('shop:product_list')
     return render(request, 'shop/order_return.html', {
         'order_id': order_id,
         'has_order': has_order,
@@ -236,7 +260,7 @@ def order_cancel(request):
     order_id = request.session.get('last_order_id')
     has_order = bool(order_id)
     from django.urls import reverse
-    fallback_url = reverse('product_list')
+    fallback_url = reverse('shop:product_list')
     return render(request, 'shop/order_cancel.html', {
         'order_id': order_id,
         'has_order': has_order,
