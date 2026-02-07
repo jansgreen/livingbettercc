@@ -18,8 +18,8 @@ def product_list(request):
     # Búsqueda
     search_query = request.GET.get('q', '').strip()
 
-    courses = Course.objects.all()
-    products = Product.objects.all()
+    courses = Course.objects.all().order_by('-id')
+    products = Product.objects.all().order_by('-id')
 
     if search_query:
         courses = courses.filter(title__icontains=search_query)

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from ..cart import Cart
 import logging
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ def obtener_menu_cart(request):
     cart_length = sum(cart.cart.values())
 
     # Define la URL para ver el carrito
-    menu_cart = 'checkout/checkout_list'  # Cambia esto a la URL que tienes definida en tus rutas
+    menu_cart = reverse('shop:checkout:checkout_list')
     logger.warning(f"[CTX] obtener_menu_cart => {type(menu_cart)} | {menu_cart}")
 
     return {
