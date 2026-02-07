@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container">
     <h1>Categories</h1>
-    <a href="{% url 'category_create' %}" class="btn btn-primary mb-3">Add Category</a>
+    <a href="{% url 'shop:category_create' %}" class="btn btn-primary mb-3">Add Category</a>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -31,12 +31,12 @@
                 <td>
                     <button class="btn btn-info" onclick="showSubcategoryInput({{ category.pk }})">Add Subcategory</button>
                     <button class="btn btn-warning" onclick="showEditcategoryInput({{ category.pk }})">Edit</button>
-                    <a href="{% url 'category_delete' category.pk %}" class="btn btn-danger">Delete</a>
+                    <a href="{% url 'shop:category_delete' category.pk %}" class="btn btn-danger">Delete</a>
                 </td>
             </tr>
             <tr id="editcategory-input-{{ category.pk }}" style="display: none;">
                 <td colspan="4">
-                    <form method="POST" action="{% url 'category_update' category.pk %}">
+                    <form method="POST" action="{% url 'shop:category_update' category.pk %}">
                         {% csrf_token %}
                         <input type="hidden" name="category" value="{{ category.pk }}">
                         <div class="input-group">
@@ -50,7 +50,7 @@
             </tr>
             <tr id="subcategory-input-{{ category.pk }}" style="display: none;">
                 <td colspan="4">
-                    <form method="POST" action="{% url 'subcategory_create' category.pk %}">
+                    <form method="POST" action="{% url 'shop:subcategory_create' category.pk %}">
                         {% csrf_token %}
                         <input type="hidden" name="category" value="{{ category.pk }}">
                         <div class="input-group">
