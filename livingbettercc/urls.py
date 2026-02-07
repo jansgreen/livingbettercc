@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.shortcuts import redirect
 from django.conf.urls.static import static
 from django.conf import settings
-from authentication.views import login_view, register_view
+from authentication.views import login_view, register_view, accounts_login_alias
 
 
 # Deprecated: in-person certifications aliases removed. ReportActivity is handled in 'home' app.
@@ -30,7 +30,7 @@ urlpatterns = [
     path('', include('home.urls')),
     path('auth/',include(("authentication.urls", "authentication"), namespace="authentication")),
     # Compatibility aliases for tests and login_required default
-    path('accounts/login/', login_view),
+    path('accounts/login/', accounts_login_alias),
     path('authentication/register/', register_view),
     # Incluir URLs de la app de usuarios
     path('dashboard/', include('dashboard.urls')),  # Incluir URLs de la app de checkout

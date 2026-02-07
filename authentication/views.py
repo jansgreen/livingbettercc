@@ -316,6 +316,17 @@ def login_view(request):
     form = BootstrapAuthenticationForm()
     return render(request, "authentication/login.html", {"form": form, "next": next_url})
 
+def accounts_login_alias(request):
+    """
+    Evita bucles de /accounts/login/?next=/accounts/login...
+    Redirige a la ruta real de login con next seguro si aplica.
+    """
+    query_next = request.GET.get("next")
+    next_url = _safe_next_url(request, query_next, fallback_name="dashboard")
+    if next_url == reverse("dashboard"):
+        return redirect("authentication:login")
+    return redirect(f"{reverse('authentication:login')}?next={next_url}")
+
 def logout_view(request):
     auth_logout(request)   
     return redirect('shop:product_list')  # Redirect to login after logout
