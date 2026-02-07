@@ -175,14 +175,9 @@ def accept_invite(request, token):
         request.session['invited_email'] = invitation.email
         messages.info(request, 'Inicia sesión o regístrate para aceptar la invitación.')
         return redirect(_safe_login_url())
-
-    if invitation.email and request.user.email and invitation.email.strip().lower() != request.user.email.strip().lower():
-        messages.error(request, 'Esta invitación no corresponde a tu correo.')
-        return redirect('dashboard')
-
-    request.user.groups.add(invitation.group)
-    invitation.mark_used(request.user)
-    messages.success(request, f"Invitación aceptada. Ahora perteneces al grupo '{invitation.group.name}'.")
+    # Si ya está autenticado, no aplicamos invitación automáticamente.
+    # El admin puede agregar el usuario al grupo desde el dashboard.
+    messages.info(request, 'Esta invitación requiere registro nuevo. Si ya tienes cuenta, pide al admin que te agregue al grupo.')
     return redirect('dashboard')
 
 def invite_success(request):

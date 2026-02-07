@@ -53,8 +53,7 @@ def obtener_menu_report_activity(request):
             {'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')},
         ])
     # Otros usuarios autenticados
-    else:
-        submenus.append({'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')})
+
 
     menu = build_menu(request.user, 'Reportes', submenus, url='#')
     return {'menu_report_activity': [menu] if menu else []}

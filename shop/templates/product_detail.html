@@ -2,31 +2,43 @@
 {% load static %}
 
 {% block content %}
-    <div class="album py-5">
-        <div class="container">
-            <h1 class="mb-4 text-center">Detalles del Curso</h1>
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <div class="card">
-                        <div class="card-body">
-                                {% if product.image %}
-                                    <img src="{{ product.image.url }}" class="bd-placeholder-img card-img-top" alt="{{ product.title }}">
-                                {% else %}
-                                    <svg aria-label="Placeholder: Thumbnail" class="bd-placeholder-img card-img-top" height="225" preserveAspectRatio="xMidYMid slice" role="img" width="100%" xmlns="http://www.w3.org/2000/svg">
-                                        <title>{{ product.title }}</title>
-                                        <rect width="100%" height="100%" fill="#55595c"></rect>
-                                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
-                                    </svg>
-                                {% endif %}
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text">{{ product.description|safe }}</p>
-                            <p class="card-text"><strong>Precio:</strong> {{ product.price }}</p>
-                            <a href="{% url 'add_to_cart' product.id 1 %}" class="btn btn-primary">Agregar al Carrito</a>
-                        </div>
+<section class="container py-5">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <a href="{% url 'shop:product_list' %}" class="text-decoration-none text-muted small">&larr; Volver a la tienda</a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top object-fit-cover" style="height:380px;" alt="{{ product.name }}">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:380px;">
+                        <span class="text-muted">Sin imagen</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h1 class="h4 fw-semibold mb-2">{{ product.name }}</h1>
+                    <p class="text-muted mb-3">{{ product.description|safe }}</p>
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <span class="h5 mb-0 text-success">${{ product.price|floatformat:2 }}</span>
+                        {% if product.is_sale %}
+                            <span class="badge text-bg-success">Oferta</span>
+                        {% endif %}
+                    </div>
+                    <div class="mt-auto d-grid gap-2">
+                        <a href="{% url 'shop:add_to_cart' product.id 1 %}" class="btn btn-primary btn-lg">Agregar al carrito</a>
+                        <a href="{% url 'shop:cart_summary' %}" class="btn btn-outline-primary">Ver carrito</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+</section>
 {% endblock %}

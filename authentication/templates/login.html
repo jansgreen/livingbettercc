@@ -10,6 +10,7 @@
                             <div class="mb-3">
                                 <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
                                 {{ form.username}}
+                                <input type="hidden" name="next" value="{{ next }}">
                                 <small class="form-text text-muted">{{ form.username.help_text }}</small>
                             </div>
                             <div class="mb-3">

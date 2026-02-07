@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_backends
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from classroom.enrollments.models import Enrollment, LessonCompletion
-
+from django.conf import settings
 from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm, BootstrapAuthenticationForm
 from authentication.address.forms import AddressForm
 from authentication.models.profiles import Profiles 
@@ -13,19 +13,58 @@ from authentication.models.directives import Directives
 from authentication.address.models import Address
 from authentication.models.students import Students
 from django.utils.http import url_has_allowed_host_and_scheme
-
 from formbuilder.forms import FacilitadorRegistrationForm
-
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.contrib.auth import get_backends
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from dashboard.groups.models import Invitation
-from django.contrib.auth import login, get_backends
 from django.urls import reverse
-from django.shortcuts import redirect
+
+def _resume_after_profile(request):
+    """
+    Reanuda la intención guardada en session luego de completar el profile.
+    Prioridad:
+      1) post_profile_intent (classroom)
+      2) post_profile_next
+      3) dashboard
+    """
+    intent = request.session.pop("post_profile_intent", None)
+    if intent and intent.get("source") == "classroom":
+        course_id = intent.get("course_id")
+        if course_id:
+            return redirect("courses:start_course_payment", pk=course_id)
+
+    next_url = request.session.pop("post_profile_next", None)
+    if next_url:
+        return redirect(next_url)
+
+    return redirect("dashboard")
+
+def _safe_next_url(request, next_url: str | None, fallback_name: str = "dashboard") -> str:
+    """
+    Devuelve un next seguro para redirigir, evitando loops y URLs externas.
+    """
+    fallback = reverse(fallback_name)
+
+    if not next_url:
+        return fallback
+
+    # Evita que te manden a login/logout (loop típico)
+    blocked_prefixes = ("/auth/login", "/auth/logout", "/accounts/login", settings.LOGIN_URL.rstrip("/"))
+    if any(next_url.startswith(p) for p in blocked_prefixes):
+        return fallback
+
+    # Evita open-redirect (seguridad)
+    if not url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return fallback
+
+    return next_url
 
 def _dedupe_student_groups(user):
     """If both 'student' and 'students' are present, keep only 'students'."""
@@ -134,181 +173,256 @@ def tecnico_register_view(request):
         form = FacilitadorRegistrationForm()
     return render(request, 'authentication/facilitador_register.html', {'form': form})
 
-def login_view(request):
-    form = BootstrapAuthenticationForm(request=request)
+# CRUD Authentication
+
+def register_view(request):
+    """
+    Registro central (orquestador):
+    - No ejecuta la intención (auth_intent) aquí.
+    - Solo registra + login + redirige a completar Profile.
+    - La intención se reanuda DESPUÉS (ej: en profile_create_view).
+    """
+    # Si ya está logueado, lo mandamos a un punto estable.
+    # (Opcional: podrías mandarlo a profile si no existe aún)
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    # Intención guardada (si viene de classroom/shop/invite)
+    intent = request.session.get("auth_intent") or {}
+
+    # next solo como fallback visual (por si llegas a register directo)
+    query_next = request.GET.get("next")
+    raw_next = intent.get("next") or query_next
+    next_url = _safe_next_url(request, raw_next, fallback_name="dashboard")
 
     if request.method == "POST":
-        form = BootstrapAuthenticationForm(request=request, data=request.POST)
+        post_next = request.POST.get("next")
+        next_url = _safe_next_url(request, post_next or next_url, fallback_name="dashboard")
 
+        form = BootstrapUserCreationForm(request.POST)  # tu form real
+        if form.is_valid():
+            user = form.save()
+
+            # 🔒 Si quieres asignar group por intención, puedes hacerlo aquí
+            # (si prefieres esperar al pago/invitación, muévelo al resume)
+            role = intent.get("role")
+            if role:
+                group, _ = Group.objects.get_or_create(name=role)
+                user.groups.add(group)
+
+            # ✅ Login seguro con múltiples backends:
+            raw_password = form.cleaned_data.get("password1")
+            authed_user = authenticate(request, username=user.username, password=raw_password)
+
+            if authed_user is not None:
+                auth_login(request, authed_user)
+            else:
+                # Fallback: fuerza backend por defecto para evitar:
+                # "You have multiple authentication backends..."
+                backend_path = settings.AUTHENTICATION_BACKENDS[0]
+                auth_login(request, user, backend=backend_path)
+
+            # Aplicar invitación pendiente si existe (flujo de registro)
+            try:
+                _apply_pending_invitation(request, user)
+            except Exception:
+                pass
+
+            # ✅ NO consumimos auth_intent aquí.
+            # Lo dejamos en sesión para que profile_create lo use después.
+            request.session["post_register_next"] = next_url
+
+            # 👉 Siguiente paso obligatorio: completar Profile
+            return redirect("authentication:profile_create")
+
+        messages.error(request, "Por favor verifica los datos del formulario.")
+        return render(request, "authentication/register.html", {"form": form, "next": next_url})
+
+    # GET
+    form = BootstrapUserCreationForm()
+    return render(request, "authentication/register.html", {"form": form, "next": next_url})
+
+def login_view(request):
+    # Si ya está logueado, no tiene sentido mostrar login
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    # next puede venir por querystring o por intent guardado en session
+    query_next = request.GET.get("next")
+    intent = request.session.get("auth_intent") or {}
+
+    raw_next = intent.get("next") or query_next
+    next_url = _safe_next_url(request, raw_next, fallback_name="dashboard")
+
+    if request.method == "POST":
+        # Si tu template manda <input hidden name="next">
+        post_next = request.POST.get("next")
+        next_url = _safe_next_url(request, post_next or next_url, fallback_name="dashboard")
+
+        form = BootstrapAuthenticationForm(data=request.POST)  # <-- tu form actual
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
 
-            _dedupe_student_groups(user)
-
-            # 1) Reanudar intención: si venía a pagar/inscribirse en un curso
-            role = request.session.get("post_register_role")
-            item_id = request.session.get("selected_item")
-
-            if item_id:
-                if role:
-                    group, _ = Group.objects.get_or_create(name=role)
-                    user.groups.add(group)
-
-                request.session.pop("post_register_role", None)
-                # si lo usas en otros flujos, no lo borres aquí; si es solo cursos, bórralo también:
-                # request.session.pop("selected_item", None)
-
-                return redirect("courses:start_course_payment", pk=item_id)
-
-            # 2) Invitación: SOLO si hay invitación pendiente (ajusta keys a tu implementación real)
-            has_invite = bool(
-                request.session.get("pending_invitation_id")
-                or request.session.get("pending_invitation_token")
-                or request.session.get("assign_facilitador")  # si usas esto como bandera
-            )
-
-            if has_invite:
-                invite_applied = _apply_pending_invitation(request, user)
-                if invite_applied:
-                    # si quieres, limpia banderas aquí
-                    request.session.pop("assign_facilitador", None)
-                    return redirect("dashboard")
-
-                messages.error(
-                    request,
-                    "No se pudo aplicar la invitación pendiente; por favor contacta con soporte técnico.",
-                )
-                return redirect("contactanos")
-
-            # 3) Login normal (sin invitación): respetar next si es seguro
-            next_url = request.POST.get("next") or request.GET.get("next")
-            if next_url and url_has_allowed_host_and_scheme(
-                next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
-            ):
-                return redirect(next_url)
-
-            return redirect("dashboard")
-
-        # Form inválido: NO uses |safe aquí (eso es de templates)
-        messages.error(request, f"{form.errors} Por favor verifica los datos del formulario.")
-        return redirect("authentication:login")
-
-    return render(request, "authentication/login.html", {"form": form})
-
-def register_view(request):
-    if request.method == 'POST':
-        form = BootstrapUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-
-            # Autenticamos al usuario recién creado para mantener la sesión
+            # Aplicar invitación si existe
+            invite_applied = False
             try:
-                backend = get_backends()[0]
-                user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
-                auth_login(request, user)
+                invite_applied = _apply_pending_invitation(request, user)
             except Exception:
-                # Si por alguna razón no podemos autenticar ahora, seguimos sin fallo
+                invite_applied = False
+
+            # Limpieza de grupos duplicados si la tienes
+            try:
+                _dedupe_student_groups(user)
+            except Exception:
                 pass
 
-            # Recuperar datos temporales de la sesión
-            role = request.session.get('post_register_role', None)
-            item_id = request.session.get('selected_item', None)
-            student_mode = request.session.get('student_register_mode', None)
+            # Consumimos intent AHORA (ya está logueado)
+            intent = request.session.pop("auth_intent", {}) or {}
+            source = intent.get("source")
+            role = intent.get("role")
+            item = intent.get("item") or {}
+            legacy_course_id = intent.get("course_id")
 
-            # Invitación pendiente (si existe)
-            _apply_pending_invitation(request, user)
-            # 1. Asignar grupo (si role viene de la sesión)
+            # Asignar grupo por rol (si es parte de tu estrategia)
             if role:
-                group, created = Group.objects.get_or_create(name=role)
+                group, _ = Group.objects.get_or_create(name=role)
                 user.groups.add(group)
 
-            _dedupe_student_groups(user)
+            # ---- Resolver intención ----
+            # Classroom: delegar al flujo real
+            if source == "classroom":
+                if item.get("type") == "course" and item.get("id"):
+                    return redirect("courses:start_course_payment", pk=item["id"])
+                if legacy_course_id:
+                    return redirect("courses:start_course_payment", pk=legacy_course_id)
 
-            # Si venía para tomar un curso y registrarse como estudiante
-            if role == 'student' and item_id:
-                # No crear Enrollment aquí; delegar a Classroom
-                request.session.pop('post_register_role', None)
-                return redirect('courses:start_course_payment', pk=item_id)
+            # Shop: normalmente vuelves al next (checkout/cart)
+            if source == "shop":
+                return redirect(next_url)
 
-            # Estudiante que viene por Distrito Educativo
-            elif role == 'student' and student_mode == 'district':
-                # Limpiamos solo esa bandera
-                request.session.pop('student_register_mode', None)
-                messages.info(request, "Bienvenido(a). Completa el formulario del Distrito Educativo.")
-                return redirect('students:student_by_district')
+            # Invitación aplicada -> dashboard (o donde tú quieras)
+            if invite_applied:
+                return redirect("dashboard")
 
-            # Si venía como cliente comprando algo
-            elif role == 'customer' and item_id:
-                # Flujo de tienda no aplica a cursos
-                request.session.pop('cart', None)
+            # Default: next seguro
+            return redirect(next_url)
 
-            # Si el rol es facilitador (docente, staff educativo)
-            elif role == 'facilitador' and item_id:
-                messages.info(request, "Listo ya te has registrado, ahora por favor completa el formulario.")
-                return redirect('formbuilder:form_detail', item_id)
+        # Form inválido: NO redirijas (pierdes errores), renderiza la página
+        messages.error(request, "Por favor verifica los datos del formulario.")
+        return render(request, "authentication/login.html", {"form": form, "next": next_url})
 
-            # 3. Limpiar variables temporales de la sesión
-            request.session.pop('post_register_role', None)
-            request.session.pop('selected_item', None) 
-
-            messages.success(request, 'Tu cuenta ha sido creada con éxito.')
-            return redirect('dashboard')
-
-        else:
-            messages.error(request, f'Por favor verifica los datos del formulario: {form.errors}')
-    else:
-        form = BootstrapUserCreationForm()
-    return render(request, 'authentication/register.html', {'form': form})
+    # GET
+    form = BootstrapAuthenticationForm()
+    return render(request, "authentication/login.html", {"form": form, "next": next_url})
 
 def logout_view(request):
     auth_logout(request)   
-    return redirect('shop')  # Redirect to login after logout
+    return redirect('shop:product_list')  # Redirect to login after logout
 
-def prepare_register(request, pk, role): 
-    # Solo guardar intención en sesión y asegurar grupo; no crear Enrollment aquí
-    request.session['post_register_role'] = role
-    request.session['selected_item'] = int(pk)
+# CRUD de Profile
 
-    if request.user.is_authenticated:
-        # Asegurar grupo idempotente
-        group, _ = Group.objects.get_or_create(name=role)
-        request.user.groups.add(group)
-        # Redirigir al flujo de Classroom para decidir Enrollment/estado/pago
-        return redirect('courses:start_course_payment', pk=pk)
+def _resolve_intent_redirect(request, fallback_name="dashboard"):
+    """
+    Consume el intent y decide a dónde seguir.
+    OJO: aquí NO hacemos Enrollment. Solo redirigimos al flujo que lo hará.
+    """
+    intent = request.session.pop("auth_intent", None) or {}
+    source = intent.get("source")
+    item = intent.get("item") or {}
+    legacy_course_id = intent.get("course_id")
 
-    # Usuario no autenticado: continuar con registro/login con next; luego reanudar desde sesión
-    next_url = reverse('courses:start_course_payment', kwargs={'pk': pk})
-    return redirect(f"{reverse('authentication:register')}?next={next_url}")
+    if source == "classroom":
+        if item.get("type") == "course" and item.get("id"):
+            return redirect("courses:start_course_payment", pk=item["id"])
+        if legacy_course_id:
+            return redirect("courses:start_course_payment", pk=legacy_course_id)
 
+    if source == "shop":
+        # si tienes un flujo específico, ponlo aquí
+        # return redirect("checkout:checkout_list")
+        raw_next = intent.get("next")
+        return redirect(_safe_next_url(request, raw_next, fallback_name=fallback_name))
+
+    if source == "invite":
+        return redirect("dashboard")
+
+    # por defecto, respetar next si existe
+    raw_next = intent.get("next")
+    if raw_next:
+        return redirect(_safe_next_url(request, raw_next, fallback_name=fallback_name))
+
+    # registro normal desde navbar: usa post_register_next si existe
+    post_register_next = request.session.pop("post_register_next", None)
+    if post_register_next:
+        return redirect(_safe_next_url(request, post_register_next, fallback_name=fallback_name))
+
+    return redirect(reverse(fallback_name))
+
+
+
+@login_required
 def profile_create_view(request):
-    if request.method == 'POST':
+    """
+    Completa Profile. Si falta Address, redirige a address_create conservando next.
+    Cuando Profile+Address están listos: consume auth_intent y redirige al flujo (classroom/shop/etc).
+    """
+    # Si ya existe profile para este user, no lo obligues a crearlo otra vez
+    existing = Profiles.objects.filter(user=request.user).first()
+    if existing:
+        # si ya existe profile, entonces intenta resolver intent directo
+        return _resolve_intent_redirect(request, fallback_name="dashboard")
+
+    # next viene por querystring (si address_create te devuelve) o por intent
+    query_next = request.GET.get("next")
+    intent = request.session.get("auth_intent") or {}
+    raw_next = query_next or intent.get("next")
+    next_url = _safe_next_url(request, raw_next, fallback_name="dashboard")
+
+    if request.method == "POST":
         form = ProfileForm(request.POST)
         if form.is_valid():
             profile = form.save(commit=False)
-            profile.user = request.user  # Set the user to the currently logged-in user
-            profile.old_cart = ''  # Initialize old_cart or set as needed
+            profile.user = request.user
+            profile.old_cart = ""
             profile.save()
-            if not Address.objects.filter(user=request.user, address_type='residencial').exists():
-                address, created = Address.objects.get_or_create(user=request.user, address_type='residencial')
-                profile.direccion = address
-                profile.save()
-                if created:
-                    # After creating initial residencial address record, direct user to complete details
-                    addr_url = reverse('authentication:address:address_create', kwargs={'address_type': 'residencial', 'pk': request.user.id})
-                    next_url = reverse('authentication:profile_list')
-                    return redirect(f"{addr_url}?next={next_url}")
-            if not profile.direccion:
-                addr_url = reverse('authentication:address:address_create', kwargs={'address_type': 'residencial', 'pk': request.user.id})
-                next_url = reverse('authentication:profile_list')
-                return redirect(f"{addr_url}?next={next_url}")  # Redirect to address creation if direccion is not set
-            return redirect('profile_list')  # Redirect to profile list after creation
-        else:
-            messages.error(request, f'{{form.errors}}, Por favor verifica los datos del formulario: {form.errors}')
-    else:
-        form = ProfileForm()
-    return render(request, 'authentication/profile_create.html', {'form': form})
 
+            # Asegurar Address residencial
+            address = Address.objects.filter(user=request.user, address_type="residencial").first()
+
+            if not address:
+                # crea el registro base si no existe
+                address = Address.objects.create(user=request.user, address_type="residencial")
+
+            # si el profile no tiene direccion, asígnala
+            if not getattr(profile, "direccion_id", None):
+                profile.direccion = address
+                profile.save(update_fields=["direccion"])
+
+            # Si quieres obligar a completar detalles de address, manda al formulario
+            # (Tu URL actual usa kwargs address_type y pk)
+            addr_url = reverse(
+                "authentication:address:address_create",
+                kwargs={"address_type": "residencial", "pk": request.user.id},
+            )
+
+            # IMPORTANTÍSIMO:
+            # NO consumas intent aquí si vas a mandar a address_create,
+            # porque todavía falta completar address.
+            # Le pasamos next para que address_create nos devuelva aquí.
+            if not address or not getattr(address, "street", None):  # ajusta este check a tus campos reales
+                return redirect(f"{addr_url}?next={reverse('authentication:profile_create')}")
+
+            # ✅ Ya Profile + Address listos -> ahora sí consume intent y redirige
+            return _resolve_intent_redirect(request, fallback_name="dashboard")
+
+        messages.error(request, f"Por favor verifica los datos del formulario: {form.errors}")
+        return render(request, "authentication/profile_create.html", {"form": form, "next": next_url})
+
+    form = ProfileForm()
+    return render(request, "authentication/profile_create.html", {"form": form, "next": next_url})
+
+@login_required
 def profile_list_view(request):
     object_list = User.objects.all()
     context = {'object_list': object_list}
@@ -328,6 +442,7 @@ def profile_view(request):
     }
     return render(request, 'authentication/profile_detail.html', context)
 
+@login_required
 def profile_update_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
     if request.method == 'POST':
@@ -339,6 +454,7 @@ def profile_update_view(request, pk):
         form = ProfileForm(instance=profile)
     return render(request, 'authentication/profile_update.html', {'form': form})
 
+@login_required
 def profile_delete_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
     if request.method == 'POST':
@@ -406,10 +522,10 @@ def customer_view(request):
             backend = get_backends()[0]
             user.backend = f"{backend.__module__}.{backend.__class__.__name__}"
             auth_login(request, user)
-            return redirect('checkout_list')  # Redirect to the next stage
+            return redirect('shop:checkout:checkout_list')  # Redirect to the next stage
         else:
             messages.error(request, f'{form.errors} Error al crear el cliente. Por favor, corrige los errores.')
-            return redirect('shop:checkout')
+            return redirect('shop:checkout:checkout_list')
     else:
         form = CustomerForm()
     return render(request, 'customers/customers.html', {'form': form})

@@ -32,7 +32,33 @@ from classroom.courses.models import Module
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
 from classroom.quicktest.models import QuickTest, QuickTestDefinition
 from classroom.certifications.models import Certificate
+from django.utils.http import url_has_allowed_host_and_scheme
 
+
+
+# incribiendo el nuevo estudiants
+
+def session_enroll_students(request, pk):
+    # Si NO está autenticado: guarda intención y manda a register
+    if not request.user.is_authenticated:
+        next_url = request.get_full_path()
+
+        # Seguridad: evita next a dominios externos o urls raras
+        if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+            next_url = "/"
+
+        # Unificamos formato de auth_intent para que login/profile resuelvan igual
+        request.session["auth_intent"] = {
+            "source": "classroom",
+            "role": "Student",
+            "item": {"type": "course", "id": pk},
+            "next": next_url,
+        }
+
+        return redirect("authentication:register")
+
+    # Si YA está autenticado: sigue el flujo normal
+    return redirect("courses:start_course_payment", pk=pk)
 
 @login_required
 def quicktest_view(request, module_id):
@@ -381,18 +407,19 @@ def start_course_payment(request, pk):
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
 
     # For paid courses, even a newly created enrollment should go to pending_payment
-    if course.price and float(course.price) > 0:
+    if not course.payment_required:
+        # Curso gratis: activar inscripción y redirigir a mis cursos
+        enrollment.status = Enrollment.Status.ACTIVE
+        enrollment.save(update_fields=['status'])
+        return redirect('courses:my_course')
+    else:
+        # Curso de pago: marcar pendiente de pago y redirigir a checkout
         if enrollment.status != Enrollment.Status.COMPLETED:
             if enrollment.status != Enrollment.Status.PENDING_PAYMENT:
                 enrollment.status = Enrollment.Status.PENDING_PAYMENT
                 enrollment.save(update_fields=['status'])
             return redirect(reverse('enrollments:create_checkout_session', kwargs={'enrollment_id': enrollment.id}))
-        # Completed remains as-is
-        return redirect('courses:my_course')
-
-    # Free courses:
-    if enrollment.status in (Enrollment.Status.ACTIVE, Enrollment.Status.COMPLETED):
-        return redirect('courses:my_course')
+        # Si ya está completado, solo redirige
 
     if enrollment.status == Enrollment.Status.PENDING_APPROVAL:
         messages.info(request, 'Tu matrícula está en revisión (beca).')
@@ -801,20 +828,6 @@ def _module_lessons_completed(*, enrollment: Enrollment, module: Module) -> bool
         return True  # módulo sin lecciones => lo tratamos como completo
     done = LessonCompletion.objects.filter(enrollment=enrollment, lesson_id__in=lesson_ids).count()
     return done >= len(lesson_ids)
-
-def _module_quicktest_passed(*, user, module: Module) -> bool:
-    has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
-    if not has_qdef:
-        return True
-    qt = (
-        QuickTest.objects
-        .filter(user=user, module=module)
-        .order_by("-completed_at")
-        .first()
-    )
-    return bool(qt and float(qt.score) >= PASSING_SCORE)
-
-PASSING_SCORE = 70
 
 def _passed_quicktest(user, module) -> bool:
     """True if module has no test OR user has latest score >= PASSING_SCORE."""
