@@ -581,6 +581,7 @@ def shared_form_entry(request, token):
     # Redirige al form real (sin exponer ID público si no quieres)
     return redirect("render_form", form_name=link.form.name)
 
+@login_required
 def my_user_complete_forms(request):
     completed_forms = CompletedForm.objects.filter(user=request.user)
     context = {

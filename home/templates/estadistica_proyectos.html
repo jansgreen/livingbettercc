@@ -60,136 +60,272 @@
         <div class="tab-content" id="impactTabsContent">
 
           {% for cat_id, cat_name in tabs %}
-            <div
-              class="tab-pane fade {% if forloop.first %}show active{% endif %}"
-              id="pane-cat-{{ cat_id }}"
-              role="tabpanel"
-              aria-labelledby="tab-cat-{{ cat_id }}"
-              tabindex="0">
+            {% if cat_name == "TAOD" %}
+              <div
+                class="tab-pane fade show active"
+                id="pane-cat-{{ cat_id }}"
+                role="tabpanel"
+                aria-labelledby="tab-cat-{{ cat_id }}"
+                tabindex="0">
 
-              {% with impacts=issues_by_cat|get_item:cat_id %}
-                {% if impacts %}
+                {% with impacts=issues_by_cat|get_item:cat_id %}
+                  {% if impacts %}
 
-                  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                    {% for impact in impacts %}
-                      <div class="col" data-aos="fade-up">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                      {% for impact in impacts %}
+                        <div class="col" data-aos="fade-up">
 
-                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
-                             style="transition: transform .2s ease, box-shadow .2s ease;">
+                          <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
+                               style="transition: transform .2s ease, box-shadow .2s ease;">
 
-                          <!-- Imagen -->
-                          <div style="position: relative; height: 210px; overflow: hidden;" class="mb-5">
-                            <img
-                              src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
-                              class="w-100 h-100"
-                              style="object-fit: cover;"
-                              alt="{{ cat_name }}"
-                            >
+                            <!-- Imagen -->
+                            <div style="position: relative; height: 210px; overflow: hidden;" class="mb-5">
+                              <img
+                                src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
+                                class="w-100 h-100"
+                                style="object-fit: cover;"
+                                alt="{{ cat_name }}"
+                              >
 
-                            <div class="mt-2 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
-                                 style="background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); box-shadow: 0 8px 18px rgba(0,0,0,.18);">
-                              Año {{ impact.issued_date.year }}
-                            </div>
-                          </div>
-
-                          <!-- Contenido -->
-                          <div class="card-body d-flex flex-column p-4 mt-5">
-
-                              <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
-                                <div class="text-muted small"><strong>Año {{ impact.issued_date.year }}</strong></div>
-                                  <div class="fw-bold">
-                                    <span class="badge text-bg-primary text-wrap mb-2">
-                                      {{ impact.course.title }}
-                                    </span>
-                                  </div>
-                                </div>  
-
-
-                            <p class="text-muted small mb-3">
-                              📍 Distrito/Regionales: <span class="fw-semibold">{{ impact.district }}</span>
-                            </p>
-
-                            <div class="d-flex flex-wrap gap-2 mb-3">
-                              <span class="badge bg-primary rounded-pill px-3 py-2">
-                                <i class="bi bi-person-fill"></i> {{ impact.quantity|intcomma }} Presencial
-                              </span>
-
-                              {% if impact.impact is not None %}
-                                <span class="badge bg-info rounded-pill px-3 py-2">
-                                  <i class="bi bi-computer"></i> {{ impact.impact|intcomma }} Online
-                                </span>
-                              {% endif %}
-                            </div>
-
-                            {% if impact.pct_total is not None %}
-                              <div class="mb-3">
-                                <div class="d-flex justify-content-between small text-muted mb-1">
-                                  <span>Progreso relativo</span>
-                                  <span>{{ impact.pct_total|default:0 }}%</span>
-                                </div>
-
-                                <div class="progress"
-                                     role="progressbar"
-                                     aria-label="Total {{ impact.issued_date.year }}"
-                                     aria-valuenow="{{ impact.pct_total|default:0 }}"
-                                     aria-valuemin="0"
-                                     aria-valuemax="100"
-                                     style="height: 10px;">
-                                  <div class="progress-bar"
-                                       data-pct="{{ impact.pct_total|default:0 }}"
-                                       style="width: {{ impact.pct_total|default:0 }}%">
-                                  </div>
-                                </div>
+                              <div class="mt-2 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
+                                   style="background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); box-shadow: 0 8px 18px rgba(0,0,0,.18);">
+                                Año {{ impact.issued_date.year }}
                               </div>
-                            {% endif %}
+                            </div>
 
-                            {% if impact.desde_presencial_total is not None %}
-                              <div class="p-3 rounded-3 bg-light mb-3">
-                                <p class="card-text fw-bold text-dark mb-1">
-                                  Total Presencial desde {{ impact.prev_year }}:
-                                  <span class="text-primary">{{ impact.desde_presencial_total|intcomma }}</span>
-                                </p>
+                            <!-- Contenido -->
+                            <div class="card-body d-flex flex-column p-4 mt-5">
 
-                                {% if impact.desde_online_total %}
-                                  <p class="card-text fw-bold text-dark mb-0">
-                                    Total Online desde {{ impact.prev_year }}:
-                                    <span class="text-info">{{ impact.desde_online_total|intcomma }}</span>
-                                  </p>
+                                <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                                  <div class="text-muted small"><strong>Año {{ impact.issued_date.year }}</strong></div>
+                                    <div class="fw-bold">
+                                      <span class="badge text-bg-primary text-wrap mb-2">
+                                        {{ impact.course.title }}
+                                      </span>
+                                    </div>
+                                  </div>  
+
+
+                              <p class="text-muted small mb-3">
+                                📍 Distrito/Regionales: <span class="fw-semibold">{{ impact.district }}</span>
+                              </p>
+
+                              <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3 py-2">
+                                  <i class="bi bi-person-fill"></i> {{ impact.quantity|intcomma }} Presencial
+                                </span>
+
+                                {% if impact.impact is not None %}
+                                  <span class="badge bg-info rounded-pill px-3 py-2">
+                                    <i class="bi bi-computer"></i> {{ impact.impact|intcomma }} Online
+                                  </span>
                                 {% endif %}
                               </div>
-                            {% endif %}
 
-                            <!-- Descripción -->
-                            {% if impact.note %}
-                              <p class="card-text text-muted small flex-grow-1 mb-3">
-                                {{ impact.note }}
-                              </p>
-                            {% else %}
-                              <p class="card-text text-muted small flex-grow-1 mb-3">
-                                Sin descripción adicional.
-                              </p>
-                            {% endif %}
+                              {% if impact.pct_total is not None %}
+                                <div class="mb-3">
+                                  <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Progreso relativo</span>
+                                    <span>{{ impact.pct_total|default:0 }}%</span>
+                                  </div>
 
-                            <small class="text-muted d-block pt-3 border-top">
-                              📅 Registrado: {{ impact.updated_at|date:'d/m/Y' }}
-                            </small>
+                                  <div class="progress"
+                                       role="progressbar"
+                                       aria-label="Total {{ impact.issued_date.year }}"
+                                       aria-valuenow="{{ impact.pct_total|default:0 }}"
+                                       aria-valuemin="0"
+                                       aria-valuemax="100"
+                                       style="height: 10px;">
+                                    <div class="progress-bar"
+                                         data-pct="{{ impact.pct_total|default:0 }}"
+                                         style="width: {{ impact.pct_total|default:0 }}%">
+                                    </div>
+                                  </div>
+                                </div>
+                              {% endif %}
 
+                              {% if impact.desde_presencial_total is not None %}
+                                <div class="p-3 rounded-3 bg-light mb-3">
+                                  <p class="card-text fw-bold text-dark mb-1">
+                                    Total Presencial desde {{ impact.prev_year }}:
+                                    <span class="text-primary">{{ impact.desde_presencial_total|intcomma }}</span>
+                                  </p>
+
+                                  {% if impact.desde_online_total %}
+                                    <p class="card-text fw-bold text-dark mb-0">
+                                      Total Online desde {{ impact.prev_year }}:
+                                      <span class="text-info">{{ impact.desde_online_total|intcomma }}</span>
+                                    </p>
+                                  {% endif %}
+                                </div>
+                              {% endif %}
+
+                              <!-- Descripción -->
+                              {% if impact.note %}
+                                <p class="card-text text-muted small flex-grow-1 mb-3">
+                                  {{ impact.note }}
+                                </p>
+                              {% else %}
+                                <p class="card-text text-muted small flex-grow-1 mb-3">
+                                  Sin descripción adicional.
+                                </p>
+                              {% endif %}
+
+                              <small class="text-muted d-block pt-3 border-top">
+                                📅 Registrado: {{ impact.updated_at|date:'d/m/Y' }}
+                              </small>
+
+                            </div>
                           </div>
+
                         </div>
+                      {% endfor %}
+                    </div>
 
-                      </div>
-                    {% endfor %}
-                  </div>
+                  {% else %}
+                    <div class="bg-white rounded-4 p-4 p-md-5 shadow-sm text-center">
+                      <div class="display-6 mb-2">—</div>
+                      <p class="mb-0 text-muted">No hay registros para esta categoría.</p>
+                    </div>
+                  {% endif %}
+                {% endwith %}
 
-                {% else %}
-                  <div class="bg-white rounded-4 p-4 p-md-5 shadow-sm text-center">
-                    <div class="display-6 mb-2">—</div>
-                    <p class="mb-0 text-muted">No hay registros para esta categoría.</p>
-                  </div>
-                {% endif %}
-              {% endwith %}
+              </div>
+            {% endif %}
+          {% endfor %}
+          {% for cat_id, cat_name in tabs %}
+            {% if cat_name != "TAOD" %}
+              <div
+                class="tab-pane fade"
+                id="pane-cat-{{ cat_id }}"
+                role="tabpanel"
+                aria-labelledby="tab-cat-{{ cat_id }}"
+                tabindex="0">
 
-            </div>
+                {% with impacts=issues_by_cat|get_item:cat_id %}
+                  {% if impacts %}
+
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                      {% for impact in impacts %}
+                        <div class="col" data-aos="fade-up">
+
+                          <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
+                               style="transition: transform .2s ease, box-shadow .2s ease;">
+
+                            <!-- Imagen -->
+                            <div style="position: relative; height: 210px; overflow: hidden;" class="mb-5">
+                              <img
+                                src="{% if impact.image %}{{ impact.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
+                                class="w-100 h-100"
+                                style="object-fit: cover;"
+                                alt="{{ cat_name }}"
+                              >
+
+                              <div class="mt-2 position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill text-white fw-bold"
+                                   style="background: linear-gradient(90deg, var(--lb-blue-light), var(--lb-blue-dark)); box-shadow: 0 8px 18px rgba(0,0,0,.18);">
+                                Año {{ impact.issued_date.year }}
+                              </div>
+                            </div>
+
+                            <!-- Contenido -->
+                            <div class="card-body d-flex flex-column p-4 mt-5">
+
+                                <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                                  <div class="text-muted small"><strong>Año {{ impact.issued_date.year }}</strong></div>
+                                    <div class="fw-bold">
+                                      <span class="badge text-bg-primary text-wrap mb-2">
+                                        {{ impact.course.title }}
+                                      </span>
+                                    </div>
+                                  </div>  
+
+
+                              <p class="text-muted small mb-3">
+                                📍 Distrito/Regionales: <span class="fw-semibold">{{ impact.district }}</span>
+                              </p>
+
+                              <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-primary rounded-pill px-3 py-2">
+                                  <i class="bi bi-person-fill"></i> {{ impact.quantity|intcomma }} Presencial
+                                </span>
+
+                                {% if impact.impact is not None %}
+                                  <span class="badge bg-info rounded-pill px-3 py-2">
+                                    <i class="bi bi-computer"></i> {{ impact.impact|intcomma }} Online
+                                  </span>
+                                {% endif %}
+                              </div>
+
+                              {% if impact.pct_total is not None %}
+                                <div class="mb-3">
+                                  <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Progreso relativo</span>
+                                    <span>{{ impact.pct_total|default:0 }}%</span>
+                                  </div>
+
+                                  <div class="progress"
+                                       role="progressbar"
+                                       aria-label="Total {{ impact.issued_date.year }}"
+                                       aria-valuenow="{{ impact.pct_total|default:0 }}"
+                                       aria-valuemin="0"
+                                       aria-valuemax="100"
+                                       style="height: 10px;">
+                                    <div class="progress-bar"
+                                         data-pct="{{ impact.pct_total|default:0 }}"
+                                         style="width: {{ impact.pct_total|default:0 }}%">
+                                    </div>
+                                  </div>
+                                </div>
+                              {% endif %}
+
+                              {% if impact.desde_presencial_total is not None %}
+                                <div class="p-3 rounded-3 bg-light mb-3">
+                                  <p class="card-text fw-bold text-dark mb-1">
+                                    Total Presencial desde {{ impact.prev_year }}:
+                                    <span class="text-primary">{{ impact.desde_presencial_total|intcomma }}</span>
+                                  </p>
+
+                                  {% if impact.desde_online_total %}
+                                    <p class="card-text fw-bold text-dark mb-0">
+                                      Total Online desde {{ impact.prev_year }}:
+                                      <span class="text-info">{{ impact.desde_online_total|intcomma }}</span>
+                                    </p>
+                                  {% endif %}
+                                </div>
+                              {% endif %}
+
+                              <!-- Descripción -->
+                              {% if impact.note %}
+                                <p class="card-text text-muted small flex-grow-1 mb-3">
+                                  {{ impact.note }}
+                                </p>
+                              {% else %}
+                                <p class="card-text text-muted small flex-grow-1 mb-3">
+                                  Sin descripción adicional.
+                                </p>
+                              {% endif %}
+
+                              <small class="text-muted d-block pt-3 border-top">
+                                📅 Registrado: {{ impact.updated_at|date:'d/m/Y' }}
+                              </small>
+
+                            </div>
+                          </div>
+
+                        </div>
+                      {% endfor %}
+                    </div>
+
+                  {% else %}
+                    <div class="bg-white rounded-4 p-4 p-md-5 shadow-sm text-center">
+                      <div class="display-6 mb-2">—</div>
+                      <p class="mb-0 text-muted">No hay registros para esta categoría.</p>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+              </div>
+            {% endif %}
           {% endfor %}
 
         </div>
