@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import Http404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
@@ -11,8 +10,8 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
 from .utils import generate_dynamic_form, build_ordered_responses
 from django.contrib import messages
-from django.urls import reverse
 from django.contrib.auth.models import User, Group
+from django.db.models import Q
 from django.core.files.storage import default_storage
 from django.contrib.auth import login, get_backends
 from django.utils.text import slugify
@@ -22,12 +21,36 @@ from django.contrib.auth.decorators import login_required
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
+from urllib.parse import urlencode
+
+
+def _is_facilitador(user) -> bool:
+    return bool(user and user.is_authenticated and user.groups.filter(name='facilitador').exists())
+
+
+def _is_tecnico(user) -> bool:
+    return bool(user and user.is_authenticated and user.groups.filter(name='tecnico').exists())
+
+
+def _is_staff(user) -> bool:
+    return bool(user and user.is_authenticated and user.is_staff)
+
+
+def _require_facilitador_or_staff(request):
+    if False:
+        next_url = request.get_full_path()
+        register_url = reverse('authentication:facilitador_register')
+        return redirect(f"{register_url}?next={next_url}")
+    if not (_is_facilitador(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
+    return None
 
 
 
 def pending_forms(request):
-    if not request.user.is_authenticated:
-        return redirect_to_login(request.get_full_path(), login_url=reverse('authentication:login'))
+    guard = _require_facilitador_or_staff(request)
+    if guard:
+        return guard
     # Aquí puedes implementar la lógica para obtener los formularios pendientes
     # Por simplicidad, asumiremos que todos los formularios están pendientes
     pending_forms = FormDefinition.objects.all()
@@ -36,7 +59,8 @@ def pending_forms(request):
     for f in pending_forms:
         f.user_completed_pk = (
             CompletedForm.objects
-            .filter(user=request.user, form_name=f.name)
+            .filter(user=request.user)
+            .filter(Q(form=f) | Q(form_name=f.name))
             .order_by('-submitted_at')
             .values_list('pk', flat=True)
             .first()
@@ -48,8 +72,9 @@ def pending_forms(request):
     return render(request, 'formbuilder/pending_forms.html', context)
 
 def edit_forms(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
+    guard = _require_facilitador_or_staff(request)
+    if guard:
+        return guard
     
     # Aquí puedes implementar la lógica para obtener los formularios que el usuario puede editar
     # Por simplicidad, asumiremos que todos los formularios pueden ser editados
@@ -110,6 +135,8 @@ def enroll_facilitador(request):
     return render(request, 'formbuilder/facilitador/enroll_facilitador.html', context)
 
 def facilitador_list_view(request):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
     facilitadores = User.objects.filter(groups__name='facilitador')
     context = {
         'facilitadores': facilitadores
@@ -118,15 +145,21 @@ def facilitador_list_view(request):
 
 # FormDefinition CRUD - function-based views
 def form_list(request):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     forms = FormDefinition.objects.all()
     return render(request, 'formbuilder/form_list.html', {'forms': forms})
 
 def form_detail(request, pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     form_obj = get_object_or_404(FormDefinition, pk=pk)
     return render(request, 'formbuilder/form_detail.html', {'form': form_obj})
 
 @require_http_methods(["GET", "POST"])
 def form_create(request):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     if request.method == 'POST':
         form = FormDefinitionForm(request.POST, request.FILES)
         if form.is_valid():
@@ -138,6 +171,8 @@ def form_create(request):
 
 @require_http_methods(["GET", "POST"])
 def form_update(request, pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     instance = get_object_or_404(FormDefinition, pk=pk)
     if request.method == 'POST':
         form = FormDefinitionForm(request.POST, request.FILES, instance=instance)
@@ -150,6 +185,8 @@ def form_update(request, pk):
 
 @require_http_methods(["GET", "POST"])
 def form_delete(request, pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     instance = get_object_or_404(FormDefinition, pk=pk)
     if request.method == 'POST':
         instance.delete()
@@ -159,6 +196,8 @@ def form_delete(request, pk):
 # FormField CRUD - function-based views
 @require_http_methods(["GET", "POST"])
 def field_create(request, form_pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     parent_form = get_object_or_404(FormDefinition, pk=form_pk)
     if request.method == 'POST':
         form = FormFieldForm(request.POST)
@@ -173,6 +212,8 @@ def field_create(request, form_pk):
 
 @require_http_methods(["GET", "POST"])
 def field_update(request, pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     instance = get_object_or_404(FormField, pk=pk)
     if request.method == 'POST':
         form = FormFieldForm(request.POST, instance=instance)
@@ -185,6 +226,8 @@ def field_update(request, pk):
 
 @require_http_methods(["GET", "POST"])
 def field_delete(request, pk):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
     instance = get_object_or_404(FormField, pk=pk)
     parent_pk = instance.form.pk
     if request.method == 'POST':
@@ -199,22 +242,16 @@ def render_form(request, form_name):
     - Evita loops de `next` apuntando al login.
     - En POST: guarda CompletedForm con data JSON-safe (incluye URLs de archivos subidos).
     """
-    import os
-    from urllib.parse import urlencode
-
-    from django.conf import settings
-    from django.contrib import messages
-    from django.core.files.storage import default_storage
-    from django.shortcuts import get_object_or_404, redirect, render
-    from django.urls import reverse
-    from django.utils.text import slugify
-    from django.utils.http import url_has_allowed_host_and_scheme
 
     form_obj = get_object_or_404(FormDefinition, name=form_name)
 
-    DynamicForm = generate_dynamic_form(form_name)
+    DynamicForm = generate_dynamic_form(form_obj)
     if not DynamicForm:
         return render(request, "formbuilder/not_found.html", {"form_name": form_name})
+
+    guard = _require_facilitador_or_staff(request)
+    if guard:
+        return guard
 
     # ---------------------------------------------------------------------
     # Auth gate (aplica tanto GET como POST)
@@ -307,6 +344,7 @@ def render_form(request, form_name):
 
             CompletedForm.objects.create(
                 user=request.user,
+                form=form_obj,
                 form_name=form_name,
                 titulo=form.cleaned_data.get("titulo", ""),
                 descripcion=subtitle or form.cleaned_data.get("descripcion", ""),
@@ -340,17 +378,17 @@ def render_form(request, form_name):
 
 # Completed Forms Views
 def completed_forms_list(request):
-    # Require the user to be a tecnico (or staff) to view this listing.
-    # If the user is not authenticated or not a tecnico, redirect them to the
-    # tecnico registration page and include `next` so they return here after
-    # registering.
-    is_tecnico = request.user.groups.filter(name='tecnico').exists() if request.user.is_authenticated else False
-    if not request.user.is_authenticated or (not is_tecnico and not request.user.is_staff):
+    if not request.user.is_authenticated:
         next_url = request.get_full_path()
-        register_url = reverse('tecnico_register')
+        register_url = reverse('authentication:tecnico_register')
         return redirect(f"{register_url}?next={next_url}")
 
-    completed_forms = CompletedForm.objects.all()
+    if _is_staff(request.user):
+        completed_forms = CompletedForm.objects.all()
+    elif _is_tecnico(request.user):
+        completed_forms = CompletedForm.objects.filter(user__groups__name='facilitador')
+    else:
+        raise Http404("No encontrado")
     if not completed_forms:
         messages.info(request, 'No hay formularios completados.')
     context = {
@@ -366,11 +404,10 @@ def completed_forms_detail(request, pk):
     # permission: owner or staff can view, others get a 404.
     completed_form = get_object_or_404(CompletedForm, pk=pk)
     # Allow owner, staff, or users in group 'tecnico' to view the completed form
-    is_tecnico = request.user.groups.filter(name='tecnico').exists() if request.user.is_authenticated else False
-    if completed_form.user != request.user and not request.user.is_staff and not is_tecnico:
+    if completed_form.user != request.user and not _is_staff(request.user) and not _is_tecnico(request.user):
         # Keep previous behavior (404) for non-authorized users.
         raise Http404("No encontrado")
-    form_obj = FormDefinition.objects.filter(name=completed_form.form_name).first()
+    form_obj = completed_form.form or FormDefinition.objects.filter(name=completed_form.form_name).first()
     responses = build_ordered_responses(completed_form.form_name, completed_form.form_data)
     return render(
         request,
@@ -383,12 +420,14 @@ def completed_forms_detail(request, pk):
     )
 
 def completed_forms_edit(request, pk):
-    completed_form = get_object_or_404(CompletedForm, pk=pk, user=request.user)
-    DynamicForm = generate_dynamic_form(completed_form.form_name)
+    completed_form = get_object_or_404(CompletedForm, pk=pk)
+    if completed_form.user != request.user and not _is_staff(request.user):
+        raise Http404("No encontrado")
+    DynamicForm = generate_dynamic_form(completed_form.form or completed_form.form_name)
     if not DynamicForm:
         return render(request, 'formbuilder/not_found.html', {'form_name': completed_form.form_name})
 
-    form_obj = FormDefinition.objects.filter(name=completed_form.form_name).first()
+    form_obj = completed_form.form or FormDefinition.objects.filter(name=completed_form.form_name).first()
     file_field_names = set()
     if form_obj:
         file_field_names = set(
@@ -447,6 +486,8 @@ def completed_forms_edit(request, pk):
     return render(request, 'formbuilder/completed/edit_completed_form.html', context)
 
 def facilitadores_por_formulario(request):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
     completed_forms = CompletedForm.objects.exclude(distrito__isnull=True).exclude(distrito__exact='')
     context = {
         'completed_forms': completed_forms
@@ -462,8 +503,7 @@ def share_with_facilitadores(request, pk):
     this to send emails or toggles on the model.
     """
     completed_form = get_object_or_404(CompletedForm, pk=pk)
-    is_tecnico = request.user.groups.filter(name='tecnico').exists() if request.user.is_authenticated else False
-    if completed_form.user != request.user and not request.user.is_staff and not is_tecnico:
+    if completed_form.user != request.user and not _is_staff(request.user) and not _is_tecnico(request.user):
         raise Http404("No encontrado")
 
     # Build a short, shareable URL that redirects to the completed form detail.
@@ -488,14 +528,13 @@ def shared_completed_form(request, pk):
 
     # If user is authenticated and authorized, redirect to detail
     if request.user.is_authenticated:
-        is_tecnico = request.user.groups.filter(name='tecnico').exists()
-        if completed_form.user == request.user or request.user.is_staff or is_tecnico:
+        if completed_form.user == request.user or _is_staff(request.user) or _is_tecnico(request.user):
             return redirect(detail_path)
         # Authenticated but not authorized -> 404
         raise Http404("No encontrado")
 
     # Not authenticated: redirect to tecnico registration with next=detail_path
-    register_url = reverse('tecnico_register')
+    register_url = reverse('authentication:tecnico_register')
     return redirect(f"{register_url}?next={detail_path}")
 
 # shared form definition view UUID
@@ -505,9 +544,8 @@ def share_form_definition(request, pk):
     Genera un link compartible para un FormDefinition (plantilla).
     Recomendado: solo permitir a staff / tecnico / owner (según tu lógica).
     """
-    if not request.user.is_authenticated:
-        next_url = request.get_full_path()
-        return redirect(f"{reverse('authentication:login')}?next={next_url}")
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
 
     form_obj = get_object_or_404(FormDefinition, pk=pk)
 
@@ -539,13 +577,16 @@ def shared_form_definition(request, token):
     if not request.user.is_authenticated:
         next_url = request.get_full_path()
         # usa login o register, según tu flujo
-        return redirect(f"{reverse('authentication:login')}?next={next_url}")
+        return redirect(f"{reverse('authentication:facilitador_register')}?next={next_url}")
 
     # Si necesitas forzar grupo "facilitador", aquí es donde lo manejas:
     # if not request.user.groups.filter(name="facilitador").exists() and not request.user.is_staff:
     #     messages.info(request, "Necesitas cuenta de facilitador para completar este formulario.")
     #     next_url = request.get_full_path()
     #     return redirect(f"{reverse('authentication:register')}?next={next_url}")
+
+    if not (_is_facilitador(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
 
     # Ya autenticado y autorizado → render_form normal
     return redirect(reverse("formbuilder:render_form", kwargs={"form_name": form_obj.name}))
@@ -561,25 +602,18 @@ def shared_form_entry(request, token):
     if not request.user.is_authenticated:
         next_url = request.get_full_path()
 
-        # protección anti-loop: si next apunta al login, lo reseteas
-        login_path = reverse("account_login") if "account_login" in [u.name for u in request.resolver_match.namespace_dict.values()] else settings.LOGIN_URL
-        if next_url.startswith(login_path):
-            next_url = reverse("home")
-
         # Valida que next sea seguro
         if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
             next_url = reverse("home")
 
-        # elige uno: login o signup
-        return redirect(f"{reverse('account_login')}?next={next_url}")
-        # o: return redirect(f"{reverse('account_signup')}?next={next_url}")
+        return redirect(f"{reverse('authentication:facilitador_register')}?next={next_url}")
 
     # Ya autenticado: aquí validas rol/grupo (facilitador)
-    if not request.user.groups.filter(name="Facilitador").exists() and not request.user.is_superuser:
+    if not _is_facilitador(request.user) and not _is_staff(request.user):
         return redirect("home")  # o 403
 
     # Redirige al form real (sin exponer ID público si no quieres)
-    return redirect("render_form", form_name=link.form.name)
+    return redirect("formbuilder:render_form", form_name=link.form.name)
 
 @login_required
 def my_user_complete_forms(request):

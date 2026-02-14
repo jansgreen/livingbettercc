@@ -45,6 +45,7 @@ urlpatterns = [
     path('formbuilder/', include('formbuilder.urls')),
     path('payments/', include('payments.urls')),
 
+
 ]
 
 if settings.DEBUG:

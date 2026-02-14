@@ -36,14 +36,17 @@ class MultipleFileField(forms.FileField):
         return cleaned
 
 
-def generate_dynamic_form(form_name: str):
-    try:
-        form_def = FormDefinition.objects.get(name=form_name)
-    except FormDefinition.DoesNotExist:
-        return None
+def generate_dynamic_form(form_name_or_def):
+    if isinstance(form_name_or_def, FormDefinition):
+        form_def = form_name_or_def
+    else:
+        try:
+            form_def = FormDefinition.objects.get(name=form_name_or_def)
+        except FormDefinition.DoesNotExist:
+            return None
 
     fields: dict[str, forms.Field] = {}
-    for field in form_def.fields.all():
+    for field in form_def.fields.all().order_by("order", "id"):
         field_args = {'label': field.label, 'required': field.required}
         attrs = _widget_attrs(field.field_type)
 
@@ -88,7 +91,7 @@ def generate_dynamic_form(form_name: str):
                 widget=MultipleFileInput(attrs={**attrs, 'multiple': True}),
             )
 
-    DynamicForm = type(f"{form_name}Form", (forms.Form,), fields)
+    DynamicForm = type(f"{form_def.name}Form", (forms.Form,), fields)
     return DynamicForm
 
 

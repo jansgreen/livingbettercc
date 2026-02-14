@@ -1,27 +1,37 @@
 {% extends "frontend.html" %}
 {% load static %}
 {% block content %}
-  <div class="py-4">
+<div class="contener m-5">
     <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-          {% if form_obj.image_left %}
-              <div class="text-center mb-3">
-          <img src="{{ form_obj.image_left.url }}" alt="Imagen izquierda del formulario" class="img-fluid" style="max-width: 160px; object-fit: contain;"/>
-              </div>
-            {% endif %}
-              <div class="text-center">
-          <div class="text-center mb-3">
-            <img src="{% static 'setting/logo.png' %}" alt="Logo Living Better CC" class="logo-lbcc rounded-4" style="width: 120px; height: 120px; object-fit: contain;"/>
-          </div>
-          <h1 class="h4 mb-1">{{ form_name }}</h1>
-              </div>
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-center gap-3 mb-3 flex-wrap">
+                {% if form_obj and form_obj.image_left %}
+                    <div class="text-center mb-3" style="width: 160px;">
+                        <img src="{{ form_obj.image_left.url }}" alt="Imagen izquierda del formulario" class="img-fluid" style="width: 160px; height: 160px; object-fit: contain;" />
+                    </div>
+                {% endif %}
 
-          {% if form_obj.image_right %}
-              <div class="text-center mb-3">
-          <img src="{{ form_obj.image_right.url }}" alt="Imagen derecha del formulario" class="img-fluid" style="max-width: 160px; object-fit: contain;"/>
-              </div>
-            {% endif %}
+                <div class="text-center" style="width: 160px;">
+                    <div class="text-center mb-3">
+                        <img src="{% static 'setting/logo.png' %}" alt="Logo Living Better CC" class="logo-lbcc rounded-4" style="width: 160px; height: 160px; object-fit: contain;" />
+                    </div>
+                </div>
+
+                {% if form_obj and form_obj.image_right %}
+                    <div class="text-center mb-3" style="width: 160px;">
+                        <img src="{{ form_obj.image_right.url }}" alt="Imagen derecha del formulario" class="img-fluid" style="width: 160px; height: 160px; object-fit: contain;" />
+                    </div>
+                {% endif %}
+            </div>
+
+        <div class="card-header border rounded-4 mt-4">
+            <h1 class="h4 mb-1">
+                {% if form_obj %}
+                    {{ form_obj.name }}
+                {% else %}
+                    {{ completed_form.form_name }}
+                {% endif %}
+            </h1>
         </div>
  
 
