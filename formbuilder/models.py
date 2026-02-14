@@ -20,6 +20,23 @@ class FormDefinition(models.Model):
     def __str__(self):
         return self.name
 
+    def _safe_image_url(self, field_name: str) -> str:
+        field = getattr(self, field_name, None)
+        if not field:
+            return ""
+        try:
+            return field.url
+        except Exception:
+            return ""
+
+    @property
+    def image_left_url(self) -> str:
+        return self._safe_image_url("image_left")
+
+    @property
+    def image_right_url(self) -> str:
+        return self._safe_image_url("image_right")
+
 FIELD_TYPES = [
     ('char', 'Campo de texto'),
     ('email', 'Correo electrónico'),

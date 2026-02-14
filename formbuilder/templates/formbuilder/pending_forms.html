@@ -3,7 +3,8 @@
 {% block content %}
 
 <div class="pending-forms-container">
-    <h1>Pending Forms</h1>
+    {% include "formbuilder/partials/taod_header.html" with header_title="Formularios Pendientes" %}
+    <h1 class="h5 mb-3">Formularios Pendientes</h1>
     {% if pending_forms %}
         <ul class="list-group">
             {% for form in pending_forms %}

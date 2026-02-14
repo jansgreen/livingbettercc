@@ -313,13 +313,21 @@ WHITENOISE_MANIFEST_STRICT = False
 
 # Archivos de medios (subidos por los usuarios)
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Cloudinary Storage si está habilitado
 
 USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+if USE_CLOUDINARY and not CLOUDINARY_URL:
+    # Fail-safe: if Cloudinary isn't configured, fall back to local media.
+    USE_CLOUDINARY = False
 
+if USE_CLOUDINARY:
+    MEDIA_URL = None
+else:
+    MEDIA_URL = "/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" 

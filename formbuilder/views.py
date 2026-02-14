@@ -405,6 +405,25 @@ def completed_forms_detail(request, pk):
         raise Http404("No encontrado")
     form_obj = completed_form.form or FormDefinition.objects.filter(name=completed_form.form_name).first()
     responses = build_ordered_responses(completed_form.form_name, completed_form.form_data)
+    responses_by_name = {r.get('name'): r for r in responses}
+    handled_names = {
+        'centro_educativo',
+        'responsables',
+        'fechas',
+        'temas_impartidos',
+        'objetivo_razon_motivo',
+        'impacto_antes_decepcion_escolar',
+        'impacto_antes_conflicto_familiar',
+        'impacto_antes_hogares_disfuncionales',
+        'impacto_antes_problemas_salud',
+        'impacto_antes_problemas_mentales',
+        'impacto_positivo_nivel_escolar',
+        'impacto_positivo_nivel_familiar',
+        'impacto_positivo_social',
+        'mejora_decepcion_escolar',
+        'anexos',
+    }
+    remaining_responses = [r for r in responses if r.get('name') not in handled_names]
     return render(
         request,
         'formbuilder/completed/completed_form_detail.html',
@@ -412,6 +431,8 @@ def completed_forms_detail(request, pk):
             'completed_form': completed_form,
             'form_obj': form_obj,
             'responses': responses,
+            'responses_by_name': responses_by_name,
+            'remaining_responses': remaining_responses,
         },
     )
 

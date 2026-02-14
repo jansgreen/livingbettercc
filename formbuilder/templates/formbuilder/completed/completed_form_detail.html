@@ -6,35 +6,7 @@
 <div class="py-4">
     <div class="card shadow-sm">
         <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center gap-3 mb-3 flex-wrap">
-                {% if form_obj and form_obj.image_left %}
-                    <div class="text-center mb-3" style="width: 160px;">
-                        <img src="{{ form_obj.image_left.url }}" alt="Imagen izquierda del formulario" class="img-fluid" style="width: 160px; height: 160px; object-fit: contain;" />
-                    </div>
-                {% endif %}
-
-                <div class="text-center" style="width: 160px;">
-                    <div class="text-center mb-3">
-                        <img src="{% static 'setting/logo.png' %}" alt="Logo Living Better CC" class="logo-lbcc rounded-4" style="width: 160px; height: 160px; object-fit: contain;" />
-                    </div>
-                </div>
-
-                {% if form_obj and form_obj.image_right %}
-                    <div class="text-center mb-3" style="width: 160px;">
-                        <img src="{{ form_obj.image_right.url }}" alt="Imagen derecha del formulario" class="img-fluid" style="width: 160px; height: 160px; object-fit: contain;" />
-                    </div>
-                {% endif %}
-            </div>
-
-        <div class="card-header border rounded-4 mt-4">
-            <h1 class="h4 mb-1">
-                {% if form_obj %}
-                    {{ form_obj.name }}
-                {% else %}
-                    {{ completed_form.form_name }}
-                {% endif %}
-            </h1>
-        </div>
+            {% include "formbuilder/partials/taod_header.html" with header_title=completed_form.form_name form_obj=form_obj %}
 
             {% if completed_form.descripcion %}
                 <p class="text-muted mb-0 mt-3">{{ completed_form.descripcion|safe }}</p>
@@ -54,26 +26,85 @@
             </div>
 
             <h2 class="h6 mb-3">Respuestas</h2>
-            <div class="list-group">
-                {% for r in responses %}
-                    <div class="list-group-item">
-                        <div class="fw-semibold">{{ r.label }}</div>
-                        {% if r.is_list %}
-                            <ul class="mb-0">
-                                {% for item in r.value %}
-                                    <li><a href="{{ item }}" target="_blank" rel="noopener">{{ item }}</a></li>
-                                {% empty %}
-                                    <li class="text-muted">(Sin archivos)</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <div class="text-body">{{ r.value }}</div>
-                        {% endif %}
-                    </div>
-                {% empty %}
-                    <div class="list-group-item">No hay respuestas.</div>
-                {% endfor %}
-            </div>
+
+            {% if responses_by_name.centro_educativo and responses_by_name.responsables and responses_by_name.fechas %}
+              <table class="taod-table">
+                <tr>
+                  <td class="taod-label" style="width: 18%;">Centro Educativo</td>
+                  <td style="width: 32%;">{{ responses_by_name.centro_educativo.value }}</td>
+                  <td class="taod-label" style="width: 18%;">Responsables<br/>Fechas</td>
+                  <td style="width: 32%;">
+                    <div>{{ responses_by_name.responsables.value }}</div>
+                    <div style="margin-top: 6px;">{{ responses_by_name.fechas.value }}</div>
+                  </td>
+                </tr>
+                {% if responses_by_name.temas_impartidos %}
+                <tr>
+                  <td class="taod-label">Temas impartidos</td>
+                  <td colspan="3">{{ responses_by_name.temas_impartidos.value }}</td>
+                </tr>
+                {% endif %}
+              </table>
+            {% endif %}
+
+            {% if responses_by_name.objetivo_razon_motivo %}
+              <div class="taod-section-title">Objetivo/Razón/Motivo</div>
+              <div class="taod-box">{{ responses_by_name.objetivo_razon_motivo.value|safe }}</div>
+            {% endif %}
+
+            {% if responses_by_name.impacto_antes_decepcion_escolar %}
+              <div class="taod-section-title">Impacto antes de la implementación (por uso y abuso de Tabaco, alcohol y otras Drogas)</div>
+              <ol class="taod-list">
+                <li>Decepción Escolar: <span class="taod-line">{{ responses_by_name.impacto_antes_decepcion_escolar.value }}</span></li>
+                {% if responses_by_name.impacto_antes_conflicto_familiar %}<li>Conflicto familiar: <span class="taod-line">{{ responses_by_name.impacto_antes_conflicto_familiar.value }}</span></li>{% endif %}
+                {% if responses_by_name.impacto_antes_hogares_disfuncionales %}<li>Hogares disfuncionales: <span class="taod-line">{{ responses_by_name.impacto_antes_hogares_disfuncionales.value }}</span></li>{% endif %}
+                {% if responses_by_name.impacto_antes_problemas_salud %}<li>Problemas de salud (inducida): <span class="taod-line">{{ responses_by_name.impacto_antes_problemas_salud.value }}</span></li>{% endif %}
+                {% if responses_by_name.impacto_antes_problemas_mentales %}<li>Problemas mentales (inducida): <span class="taod-line">{{ responses_by_name.impacto_antes_problemas_mentales.value }}</span></li>{% endif %}
+              </ol>
+            {% endif %}
+
+            {% if responses_by_name.impacto_positivo_nivel_escolar %}
+              <div class="taod-section-title">Impacto positivo a raíz de la implementación del proyecto en los centros educativos y su entorno</div>
+              <ol class="taod-list">
+                <li>A nivel escolar: <span class="taod-line">{{ responses_by_name.impacto_positivo_nivel_escolar.value }}</span></li>
+                {% if responses_by_name.impacto_positivo_nivel_familiar %}<li>A nivel familiar: <span class="taod-line">{{ responses_by_name.impacto_positivo_nivel_familiar.value }}</span></li>{% endif %}
+                {% if responses_by_name.impacto_positivo_social %}<li>Social: <span class="taod-line">{{ responses_by_name.impacto_positivo_social.value }}</span></li>{% endif %}
+                {% if responses_by_name.mejora_decepcion_escolar %}<li>Mejora en la decepción escolar: <span class="taod-line">{{ responses_by_name.mejora_decepcion_escolar.value }}</span></li>{% endif %}
+              </ol>
+            {% endif %}
+
+            {% if remaining_responses %}
+              {% for r in remaining_responses %}
+                {% if r.is_list %}
+                  <div class="taod-section-title">{{ r.label }}</div>
+                  <ul class="taod-list">
+                    {% for item in r.value %}
+                      <li><a href="{{ item }}" target="_blank" rel="noopener">{{ item }}</a></li>
+                    {% empty %}
+                      <li class="text-muted">(Sin archivos)</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="taod-section-title">{{ r.label }}</div>
+                  <div class="taod-line">{{ r.value|safe }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+
+            {% if responses_by_name.anexos %}
+              <div class="taod-anexos">Anexos</div>
+              {% if responses_by_name.anexos.is_list %}
+                <ul class="taod-list">
+                  {% for item in responses_by_name.anexos.value %}
+                    <li><a href="{{ item }}" target="_blank" rel="noopener">{{ item }}</a></li>
+                  {% empty %}
+                    <li class="text-muted">(Sin archivos)</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <div class="taod-line">{{ responses_by_name.anexos.value|safe }}</div>
+              {% endif %}
+            {% endif %}
 
             <div class="d-flex gap-2 mt-4">
                 {% if completed_form.user == request.user %}
