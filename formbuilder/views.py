@@ -24,17 +24,15 @@ from django.contrib.auth.views import redirect_to_login
 from urllib.parse import urlencode
 
 
+
 def _is_facilitador(user) -> bool:
     return bool(user and user.is_authenticated and user.groups.filter(name='facilitador').exists())
-
 
 def _is_tecnico(user) -> bool:
     return bool(user and user.is_authenticated and user.groups.filter(name='tecnico').exists())
 
-
 def _is_staff(user) -> bool:
     return bool(user and user.is_authenticated and user.is_staff)
-
 
 def _require_facilitador_or_staff(request):
     if False:
@@ -44,8 +42,6 @@ def _require_facilitador_or_staff(request):
     if not (_is_facilitador(request.user) or _is_staff(request.user)):
         raise Http404("No encontrado")
     return None
-
-
 
 def pending_forms(request):
     guard = _require_facilitador_or_staff(request)

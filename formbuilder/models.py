@@ -5,6 +5,7 @@ from authentication.address.models import Address
 from django.conf import settings
 from django.db import models
 
+from payments.models import User
 
 
 class FormDefinition(models.Model):
@@ -18,7 +19,6 @@ class FormDefinition(models.Model):
 
     def __str__(self):
         return self.name
-
 
 FIELD_TYPES = [
     ('char', 'Campo de texto'),
@@ -66,7 +66,6 @@ class CompletedForm(models.Model):
     def __str__(self):
         form_name = self.form.name if self.form else self.form_name
         return f"CompletedForm by {self.user.username} for {form_name} at {self.submitted_at}"
-    
 
 class FormShareLink(models.Model):
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)

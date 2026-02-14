@@ -120,6 +120,8 @@ def build_ordered_responses(form_name: str, form_data: dict) -> list[dict]:
     used_keys: set[str] = set()
 
     for f in field_defs:
+        if f.name in used_keys:
+            continue
         if not form_data or f.name not in form_data:
             value = ''
         else:
