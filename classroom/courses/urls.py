@@ -4,6 +4,10 @@ from . import views
 app_name = 'courses'
 
 urlpatterns = [
+    # Staff admin views
+    path('admin/', views.course_admin_list, name='course_admin_list'),
+    path('admin/<int:pk>/', views.course_admin_detail, name='course_admin_detail'),
+
     path('course_list/', views.course_list, name='course_list'),
     path('my_course/', views.my_course, name='my_course'),
     path('course_create/', views.course_create, name='course_create'),

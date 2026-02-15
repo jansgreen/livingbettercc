@@ -91,6 +91,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=255)
     content = CKEditor5Field('lesson content')
     video_url = models.URLField(blank=True)
+    video_file = models.FileField(upload_to='lesson_videos/', blank=True, null=True)
     order = models.PositiveIntegerField()
 
     class Meta:

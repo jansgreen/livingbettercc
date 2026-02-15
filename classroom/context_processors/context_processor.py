@@ -31,6 +31,10 @@ def obtener_menu_classroom(request):
         if url_course_list:
             submenus.append({'nombre': 'Lista de Cursos', 'url': url_course_list, 'perm': 'groups.access_module'})
 
+        url_course_admin = safe_reverse('courses:course_admin_list')
+        if url_course_admin:
+            submenus.append({'nombre': 'Cursos Admin', 'url': url_course_admin, 'perm': 'groups.access_module'})
+
         url_module_create = safe_reverse('courses:module_create')
         if url_module_create:
             submenus.append({'nombre': 'Crear Modulo', 'url': url_module_create, 'perm': 'groups.access_module'})

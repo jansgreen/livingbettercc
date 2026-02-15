@@ -1,0 +1,20 @@
+{% extends "dashboard.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h4 mb-0">Cursos (Admin)</h1>
+    <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Crear curso</a>
+  </div>
+  <div class="list-group">
+    {% for course in courses %}
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+         href="{% url 'courses:course_admin_detail' course.pk %}">
+        <span>{{ course.title }}</span>
+        <span class="badge bg-secondary">{{ course.modules.count }} módulos</span>
+      </a>
+    {% empty %}
+      <div class="list-group-item">No hay cursos.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

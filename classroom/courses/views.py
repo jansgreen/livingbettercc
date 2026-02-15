@@ -11,7 +11,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from types import SimpleNamespace
 import json
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from authentication.models.students import Students  # Ajusta el import según tu estructura
@@ -27,6 +27,25 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
+
+def _require_active_enrollment(request, *, course):
+    enr = Enrollment.objects.filter(
+        user=request.user,
+        course=course,
+    ).order_by('-id').first()
+    if not enr:
+        messages.error(request, "Debes inscribirte para acceder al contenido de este curso.")
+        return None, redirect("courses:course_detail", pk=course.pk)
+    if enr.status != Enrollment.Status.ACTIVE:
+        messages.warning(request, "Debes realizar el pago para acceder a las lecciones.")
+        return enr, redirect("courses:course_detail", pk=course.pk)
+    return enr, None
+
+
+def _require_staff(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        raise Http404("No encontrado")
+    return None
 
 from classroom.courses.models import Module
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
@@ -149,6 +168,23 @@ def course_list(request):
         'can_access_module': can_access_module,
     }
     return render(request, 'courses/course_list.html', context)
+
+
+@login_required
+def course_admin_list(request):
+    _require_staff(request)
+    courses = Course.objects.all().order_by('title')
+    return render(request, 'courses/admin_course_list.html', {'courses': courses})
+
+
+@login_required
+def course_admin_detail(request, pk):
+    _require_staff(request)
+    course = get_object_or_404(
+        Course.objects.prefetch_related('modules__lessons'),
+        pk=pk
+    )
+    return render(request, 'courses/admin_course_detail.html', {'course': course})
 
 def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
@@ -508,7 +544,6 @@ def lesson_update(request, pk):
         'object': True,
     }
     return render(request, 'lesson/lesson_form.html', context)
-
 
 @login_required
 def lesson_detail(request, pk):
