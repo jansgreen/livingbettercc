@@ -41,18 +41,6 @@ def obtener_menu_report_activity(request):
 
         ])
     # Técnico: solo ver lista y detalle
-    elif is_tecnico:
-        submenus.extend([
-            {'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')},
-            {'nombre': 'Detalle de Reporte', 'url': _safe_url('report_detail', '/reportes/detalle/', pk=1)},
-        ])
-    # Facilitador: solo crear y ver lista
-    elif is_facilitador:
-        submenus.extend([
-            {'nombre': 'Nuevo Reporte', 'url': _safe_url('report_create', '/reportes/nuevo/')},
-            {'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')},
-        ])
-    # Otros usuarios autenticados
 
 
     menu = build_menu(request.user, 'Reportes', submenus, url='#')

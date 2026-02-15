@@ -40,7 +40,6 @@ def obtener_formbuilder_menu(request):
     # Facilitador: ver/llenar formularios y ver sus completados
     elif is_facilitador:
         submenus.extend([
-            {'nombre': 'Formbuilder', 'url': _safe_url('formbuilder:form_list', '/formbuilder/')},
             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
         ])
     # Otros usuarios autenticados
