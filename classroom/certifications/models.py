@@ -34,6 +34,7 @@ class Certificate(models.Model):
         related_name="certificates"
     )
     cert_no = models.CharField(max_length=30, unique=True, blank=True, editable=False)
+    certificate_number = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     issued_date = models.DateField(default=timezone.now, db_index=True)
     created_at = models.DateTimeField(default=timezone.now, db_index=True)
     class Meta:
@@ -72,4 +73,6 @@ class Certificate(models.Model):
     def save(self, *args, **kwargs):
         if not self.cert_no:
             self.cert_no = self._generate_cert_no()
+        if not self.certificate_number:
+            self.certificate_number = self.cert_no
         super().save(*args, **kwargs)
