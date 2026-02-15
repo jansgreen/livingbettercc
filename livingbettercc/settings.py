@@ -93,6 +93,7 @@ if not DEBUG:
         ".livingbettercc.org",
         ".livingbettercc.xyz",
         "livingbettercc-dev-5e915f7fc878.herokuapp.com",
+        "livingbettercc-ba2163025eea.herokuapp.com",
     ]
     ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
 
