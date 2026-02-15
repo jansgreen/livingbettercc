@@ -111,7 +111,11 @@ if not DEBUG:
         "https://www.livingbettercc.xyz",
     ]
 else:
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
+    _dev_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0")
+    _env_hosts = _parse_hosts_csv(_dev_hosts)
+    if IS_HEROKU:
+        _env_hosts.extend([".herokuapp.com"])
+    ALLOWED_HOSTS = list(dict.fromkeys(_env_hosts))
 
 
 
