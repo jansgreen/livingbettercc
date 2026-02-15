@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import re
-import uuid
+import uuid as uuid_module
 from typing import Final
 
 from django.conf import settings
@@ -20,8 +20,8 @@ def _safe_component(value: str) -> str:
     return value or "file"
 
 class Certificate(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
-    public_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    uuid = models.UUIDField(default=uuid_module.uuid4, unique=True, editable=False, db_index=True)
+    public_uuid = models.UUIDField(default=uuid_module.uuid4, unique=True, editable=False, db_index=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
