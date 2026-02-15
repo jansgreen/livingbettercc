@@ -21,6 +21,7 @@ def _safe_component(value: str) -> str:
 
 class Certificate(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    public_uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -42,11 +43,6 @@ class Certificate(models.Model):
 
     def __str__(self):
         return f"{self.user} | {self.course} | {self.cert_no}"
-
-    @property
-    def public_uuid(self) -> str:
-        # Some templates expect 'public_uuid'; expose uuid as string for compatibility
-        return str(self.uuid)
 
     def _generate_cert_no(self):
         year = (self.issued_date.year if self.issued_date else timezone.now().year)
