@@ -328,7 +328,12 @@ if USE_CLOUDINARY and not CLOUDINARY_URL:
     USE_CLOUDINARY = False
 
 if USE_CLOUDINARY:
-    MEDIA_URL = None
+    # Use empty prefix for Cloudinary storage to avoid None prefix errors.
+    MEDIA_URL = ""
+    CLOUDINARY_STORAGE = {
+        "SECURE": True,
+        "PREFIX": "",
+    }
 else:
     MEDIA_URL = "/media/"
 
