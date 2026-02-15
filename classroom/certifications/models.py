@@ -35,6 +35,7 @@ class Certificate(models.Model):
     )
     cert_no = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     issued_date = models.DateField(default=timezone.now, db_index=True)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["user", "course"], name="unique_user_course_certificate")
