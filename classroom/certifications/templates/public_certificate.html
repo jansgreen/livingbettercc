@@ -1,26 +1,117 @@
-<!-- templates/certificates/public_certificate.html -->
-{% extends "dashboards/dashboard.html" %}
+{% extends "frontend.html" %}
 {% load static %}
 {% block content %}
-<div style="position:relative; width:900px; height:650px; margin:auto;">
-  <img src="{% static 'certificates/certificados_regional.png' %}" alt="Certificado fondo" style="position:absolute; top:0; left:0; width:900px; height:650px; object-fit:cover; z-index:0;">
-  <!-- Nombre del usuario -->
-  <div style="position:absolute; top:330px; left:0; width:100%; text-align:center; font-size:2.2em; font-weight:bold; color:#2a2a2a; letter-spacing:1px; z-index:2;">
-    {{ user.get_full_name }}
-  </div>
-  <!-- Título del curso -->
-  <div style="position:absolute; top:380px; left:0; width:100%; text-align:center; font-size:1.5em; color:#3a7bd5; z-index:2;">
-    {{ course.title }}
-  </div>
-  <!-- Fecha -->
-  <div style="position:absolute; top:430px; left:0; width:100%; text-align:center; font-size:1.2em; color:#444; z-index:2;">
-    Fecha: {{ date|date:"d/m/Y" }}
-  </div>
+{% include "certifications/certificate_styles.html" %}
+<div class="toolbar">
+  <button class="btn primary" onclick="window.print()">Imprimir / Guardar PDF</button>
 </div>
+
+<div class="stage">
+  <section class="cert" id="cert">
+    <div class="frame-outer"></div>
+    <div class="frame-inner"></div>
+
+    <div class="paper">
+      <div class="wm" aria-hidden="true">
+        <div class="wm-mark">
+          <div class="tree">
+            <img src="{% static 'setting/logo.png' %}" alt="LBCC">
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar">
+        <div id="leftRef">{{ cert_left_ref|default:"No. de Habilitaci&#243;n Sectorial 000627/EDU-0206/2023" }}</div>
+        <div id="rightRef">{{ cert_right_ref|default:"No. de Habilitaci&#243;n Sectorial 000321/SAL-0207/2023" }}</div>
+      </div>
+
+      <div class="logos">
+        <div class="logoBox">
+          <img src="{% static 'setting/Minerd.png' %}" alt="Educaci&#243;n">
+        </div>
+
+        <div class="centerBrand">
+          <div class="lbccMark">
+            <img src="{% static 'setting/logo.png' %}" alt="LBCC">
+          </div>
+          <div class="brandRibbon">{{ cert_brand|default:"Living Better Community Center" }}</div>
+        </div>
+
+        <div class="logoBox">
+          <img src="{% static 'setting/minerdsalud.png' %}" alt="Salud P&#250;blica">
+        </div>
+      </div>
+
+      <div class="titleArea">
+        <h1 class="bigTitle">CERTIFICADO</h1>
+        <div class="subTitle">De participaci&#243;n a:</div>
+      </div>
+
+      <div class="fields">
+        <div class="name" id="studentName">
+          {% if student_name %}{{ student_name }}{% else %}{{ user.get_full_name }}{% endif %}
+        </div>
+
+        <div class="program">
+          Por haber completado el programa de
+          <span class="pname" id="programName">
+            {% if course %}{{ course.title }}{% elif certificado %}{{ certificado.course.title }}{% endif %}
+          </span>
+        </div>
+
+        <div class="dateRow">
+          en fecha de <span class="d" id="issueDate">
+            {% if issue_date %}{{ issue_date|date:"d/m/Y" }}{% elif certificado %}{{ certificado.issued_date|date:"d/m/Y" }}{% else %}{{ date|date:"d/m/Y" }}{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="script m-2" id="givenText">
+        Clase online www.livingbettercc.com, Rep&#250;blica Dominicana.
+      </div>
+
+      <div class="footer">
+        <div class="signs">
+          <div class="sig">
+            <div class="sigImage">
+              <img src="{% static 'setting/firma1.png' %}" alt="Firma 1" />
+            </div>
+            <div class="sigName" id="sig1Name">{{ cert_sig1_name|default:"THD, CASAC Jos&#233; Miguel N&#250;&#241;ez" }}</div>
+            <div class="sigRole" id="sig1Role">{{ cert_sig1_role|default:"Presidente" }}</div>
+          </div>
+          <div class="sig">
+            <div class="sigImage">
+              <img src="{% static 'setting/firma2.png' %}" alt="Firma 2" />
+            </div>
+            <div class="sigName" id="sig2Name">{{ cert_sig2_name|default:"Tec. Emilia Luna" }}</div>
+            <div class="sigRole" id="sig2Role">{{ cert_sig2_role|default:"Secretaria Ejecutiva" }}</div>
+          </div>
+        </div>
+
+        <div class="sealWrap" title="Sello LBCC">
+          <img src="{% static 'setting/cello.png' %}" alt="Sello digital" class="sealImage"/>
+        </div>
+      </div>
+
+      <div class="footbar">
+        <div class="quote" id="quote">
+          {{ cert_quote|default:"ES MEJOR CONSTRUIR UNA CERCA EN LA CIMA DE LA MONTA&#209;A QUE UN HOSPITAL EN LA FALDA DE LA MISMA." }}
+        </div>
+        <div class="certNo">
+          Certificado No.
+          <b id="certNumber">
+            {% if cert_no %}{{ cert_no }}{% elif certificado %}{{ certificado.cert_no|default:"" }}{% endif %}
+          </b>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+{% block extra_js %}
+<script>
+  // Placeholder for future enhancements.
+</script>
 {% endblock %}
-<style>
-  /* Ajustes para posicionar los datos sobre el fondo */
-  body {
-    background: #eaf4ff;
-  }
-</style>
+{% endblock %}

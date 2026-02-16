@@ -29,6 +29,8 @@ urlpatterns = [
     # Public certificate view and PDF download
     path('certificate/public/<uuid:uuid>/', views.certificate_public_view, name='certificate_public_view'),
     path('certificate/public/<uuid:uuid>/pdf/', views.certificate_pdf_download, name='certificate_pdf_download'),
+    path('certificate/toggle/<uuid:uuid>/', views.certificate_toggle_pending, name='certificate_toggle_pending'),
+    path('certificate/claim/<uuid:uuid>/', views.claim_certificate, name='certificate_claim'),
 
     # In-person certificates routes removed; using ReportActivity via home app.
 

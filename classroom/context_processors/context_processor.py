@@ -23,29 +23,16 @@ def obtener_menu_classroom(request):
                 return None
 
         # Admin/staff actions gated by permission
-        url_course_create = safe_reverse('courses:course_create')
-        if url_course_create:
-            submenus.append({'nombre': 'Crear Curso', 'url': url_course_create, 'perm': 'groups.access_module'})
 
-        url_course_list = safe_reverse('courses:course_list')
+        url_course_list = safe_reverse('courses:course_list')  # Panel del Aula
         if url_course_list:
-            submenus.append({'nombre': 'Lista de Cursos', 'url': url_course_list, 'perm': 'groups.access_module'})
+            submenus.append({'nombre': 'Panel del Aula', 'url': url_course_list, 'perm': 'groups.access_module'})
 
-        url_module_create = safe_reverse('courses:module_create')
-        if url_module_create:
-            submenus.append({'nombre': 'Crear Modulo', 'url': url_module_create, 'perm': 'groups.access_module'})
+        url_certs_panel = safe_reverse('certifications:certificate_list')  # Panel de Certificaciones
+        if url_certs_panel:
+            submenus.append({'nombre': 'Panel de Certificaciones', 'url': url_certs_panel, 'perm': 'groups.access_module'})
 
-        url_module_list = safe_reverse('courses:module_list')
-        if url_module_list:
-            submenus.append({'nombre': 'Modulos', 'url': url_module_list, 'perm': 'groups.access_module'})
-
-        url_lesson_list = safe_reverse('courses:lesson_list')
-        if url_lesson_list:
-            submenus.append({'nombre': 'Lecciones', 'url': url_lesson_list, 'perm': 'groups.access_module'})
-
-        url_lesson_create = safe_reverse('courses:lesson_create')
-        if url_lesson_create:
-            submenus.append({'nombre': 'Crear Lección', 'url': url_lesson_create, 'perm': 'groups.access_module'})
+        # Admin actions centralized in panels above.
 
         # In-person links removed; ReportActivity is managed in 'home' app.
 
@@ -80,7 +67,7 @@ def obtener_menu_classroom(request):
                 submenus.append({'nombre': 'Mis Certificados', 'url': url_my_certs})
 
 
-        menu = build_menu(request.user, 'Classroom', submenus, url='#')
+        menu = build_menu(request.user, 'Aula Virtual', submenus, url='#')
         return {'menu_classroom': [menu] if menu else []}
     else:
         return {'menu_classroom': []}
@@ -148,7 +135,7 @@ def obtener_progress_class(request):
             'completed': enrollment.completed,
         })
     logger.warning(f"[CTX] obtener_progress_class => {type(progress)} | {progress}")
-    return {'progress_classroom': progress}
+    return {'Cursos en Progreso': progress}
 
 def obtener_certificados_usuario(request):
     if not request.user.is_authenticated:
@@ -242,7 +229,7 @@ def obtener_quicktest_manager(request):
         if url_q_list:
             submenus.append({'nombre': 'Preguntas de QuickTest', 'url': url_q_list, 'perm': 'groups.access_module'})
 
-        menu = build_menu(request.user, 'QuickTest', submenus, url='#')
+        menu = build_menu(request.user, 'Menu de Examenes', submenus, url='#')
         return {'menu_quicktest': [menu] if menu else []}
     else:
         return {'menu_quicktest': []}

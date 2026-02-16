@@ -36,7 +36,7 @@ class ModuleForm(forms.ModelForm):
 class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
-        fields = ['module', 'title', 'content', 'video_url', 'order']
+        fields = ['module', 'title', 'content', 'video_url', 'video_file', 'order']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:

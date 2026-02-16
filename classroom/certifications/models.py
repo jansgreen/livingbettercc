@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import os
 import re
-import uuid
+import uuid as uuid_module
 from typing import Final
 
 from django.conf import settings
@@ -20,7 +20,8 @@ def _safe_component(value: str) -> str:
     return value or "file"
 
 class Certificate(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
+    uuid = models.UUIDField(default=uuid_module.uuid4, unique=True, editable=False, db_index=True)
+    public_uuid = models.UUIDField(default=uuid_module.uuid4, unique=True, editable=False, db_index=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -32,8 +33,11 @@ class Certificate(models.Model):
         on_delete=models.CASCADE,
         related_name="certificates"
     )
+    pending = models.BooleanField(default=False, db_index=True)
     cert_no = models.CharField(max_length=30, unique=True, blank=True, editable=False)
+    certificate_number = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     issued_date = models.DateField(default=timezone.now, db_index=True)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["user", "course"], name="unique_user_course_certificate")
@@ -42,11 +46,6 @@ class Certificate(models.Model):
 
     def __str__(self):
         return f"{self.user} | {self.course} | {self.cert_no}"
-
-    @property
-    def public_uuid(self) -> str:
-        # Some templates expect 'public_uuid'; expose uuid as string for compatibility
-        return str(self.uuid)
 
     def _generate_cert_no(self):
         year = (self.issued_date.year if self.issued_date else timezone.now().year)
@@ -75,4 +74,6 @@ class Certificate(models.Model):
     def save(self, *args, **kwargs):
         if not self.cert_no:
             self.cert_no = self._generate_cert_no()
+        if not self.certificate_number:
+            self.certificate_number = self.cert_no
         super().save(*args, **kwargs)

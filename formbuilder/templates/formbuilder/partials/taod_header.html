@@ -1,0 +1,47 @@
+{% load static %}
+<style>
+  .taod-header { text-align: center; margin-bottom: 1.5rem; }
+  .taod-logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: center; }
+  .taod-logo-box { height: 120px; display: flex; align-items: center; justify-content: center; }
+  .taod-logo-box img { max-width: 120px; max-height: 120px; object-fit: contain; }
+  .taod-title { font-style: italic; font-weight: 600; margin: 1.25rem auto 0.75rem; max-width: 900px; }
+  .taod-org { font-style: italic; color: #666; line-height: 1.35; }
+  .taod-table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; }
+  .taod-table td { border: 1px solid #222; padding: 10px; vertical-align: middle; }
+  .taod-label { background: #e6e6e6; font-weight: 600; text-align: center; }
+  .taod-box { border: 1px solid #222; padding: 10px; margin: 0.75rem 0 1.25rem; }
+  .taod-section-title { font-style: italic; font-weight: 600; margin: 1.25rem 0 0.5rem; }
+  .taod-line { border-bottom: 1px solid #222; min-height: 22px; padding: 4px 0; }
+  .taod-list { margin: 0.25rem 0 1rem 1.25rem; }
+  .taod-anexos { text-align: center; margin-top: 1.5rem; font-weight: 600; }
+</style>
+
+<div class="taod-header">
+  <div class="taod-logos">
+    <div class="taod-logo-box">
+      {% if form_obj and form_obj.image_left_url %}
+        <img src="{{ form_obj.image_left_url }}" alt="Imagen izquierda del formulario" />
+      {% endif %}
+    </div>
+    <div class="taod-logo-box">
+      <img src="{% static 'setting/logo.png' %}" alt="Logo Living Better CC" />
+    </div>
+    <div class="taod-logo-box">
+      {% if form_obj and form_obj.image_right_url %}
+        <img src="{{ form_obj.image_right_url }}" alt="Imagen derecha del formulario" />
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="taod-org">
+    <div><strong>Living Better Community Center Inc.</strong></div>
+    <div>C/CUL DE SAC2 SUR EDF T APT 4 LAS PRADERAS</div>
+    <div>RESIDENCIAL SANTO DOMINGO</div>
+    <div>Email: livingbetter08@yahoo.com</div>
+    <div>Tel.: 809-498-5985</div>
+  </div>
+
+  {% if header_title %}
+    <h1 class="taod-title">{{ header_title }}</h1>
+  {% endif %}
+</div>

@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.models import User
 from django.utils.text import slugify
 from .models import FormDefinition, FormField
 
@@ -85,5 +86,7 @@ class FacilitadorRegistrationForm(forms.Form):
             first_name=self.cleaned_data['first_name'],
             last_name=self.cleaned_data['last_name'],
         )
-        return user
+        distrito = self.cleaned_data.get('distrito', '')
+        address = None
+        return user, distrito, address
  

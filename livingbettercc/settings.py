@@ -93,6 +93,7 @@ if not DEBUG:
         ".livingbettercc.org",
         ".livingbettercc.xyz",
         "livingbettercc-dev-5e915f7fc878.herokuapp.com",
+        "livingbettercc-ba2163025eea.herokuapp.com",
     ]
     ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
 
@@ -110,7 +111,11 @@ if not DEBUG:
         "https://www.livingbettercc.xyz",
     ]
 else:
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0").split(",")
+    _dev_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0")
+    _env_hosts = _parse_hosts_csv(_dev_hosts)
+    if IS_HEROKU:
+        _env_hosts.extend([".herokuapp.com"])
+    ALLOWED_HOSTS = list(dict.fromkeys(_env_hosts))
 
 
 
@@ -313,13 +318,26 @@ WHITENOISE_MANIFEST_STRICT = False
 
 # Archivos de medios (subidos por los usuarios)
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Cloudinary Storage si está habilitado
 
 USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+if USE_CLOUDINARY and not CLOUDINARY_URL:
+    # Fail-safe: if Cloudinary isn't configured, fall back to local media.
+    USE_CLOUDINARY = False
 
+if USE_CLOUDINARY:
+    # Use empty prefix for Cloudinary storage to avoid None prefix errors.
+    MEDIA_URL = ""
+    CLOUDINARY_STORAGE = {
+        "SECURE": True,
+        "PREFIX": "",
+    }
+else:
+    MEDIA_URL = "/media/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" 

@@ -1,14 +1,28 @@
 {% extends 'dashboard.html' %}
 
 {% block content %}
-    <h1>Lista de Facilitadores</h1>
-    <a href="{% url 'formbuilder:enroll_facilitador' %}" class="btn btn-primary mb-3">Agregar Facilitador</a>
+    {% if request.user.is_staff or request.user.is_superuser %}
+    <h1>Gestion de Colaboradores</h1>
+    {% else %}
+    <h1>Panel de Facilitadores</h1>
+    {% endif %}
+    
+    {% if request.user.is_staff or request.user.is_superuser %}
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a class="btn btn-primary m-2" href="{% url 'formbuilder:enroll_facilitador' %}">Agregar Facilitador</a>
+        <a class="btn btn-primary m-2" href="{% url 'invite_friend' %}?group=facilitador">Invitar</a>
+    </div>
+    {% endif %}
+
     <table class="table">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Email</th>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                <th>Grupos</th>
+                {% endif %}
                 <th>Formularios Completados</th>
             </tr>
         </thead>
@@ -16,8 +30,17 @@
             {% for facilitador in facilitadores %}
                 <tr>
                     <td>{{ facilitador.id }}</td>
-                    <td>{{ facilitador.username }}</td>
+                    <td>{{ facilitador.username|capfirst }}</td>
                     <td>{{ facilitador.email }}</td>
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                    <td>
+                        {% for group in facilitador.groups.all %}
+                            <span class="badge bg-success">{{ group.name }}</span>
+                        {% empty %}
+                            <span class="text-muted">Sin grupo</span>
+                        {% endfor %}
+                    </td>
+                    {% endif %}
                     <td>
                         {% with completed_forms=facilitador.completedform_set.all %}
                             <select class="form-select" onchange="if(this.value) window.location.href=this.value">
@@ -27,7 +50,10 @@
                                         <option value="{{ cf.get_absolute_url }}">{{ cf }}</option>
                                     {% else %}
                                         {# Si no tiene get_absolute_url, use la URL con namespace completo #}
-                                        <option value="{% url 'formbuilder:render_form' cf.form_name %}">{{ cf.form_name }}</option>
+                                        <option value="{% url 'formbuilder:completed_forms_edit' cf.pk %}">
+                                            {{ cf.form_name|truncatechars:30 }}
+                                        </option>
+
                                     {% endif %}
                                 {% endfor %}
                             </select>
@@ -45,6 +71,7 @@
                             </noscript>
                         {% endwith %}
                     </td>
+                    <td><a class="btn btn-offline-danger" href="#" onclick="return confirm('Esta funcion no esta disponible, contacta al administrador.');">Eliminar</a></td>
                 </tr>
             {% empty %}
                 <tr>
@@ -53,4 +80,5 @@
             {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

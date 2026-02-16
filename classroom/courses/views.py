@@ -11,14 +11,14 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from types import SimpleNamespace
 import json
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from authentication.models.students import Students  # Ajusta el import según tu estructura
 from authentication.models.profiles import Profiles
 from django.contrib.auth.models import Group
 from classroom.courses.models import Course, Module, Lesson
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -27,6 +27,25 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
+
+def _require_active_enrollment(request, *, course):
+    enr = Enrollment.objects.filter(
+        user=request.user,
+        course=course,
+    ).order_by('-id').first()
+    if not enr:
+        messages.error(request, "Debes inscribirte para acceder al contenido de este curso.")
+        return None, redirect("courses:course_detail", pk=course.pk)
+    if enr.status != Enrollment.Status.ACTIVE:
+        messages.warning(request, "Debes realizar el pago para acceder a las lecciones.")
+        return enr, redirect("courses:course_detail", pk=course.pk)
+    return enr, None
+
+
+def _require_staff(request):
+    if not request.user.is_authenticated or not request.user.is_staff:
+        raise Http404("No encontrado")
+    return None
 
 from classroom.courses.models import Module
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
@@ -138,228 +157,47 @@ def quicktest_view(request, module_id):
     })
 
 def course_enroll(request, pk):
-    """Permite a un usuario inscribirse en un curso."""
-    if not request.user.is_authenticated:
-        # Guardar intención en sesión para redirigir al curso después del registro
-        request.session['post_register_role'] = 'student'
-        request.session['selected_item'] = pk
-        # Si viene un POST con datos de beca, guardarlos temporalmente en sesión
-        if request.method == 'POST' and 'cedula' in request.POST:
-            pending = {
-                'cedula': request.POST.get('cedula', '').strip(),
-                'exequatur': request.POST.get('exequatur', '').strip(),
-                'centro_educativo': request.POST.get('centro_educativo', '').strip(),
-                'distrito_escolar': request.POST.get('distrito_escolar', '').strip(),
-                'street': request.POST.get('street', '').strip(),
-                'neighborhood': request.POST.get('neighborhood', '').strip(),
-                'provincia': request.POST.get('provincia', '').strip(),
-                'municipio': request.POST.get('municipio', '').strip(),
-                'zip_code': request.POST.get('zip_code', '').strip(),
-                'city': request.POST.get('city', '').strip(),
-                'state': request.POST.get('state', '').strip(),
-            }
-            request.session['pending_beca'] = pending
-        messages.warning(request, 'Debes iniciar sesión o registrarte para inscribirte en un curso.')
-        return redirect('authentication:register')
-
-    user = request.user
-    course = get_object_or_404(Course, pk=pk)
-
-    # Crear o recuperar estudiante
-    student, created = Students.objects.get_or_create(user=user)
-
-    # Asegurarse de que el usuario pertenezca al grupo 'student'
-    student_group, _ = Group.objects.get_or_create(name='student')
-    if not user.groups.filter(name='student').exists():
-        user.groups.add(student_group)
-
-    # Verificar si el usuario tiene perfil
-    profile = Profiles.objects.filter(user=user).first()
-
-    # Si existe una solicitud de beca almacenada en sesión (usuario se autenticó luego), procesarla aquí
-    pending_beca = request.session.get('pending_beca')
-    if pending_beca:
-        # Requiere perfil para beca Minerd
-        if not profile:
-            return redirect(reverse('authentication:profile_create'))
-        cedula = pending_beca.get('cedula', '').strip()
-        exequatur = pending_beca.get('exequatur', '').strip()
-        centro_educativo = pending_beca.get('centro_educativo', '').strip()
-        distrito_escolar = pending_beca.get('distrito_escolar', '').strip()
-        street = pending_beca.get('street', '').strip()
-        neighborhood = pending_beca.get('neighborhood', '').strip()
-        provincia = pending_beca.get('provincia', '').strip()
-        municipio = pending_beca.get('municipio', '').strip()
-        zip_code = pending_beca.get('zip_code', '').strip()
-        city = pending_beca.get('city', '').strip()
-        state = pending_beca.get('state', '').strip()
-        # Validación básica
-        if not profile.profesion:
-            messages.error(request, 'Debes tener una profesión registrada en tu perfil para aplicar a la beca Minerd.')
-            return redirect('courses:course_detail', pk=pk)
-        if not cedula or not exequatur or not centro_educativo or not distrito_escolar:
-            messages.error(request, 'Debes completar todos los campos para aplicar a la beca Minerd.')
-            return redirect('courses:course_detail', pk=pk)
-        # Guardar datos en Students
-        student.cedula = cedula
-        student.certification = exequatur
-        student.save()
-        # Dirección laboral
-        from authentication.address.models import Address
-        address = Address.objects.create(
-            user=user,
-            address_type='laboral',
-            street=street,
-            neighborhood=neighborhood,
-            city=city,
-            state=state,
-            zip_code=zip_code
-        )
-        # Guardar aplicación a beca
-        from classroom.enrollments.models import BecaApplication
-        beca_app, beca_created = BecaApplication.objects.get_or_create(
-            user=user,
-            course=course,
-            defaults={
-                'cedula': cedula,
-                'exequatur': exequatur,
-                'centro_educativo': centro_educativo,
-                'distrito_escolar': distrito_escolar,
-                'address': address,
-                'status': 'submitted',
-            }
-        )
-        if not beca_created:
-            beca_app.cedula = cedula
-            beca_app.exequatur = exequatur
-            beca_app.centro_educativo = centro_educativo
-            beca_app.distrito_escolar = distrito_escolar
-            beca_app.address = address
-            beca_app.status = 'submitted'
-            beca_app.save()
-        enrollment, _ = Enrollment.objects.get_or_create(user=user, course=course)
-        enrollment.status = Enrollment.Status.PENDING_APPROVAL
-        enrollment.save()
-        # Email de confirmación
-        try:
-            if user.email:
-                EmailMessage(
-                    subject='Solicitud de beca en revisión',
-                    body=f'Hemos recibido tu solicitud de beca para {course.title}. Pronto te notificaremos el resultado.',
-                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
-                    to=[user.email],
-                ).send(fail_silently=True)
-        except Exception:
-            pass
-        # Limpiar sesión al completar
-        request.session.pop('pending_beca', None)
-        messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada y está en revisión.')
-        return redirect('courses:my_course')
-
-    # Si el usuario aplica a beca Minerd (POST con cedula y exequatur)
-    if request.method == 'POST' and 'cedula' in request.POST and 'exequatur' in request.POST:
-        # Requiere perfil para beca Minerd
-        if not profile:
-            return redirect(reverse('authentication:profile_create'))
-        cedula = request.POST.get('cedula', '').strip()
-        exequatur = request.POST.get('exequatur', '').strip()
-        centro_educativo = request.POST.get('centro_educativo', '').strip()
-        distrito_escolar = request.POST.get('distrito_escolar', '').strip()
-        # Dirección laboral
-        street = request.POST.get('street', '').strip()
-        neighborhood = request.POST.get('neighborhood', '').strip()
-        provincia = request.POST.get('provincia', '').strip()
-        municipio = request.POST.get('municipio', '').strip()
-        zip_code = request.POST.get('zip_code', '').strip()
-        city = request.POST.get('city', '').strip()
-        state = request.POST.get('state', '').strip()
-        # Validar profesional
-        if not profile.profesion:
-            messages.error(request, 'Debes tener una profesión registrada en tu perfil para aplicar a la beca Minerd.')
-            return redirect('courses:course_detail', pk=pk)
-        if not cedula or not exequatur or not centro_educativo or not distrito_escolar:
-            messages.error(request, 'Debes completar todos los campos para aplicar a la beca Minerd.')
-            return redirect('courses:course_detail', pk=pk)
-        # Guardar datos en Students
-        student.cedula = cedula
-        student.certification = exequatur
-        student.save()
-        # Guardar dirección laboral
-        from authentication.address.models import Address
-        address = Address.objects.create(
-            user=user,
-            address_type='laboral',
-            street=street,
-            neighborhood=neighborhood,
-            city=city,
-            state=state,
-            zip_code=zip_code
-        )
-        # Guardar aplicación a beca
-        from classroom.enrollments.models import BecaApplication
-        beca_app, beca_created = BecaApplication.objects.get_or_create(
-            user=user,
-            course=course,
-            defaults={
-                'cedula': cedula,
-                'exequatur': exequatur,
-                'centro_educativo': centro_educativo,
-                'distrito_escolar': distrito_escolar,
-                'address': address,
-                'status': 'submitted',
-            }
-        )
-        if not beca_created:
-            beca_app.cedula = cedula
-            beca_app.exequatur = exequatur
-            beca_app.centro_educativo = centro_educativo
-            beca_app.distrito_escolar = distrito_escolar
-            beca_app.address = address
-            beca_app.status = 'submitted'
-            beca_app.save()
-        # Crear o recuperar matrícula y marcar estado pendiente de aprobación
-        enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
-        enrollment.status = Enrollment.Status.PENDING_APPROVAL
-        enrollment.save()
-        if created:
-            messages.success(request, f'Tu aplicación a la beca Minerd para {course.title} fue enviada y está en revisión.')
-        else:
-            messages.info(request, f'Tu matrícula está en revisión para la beca.')
-        # Email de confirmación de solicitud en revisión
-        try:
-            if user.email:
-                EmailMessage(
-                    subject='Solicitud de beca en revisión',
-                    body=f'Hemos recibido tu solicitud de beca para {course.title}. Pronto te notificaremos el resultado.',
-                    from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
-                    to=[user.email],
-                ).send(fail_silently=True)
-        except Exception:
-            pass
-        return redirect('courses:my_course')
-
-    # Inscripción normal (pago)
-    enrollment, created = Enrollment.objects.get_or_create(user=user, course=course)
-    if course.price and float(course.price) > 0:
-        enrollment.status = Enrollment.Status.PENDING_PAYMENT
-        enrollment.save()
-        msg = f'Registrado en {course.title}. Completa el pago para activar tu acceso.'
-    else:
-        enrollment.status = Enrollment.Status.ACTIVE
-        enrollment.save()
-        msg = f'Te has matriculado con éxito en {course.title}.'
-    messages.success(request, msg if created else f'Ya estás matriculado en {course.title}.')
-
-    return redirect('courses:my_course')
+    """Legacy endpoint: redirect to the modern auth_intent flow."""
+    return redirect("courses:session_enroll_students", pk=pk)
 
 def course_list(request):
     can_access_module = request.user.has_perm('groups.access_module')
-    courses = Course.objects.filter(published=True)
+    if request.user.is_staff or request.user.is_superuser or can_access_module:
+        courses = (
+            Course.objects
+            .all()
+            .annotate(modules_count=Count("modules", distinct=True))
+            .annotate(lessons_count=Count("modules__lessons", distinct=True))
+        )
+    else:
+        courses = (
+            Course.objects
+            .filter(published=True)
+            .annotate(modules_count=Count("modules", distinct=True))
+            .annotate(lessons_count=Count("modules__lessons", distinct=True))
+        )
     context = {
         'courses': courses,
         'can_access_module': can_access_module,
     }
     return render(request, 'courses/course_list.html', context)
+
+
+@login_required
+def course_admin_list(request):
+    _require_staff(request)
+    courses = Course.objects.all().order_by('title')
+    return render(request, 'courses/admin_course_list.html', {'courses': courses})
+
+
+@login_required
+def course_admin_detail(request, pk):
+    _require_staff(request)
+    course = get_object_or_404(
+        Course.objects.prefetch_related('modules__lessons'),
+        pk=pk
+    )
+    return render(request, 'courses/admin_course_detail.html', {'course': course})
 
 def course_detail(request, pk):
     course = Course.objects.prefetch_related('modules__lessons').get(pk=pk)
@@ -719,7 +557,6 @@ def lesson_update(request, pk):
         'object': True,
     }
     return render(request, 'lesson/lesson_form.html', context)
-
 
 @login_required
 def lesson_detail(request, pk):

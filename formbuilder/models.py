@@ -5,6 +5,7 @@ from authentication.address.models import Address
 from django.conf import settings
 from django.db import models
 
+from payments.models import User
 
 
 class FormDefinition(models.Model):
@@ -19,6 +20,22 @@ class FormDefinition(models.Model):
     def __str__(self):
         return self.name
 
+    def _safe_image_url(self, field_name: str) -> str:
+        field = getattr(self, field_name, None)
+        if not field:
+            return ""
+        try:
+            return field.url
+        except Exception:
+            return ""
+
+    @property
+    def image_left_url(self) -> str:
+        return self._safe_image_url("image_left")
+
+    @property
+    def image_right_url(self) -> str:
+        return self._safe_image_url("image_right")
 
 FIELD_TYPES = [
     ('char', 'Campo de texto'),
@@ -33,7 +50,10 @@ FIELD_TYPES = [
 class FormField(models.Model):
     form = models.ForeignKey(FormDefinition, on_delete=models.CASCADE, related_name='fields')
     label = models.CharField(max_length=255)
-    name = models.SlugField(help_text="Nombre interno del campo (sin espacios ni caracteres especiales)")
+    name = models.SlugField(
+        help_text="Nombre interno del campo (sin espacios ni caracteres especiales)",
+        blank=True,
+    )
     field_type = models.CharField(max_length=20, choices=FIELD_TYPES)
     required = models.BooleanField(default=True)
     choices = models.TextField(
@@ -51,6 +71,7 @@ class FormField(models.Model):
 
 class CompletedForm(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    form = models.ForeignKey("FormDefinition", null=True, blank=True, on_delete=models.SET_NULL)
     form_name = models.CharField(max_length=255)
     titulo = models.CharField(max_length=255, blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
@@ -60,8 +81,8 @@ class CompletedForm(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"CompletedForm by {self.user.username} for {self.form_name} at {self.submitted_at}"
-    
+        form_name = self.form.name if self.form else self.form_name
+        return f"CompletedForm by {self.user.username} for {form_name} at {self.submitted_at}"
 
 class FormShareLink(models.Model):
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -72,3 +93,7 @@ class FormShareLink(models.Model):
 
     def __str__(self):
         return f"{self.form.name} ({self.token})"
+
+    def is_valid(self) -> bool:
+        # No expiration policy; only active links are valid.
+        return self.is_active

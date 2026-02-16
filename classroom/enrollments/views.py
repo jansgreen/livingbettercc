@@ -24,33 +24,8 @@ def enrollment_detail(request, pk):
 
 @login_required
 def enrollment_create(request, course_id):
-    course = get_object_or_404(Course, pk=course_id)
-
-    enrollment, created = Enrollment.objects.get_or_create(
-        user=request.user,
-        course=course,
-        defaults={
-            "status": Enrollment.Status.PENDING_PAYMENT if course.price and course.price > 0 else Enrollment.Status.ACTIVE
-        }
-    )
-
-    # Already exists
-    if not created:
-        if enrollment.status in [Enrollment.Status.ACTIVE, Enrollment.Status.COMPLETED]:
-            messages.info(request, f"Ya tienes acceso activo a {course.title}.")
-            return redirect("courses:my_course")
-
-        if enrollment.status == Enrollment.Status.PENDING_APPROVAL:
-            messages.info(request, "Tu solicitud de beca está en revisión.")
-            return redirect("courses:my_course")
-
-    # Newly created
-    if enrollment.status == Enrollment.Status.PENDING_PAYMENT:
-        messages.success(request, f"Inscripción creada. Falta completar el pago.")
-        return redirect("enrollments:create_checkout_session", enrollment_id=enrollment.id)
-
-    messages.success(request, f"Inscripción activa en {course.title}.")
-    return redirect("courses:my_course")
+    """Legacy endpoint: redirect to the modern auth_intent flow."""
+    return redirect("courses:session_enroll_students", pk=course_id)
 
 @login_required
 def enrollment_delete(request, pk):

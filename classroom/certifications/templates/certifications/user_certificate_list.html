@@ -1,27 +1,52 @@
-{% extends "dashboard/dashboard_base.html" %}
+{% extends "dashboard.html" %}
 {% load static %}
 {% block content %}
-<h1>Lista de Certificados de Usuarios</h1>
+<h1>Panel de Certificados de Usuarios</h1>
 <table class="table">
     <thead>
         <tr>
             <th>ID</th>
             <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
             <th>Curso</th>
             <th>Fecha de Emisión</th>
             <th>Número de Certificado</th>
             <th>UUID Público</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         {% for certificado in certificados %}
         <tr>
             <td>{{ certificado.id }}</td>
-            <td>{{ certificado.user.username }}</td>
-            <td>{{ certificado.course.title }}</td>
+            <td>{{ certificado.user.username|capfirst }}</td>
+            <td>{{ certificado.user.first_name|capfirst }}</td>
+            <td>{{ certificado.user.last_name|capfirst }}</td>
+
+            <td>{{ certificado.course.title|truncatechars:50 }}</td>
             <td>{{ certificado.issued_date }}</td>
             <td>{{ certificado.cert_no }}</td>
-            <td><a href="{% url 'certifications:certificate_public_view' certificado.public_uuid %}">{{ certificado.public_uuid }}</a></td>
+            <td>
+                {% with uuid=certificado.public_uuid|stringformat:"s" %}
+                    <a href="{% url 'certifications:certificate_public_view' certificado.public_uuid %}">
+                        {{ uuid|slice:":4" }}-{{ uuid|slice:"-4:" }}
+                    </a>
+                {% endwith %}
+            </td>
+            <td>
+                {% if certificado.pending %}
+                <form method="post" action="{% url 'certifications:certificate_toggle_pending' certificado.uuid %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm">Certificar</button>
+                </form>
+                {% else %}
+                <form method="post" action="{% url 'certifications:certificate_toggle_pending' certificado.uuid %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Desactivar</button>
+                </form>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
