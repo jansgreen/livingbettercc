@@ -109,6 +109,13 @@ class InviteFriendView(View):
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
+        else:
+            try:
+                from django.contrib.auth.models import Group
+                g = Group.objects.get(name__iexact="students_becados")
+                initial['group'] = g.id
+            except Group.DoesNotExist:
+                pass
         form = self.form_class(initial=initial)
         return render(request, self.template_name, {'form': form})
 

@@ -1,19 +1,35 @@
 {% extends "dashboard.html" %}
 {% load static %}
 {% block content %}
-{% include "formbuilder/partials/taod_header.html" with header_title="Formularios" %}
+{% include "formbuilder/partials/taod_header.html" with header_title="Panel del Formulario" %}
 <h1 class="h5 mb-3">Formularios</h1>
-<a href="{% url 'formbuilder:form_create' %}">Crear nuevo formulario</a>
-<a href="{% url 'invite_friend' %}?group=facilitador" class="btn btn-warning mt-2">Invitar Facilitador</a>
-<br>
-<a href="{% url 'formbuilder:enroll_facilitador' %}" class="btn btn-info mt-2">Ver facilitadores por formulario</a>
-<ul  class="list-group">
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{% url 'formbuilder:form_create' %}" class="btn btn-primary">Nuevo</a>
+  <a class="btn btn-outline-success" href="{% url 'formbuilder:facilitador_list_view' %}">Panel del Facilitador</a>
+</div>
+
+<div class="list-group">
     {% for form in forms %}
-        <li class="list-group-item">
-            <a href="{% url 'formbuilder:form_detail' form.pk %}">{{ form.name }}</a>
-        </li>
+        <div class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="me-3">
+                <div class="fw-semibold">{{ form.name|truncatewords:10 }}</div>
+                {% if form.description %}
+                  <div class="text-muted small">{{ form.description|striptags|truncatewords:10 }}</div>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'formbuilder:completed_forms_list'%}" class="btn btn-success">Completados</a>
+                <a href="{% url 'formbuilder:form_detail' form.pk %}" class="btn btn-outline-secondary btn-sm">Agregar Campos</a>
+                <a href="{% url 'formbuilder:form_update' form.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                <form method="post" action="{% url 'formbuilder:form_delete' form.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este formulario?');">Eliminar</button>
+                </form>
+            </div>
+        </div>
     {% empty %}
-        <li class="list-group-item">No hay formularios.</li>
+        <div class="list-group-item">No hay formularios.</div>
     {% endfor %}
-</ul>
+</div>
+
 {% endblock %}

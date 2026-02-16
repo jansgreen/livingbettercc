@@ -18,7 +18,7 @@ from authentication.models.students import Students  # Ajusta el import según t
 from authentication.models.profiles import Profiles
 from django.contrib.auth.models import Group
 from classroom.courses.models import Course, Module, Lesson
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Count
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
@@ -162,7 +162,20 @@ def course_enroll(request, pk):
 
 def course_list(request):
     can_access_module = request.user.has_perm('groups.access_module')
-    courses = Course.objects.filter(published=True)
+    if request.user.is_staff or request.user.is_superuser or can_access_module:
+        courses = (
+            Course.objects
+            .all()
+            .annotate(modules_count=Count("modules", distinct=True))
+            .annotate(lessons_count=Count("modules__lessons", distinct=True))
+        )
+    else:
+        courses = (
+            Course.objects
+            .filter(published=True)
+            .annotate(modules_count=Count("modules", distinct=True))
+            .annotate(lessons_count=Count("modules__lessons", distinct=True))
+        )
     context = {
         'courses': courses,
         'can_access_module': can_access_module,

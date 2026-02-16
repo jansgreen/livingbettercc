@@ -22,15 +22,17 @@ def obtener_formbuilder_menu(request):
 
     # Staff/admin: acceso total
     if is_staff:
-        submenus.extend([
-            {'nombre': 'Formbuilder', 'url': _safe_url('formbuilder:form_list', '/formbuilder/')},
-            {'nombre': 'Crear Formulario', 'url': _safe_url('formbuilder:form_create', '/formbuilder/create/')},
-            {'nombre': 'Lista Formularios Completados', 'url': _safe_url('formbuilder:completed_forms_list', '/formbuilder/completed/')},
-            {'nombre': 'Lista de Facilitadores', 'url': _safe_url('formbuilder:facilitador_list_view', '/formbuilder/facilitadores/')},
+        submenus.extend([ ## colocar la firma y el sello original del certificado
+            {'nombre': 'Panel del Formularios', 'url': _safe_url('formbuilder:form_list', '/formbuilder/')},
+            {'nombre': 'Panel de Facilitadores', 'url': _safe_url('formbuilder:facilitador_list_view', '/formbuilder/facilitadores/')},
             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
-            {'nombre': 'Inscribir Facilitador', 'url': _safe_url('formbuilder:enroll_facilitador', '/formbuilder/enroll_facilitador/')},
+            {'nombre': 'Invitar Estudiante Becado', 'url': f"{_safe_url('invite_friend', '#')}?group=students_becados"},
             {'nombre': 'Invitar Facilitador', 'url': f"{_safe_url('invite_friend', '#')}?group=facilitador"},
+            {'nombre': 'Invitar Tecnico', 'url': f"{_safe_url('invite_friend', '#')}?group=tecnico"},
+            {'nombre': 'Invitar Coordinador', 'url': f"{_safe_url('invite_friend', '#')}?group=coordinador"},
+
         ])
+
     # Técnico: solo ver completados y facilitadores
     elif is_tecnico:
         submenus.extend([
@@ -46,6 +48,6 @@ def obtener_formbuilder_menu(request):
     else:
         submenus.append({'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')})
 
-    menu = build_menu(request.user, 'Form Builder', submenus, url='#')
+    menu = build_menu(request.user, 'Gestiones y Formularios', submenus, url='#')
     logger.warning(f"[CTX] obtener_formbuilder_menu => {type(menu)} | {menu}")
     return {'formbuilder_menu': [menu] if menu else []}

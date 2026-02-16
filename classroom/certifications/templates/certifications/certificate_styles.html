@@ -1,0 +1,385 @@
+<style>
+:root{
+    --navy:#0b2346;
+    --navy-2:#0f2f66;
+    --blue:#1e4f9b;
+    --blue-2:#2f6ad4;
+    --gold:#b88a2f;
+    --gold-2:#e2c67a;
+    --paper:#ffffff;
+    --ink:#0f172a;
+    --muted:#475569;
+    --w: 1200px;
+    --h: 820px;
+    --radius: 16px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    font-family: "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    background:#0b1324;
+    color:var(--ink);
+  }
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    padding:14px 12px;
+    flex-wrap:wrap;
+  }
+  .btn{
+    border:1px solid #cbd5e1;
+    background:#fff;
+    padding:10px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    letter-spacing:.2px;
+  }
+  .btn.primary{
+    background:linear-gradient(180deg, var(--navy-2), var(--navy));
+    border-color:#0f172a;
+    color:#fff;
+  }
+
+  @media print{
+    @page{ size: landscape; margin: 0; }
+    *{ -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body{ background:#fff !important; }
+    .toolbar{ display:none !important; }
+    .navbar, nav, header, footer, .b-example-divider, .container-fluid, .cloudinary-wrap, #topbar, #navbar{ display:none !important; }
+    body{ padding-top:0 !important; margin:0 !important; }
+    main{ margin:0 !important; padding:0 !important; }
+    .stage{ padding:0 !important; }
+    .cert{ box-shadow:none !important; margin:0 !important; transform:scale(0.96) !important; transform-origin: top center !important; }
+  }
+
+  .stage{
+    --scale: min(1, calc((100vw - 24px) / 1200));
+    display:flex;
+    justify-content:center;
+    padding:18px 12px 40px;
+  }
+
+  .cert{
+    width:var(--w);
+    height:var(--h);
+    position:relative;
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 18px 50px rgba(0,0,0,.28);
+    background:linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
+    transform: scale(var(--scale));
+    transform-origin: top center;
+  }
+
+  @media (max-width: 768px){
+    .stage{
+      --scale: min(1, calc((100vw - 16px) / 1200));
+      padding:12px 8px 24px;
+    }
+  }
+
+  @media (max-width: 480px){
+    .stage{
+      --scale: min(1, calc((100vw - 8px) / 1200));
+      padding:8px 4px 18px;
+    }
+  }
+
+  .frame-outer{
+    position:absolute;
+    inset:16px;
+    border-radius:calc(var(--radius) - 2px);
+    background:linear-gradient(180deg, #14305f 0%, #0d2146 100%);
+    box-shadow: inset 0 0 0 3px rgba(184,138,47,.55);
+  }
+  .frame-inner{
+    position:absolute;
+    inset:28px;
+    border-radius:calc(var(--radius) - 6px);
+    background:linear-gradient(180deg, rgba(46,104,196,.9) 0%, rgba(20,48,95,.9) 100%);
+    box-shadow: inset 0 0 0 2px rgba(184,138,47,.45);
+  }
+
+  .paper{
+    position:absolute;
+    inset:44px;
+    border-radius:12px;
+    background:
+      radial-gradient(1000px 600px at 50% 20%, rgba(15,47,102,.06) 0%, rgba(15,47,102,0) 60%),
+      #ffffff;
+    border:1px solid rgba(15,23,42,.08);
+    padding:22px 38px 0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .wm{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+    opacity:.18;
+  }
+  .wm .wm-mark{
+    width:860px;
+    height:860px;
+    border-radius:50%;
+    border:2px solid rgba(184,138,47,.22);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wm .tree img{
+    width:160px;
+    height:160px;
+    object-fit:contain;
+  }
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    font-weight:700;
+    color:#1f3b69;
+    letter-spacing:.2px;
+    padding-bottom:6px;
+    border-bottom:1px solid rgba(15,23,42,.12);
+  }
+
+  .logos{
+    display:grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    align-items:center;
+    gap:12px;
+    margin-top:6px;
+  }
+  .logoBox{
+    height:120px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .logoBox img{
+    max-width:90%;
+    max-height:90%;
+    object-fit:contain;
+  }
+  .centerBrand{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+  }
+  .centerBrand .lbccMark{
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    border:2px solid rgba(184,138,47,.4);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:#fff;
+  }
+  .centerBrand .lbccMark img{
+    width:92%;
+    height:92%;
+    object-fit:contain;
+  }
+
+  .banner{
+    margin:8px auto 0;
+    padding:8px 22px;
+    border-radius:6px;
+    background:linear-gradient(180deg, #163867 0%, #0f2a54 100%);
+    color:#fff;
+    font-weight:800;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    border:2px solid rgba(184,138,47,.55);
+    position:relative;
+  }
+  .banner::before,
+  .banner::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:52px;
+    height:2px;
+    background:linear-gradient(90deg, rgba(184,138,47,0), rgba(184,138,47,.8));
+  }
+  .banner::before{ left:-62px; }
+  .banner::after{ right:-62px; transform:scaleX(-1); }
+
+  .titleArea{
+    text-align:center;
+    margin-top:4px;
+  }
+  .bigTitle{
+    margin:0;
+    font-size:50px;
+    font-weight:900;
+    letter-spacing:3px;
+    color:#2b5aa6;
+    font-family: "Georgia", "Times New Roman", serif;
+  }
+  .subTitle{
+    margin-top:4px;
+    font-size:17px;
+    font-weight:700;
+    color:#2b3d59;
+  }
+
+  .fields{
+    text-align:center;
+    margin-top:2px;
+  }
+  .name{
+    font-size:26px;
+    font-weight:900;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    margin:4px 0 2px;
+    color:#0b132b;
+  }
+  .line{
+    height:1px;
+    background:rgba(15,23,42,.28);
+    margin:4px auto;
+  }
+  .line.long{ width:78%; }
+  .line.medium{ width:70%; }
+
+  .program{
+    font-size:17px;
+    font-weight:700;
+    line-height:1.35;
+    color:#0f172a;
+  }
+  .program .pname{
+    display:inline-block;
+    padding:0 8px;
+  }
+  .dateRow{
+    margin-top:4px;
+    font-size:15px;
+    font-weight:700;
+    color:#0f172a;
+  }
+
+  .script{
+    margin-top:2px;
+    font-family:"Brush Script MT","Segoe Script","Apple Chancery",cursive;
+    font-size:20px;
+    color:rgba(15,23,42,.75);
+    text-align:center;
+  }
+
+  .footer{
+    margin-top:0;
+    margin-bottom:0;
+    display:grid;
+    grid-template-columns: 1fr 150px;
+    gap:16px;
+    align-items:end;
+  }
+
+  .signs{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:20px;
+    align-items:end;
+  }
+  .sig{
+    text-align:center;
+    position:relative;
+    padding-top:34px;
+  }
+  .sig .sigImage{
+    width:100%;
+    height:54px;
+    position:absolute;
+    top:-4px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    pointer-events:none;
+    z-index:2;
+  }
+  .sig .sigImage img{
+    max-height:54px;
+    max-width:100%;
+    object-fit:contain;
+    opacity:.95;
+  }
+  .sigLine{
+    height:1px;
+    background:rgba(15,23,42,.35);
+    width:86%;
+    margin:0 auto 6px;
+  }
+  .sig .sigName{
+    position:relative;
+    z-index:1;
+    font-weight:800;
+    font-size:14px;
+    margin-bottom:2px;
+  }
+  .sig .sigRole{
+    font-size:12.5px;
+    color:var(--muted);
+    font-weight:700;
+  }
+
+  .sealWrap{
+    width:150px;
+    height:150px;
+    justify-self:end;
+    align-self:end;
+    filter: drop-shadow(0 8px 16px rgba(15,23,42,.22));
+  }
+  .sealImage{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+
+  .footbar{
+    margin-top:2px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 14px;
+    border-radius:8px;
+    background:linear-gradient(180deg, #123159 0%, #0d2446 100%);
+    color:#f8f3df;
+    border:2px solid rgba(184,138,47,.55);
+  }
+  .quote{
+    font-size:11.5px;
+    letter-spacing:.4px;
+    font-weight:800;
+    text-transform:uppercase;
+    max-width:70%;
+  }
+  .certNo{
+    font-size:16px;
+    font-weight:900;
+    white-space:nowrap;
+  }
+  .certNo b{
+    color:var(--gold-2);
+    margin-left:6px;
+  }
+</style>

@@ -1,91 +1,32 @@
 {% extends "classroom/classroom.html" %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-.card-module {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border-radius: 1rem;
-  transition: box-shadow 0.2s;
-}
-.card-module:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-  border-color: #0d6efd;
-}
-.module-title {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #0d6efd;
-}
-.lesson-badge {
-  background: #7ec8ff;
-  color: #052c65;
-  font-size: 0.9rem;
-  border-radius: 0.5rem;
-  padding: 0.2rem 0.7rem;
-}
-.btn-action {
-  margin-right: 0.3rem;
-}
-</style>
-
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-primary"><i class="fa-solid fa-layer-group"></i> Módulos de Cursos</h2>
-    <div>
-      <a href="{% url 'courses:module_create' %}" class="btn btn-primary btn-action"><i class="fa fa-plus"></i> Nuevo Módulo</a>
-      <a href="{% url 'courses:lesson_create' %}" class="btn btn-info btn-action"><i class="fa fa-book"></i> Nueva Lección</a>
-    </div>
+  <h1 class="h5 mb-3">Panel de Módulos</h1>
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <a href="{% url 'courses:lesson_list' %}" class="btn btn-primary">Panel de las lecciones</a>
+    <a class="btn btn-outline-success" href="{% url 'courses:module_list' %}">Panel de los módulos</a>
   </div>
-  <div class="row g-4">
+
+  <div class="list-group">
     {% for module in modules %}
-      <div class="col-12 col-md-6 col-lg-4">
-        <div class="card card-module h-100 animate__animated animate__fadeInUp">
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex align-items-center mb-2">
-              <i class="fa-solid fa-cube fa-2x text-primary me-2"></i>
-              <span class="module-title">{{ module.title }}</span>
-            </div>
-            <p class="mb-2 text-muted">Curso: <span class="fw-bold">{{ module.course.title }}</span></p>
-            <div class="mb-2">
-              <span class="badge bg-secondary">{{ module.lessons.count }} Lecciones</span>
-            </div>
-            <ul class="list-group mb-3">
-              {% for lesson in module.lessons.all %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span><i class="fa fa-book-open me-1"></i> <a href="{% url 'courses:lesson_detail' lesson.pk %}" class="fw-bold text-dark">{{ lesson.title|capfirst }}</a></span>
-                  <span class="lesson-badge">Lección</span>
-                  <div>
-                    {% if can_access_module or request.user.is_superuser %}
-                      <a class="btn btn-warning btn-sm btn-action" href="{% url 'courses:lesson_update' lesson.pk %}"><i class="fa fa-edit"></i></a>
-                      <form action="{% url 'courses:lesson_delete' lesson.pk %}" method="post" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-sm btn-action"><i class="fa fa-trash"></i></button>
-                      </form>
-                    {% endif %}
-                  </div>
-                </li>
-              {% empty %}
-                <li class="list-group-item">No hay lecciones en este módulo.</li>
-              {% endfor %}
-            </ul>
-            <div class="mt-auto">
-              <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-primary btn-sm btn-action"><i class="fa fa-eye"></i> Ver Módulo</a>
-              {% if can_access_module or request.user.is_superuser %}
-                <a href="{% url 'courses:module_update' module.pk %}" class="btn btn-warning btn-sm btn-action"><i class="fa fa-edit"></i></a>
-                <a href="{% url 'courses:module_delete' module.pk %}" class="btn btn-danger btn-sm btn-action"><i class="fa fa-trash"></i></a>
-              {% endif %}
-            </div>
-          </div>
+      <div class="list-group-item d-flex align-items-center justify-content-between">
+        <div class="me-3">
+          <div class="fw-semibold">{{ module.title }}</div>
+          <div class="text-muted small">Curso: {{ module.course.title }}</div>
+          <div class="small text-muted">Lecciones: {{ module.lessons.count }}</div>
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
+          {% if request.user.is_superuser or perms.groups.access_module %}
+            <a href="{% url 'courses:module_update' module.pk %}" class="btn btn-primary btn-sm">Editar</a>
+            <a href="{% url 'courses:module_delete' module.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+          {% endif %}
         </div>
       </div>
     {% empty %}
-      <div class="col-12">
-        <div class="alert alert-info">No hay módulos publicados.</div>
-      </div>
+      <div class="list-group-item">No hay módulos publicados.</div>
     {% endfor %}
   </div>
 </div>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 {% endblock %}
-

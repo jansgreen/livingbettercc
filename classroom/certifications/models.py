@@ -33,6 +33,7 @@ class Certificate(models.Model):
         on_delete=models.CASCADE,
         related_name="certificates"
     )
+    pending = models.BooleanField(default=False, db_index=True)
     cert_no = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     certificate_number = models.CharField(max_length=30, unique=True, blank=True, editable=False)
     issued_date = models.DateField(default=timezone.now, db_index=True)

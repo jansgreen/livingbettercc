@@ -12,7 +12,7 @@ urlpatterns = [
     path('groups/create/', group_create, name='group_create'),
     path('groups/<int:pk>/update/', group_update, name='group_update'),
 
-    path('invite/', InviteFriendView.as_view(), name='invite_friend'),
+    path('invite/', InviteFriendView.as_view(), name='invite_friend'), 
     path('accept-invite/<uuid:token>/', accept_invite, name='accept_invite'),
     path('invite_success/', invite_success, name='invite_success'), 
 
