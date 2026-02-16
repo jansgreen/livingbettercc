@@ -1,4 +1,4 @@
-﻿[
+[
 {
   "model": "admin.logentry",
   "pk": 127,
@@ -579,7 +579,7 @@
     "user": 71,
     "content_type": 50,
     "object_id": "6",
-    "object_repr": "La educaci�n temprana sobre el Uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial",
+    "object_repr": "La educaci?n temprana sobre el Uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial",
     "action_flag": 3,
     "change_message": ""
   }
@@ -592,7 +592,7 @@
     "user": 71,
     "content_type": 50,
     "object_id": "2",
-    "object_repr": "La educaci�n temprana sobre el Uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial",
+    "object_repr": "La educaci?n temprana sobre el Uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial",
     "action_flag": 3,
     "change_message": ""
   }
@@ -618,7 +618,7 @@
     "user": 71,
     "content_type": 50,
     "object_id": "8",
-    "object_repr": "La educaci�n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial",
+    "object_repr": "La educaci?n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial",
     "action_flag": 2,
     "change_message": "[{\"changed\": {\"fields\": [\"Course description\", \"Program\", \"Image\"]}}, {\"added\": {\"name\": \"module\", \"object\": \"La educaci\\u00f3n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j\\u00f3venes no se enfermen Bio-psicosocial - Pronto\"}}]"
   }
@@ -722,7 +722,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "53",
-    "object_repr": "estudiantedemo in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "estudiantedemo in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -735,7 +735,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "54",
-    "object_repr": "estudiantedemo in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "estudiantedemo in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -748,7 +748,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "55",
-    "object_repr": "estudiantedemo in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "estudiantedemo in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -787,7 +787,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "58",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -800,7 +800,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "57",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -813,7 +813,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "56",
-    "object_repr": "estudiantedemo in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "estudiantedemo in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -826,7 +826,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "59",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -839,7 +839,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "60",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -852,7 +852,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "61",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -865,7 +865,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "62",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -878,7 +878,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "63",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -891,7 +891,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "64",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -904,7 +904,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "65",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -917,7 +917,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "66",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -930,7 +930,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "67",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -943,7 +943,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "68",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -956,7 +956,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "1",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - DemoStudents (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - DemoStudents (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -969,7 +969,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "2",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - DemoStudents (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - DemoStudents (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -982,7 +982,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "69",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -995,7 +995,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "70",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1008,7 +1008,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "71",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1021,7 +1021,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "73",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1034,7 +1034,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "72",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1073,7 +1073,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "4",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1086,7 +1086,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "3",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - DemoStudents (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - DemoStudents (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1099,7 +1099,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "74",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1125,7 +1125,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "7",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1138,7 +1138,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "75",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1151,7 +1151,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "76",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1177,7 +1177,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "9",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (80.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (80.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1203,7 +1203,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "11",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1216,7 +1216,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "77",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1229,7 +1229,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "78",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1255,7 +1255,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "13",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1281,7 +1281,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "15",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1294,7 +1294,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "79",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1320,7 +1320,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "17",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1333,7 +1333,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "80",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1346,7 +1346,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "81",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1359,7 +1359,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "21",
-    "object_repr": "QuickTest Decisiones y Protecci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1385,7 +1385,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "19",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1398,7 +1398,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "24",
-    "object_repr": "QuickTest Decisiones y Protecci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1424,7 +1424,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "22",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1437,7 +1437,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "82",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1450,7 +1450,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "84",
-    "object_repr": "DemoStudents in La educaci�n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial (pending_payment)",
+    "object_repr": "DemoStudents in La educaci?n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial (pending_payment)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1463,7 +1463,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "83",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1476,7 +1476,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "27",
-    "object_repr": "QuickTest Decisiones y Protecci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1502,7 +1502,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "25",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (85.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (85.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1515,7 +1515,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "85",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (active)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1528,7 +1528,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "28",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - custumerdemo (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - custumerdemo (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1541,7 +1541,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "34",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - custumerdemo (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - custumerdemo (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1554,7 +1554,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "33",
-    "object_repr": "QuickTest Decisiones y Protecci�n - DemoStudents (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - DemoStudents (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1580,7 +1580,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "31",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - DemoStudents (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - DemoStudents (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1593,7 +1593,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "30",
-    "object_repr": "QuickTest Decisiones y Protecci�n - custumerdemo (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - custumerdemo (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1619,7 +1619,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "87",
-    "object_repr": "custumerdemo in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "custumerdemo in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1632,7 +1632,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "86",
-    "object_repr": "DemoStudents in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "DemoStudents in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1762,7 +1762,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "40",
-    "object_repr": "QuickTest Decisiones y Protecci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Decisiones y Protecci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1788,7 +1788,7 @@
     "user": 71,
     "content_type": 70,
     "object_id": "38",
-    "object_repr": "QuickTest Fundamentos de Prevenci�n - jansgreen02 (100.00)",
+    "object_repr": "QuickTest Fundamentos de Prevenci?n - jansgreen02 (100.00)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -1801,7 +1801,7 @@
     "user": 71,
     "content_type": 54,
     "object_id": "89",
-    "object_repr": "jansgreen02 in DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
+    "object_repr": "jansgreen02 in DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas (completed)",
     "action_flag": 3,
     "change_message": ""
   }
@@ -2333,8 +2333,8 @@
   "model": "courses.course",
   "pk": 7,
   "fields": {
-    "title": "La competencia de comunicaci�n efectiva y resoluci�n de conflictos",
-    "description": "<p><span style=\"color:black;\">la competencia de comunicaci�n efectiva y resoluci�n de conflictos</span></p>",
+    "title": "La competencia de comunicaci?n efectiva y resoluci?n de conflictos",
+    "description": "<p><span style=\"color:black;\">la competencia de comunicaci?n efectiva y resoluci?n de conflictos</span></p>",
     "program": null,
     "price": "0.00",
     "image": "media/course_images/Lbcc_manual_e5w5hl",
@@ -2349,8 +2349,8 @@
   "model": "courses.course",
   "pk": 8,
   "fields": {
-    "title": "La educaci�n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial",
-    "description": "<p>Formando j�venes fuertes, sanos y conscientes La educaci�n temprana salva vidas. Este curso ha sido dise�ado para brindar a padres, educadores, l�deres comunitarios y j�venes las herramientas necesarias para prevenir el consumo de tabaco, alcohol y otras drogas desde una perspectiva bio-psicosocial, fortaleciendo la mente, el cuerpo y el entorno social de nuestros j�venes. Vivimos en una generaci�n expuesta constantemente a presiones sociales, estr�s emocional y modelos de conducta que aumentan el riesgo de consumo temprano. LBCC presenta este programa como una respuesta educativa integral que protege, orienta y empodera.</p>",
+    "title": "La educaci?n temprana sobre el uso del Tabaco, Alcohol y Otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial",
+    "description": "<p>Formando j?venes fuertes, sanos y conscientes La educaci?n temprana salva vidas. Este curso ha sido dise?ado para brindar a padres, educadores, l?deres comunitarios y j?venes las herramientas necesarias para prevenir el consumo de tabaco, alcohol y otras drogas desde una perspectiva bio-psicosocial, fortaleciendo la mente, el cuerpo y el entorno social de nuestros j?venes. Vivimos en una generaci?n expuesta constantemente a presiones sociales, estr?s emocional y modelos de conducta que aumentan el riesgo de consumo temprano. LBCC presenta este programa como una respuesta educativa integral que protege, orienta y empodera.</p>",
     "program": 1,
     "price": "10.99",
     "image": "media/course_images/Portada_mldpdu",
@@ -2365,8 +2365,8 @@
   "model": "courses.course",
   "pk": 9,
   "fields": {
-    "title": "DEMO � Prevenci�n del Uso de Alcohol, Tabaco y Otras Drogas",
-    "description": "Este es un curso DEMO dise�ado para visualizar, probar y presentar el funcionamiento del Classroom de LBCC. No es un programa acad�mico real; su prop�sito es mostrar el flujo de m�dulos, lecciones, evaluaciones y progreso basado en valores educativos y de prevenci�n.",
+    "title": "DEMO ? Prevenci?n del Uso de Alcohol, Tabaco y Otras Drogas",
+    "description": "Este es un curso DEMO dise?ado para visualizar, probar y presentar el funcionamiento del Classroom de LBCC. No es un programa acad?mico real; su prop?sito es mostrar el flujo de m?dulos, lecciones, evaluaciones y progreso basado en valores educativos y de prevenci?n.",
     "program": null,
     "price": "0.00",
     "image": "",
@@ -2401,7 +2401,7 @@
     "year": 2021,
     "in_person_certified": 29,
     "estimated_children_impacted": 0,
-    "notes": "Logros 2021: 29 entrenadores a nivel nacional (docentes, orientadores y psic�logos del Ministerio de Educaci�n).",
+    "notes": "Logros 2021: 29 entrenadores a nivel nacional (docentes, orientadores y psic?logos del Ministerio de Educaci?n).",
     "updated_at": "2025-12-28T13:17:55.362Z"
   }
 },
@@ -2413,7 +2413,7 @@
     "year": 2022,
     "in_person_certified": 88,
     "estimated_children_impacted": 0,
-    "notes": "En el a�o 2022, gracias al ministro, viceministro, director de participaci�n comunitaria, t�cnicos y otros ministerio como el de econom�a nacional por aprobar este programa que por nombre lleva la educaci�n temprana sobre el uso de alcohol, tabaco y otras drogas, previene que nuestros j�venes no se enfermen bio-psicosocialmente. Logros: 2021, 29 entrenadores a nivel nacional, de los docentes, orientadores y psic�logos del ministerio de educaci�n, 2022 a 88 t�cnicos regionales y distritales tanto de participaci�n comunitaria como de orientaci�n y psicolog�a. En el a�o 2023 actualizado, 1442 facilitadores y en el a�o 2024 certificamos a 816.",
+    "notes": "En el a?o 2022, gracias al ministro, viceministro, director de participaci?n comunitaria, t?cnicos y otros ministerio como el de econom?a nacional por aprobar este programa que por nombre lleva la educaci?n temprana sobre el uso de alcohol, tabaco y otras drogas, previene que nuestros j?venes no se enfermen bio-psicosocialmente. Logros: 2021, 29 entrenadores a nivel nacional, de los docentes, orientadores y psic?logos del ministerio de educaci?n, 2022 a 88 t?cnicos regionales y distritales tanto de participaci?n comunitaria como de orientaci?n y psicolog?a. En el a?o 2023 actualizado, 1442 facilitadores y en el a?o 2024 certificamos a 816.",
     "updated_at": "2025-12-28T13:22:23.354Z"
   }
 },
@@ -2449,7 +2449,7 @@
     "year": 2025,
     "in_person_certified": 8,
     "estimated_children_impacted": 255600,
-    "notes": "Incluyendo los 149 que se han certificados en el proyecto de prevenci�n del uso de TAOD y 149 mas sobre la competencia de comunicaci�n efectiva y resoluci�n de conflictos, actualizado a la fecha de hoy un total de 2,383 facilitadores certificados sobre prevenci�n del uso de TAOD y 173 sobre la competencia de comunicaci�n efectiva y resoluci�n de conflictos, que est�n impactando un promedio de 255,600 ni�os(as) . En las regionales 01, 05, 06, 07, 15, 11, 13 16. La ASFL esta habilitada por los Ministerios de Educaci�n y Salud de una manera permanente.",
+    "notes": "Incluyendo los 149 que se han certificados en el proyecto de prevenci?n del uso de TAOD y 149 mas sobre la competencia de comunicaci?n efectiva y resoluci?n de conflictos, actualizado a la fecha de hoy un total de 2,383 facilitadores certificados sobre prevenci?n del uso de TAOD y 173 sobre la competencia de comunicaci?n efectiva y resoluci?n de conflictos, que est?n impactando un promedio de 255,600 ni?os(as) . En las regionales 01, 05, 06, 07, 15, 11, 13 16. La ASFL esta habilitada por los Ministerios de Educaci?n y Salud de una manera permanente.",
     "updated_at": "2025-12-28T13:22:23.358Z"
   }
 },
@@ -2459,7 +2459,7 @@
   "fields": {
     "course": 125,
     "title": "GENERAL KNOWLEDGE",
-    "description": "<h2>GENERAL KNOWLEDGE</h2><p>Contenido base del CDL: conducci�n segura, leyes b�sicas, alcohol/drogas, emergencias, clima, fatiga, horas de servicio y pr�cticas defensivas.</p>",
+    "description": "<h2>GENERAL KNOWLEDGE</h2><p>Contenido base del CDL: conducci?n segura, leyes b?sicas, alcohol/drogas, emergencias, clima, fatiga, horas de servicio y pr?cticas defensivas.</p>",
     "order": 1
   }
 },
@@ -2478,8 +2478,8 @@
   "pk": 16,
   "fields": {
     "course": 9,
-    "title": "Fundamentos de Prevenci�n",
-    "description": "Conceptos b�sicos sobre drogas y prevenci�n.",
+    "title": "Fundamentos de Prevenci?n",
+    "description": "Conceptos b?sicos sobre drogas y prevenci?n.",
     "order": 1
   }
 },
@@ -2498,8 +2498,8 @@
   "pk": 18,
   "fields": {
     "course": 9,
-    "title": "Decisiones y Protecci�n",
-    "description": "Factores de riesgo/protecci�n y toma de decisiones.",
+    "title": "Decisiones y Protecci?n",
+    "description": "Factores de riesgo/protecci?n y toma de decisiones.",
     "order": 3
   }
 },
@@ -2509,7 +2509,7 @@
   "fields": {
     "course": 125,
     "title": "PRE-TRIP INSPECTION",
-    "description": "<h2>PRE-TRIP INSPECTION</h2><p>Este m�dulo cubre la inspecci�n previa al viaje requerida para el CDL. Incluye revisi�n del veh�culo, sistemas de seguridad, frenos, luces, neum�ticos, suspensi�n y componentes cr�ticos antes de operar un veh�culo comercial.</p>",
+    "description": "<h2>PRE-TRIP INSPECTION</h2><p>Este m?dulo cubre la inspecci?n previa al viaje requerida para el CDL. Incluye revisi?n del veh?culo, sistemas de seguridad, frenos, luces, neum?ticos, suspensi?n y componentes cr?ticos antes de operar un veh?culo comercial.</p>",
     "order": 2
   }
 },
@@ -2519,7 +2519,7 @@
   "fields": {
     "course": 125,
     "title": "AIR BRAKES",
-    "description": "<h2>AIR BRAKES</h2><p>Este m�dulo cubre el funcionamiento del sistema de frenos de aire, componentes principales, presiones seguras, advertencias, pruebas requeridas y procedimientos de seguridad para veh�culos comerciales.</p>",
+    "description": "<h2>AIR BRAKES</h2><p>Este m?dulo cubre el funcionamiento del sistema de frenos de aire, componentes principales, presiones seguras, advertencias, pruebas requeridas y procedimientos de seguridad para veh?culos comerciales.</p>",
     "order": 3
   }
 },
@@ -2529,7 +2529,7 @@
   "fields": {
     "course": 125,
     "title": "COMBINATION VEHICLES",
-    "description": "<h2>COMBINATION VEHICLES</h2><p>Este m�dulo cubre operaci�n segura de veh�culos combinados (tractor-trailer), acoplamiento/desacoplamiento, quinta rueda, remolque, estabilidad, distancia de frenado y riesgos comunes.</p>",
+    "description": "<h2>COMBINATION VEHICLES</h2><p>Este m?dulo cubre operaci?n segura de veh?culos combinados (tractor-trailer), acoplamiento/desacoplamiento, quinta rueda, remolque, estabilidad, distancia de frenado y riesgos comunes.</p>",
     "order": 4
   }
 },
@@ -2539,7 +2539,7 @@
   "fields": {
     "course": 125,
     "title": "SAFE DRIVING",
-    "description": "<h2>SAFE DRIVING</h2><p>Este m�dulo cubre conducci�n defensiva, manejo del espacio, velocidad segura, distancias, puntos ciegos, control del veh�culo, conducci�n nocturna y t�cnicas para reducir riesgos y evitar colisiones.</p>",
+    "description": "<h2>SAFE DRIVING</h2><p>Este m?dulo cubre conducci?n defensiva, manejo del espacio, velocidad segura, distancias, puntos ciegos, control del veh?culo, conducci?n nocturna y t?cnicas para reducir riesgos y evitar colisiones.</p>",
     "order": 5
   }
 },
@@ -2549,7 +2549,7 @@
   "fields": {
     "course": 125,
     "title": "TRANSPORTING CARGO SAFELY",
-    "description": "<h2>TRANSPORTING CARGO SAFELY</h2><p>Este m�dulo cubre la carga segura, distribuci�n del peso, sujeci�n adecuada, inspecci�n de amarres y prevenci�n de desplazamiento de la carga durante el transporte.</p>",
+    "description": "<h2>TRANSPORTING CARGO SAFELY</h2><p>Este m?dulo cubre la carga segura, distribuci?n del peso, sujeci?n adecuada, inspecci?n de amarres y prevenci?n de desplazamiento de la carga durante el transporte.</p>",
     "order": 6
   }
 },
@@ -2559,7 +2559,7 @@
   "fields": {
     "course": 125,
     "title": "EMERGENCIES & ACCIDENT PROCEDURES",
-    "description": "<h2>EMERGENCIES & ACCIDENT PROCEDURES</h2><p>Este m�dulo cubre respuesta a emergencias, control del veh�culo ante fallas, procedimientos en accidentes, protecci�n de la escena, comunicaci�n, primeros pasos y manejo seguro hasta que llegue ayuda.</p>",
+    "description": "<h2>EMERGENCIES & ACCIDENT PROCEDURES</h2><p>Este m?dulo cubre respuesta a emergencias, control del veh?culo ante fallas, procedimientos en accidentes, protecci?n de la escena, comunicaci?n, primeros pasos y manejo seguro hasta que llegue ayuda.</p>",
     "order": 7
   }
 },
@@ -2569,7 +2569,7 @@
   "fields": {
     "course": 125,
     "title": "HAZARDOUS MATERIALS (HAZMAT)",
-    "description": "<h2>HAZARDOUS MATERIALS (HAZMAT)</h2><p>Este m�dulo cubre fundamentos de materiales peligrosos, clases, etiquetas/placards, documentaci�n, responsabilidad del conductor y pr�cticas de seguridad para transporte y manejo.</p>",
+    "description": "<h2>HAZARDOUS MATERIALS (HAZMAT)</h2><p>Este m?dulo cubre fundamentos de materiales peligrosos, clases, etiquetas/placards, documentaci?n, responsabilidad del conductor y pr?cticas de seguridad para transporte y manejo.</p>",
     "order": 8
   }
 },
@@ -2578,8 +2578,8 @@
   "pk": 26,
   "fields": {
     "module": 16,
-    "title": "�Qu� son las drogas?",
-    "content": "Definici�n simple y ejemplos cotidianos. Enfatiza que incluyen sustancias legales e ilegales.",
+    "title": "?Qu? son las drogas?",
+    "content": "Definici?n simple y ejemplos cotidianos. Enfatiza que incluyen sustancias legales e ilegales.",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2590,8 +2590,8 @@
   "pk": 27,
   "fields": {
     "module": 16,
-    "title": "Tipos de drogas m�s comunes",
-    "content": "Alcohol, tabaco, marihuana y f�rmacos mal utilizados; riesgos generales.",
+    "title": "Tipos de drogas m?s comunes",
+    "content": "Alcohol, tabaco, marihuana y f?rmacos mal utilizados; riesgos generales.",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2627,7 +2627,7 @@
   "fields": {
     "module": 17,
     "title": "Impacto familiar",
-    "content": "Tensiones en la comunicaci�n, confianza y convivencia.",
+    "content": "Tensiones en la comunicaci?n, confianza y convivencia.",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2638,8 +2638,8 @@
   "pk": 31,
   "fields": {
     "module": 17,
-    "title": "Prevenci�n comunitaria",
-    "content": "El papel de la escuela, familia y comunidad en la prevenci�n.",
+    "title": "Prevenci?n comunitaria",
+    "content": "El papel de la escuela, familia y comunidad en la prevenci?n.",
     "video_url": "",
     "video_file": "",
     "order": 3
@@ -2651,7 +2651,7 @@
   "fields": {
     "module": 18,
     "title": "Factores de riesgo",
-    "content": "Presi�n de pares, baja supervisi�n y manejo emocional limitado.",
+    "content": "Presi?n de pares, baja supervisi?n y manejo emocional limitado.",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2662,7 +2662,7 @@
   "pk": 33,
   "fields": {
     "module": 18,
-    "title": "Factores de protecci�n",
+    "title": "Factores de protecci?n",
     "content": "Apoyo familiar, metas claras y actividades positivas.",
     "video_url": "",
     "video_file": "",
@@ -2686,8 +2686,8 @@
   "pk": 1001,
   "fields": {
     "module": 1,
-    "title": "LECCI�N GK-01 � Alcohol, Drogas y Responsabilidad del Conductor CDL",
-    "content": "<h2>LECCI�N GK-01 � Alcohol, Drogas y Responsabilidad del Conductor CDL</h2>\n\n<h3>BAC y sus efectos</h3>\n<p>El BAC (Blood Alcohol Concentration) es la concentraci�n de alcohol en la sangre. A medida que sube, el alcohol afecta el cerebro y la conducci�n segura.</p>\n<ul>\n  <li>Se deteriora el juicio y el autocontrol.</li>\n  <li>Se incrementa el riesgo de decisiones peligrosas.</li>\n</ul>\n\n<h3>Juicio y autocontrol</h3>\n<p>El alcohol afecta primero la capacidad de tomar decisiones. El conductor puede subestimar riesgos y sobreestimar sus habilidades.</p>\n\n<h3>Consentimiento impl�cito</h3>\n<p>Al conducir con licencia (especialmente CDL), el conductor acepta someterse a pruebas de alcohol/drogas cuando la ley lo requiera. Negarse puede tener consecuencias severas.</p>\n\n<h3>Alcohol y tiempo de reacci�n</h3>\n<p>El alcohol aumenta el tiempo de reacci�n: tarda m�s en reconocer un peligro y actuar. En veh�culos comerciales esto aumenta el riesgo debido a la mayor distancia de parada.</p>\n\n<h3>Medicamentos de venta libre</h3>\n<p>Medicamentos para resfriado/alergias pueden causar somnolencia o mareos. Aunque sean legales, pueden hacer inseguro conducir.</p>\n\n<h3>Drogas legales e ilegales</h3>\n<p>Drogas ilegales o algunos medicamentos recetados pueden afectar atenci�n, coordinaci�n y juicio. Su uso puede provocar accidentes y arrestos.</p>\n\n<h3>Responsabilidad legal del conductor CDL</h3>\n<p>El conductor CDL debe estar apto para conducir, cumplir regulaciones y evitar sustancias que afecten la seguridad.</p>",
+    "title": "LECCI?N GK-01 ? Alcohol, Drogas y Responsabilidad del Conductor CDL",
+    "content": "<h2>LECCI?N GK-01 ? Alcohol, Drogas y Responsabilidad del Conductor CDL</h2>\n\n<h3>BAC y sus efectos</h3>\n<p>El BAC (Blood Alcohol Concentration) es la concentraci?n de alcohol en la sangre. A medida que sube, el alcohol afecta el cerebro y la conducci?n segura.</p>\n<ul>\n  <li>Se deteriora el juicio y el autocontrol.</li>\n  <li>Se incrementa el riesgo de decisiones peligrosas.</li>\n</ul>\n\n<h3>Juicio y autocontrol</h3>\n<p>El alcohol afecta primero la capacidad de tomar decisiones. El conductor puede subestimar riesgos y sobreestimar sus habilidades.</p>\n\n<h3>Consentimiento impl?cito</h3>\n<p>Al conducir con licencia (especialmente CDL), el conductor acepta someterse a pruebas de alcohol/drogas cuando la ley lo requiera. Negarse puede tener consecuencias severas.</p>\n\n<h3>Alcohol y tiempo de reacci?n</h3>\n<p>El alcohol aumenta el tiempo de reacci?n: tarda m?s en reconocer un peligro y actuar. En veh?culos comerciales esto aumenta el riesgo debido a la mayor distancia de parada.</p>\n\n<h3>Medicamentos de venta libre</h3>\n<p>Medicamentos para resfriado/alergias pueden causar somnolencia o mareos. Aunque sean legales, pueden hacer inseguro conducir.</p>\n\n<h3>Drogas legales e ilegales</h3>\n<p>Drogas ilegales o algunos medicamentos recetados pueden afectar atenci?n, coordinaci?n y juicio. Su uso puede provocar accidentes y arrestos.</p>\n\n<h3>Responsabilidad legal del conductor CDL</h3>\n<p>El conductor CDL debe estar apto para conducir, cumplir regulaciones y evitar sustancias que afecten la seguridad.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2698,8 +2698,8 @@
   "pk": 1101,
   "fields": {
     "module": 102,
-    "title": "LECCI�N PT-01 � Inspecci�n Previa al Viaje (Conceptos B�sicos)",
-    "content": "<h2>Inspecci�n Previa al Viaje</h2><p>La inspecci�n previa al viaje es una revisi�n obligatoria que el conductor CDL debe realizar antes de operar un veh�culo comercial.</p><ul><li>Detecta fallas mec�nicas.</li><li>Previene accidentes.</li><li>Es requerida por ley.</li></ul><h3>Responsabilidad del conductor</h3><p>El conductor es legalmente responsable del estado seguro del veh�culo antes de iniciar el viaje.</p><h3>Cu�ndo realizarla</h3><p>Debe hacerse antes de cada viaje y despu�s de que el veh�culo haya estado estacionado por un per�odo prolongado.</p>",
+    "title": "LECCI?N PT-01 ? Inspecci?n Previa al Viaje (Conceptos B?sicos)",
+    "content": "<h2>Inspecci?n Previa al Viaje</h2><p>La inspecci?n previa al viaje es una revisi?n obligatoria que el conductor CDL debe realizar antes de operar un veh?culo comercial.</p><ul><li>Detecta fallas mec?nicas.</li><li>Previene accidentes.</li><li>Es requerida por ley.</li></ul><h3>Responsabilidad del conductor</h3><p>El conductor es legalmente responsable del estado seguro del veh?culo antes de iniciar el viaje.</p><h3>Cu?ndo realizarla</h3><p>Debe hacerse antes de cada viaje y despu?s de que el veh?culo haya estado estacionado por un per?odo prolongado.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2710,8 +2710,8 @@
   "pk": 1102,
   "fields": {
     "module": 102,
-    "title": "LECCI�N PT-02 � Componentes Cr�ticos a Revisar",
-    "content": "<h2>Componentes Cr�ticos</h2><p>Durante la pre-inspecci�n se deben revisar los sistemas principales del veh�culo.</p><h3>Sistemas clave</h3><ul><li>Frenos (aire o hidr�ulicos)</li><li>Luces y se�ales</li><li>Neum�ticos y ruedas</li><li>Direcci�n y suspensi�n</li><li>Acoplamientos</li></ul><h3>Reporte de defectos</h3><p>Cualquier defecto debe ser reportado y corregido antes de operar el veh�culo.</p>",
+    "title": "LECCI?N PT-02 ? Componentes Cr?ticos a Revisar",
+    "content": "<h2>Componentes Cr?ticos</h2><p>Durante la pre-inspecci?n se deben revisar los sistemas principales del veh?culo.</p><h3>Sistemas clave</h3><ul><li>Frenos (aire o hidr?ulicos)</li><li>Luces y se?ales</li><li>Neum?ticos y ruedas</li><li>Direcci?n y suspensi?n</li><li>Acoplamientos</li></ul><h3>Reporte de defectos</h3><p>Cualquier defecto debe ser reportado y corregido antes de operar el veh?culo.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2722,8 +2722,8 @@
   "pk": 1201,
   "fields": {
     "module": 103,
-    "title": "LECCI�N AB-01 � Fundamentos del Sistema de Frenos de Aire",
-    "content": "<h2>Fundamentos del Sistema de Frenos de Aire</h2><p>Los frenos de aire utilizan aire comprimido para accionar los frenos del veh�culo comercial.</p><h3>Componentes principales</h3><ul><li>Compresor de aire</li><li>Tanques (reservorios)</li><li>V�lvulas</li><li>C�maras de freno</li><li>Secador de aire</li></ul><h3>Ventajas</h3><p>Mayor potencia de frenado y seguridad para veh�culos pesados.</p>",
+    "title": "LECCI?N AB-01 ? Fundamentos del Sistema de Frenos de Aire",
+    "content": "<h2>Fundamentos del Sistema de Frenos de Aire</h2><p>Los frenos de aire utilizan aire comprimido para accionar los frenos del veh?culo comercial.</p><h3>Componentes principales</h3><ul><li>Compresor de aire</li><li>Tanques (reservorios)</li><li>V?lvulas</li><li>C?maras de freno</li><li>Secador de aire</li></ul><h3>Ventajas</h3><p>Mayor potencia de frenado y seguridad para veh?culos pesados.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2734,8 +2734,8 @@
   "pk": 1202,
   "fields": {
     "module": 103,
-    "title": "LECCI�N AB-02 � Presi�n, Advertencias y Pruebas del Sistema",
-    "content": "<h2>Presi�n y Advertencias</h2><p>El sistema debe operar dentro de rangos de presi�n seguros.</p><ul><li>Presi�n normal: 100�125 PSI</li><li>Advertencia de baja presi�n: ~60 PSI</li><li>Frenos de emergencia se activan ~20�45 PSI</li></ul><h3>Pruebas requeridas</h3><p>Pruebas de fuga, compresor, v�lvulas y freno de estacionamiento son obligatorias para el CDL.</p>",
+    "title": "LECCI?N AB-02 ? Presi?n, Advertencias y Pruebas del Sistema",
+    "content": "<h2>Presi?n y Advertencias</h2><p>El sistema debe operar dentro de rangos de presi?n seguros.</p><ul><li>Presi?n normal: 100?125 PSI</li><li>Advertencia de baja presi?n: ~60 PSI</li><li>Frenos de emergencia se activan ~20?45 PSI</li></ul><h3>Pruebas requeridas</h3><p>Pruebas de fuga, compresor, v?lvulas y freno de estacionamiento son obligatorias para el CDL.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2746,8 +2746,8 @@
   "pk": 1301,
   "fields": {
     "module": 104,
-    "title": "LECCI�N CV-01 � Fundamentos de Veh�culos Combinados",
-    "content": "<h2>Fundamentos</h2><p>Un veh�culo combinado incluye un tractor y uno o m�s remolques. La estabilidad y el control dependen del acoplamiento correcto y de una conducci�n preventiva.</p><h3>Riesgos principales</h3><ul><li>Mayor distancia de frenado</li><li>Efecto \"offtracking\" en curvas</li><li>Riesgo de volcadura por maniobras bruscas</li></ul><h3>Distribuci�n de peso</h3><p>El peso debe estar bien distribuido para evitar p�rdida de tracci�n y balanceo del remolque.</p>",
+    "title": "LECCI?N CV-01 ? Fundamentos de Veh?culos Combinados",
+    "content": "<h2>Fundamentos</h2><p>Un veh?culo combinado incluye un tractor y uno o m?s remolques. La estabilidad y el control dependen del acoplamiento correcto y de una conducci?n preventiva.</p><h3>Riesgos principales</h3><ul><li>Mayor distancia de frenado</li><li>Efecto \"offtracking\" en curvas</li><li>Riesgo de volcadura por maniobras bruscas</li></ul><h3>Distribuci?n de peso</h3><p>El peso debe estar bien distribuido para evitar p?rdida de tracci?n y balanceo del remolque.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2758,8 +2758,8 @@
   "pk": 1302,
   "fields": {
     "module": 104,
-    "title": "LECCI�N CV-02 � Acoplamiento y Desacoplamiento (Quinta Rueda)",
-    "content": "<h2>Acoplamiento y Desacoplamiento</h2><p>El acoplamiento correcto evita desprendimientos y accidentes graves.</p><h3>Pasos esenciales</h3><ul><li>Verificar la altura del remolque</li><li>Alinear tractor y remolque</li><li>Enganche completo de la quinta rueda</li><li>Inspecci�n visual del cierre (lock jaws)</li><li>Conectar l�neas de aire y cable el�ctrico</li><li>Prueba de tir�n (pull test) y revisar freno de remolque</li></ul><h3>Errores comunes</h3><p>Acoplamiento incompleto, mangueras mal conectadas o quinta rueda sin asegurar.</p>",
+    "title": "LECCI?N CV-02 ? Acoplamiento y Desacoplamiento (Quinta Rueda)",
+    "content": "<h2>Acoplamiento y Desacoplamiento</h2><p>El acoplamiento correcto evita desprendimientos y accidentes graves.</p><h3>Pasos esenciales</h3><ul><li>Verificar la altura del remolque</li><li>Alinear tractor y remolque</li><li>Enganche completo de la quinta rueda</li><li>Inspecci?n visual del cierre (lock jaws)</li><li>Conectar l?neas de aire y cable el?ctrico</li><li>Prueba de tir?n (pull test) y revisar freno de remolque</li></ul><h3>Errores comunes</h3><p>Acoplamiento incompleto, mangueras mal conectadas o quinta rueda sin asegurar.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2770,8 +2770,8 @@
   "pk": 1401,
   "fields": {
     "module": 105,
-    "title": "LECCI�N SD-01 � Conducci�n Defensiva y Manejo del Espacio",
-    "content": "<h2>Conducci�n Defensiva</h2><p>La conducci�n defensiva significa anticipar peligros, mantener el control y reducir riesgos antes de que ocurran incidentes.</p><h3>Claves de manejo del espacio</h3><ul><li>Dejar distancia suficiente de seguimiento</li><li>Evitar permanecer en puntos ciegos de otros</li><li>Mantener una ruta de escape</li></ul><h3>Distancia de seguimiento</h3><p>Veh�culos comerciales requieren m�s distancia para frenar. Aumenta la distancia en lluvia, nieve o baja visibilidad.</p>",
+    "title": "LECCI?N SD-01 ? Conducci?n Defensiva y Manejo del Espacio",
+    "content": "<h2>Conducci?n Defensiva</h2><p>La conducci?n defensiva significa anticipar peligros, mantener el control y reducir riesgos antes de que ocurran incidentes.</p><h3>Claves de manejo del espacio</h3><ul><li>Dejar distancia suficiente de seguimiento</li><li>Evitar permanecer en puntos ciegos de otros</li><li>Mantener una ruta de escape</li></ul><h3>Distancia de seguimiento</h3><p>Veh?culos comerciales requieren m?s distancia para frenar. Aumenta la distancia en lluvia, nieve o baja visibilidad.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2782,8 +2782,8 @@
   "pk": 1402,
   "fields": {
     "module": 105,
-    "title": "LECCI�N SD-02 � Velocidad Segura, Puntos Ciegos y Conducci�n Nocturna",
-    "content": "<h2>Velocidad Segura</h2><p>La velocidad segura depende del peso, la pendiente, el clima, el tr�fico y la visibilidad.</p><h3>Puntos ciegos</h3><p>Los camiones tienen zonas sin visibilidad alrededor del veh�culo. Ajusta espejos y evita movimientos bruscos.</p><h3>Conducci�n nocturna</h3><ul><li>Reduce la velocidad</li><li>Aumenta distancia</li><li>Mant�n luces y parabrisas limpios</li></ul><p>Si est�s cansado, detente: el cansancio es un factor de alto riesgo.</p>",
+    "title": "LECCI?N SD-02 ? Velocidad Segura, Puntos Ciegos y Conducci?n Nocturna",
+    "content": "<h2>Velocidad Segura</h2><p>La velocidad segura depende del peso, la pendiente, el clima, el tr?fico y la visibilidad.</p><h3>Puntos ciegos</h3><p>Los camiones tienen zonas sin visibilidad alrededor del veh?culo. Ajusta espejos y evita movimientos bruscos.</p><h3>Conducci?n nocturna</h3><ul><li>Reduce la velocidad</li><li>Aumenta distancia</li><li>Mant?n luces y parabrisas limpios</li></ul><p>Si est?s cansado, detente: el cansancio es un factor de alto riesgo.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2794,8 +2794,8 @@
   "pk": 1501,
   "fields": {
     "module": 106,
-    "title": "LECCI�N TC-01 � Distribuci�n y Sujeci�n de la Carga",
-    "content": "<h2>Distribuci�n de la Carga</h2><p>La carga debe distribuirse de manera uniforme para mantener la estabilidad del veh�culo.</p><ul><li>Evitar sobrecargar ejes.</li><li>Colocar la carga m�s pesada abajo.</li><li>Equilibrar el peso de lado a lado.</li></ul><h3>Sujeci�n adecuada</h3><p>La carga debe asegurarse con correas, cadenas o amarres certificados.</p><p>Una carga mal asegurada puede moverse y causar p�rdida de control o volcadura.</p>",
+    "title": "LECCI?N TC-01 ? Distribuci?n y Sujeci?n de la Carga",
+    "content": "<h2>Distribuci?n de la Carga</h2><p>La carga debe distribuirse de manera uniforme para mantener la estabilidad del veh?culo.</p><ul><li>Evitar sobrecargar ejes.</li><li>Colocar la carga m?s pesada abajo.</li><li>Equilibrar el peso de lado a lado.</li></ul><h3>Sujeci?n adecuada</h3><p>La carga debe asegurarse con correas, cadenas o amarres certificados.</p><p>Una carga mal asegurada puede moverse y causar p?rdida de control o volcadura.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2806,8 +2806,8 @@
   "pk": 1502,
   "fields": {
     "module": 106,
-    "title": "LECCI�N TC-02 � Inspecci�n de Carga y Revisi�n en Ruta",
-    "content": "<h2>Inspecci�n de la Carga</h2><p>El conductor debe inspeccionar la carga antes de salir y durante el viaje.</p><h3>Cu�ndo revisar</h3><ul><li>Antes de iniciar el viaje</li><li>Despu�s de las primeras 50 millas</li><li>Cada 150 millas o 3 horas</li></ul><h3>Responsabilidad legal</h3><p>El conductor es responsable de que la carga permanezca segura durante todo el trayecto.</p>",
+    "title": "LECCI?N TC-02 ? Inspecci?n de Carga y Revisi?n en Ruta",
+    "content": "<h2>Inspecci?n de la Carga</h2><p>El conductor debe inspeccionar la carga antes de salir y durante el viaje.</p><h3>Cu?ndo revisar</h3><ul><li>Antes de iniciar el viaje</li><li>Despu?s de las primeras 50 millas</li><li>Cada 150 millas o 3 horas</li></ul><h3>Responsabilidad legal</h3><p>El conductor es responsable de que la carga permanezca segura durante todo el trayecto.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2818,8 +2818,8 @@
   "pk": 1601,
   "fields": {
     "module": 107,
-    "title": "LECCI�N EA-01 � Respuesta Inicial y Control del Veh�culo en Emergencias",
-    "content": "<h2>Respuesta Inicial</h2><p>Ante una emergencia, mant�n la calma y act�a con prioridad en la seguridad.</p><h3>Acciones inmediatas</h3><ul><li>Reducir velocidad de forma controlada</li><li>Se�alizar y moverse a un lugar seguro</li><li>Evitar maniobras bruscas</li></ul><h3>Fallas comunes</h3><ul><li>Revent�n de neum�tico</li><li>Falla de frenos</li><li>Falla de direcci�n</li></ul><p>En revent�n, sujeta firme el volante, no frenes fuerte, y reduce gradualmente.</p>",
+    "title": "LECCI?N EA-01 ? Respuesta Inicial y Control del Veh?culo en Emergencias",
+    "content": "<h2>Respuesta Inicial</h2><p>Ante una emergencia, mant?n la calma y act?a con prioridad en la seguridad.</p><h3>Acciones inmediatas</h3><ul><li>Reducir velocidad de forma controlada</li><li>Se?alizar y moverse a un lugar seguro</li><li>Evitar maniobras bruscas</li></ul><h3>Fallas comunes</h3><ul><li>Revent?n de neum?tico</li><li>Falla de frenos</li><li>Falla de direcci?n</li></ul><p>En revent?n, sujeta firme el volante, no frenes fuerte, y reduce gradualmente.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2830,8 +2830,8 @@
   "pk": 1602,
   "fields": {
     "module": 107,
-    "title": "LECCI�N EA-02 � Procedimientos en Accidentes y Protecci�n de la Escena",
-    "content": "<h2>Procedimientos en Accidentes</h2><p>Tu prioridad es evitar un segundo accidente y proteger vidas.</p><h3>Pasos clave</h3><ol><li>Detenerse en un lugar seguro si es posible</li><li>Activar luces de emergencia</li><li>Colocar tri�ngulos/reflectores seg�n reglas</li><li>Llamar a servicios de emergencia</li><li>No mover heridos salvo peligro inmediato</li></ol><h3>Comunicaci�n y reporte</h3><p>Informa a la empresa/autoridades y documenta lo ocurrido seg�n procedimiento.</p>",
+    "title": "LECCI?N EA-02 ? Procedimientos en Accidentes y Protecci?n de la Escena",
+    "content": "<h2>Procedimientos en Accidentes</h2><p>Tu prioridad es evitar un segundo accidente y proteger vidas.</p><h3>Pasos clave</h3><ol><li>Detenerse en un lugar seguro si es posible</li><li>Activar luces de emergencia</li><li>Colocar tri?ngulos/reflectores seg?n reglas</li><li>Llamar a servicios de emergencia</li><li>No mover heridos salvo peligro inmediato</li></ol><h3>Comunicaci?n y reporte</h3><p>Informa a la empresa/autoridades y documenta lo ocurrido seg?n procedimiento.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2842,8 +2842,8 @@
   "pk": 1701,
   "fields": {
     "module": 108,
-    "title": "LECCI�N HM-01 � Conceptos B�sicos, Clases y Etiquetado (Placards)",
-    "content": "<h2>HazMat: Conceptos B�sicos</h2><p>Los materiales peligrosos (HazMat) son sustancias que pueden representar riesgo para la salud, la seguridad o el medio ambiente durante su transporte.</p><h3>Clases generales</h3><ul><li>Explosivos</li><li>Gases</li><li>L�quidos inflamables</li><li>S�lidos inflamables</li><li>Oxidantes y per�xidos</li><li>T�xicos e infecciosos</li><li>Radiactivos</li><li>Corrosivos</li><li>Miscel�neos</li></ul><h3>Placards</h3><p>Los placards (r�tulos) advierten a otros conductores y a los equipos de emergencia sobre el tipo de material peligroso transportado.</p>",
+    "title": "LECCI?N HM-01 ? Conceptos B?sicos, Clases y Etiquetado (Placards)",
+    "content": "<h2>HazMat: Conceptos B?sicos</h2><p>Los materiales peligrosos (HazMat) son sustancias que pueden representar riesgo para la salud, la seguridad o el medio ambiente durante su transporte.</p><h3>Clases generales</h3><ul><li>Explosivos</li><li>Gases</li><li>L?quidos inflamables</li><li>S?lidos inflamables</li><li>Oxidantes y per?xidos</li><li>T?xicos e infecciosos</li><li>Radiactivos</li><li>Corrosivos</li><li>Miscel?neos</li></ul><h3>Placards</h3><p>Los placards (r?tulos) advierten a otros conductores y a los equipos de emergencia sobre el tipo de material peligroso transportado.</p>",
     "video_url": "",
     "video_file": "",
     "order": 1
@@ -2854,8 +2854,8 @@
   "pk": 1702,
   "fields": {
     "module": 108,
-    "title": "LECCI�N HM-02 � Documentaci�n, Seguridad y Responsabilidad del Conductor",
-    "content": "<h2>Documentaci�n y Seguridad</h2><p>El transporte de HazMat requiere documentos correctos y procedimientos estrictos.</p><h3>Responsabilidades clave</h3><ul><li>Revisar shipping papers (papeles de env�o)</li><li>Verificar placards correctos</li><li>Inspecci�n del veh�culo y de la carga</li><li>Evitar fumar o fuentes de ignici�n donde aplique</li><li>Conocer rutas y restricciones</li></ul><h3>Emergencias</h3><p>En un incidente, sigue el procedimiento de seguridad: proteger la escena, avisar a autoridades y seguir gu�as de emergencia.</p>",
+    "title": "LECCI?N HM-02 ? Documentaci?n, Seguridad y Responsabilidad del Conductor",
+    "content": "<h2>Documentaci?n y Seguridad</h2><p>El transporte de HazMat requiere documentos correctos y procedimientos estrictos.</p><h3>Responsabilidades clave</h3><ul><li>Revisar shipping papers (papeles de env?o)</li><li>Verificar placards correctos</li><li>Inspecci?n del veh?culo y de la carga</li><li>Evitar fumar o fuentes de ignici?n donde aplique</li><li>Conocer rutas y restricciones</li></ul><h3>Emergencias</h3><p>En un incidente, sigue el procedimiento de seguridad: proteger la escena, avisar a autoridades y seguir gu?as de emergencia.</p>",
     "video_url": "",
     "video_file": "",
     "order": 2
@@ -2866,7 +2866,7 @@
   "pk": 4,
   "fields": {
     "module": 16,
-    "title": "QuickTest DEMO - M�dulo 1"
+    "title": "QuickTest DEMO - M?dulo 1"
   }
 },
 {
@@ -2874,7 +2874,7 @@
   "pk": 5,
   "fields": {
     "module": 17,
-    "title": "QuickTest DEMO - M�dulo 2"
+    "title": "QuickTest DEMO - M?dulo 2"
   }
 },
 {
@@ -2882,7 +2882,7 @@
   "pk": 6,
   "fields": {
     "module": 18,
-    "title": "QuickTest DEMO - M�dulo 3"
+    "title": "QuickTest DEMO - M?dulo 3"
   }
 },
 {
@@ -2890,7 +2890,7 @@
   "pk": 201,
   "fields": {
     "module": 1,
-    "title": "GENERAL KNOWLEDGE � Module QuickTest"
+    "title": "GENERAL KNOWLEDGE ? Module QuickTest"
   }
 },
 {
@@ -2898,7 +2898,7 @@
   "pk": 202,
   "fields": {
     "module": 102,
-    "title": "PRE-TRIP INSPECTION � Module QuickTest"
+    "title": "PRE-TRIP INSPECTION ? Module QuickTest"
   }
 },
 {
@@ -2906,7 +2906,7 @@
   "pk": 203,
   "fields": {
     "module": 103,
-    "title": "AIR BRAKES � Module QuickTest"
+    "title": "AIR BRAKES ? Module QuickTest"
   }
 },
 {
@@ -2914,7 +2914,7 @@
   "pk": 204,
   "fields": {
     "module": 104,
-    "title": "COMBINATION VEHICLES � Module QuickTest"
+    "title": "COMBINATION VEHICLES ? Module QuickTest"
   }
 },
 {
@@ -2922,7 +2922,7 @@
   "pk": 205,
   "fields": {
     "module": 105,
-    "title": "SAFE DRIVING � Module QuickTest"
+    "title": "SAFE DRIVING ? Module QuickTest"
   }
 },
 {
@@ -2930,7 +2930,7 @@
   "pk": 206,
   "fields": {
     "module": 106,
-    "title": "TRANSPORTING CARGO SAFELY � Module QuickTest"
+    "title": "TRANSPORTING CARGO SAFELY ? Module QuickTest"
   }
 },
 {
@@ -2938,7 +2938,7 @@
   "pk": 207,
   "fields": {
     "module": 107,
-    "title": "EMERGENCIES & ACCIDENT PROCEDURES � Module QuickTest"
+    "title": "EMERGENCIES & ACCIDENT PROCEDURES ? Module QuickTest"
   }
 },
 {
@@ -2946,7 +2946,7 @@
   "pk": 208,
   "fields": {
     "module": 108,
-    "title": "HAZARDOUS MATERIALS (HAZMAT) � Module QuickTest"
+    "title": "HAZARDOUS MATERIALS (HAZMAT) ? Module QuickTest"
   }
 },
 {
@@ -2954,11 +2954,11 @@
   "pk": 40,
   "fields": {
     "definition": 4,
-    "text": "�Cu�l es un factor de protecci�n frente al consumo?",
-    "option_a": "V�nculo familiar fuerte y comunicaci�n abierta",
-    "option_b": "Falta de supervisi�n de adultos",
+    "text": "?Cu?l es un factor de protecci?n frente al consumo?",
+    "option_a": "V?nculo familiar fuerte y comunicaci?n abierta",
+    "option_b": "Falta de supervisi?n de adultos",
     "option_c": "Consumo temprano en la adolescencia",
-    "option_d": "Participaci�n en pandillas",
+    "option_d": "Participaci?n en pandillas",
     "correct_option": "A"
   }
 },
@@ -2967,11 +2967,11 @@
   "pk": 41,
   "fields": {
     "definition": 4,
-    "text": "�Qu� ejemplo refleja un factor de riesgo en adolescentes?",
+    "text": "?Qu? ejemplo refleja un factor de riesgo en adolescentes?",
     "option_a": "Red de amistades sanas",
-    "option_b": "Presi�n de pares para �probar� sustancias",
-    "option_c": "Participaci�n en deportes",
-    "option_d": "Comunicaci�n efectiva en casa",
+    "option_b": "Presi?n de pares para ?probar? sustancias",
+    "option_c": "Participaci?n en deportes",
+    "option_d": "Comunicaci?n efectiva en casa",
     "correct_option": "B"
   }
 },
@@ -2980,11 +2980,11 @@
   "pk": 42,
   "fields": {
     "definition": 4,
-    "text": "�Qu� acci�n fortalece factores de protecci�n?",
+    "text": "?Qu? acci?n fortalece factores de protecci?n?",
     "option_a": "Normalizar el consumo en reuniones",
     "option_b": "Evitar hablar del tema en familia",
     "option_c": "Fomentar actividades extracurriculares y apoyo escolar",
-    "option_d": "Permitir el consumo �con moderaci�n�",
+    "option_d": "Permitir el consumo ?con moderaci?n?",
     "correct_option": "C"
   }
 },
@@ -2993,10 +2993,10 @@
   "pk": 43,
   "fields": {
     "definition": 4,
-    "text": "�Cu�l es un factor de protecci�n a nivel escolar?",
+    "text": "?Cu?l es un factor de protecci?n a nivel escolar?",
     "option_a": "Ausentismo frecuente",
     "option_b": "Bajo rendimiento no atendido",
-    "option_c": "Programas de prevenci�n y tutor�as",
+    "option_c": "Programas de prevenci?n y tutor?as",
     "option_d": "Ambiente de violencia",
     "correct_option": "C"
   }
@@ -3006,9 +3006,9 @@
   "pk": 44,
   "fields": {
     "definition": 4,
-    "text": "�Qu� describe mejor un factor de riesgo familiar?",
-    "option_a": "Normas claras y l�mites consistentes",
-    "option_b": "Escasa supervisi�n y l�mites difusos",
+    "text": "?Qu? describe mejor un factor de riesgo familiar?",
+    "option_a": "Normas claras y l?mites consistentes",
+    "option_b": "Escasa supervisi?n y l?mites difusos",
     "option_c": "Tiempo de calidad en familia",
     "option_d": "Refuerzo de logros",
     "correct_option": "B"
@@ -3019,11 +3019,11 @@
   "pk": 45,
   "fields": {
     "definition": 5,
-    "text": "La etapa primaria/experimental se caracteriza por�",
+    "text": "La etapa primaria/experimental se caracteriza por?",
     "option_a": "Consumo diario y dependencia",
     "option_b": "Uso frecuente con consecuencias negativas",
-    "option_c": "Primeros intentos por curiosidad, sin patr�n establecido",
-    "option_d": "Rehabilitaci�n y tratamiento",
+    "option_c": "Primeros intentos por curiosidad, sin patr?n establecido",
+    "option_d": "Rehabilitaci?n y tratamiento",
     "correct_option": "C"
   }
 },
@@ -3032,9 +3032,9 @@
   "pk": 46,
   "fields": {
     "definition": 5,
-    "text": "La etapa secundaria/abuso suele implicar�",
+    "text": "La etapa secundaria/abuso suele implicar?",
     "option_a": "Uso repetido que afecta escuela y familia",
-    "option_b": "Ning�n impacto en el rendimiento",
+    "option_b": "Ning?n impacto en el rendimiento",
     "option_c": "Solo consumo experimental",
     "option_d": "Tratamiento especializado",
     "correct_option": "A"
@@ -3045,9 +3045,9 @@
   "pk": 47,
   "fields": {
     "definition": 5,
-    "text": "La etapa terciaria/consumo diario indica�",
+    "text": "La etapa terciaria/consumo diario indica?",
     "option_a": "Curiosidad ocasional",
-    "option_b": "Dependencia y necesidad de intervenci�n",
+    "option_b": "Dependencia y necesidad de intervenci?n",
     "option_c": "Abandono total del consumo",
     "option_d": "Sin consecuencias en salud",
     "correct_option": "B"
@@ -3058,10 +3058,10 @@
   "pk": 48,
   "fields": {
     "definition": 5,
-    "text": "�Qu� se�al encaja con consumo problem�tico (abuso)?",
-    "option_a": "Participaci�n estable en clases",
-    "option_b": "Conflictos frecuentes y baja motivaci�n",
-    "option_c": "H�bitos saludables constantes",
+    "text": "?Qu? se?al encaja con consumo problem?tico (abuso)?",
+    "option_a": "Participaci?n estable en clases",
+    "option_b": "Conflictos frecuentes y baja motivaci?n",
+    "option_c": "H?bitos saludables constantes",
     "option_d": "Relaciones familiares positivas",
     "correct_option": "B"
   }
@@ -3071,11 +3071,11 @@
   "pk": 49,
   "fields": {
     "definition": 5,
-    "text": "En la etapa experimental, es com�n�",
-    "option_a": "Probar por presi�n de pares",
-    "option_b": "Reca�das despu�s del tratamiento",
-    "option_c": "S�ntomas de abstinencia severos",
-    "option_d": "Consumo cr�nico",
+    "text": "En la etapa experimental, es com?n?",
+    "option_a": "Probar por presi?n de pares",
+    "option_b": "Reca?das despu?s del tratamiento",
+    "option_c": "S?ntomas de abstinencia severos",
+    "option_d": "Consumo cr?nico",
     "correct_option": "A"
   }
 },
@@ -3084,11 +3084,11 @@
   "pk": 50,
   "fields": {
     "definition": 6,
-    "text": "Un impacto frecuente del consumo en la escuela es�",
-    "option_a": "Mejor concentraci�n",
-    "option_b": "Aumento del rendimiento acad�mico",
+    "text": "Un impacto frecuente del consumo en la escuela es?",
+    "option_a": "Mejor concentraci?n",
+    "option_b": "Aumento del rendimiento acad?mico",
     "option_c": "Ausencias, conflictos y bajo rendimiento",
-    "option_d": "Mayor integraci�n en actividades",
+    "option_d": "Mayor integraci?n en actividades",
     "correct_option": "C"
   }
 },
@@ -3097,11 +3097,11 @@
   "pk": 51,
   "fields": {
     "definition": 6,
-    "text": "Una medida de prevenci�n comunitaria efectiva es�",
+    "text": "Una medida de prevenci?n comunitaria efectiva es?",
     "option_a": "Tolerancia al consumo en eventos",
-    "option_b": "Campa�as educativas y apoyo interinstitucional",
+    "option_b": "Campa?as educativas y apoyo interinstitucional",
     "option_c": "Evitar hablar del tema",
-    "option_d": "Normalizar �probar una vez�",
+    "option_d": "Normalizar ?probar una vez?",
     "correct_option": "B"
   }
 },
@@ -3110,11 +3110,11 @@
   "pk": 52,
   "fields": {
     "definition": 6,
-    "text": "Una decisi�n saludable frente a la presi�n de pares es�",
-    "option_a": "Ceder �por una vez�",
+    "text": "Una decisi?n saludable frente a la presi?n de pares es?",
+    "option_a": "Ceder ?por una vez?",
     "option_b": "Buscar apoyo y decir no",
     "option_c": "Alejarse de actividades positivas",
-    "option_d": "Ocultar la situaci�n",
+    "option_d": "Ocultar la situaci?n",
     "correct_option": "B"
   }
 },
@@ -3123,11 +3123,11 @@
   "pk": 53,
   "fields": {
     "definition": 6,
-    "text": "�Qu� acci�n familiar ayuda a la prevenci�n?",
+    "text": "?Qu? acci?n familiar ayuda a la prevenci?n?",
     "option_a": "Evitar conversaciones sobre riesgos",
-    "option_b": "Comunicaci�n abierta y l�mites claros",
-    "option_c": "Ignorar se�ales de alerta",
-    "option_d": "Permitir consumo �bajo control�",
+    "option_b": "Comunicaci?n abierta y l?mites claros",
+    "option_c": "Ignorar se?ales de alerta",
+    "option_d": "Permitir consumo ?bajo control?",
     "correct_option": "B"
   }
 },
@@ -3136,11 +3136,11 @@
   "pk": 54,
   "fields": {
     "definition": 6,
-    "text": "�Qu� enfoque fortalece decisiones saludables?",
+    "text": "?Qu? enfoque fortalece decisiones saludables?",
     "option_a": "Informarse, planificar respuestas y buscar apoyo",
     "option_b": "Actuar sin pensar",
     "option_c": "Aislarse del entorno",
-    "option_d": "Aceptar cualquier presi�n",
+    "option_d": "Aceptar cualquier presi?n",
     "correct_option": "A"
   }
 },
@@ -3149,10 +3149,10 @@
   "pk": 3001,
   "fields": {
     "definition": 201,
-    "text": "EN: As blood alcohol concentration (BAC) goes up, what happens?\nES: A medida que sube la concentraci�n de alcohol en sangre (BAC), �qu� sucede?",
-    "option_a": "EN: Vision improves | ES: Mejora la visi�n",
+    "text": "EN: As blood alcohol concentration (BAC) goes up, what happens?\nES: A medida que sube la concentraci?n de alcohol en sangre (BAC), ?qu? sucede?",
+    "option_a": "EN: Vision improves | ES: Mejora la visi?n",
     "option_b": "EN: Judgment and self-control are affected | ES: Se afectan el juicio y el autocontrol",
-    "option_c": "EN: Reaction time improves | ES: Mejora el tiempo de reacci�n",
+    "option_c": "EN: Reaction time improves | ES: Mejora el tiempo de reacci?n",
     "option_d": "EN: Driving skills remain the same | ES: Las habilidades de manejo no cambian",
     "correct_option": "B"
   }
@@ -3162,10 +3162,10 @@
   "pk": 3002,
   "fields": {
     "definition": 201,
-    "text": "EN: Why is alcohol especially dangerous for CDL drivers?\nES: �Por qu� el alcohol es especialmente peligroso para conductores CDL?",
-    "option_a": "EN: It mainly affects physical strength | ES: Afecta principalmente la fuerza f�sica",
-    "option_b": "EN: It affects judgment before physical control | ES: Afecta el juicio antes del control f�sico",
-    "option_c": "EN: It only affects vision | ES: Solo afecta la visi�n",
+    "text": "EN: Why is alcohol especially dangerous for CDL drivers?\nES: ?Por qu? el alcohol es especialmente peligroso para conductores CDL?",
+    "option_a": "EN: It mainly affects physical strength | ES: Afecta principalmente la fuerza f?sica",
+    "option_b": "EN: It affects judgment before physical control | ES: Afecta el juicio antes del control f?sico",
+    "option_c": "EN: It only affects vision | ES: Solo afecta la visi?n",
     "option_d": "EN: It has no effect at low levels | ES: No tiene efecto en niveles bajos",
     "correct_option": "B"
   }
@@ -3175,9 +3175,9 @@
   "pk": 3003,
   "fields": {
     "definition": 201,
-    "text": "EN: Implied consent means:\nES: El consentimiento impl�cito significa:",
+    "text": "EN: Implied consent means:\nES: El consentimiento impl?cito significa:",
     "option_a": "EN: You may refuse alcohol testing | ES: Puedes negarte a la prueba de alcohol",
-    "option_b": "EN: You consent only after an accident | ES: Solo aceptas despu�s de un accidente",
+    "option_b": "EN: You consent only after an accident | ES: Solo aceptas despu?s de un accidente",
     "option_c": "EN: You have already agreed to alcohol testing | ES: Ya diste tu consentimiento para pruebas de alcohol",
     "option_d": "EN: Testing is optional for CDL drivers | ES: Las pruebas son opcionales para CDL",
     "correct_option": "C"
@@ -3188,7 +3188,7 @@
   "pk": 3004,
   "fields": {
     "definition": 201,
-    "text": "EN: How does alcohol affect reaction time?\nES: �C�mo afecta el alcohol el tiempo de reacci�n?",
+    "text": "EN: How does alcohol affect reaction time?\nES: ?C?mo afecta el alcohol el tiempo de reacci?n?",
     "option_a": "EN: It shortens reaction time | ES: Lo reduce",
     "option_b": "EN: It has no effect | ES: No lo afecta",
     "option_c": "EN: It increases reaction time | ES: Lo aumenta",
@@ -3201,9 +3201,9 @@
   "pk": 3005,
   "fields": {
     "definition": 201,
-    "text": "EN: Which statement about over-the-counter cold medicines is true?\nES: �Cu�l afirmaci�n sobre medicamentos de venta libre para resfriado es verdadera?",
+    "text": "EN: Which statement about over-the-counter cold medicines is true?\nES: ?Cu?l afirmaci?n sobre medicamentos de venta libre para resfriado es verdadera?",
     "option_a": "EN: They are always safe for driving | ES: Siempre son seguros para manejar",
-    "option_b": "EN: They can cause drowsiness and slow reaction | ES: Pueden causar sue�o y lentitud",
+    "option_b": "EN: They can cause drowsiness and slow reaction | ES: Pueden causar sue?o y lentitud",
     "option_c": "EN: CDL drivers are exempt from their effects | ES: No afectan a conductores CDL",
     "option_d": "EN: They only affect elderly drivers | ES: Solo afectan a personas mayores",
     "correct_option": "B"
@@ -3214,11 +3214,11 @@
   "pk": 3006,
   "fields": {
     "definition": 201,
-    "text": "EN: Which statement about drug use is true?\nES: �Cu�l afirmaci�n sobre el uso de drogas es verdadera?",
-    "option_a": "EN: Legal drugs never affect driving | ES: Las drogas legales nunca afectan la conducci�n",
+    "text": "EN: Which statement about drug use is true?\nES: ?Cu?l afirmaci?n sobre el uso de drogas es verdadera?",
+    "option_a": "EN: Legal drugs never affect driving | ES: Las drogas legales nunca afectan la conducci?n",
     "option_b": "EN: Drug use can lead to accidents and arrest | ES: El uso de drogas puede causar accidentes y arrestos",
     "option_c": "EN: Only illegal drugs are tested | ES: Solo se examinan drogas ilegales",
-    "option_d": "EN: Prescription drugs are always allowed | ES: Las recetadas siempre est�n permitidas",
+    "option_d": "EN: Prescription drugs are always allowed | ES: Las recetadas siempre est?n permitidas",
     "correct_option": "B"
   }
 },
@@ -3227,11 +3227,11 @@
   "pk": 3007,
   "fields": {
     "definition": 201,
-    "text": "EN: Why does a CDL driver have greater legal responsibility?\nES: �Por qu� un conductor CDL tiene mayor responsabilidad legal?",
-    "option_a": "EN: They drive more often | ES: Maneja con m�s frecuencia",
-    "option_b": "EN: They operate heavier and more dangerous vehicles | ES: Opera veh�culos m�s grandes y peligrosos",
-    "option_c": "EN: They receive higher pay | ES: Gana m�s dinero",
-    "option_d": "EN: They drive longer distances | ES: Maneja distancias m�s largas",
+    "text": "EN: Why does a CDL driver have greater legal responsibility?\nES: ?Por qu? un conductor CDL tiene mayor responsabilidad legal?",
+    "option_a": "EN: They drive more often | ES: Maneja con m?s frecuencia",
+    "option_b": "EN: They operate heavier and more dangerous vehicles | ES: Opera veh?culos m?s grandes y peligrosos",
+    "option_c": "EN: They receive higher pay | ES: Gana m?s dinero",
+    "option_d": "EN: They drive longer distances | ES: Maneja distancias m?s largas",
     "correct_option": "B"
   }
 },
@@ -3241,7 +3241,7 @@
   "fields": {
     "definition": 201,
     "text": "EN: If you have been drinking alcohol, you should:\nES: Si has bebido alcohol, debes:",
-    "option_a": "EN: Drink coffee | ES: Tomar caf�",
+    "option_a": "EN: Drink coffee | ES: Tomar caf?",
     "option_b": "EN: Drive slowly | ES: Manejar despacio",
     "option_c": "EN: Wait for it to wear off | ES: Esperar a que se pase",
     "option_d": "EN: Eat food | ES: Comer",
@@ -3253,9 +3253,9 @@
   "pk": 3101,
   "fields": {
     "definition": 202,
-    "text": "EN: Why is a pre-trip inspection important?\nES: �Por qu� es importante la inspecci�n previa al viaje?",
+    "text": "EN: Why is a pre-trip inspection important?\nES: ?Por qu? es importante la inspecci?n previa al viaje?",
     "option_a": "EN: To save fuel | ES: Para ahorrar combustible",
-    "option_b": "EN: To find mechanical problems | ES: Para detectar problemas mec�nicos",
+    "option_b": "EN: To find mechanical problems | ES: Para detectar problemas mec?nicos",
     "option_c": "EN: To improve driving speed | ES: Para aumentar la velocidad",
     "option_d": "EN: To avoid paperwork | ES: Para evitar papeleo",
     "correct_option": "B"
@@ -3266,8 +3266,8 @@
   "pk": 3102,
   "fields": {
     "definition": 202,
-    "text": "EN: Who is responsible for the vehicle's condition?\nES: �Qui�n es responsable del estado del veh�culo?",
-    "option_a": "EN: The mechanic | ES: El mec�nico",
+    "text": "EN: Who is responsible for the vehicle's condition?\nES: ?Qui?n es responsable del estado del veh?culo?",
+    "option_a": "EN: The mechanic | ES: El mec?nico",
     "option_b": "EN: The company | ES: La empresa",
     "option_c": "EN: The driver | ES: El conductor",
     "option_d": "EN: The dispatcher | ES: El despachador",
@@ -3279,9 +3279,9 @@
   "pk": 3103,
   "fields": {
     "definition": 202,
-    "text": "EN: When should a pre-trip inspection be performed?\nES: �Cu�ndo debe realizarse la inspecci�n previa?",
+    "text": "EN: When should a pre-trip inspection be performed?\nES: ?Cu?ndo debe realizarse la inspecci?n previa?",
     "option_a": "EN: Once a week | ES: Una vez por semana",
-    "option_b": "EN: Only after an accident | ES: Solo despu�s de un accidente",
+    "option_b": "EN: Only after an accident | ES: Solo despu?s de un accidente",
     "option_c": "EN: Before each trip | ES: Antes de cada viaje",
     "option_d": "EN: Only in bad weather | ES: Solo en mal clima",
     "correct_option": "C"
@@ -3292,11 +3292,11 @@
   "pk": 3104,
   "fields": {
     "definition": 202,
-    "text": "EN: What should be done if a defect is found?\nES: �Qu� debe hacerse si se encuentra un defecto?",
+    "text": "EN: What should be done if a defect is found?\nES: ?Qu? debe hacerse si se encuentra un defecto?",
     "option_a": "EN: Ignore it | ES: Ignorarlo",
     "option_b": "EN: Report and fix it | ES: Reportarlo y corregirlo",
     "option_c": "EN: Drive carefully | ES: Manejar con cuidado",
-    "option_d": "EN: Note it later | ES: Anotarlo despu�s",
+    "option_d": "EN: Note it later | ES: Anotarlo despu?s",
     "correct_option": "B"
   }
 },
@@ -3305,7 +3305,7 @@
   "pk": 3105,
   "fields": {
     "definition": 202,
-    "text": "EN: Which system is critical during pre-trip inspection?\nES: �Qu� sistema es cr�tico durante la inspecci�n previa?",
+    "text": "EN: Which system is critical during pre-trip inspection?\nES: ?Qu? sistema es cr?tico durante la inspecci?n previa?",
     "option_a": "EN: Sound system | ES: Sistema de sonido",
     "option_b": "EN: Brake system | ES: Sistema de frenos",
     "option_c": "EN: Air conditioning | ES: Aire acondicionado",
@@ -3318,11 +3318,11 @@
   "pk": 3201,
   "fields": {
     "definition": 203,
-    "text": "EN: What powers air brakes?\nES: �Qu� acciona los frenos de aire?",
-    "option_a": "EN: Hydraulic fluid | ES: Fluido hidr�ulico",
+    "text": "EN: What powers air brakes?\nES: ?Qu? acciona los frenos de aire?",
+    "option_a": "EN: Hydraulic fluid | ES: Fluido hidr?ulico",
     "option_b": "EN: Compressed air | ES: Aire comprimido",
     "option_c": "EN: Electricity | ES: Electricidad",
-    "option_d": "EN: Vacuum | ES: Vac�o",
+    "option_d": "EN: Vacuum | ES: Vac?o",
     "correct_option": "B"
   }
 },
@@ -3331,11 +3331,11 @@
   "pk": 3202,
   "fields": {
     "definition": 203,
-    "text": "EN: What is the normal operating air pressure?\nES: �Cu�l es la presi�n normal de operaci�n?",
-    "option_a": "EN: 50�70 PSI | ES: 50�70 PSI",
-    "option_b": "EN: 80�90 PSI | ES: 80�90 PSI",
-    "option_c": "EN: 100�125 PSI | ES: 100�125 PSI",
-    "option_d": "EN: 140�160 PSI | ES: 140�160 PSI",
+    "text": "EN: What is the normal operating air pressure?\nES: ?Cu?l es la presi?n normal de operaci?n?",
+    "option_a": "EN: 50?70 PSI | ES: 50?70 PSI",
+    "option_b": "EN: 80?90 PSI | ES: 80?90 PSI",
+    "option_c": "EN: 100?125 PSI | ES: 100?125 PSI",
+    "option_d": "EN: 140?160 PSI | ES: 140?160 PSI",
     "correct_option": "C"
   }
 },
@@ -3344,7 +3344,7 @@
   "pk": 3203,
   "fields": {
     "definition": 203,
-    "text": "EN: When does the low air pressure warning activate?\nES: �Cu�ndo se activa la advertencia de baja presi�n?",
+    "text": "EN: When does the low air pressure warning activate?\nES: ?Cu?ndo se activa la advertencia de baja presi?n?",
     "option_a": "EN: Around 90 PSI | ES: Alrededor de 90 PSI",
     "option_b": "EN: Around 60 PSI | ES: Alrededor de 60 PSI",
     "option_c": "EN: Around 40 PSI | ES: Alrededor de 40 PSI",
@@ -3357,7 +3357,7 @@
   "pk": 3204,
   "fields": {
     "definition": 203,
-    "text": "EN: What happens if air pressure gets too low?\nES: �Qu� sucede si la presi�n baja demasiado?",
+    "text": "EN: What happens if air pressure gets too low?\nES: ?Qu? sucede si la presi?n baja demasiado?",
     "option_a": "EN: Brakes work better | ES: Frenan mejor",
     "option_b": "EN: Nothing happens | ES: No pasa nada",
     "option_c": "EN: Emergency brakes apply | ES: Se activan los frenos de emergencia",
@@ -3370,7 +3370,7 @@
   "pk": 3205,
   "fields": {
     "definition": 203,
-    "text": "EN: Why must air brake tests be performed?\nES: �Por qu� deben realizarse pruebas de frenos de aire?",
+    "text": "EN: Why must air brake tests be performed?\nES: ?Por qu? deben realizarse pruebas de frenos de aire?",
     "option_a": "EN: For comfort | ES: Por comodidad",
     "option_b": "EN: To meet CDL requirements | ES: Para cumplir requisitos CDL",
     "option_c": "EN: To save fuel | ES: Para ahorrar combustible",
@@ -3383,9 +3383,9 @@
   "pk": 3301,
   "fields": {
     "definition": 204,
-    "text": "EN: What is a combination vehicle?\nES: �Qu� es un veh�culo combinado?",
-    "option_a": "EN: A single vehicle with no trailer | ES: Un solo veh�culo sin remolque",
-    "option_b": "EN: A tractor and one or more trailers | ES: Un tractor y uno o m�s remolques",
+    "text": "EN: What is a combination vehicle?\nES: ?Qu? es un veh?culo combinado?",
+    "option_a": "EN: A single vehicle with no trailer | ES: Un solo veh?culo sin remolque",
+    "option_b": "EN: A tractor and one or more trailers | ES: Un tractor y uno o m?s remolques",
     "option_c": "EN: A motorcycle with a sidecar | ES: Una moto con sidecar",
     "option_d": "EN: A car with roof rack | ES: Un carro con baca",
     "correct_option": "B"
@@ -3396,11 +3396,11 @@
   "pk": 3302,
   "fields": {
     "definition": 204,
-    "text": "EN: Why is weight distribution important?\nES: �Por qu� es importante la distribuci�n de peso?",
-    "option_a": "EN: It improves radio signal | ES: Mejora la se�al de radio",
-    "option_b": "EN: It prevents loss of traction and trailer swing | ES: Evita p�rdida de tracci�n y balanceo",
-    "option_c": "EN: It makes the truck faster | ES: Hace el cami�n m�s r�pido",
-    "option_d": "EN: It reduces mirror size | ES: Reduce el tama�o de espejos",
+    "text": "EN: Why is weight distribution important?\nES: ?Por qu? es importante la distribuci?n de peso?",
+    "option_a": "EN: It improves radio signal | ES: Mejora la se?al de radio",
+    "option_b": "EN: It prevents loss of traction and trailer swing | ES: Evita p?rdida de tracci?n y balanceo",
+    "option_c": "EN: It makes the truck faster | ES: Hace el cami?n m?s r?pido",
+    "option_d": "EN: It reduces mirror size | ES: Reduce el tama?o de espejos",
     "correct_option": "B"
   }
 },
@@ -3409,10 +3409,10 @@
   "pk": 3303,
   "fields": {
     "definition": 204,
-    "text": "EN: What is a pull test used for?\nES: �Para qu� se usa la prueba de tir�n (pull test)?",
-    "option_a": "EN: To check if the fifth wheel is locked | ES: Para verificar que la quinta rueda est� asegurada",
+    "text": "EN: What is a pull test used for?\nES: ?Para qu? se usa la prueba de tir?n (pull test)?",
+    "option_a": "EN: To check if the fifth wheel is locked | ES: Para verificar que la quinta rueda est? asegurada",
     "option_b": "EN: To test the horn volume | ES: Para probar el claxon",
-    "option_c": "EN: To warm up tires | ES: Para calentar neum�ticos",
+    "option_c": "EN: To warm up tires | ES: Para calentar neum?ticos",
     "option_d": "EN: To check fuel quality | ES: Para revisar calidad del combustible",
     "correct_option": "A"
   }
@@ -3422,11 +3422,11 @@
   "pk": 3304,
   "fields": {
     "definition": 204,
-    "text": "EN: What is a common coupling mistake?\nES: �Cu�l es un error com�n al acoplar?",
+    "text": "EN: What is a common coupling mistake?\nES: ?Cu?l es un error com?n al acoplar?",
     "option_a": "EN: Checking the lock jaws visually | ES: Revisar visualmente el cierre",
-    "option_b": "EN: Connecting air lines | ES: Conectar l�neas de aire",
+    "option_b": "EN: Connecting air lines | ES: Conectar l?neas de aire",
     "option_c": "EN: Incomplete coupling | ES: Acoplamiento incompleto",
-    "option_d": "EN: Performing a pull test | ES: Hacer prueba de tir�n",
+    "option_d": "EN: Performing a pull test | ES: Hacer prueba de tir?n",
     "correct_option": "C"
   }
 },
@@ -3435,10 +3435,10 @@
   "pk": 3305,
   "fields": {
     "definition": 204,
-    "text": "EN: Why do combination vehicles need more stopping distance?\nES: �Por qu� los veh�culos combinados necesitan m�s distancia de frenado?",
-    "option_a": "EN: They are heavier and longer | ES: Son m�s pesados y largos",
-    "option_b": "EN: They have smaller brakes | ES: Tienen frenos m�s peque�os",
-    "option_c": "EN: They drive slower | ES: Manejan m�s lento",
+    "text": "EN: Why do combination vehicles need more stopping distance?\nES: ?Por qu? los veh?culos combinados necesitan m?s distancia de frenado?",
+    "option_a": "EN: They are heavier and longer | ES: Son m?s pesados y largos",
+    "option_b": "EN: They have smaller brakes | ES: Tienen frenos m?s peque?os",
+    "option_c": "EN: They drive slower | ES: Manejan m?s lento",
     "option_d": "EN: They have fewer tires | ES: Tienen menos llantas",
     "correct_option": "A"
   }
@@ -3448,8 +3448,8 @@
   "pk": 3401,
   "fields": {
     "definition": 205,
-    "text": "EN: What is defensive driving?\nES: �Qu� es conducci�n defensiva?",
-    "option_a": "EN: Driving as fast as possible | ES: Manejar lo m�s r�pido posible",
+    "text": "EN: What is defensive driving?\nES: ?Qu? es conducci?n defensiva?",
+    "option_a": "EN: Driving as fast as possible | ES: Manejar lo m?s r?pido posible",
     "option_b": "EN: Anticipating hazards and reducing risk | ES: Anticipar peligros y reducir riesgos",
     "option_c": "EN: Honking to warn others | ES: Tocar bocina para advertir",
     "option_d": "EN: Following closely | ES: Manejar pegado",
@@ -3461,11 +3461,11 @@
   "pk": 3402,
   "fields": {
     "definition": 205,
-    "text": "EN: Why do CMVs need more following distance?\nES: �Por qu� los veh�culos comerciales necesitan m�s distancia?",
-    "option_a": "EN: They are lighter | ES: Son m�s livianos",
-    "option_b": "EN: They require longer stopping distance | ES: Requieren m�s distancia para frenar",
+    "text": "EN: Why do CMVs need more following distance?\nES: ?Por qu? los veh?culos comerciales necesitan m?s distancia?",
+    "option_a": "EN: They are lighter | ES: Son m?s livianos",
+    "option_b": "EN: They require longer stopping distance | ES: Requieren m?s distancia para frenar",
     "option_c": "EN: They have better brakes always | ES: Siempre tienen mejores frenos",
-    "option_d": "EN: They stop instantly | ES: Se detienen instant�neamente",
+    "option_d": "EN: They stop instantly | ES: Se detienen instant?neamente",
     "correct_option": "B"
   }
 },
@@ -3474,11 +3474,11 @@
   "pk": 3403,
   "fields": {
     "definition": 205,
-    "text": "EN: What should you do at night?\nES: �Qu� debes hacer al conducir de noche?",
+    "text": "EN: What should you do at night?\nES: ?Qu? debes hacer al conducir de noche?",
     "option_a": "EN: Increase speed | ES: Aumentar velocidad",
     "option_b": "EN: Reduce speed and increase following distance | ES: Reducir velocidad y aumentar distancia",
     "option_c": "EN: Turn off lights | ES: Apagar luces",
-    "option_d": "EN: Follow closer to see better | ES: Ir m�s cerca para ver mejor",
+    "option_d": "EN: Follow closer to see better | ES: Ir m?s cerca para ver mejor",
     "correct_option": "B"
   }
 },
@@ -3487,7 +3487,7 @@
   "pk": 3404,
   "fields": {
     "definition": 205,
-    "text": "EN: What is a key rule for managing space?\nES: �Cu�l es una regla clave para manejar el espacio?",
+    "text": "EN: What is a key rule for managing space?\nES: ?Cu?l es una regla clave para manejar el espacio?",
     "option_a": "EN: Stay in other drivers' blind spots | ES: Mantenerse en puntos ciegos",
     "option_b": "EN: Keep an escape route | ES: Mantener una ruta de escape",
     "option_c": "EN: Tailgate to save time | ES: Pegarse para ahorrar tiempo",
@@ -3503,8 +3503,8 @@
     "text": "EN: If you feel fatigued, you should:\nES: Si te sientes cansado, debes:",
     "option_a": "EN: Keep driving | ES: Seguir manejando",
     "option_b": "EN: Stop and rest | ES: Detenerte y descansar",
-    "option_c": "EN: Turn up music | ES: Subir m�sica",
-    "option_d": "EN: Drive faster to finish | ES: Manejar m�s r�pido para terminar",
+    "option_c": "EN: Turn up music | ES: Subir m?sica",
+    "option_d": "EN: Drive faster to finish | ES: Manejar m?s r?pido para terminar",
     "correct_option": "B"
   }
 },
@@ -3513,9 +3513,9 @@
   "pk": 3501,
   "fields": {
     "definition": 206,
-    "text": "EN: Why is proper cargo distribution important?\nES: �Por qu� es importante la correcta distribuci�n de la carga?",
+    "text": "EN: Why is proper cargo distribution important?\nES: ?Por qu? es importante la correcta distribuci?n de la carga?",
     "option_a": "EN: To increase speed | ES: Para aumentar la velocidad",
-    "option_b": "EN: To maintain vehicle stability | ES: Para mantener la estabilidad del veh�culo",
+    "option_b": "EN: To maintain vehicle stability | ES: Para mantener la estabilidad del veh?culo",
     "option_c": "EN: To reduce paperwork | ES: Para reducir papeleo",
     "option_d": "EN: To improve fuel taste | ES: Para mejorar el combustible",
     "correct_option": "B"
@@ -3526,10 +3526,10 @@
   "pk": 3502,
   "fields": {
     "definition": 206,
-    "text": "EN: Who is responsible for securing the cargo?\nES: �Qui�n es responsable de asegurar la carga?",
+    "text": "EN: Who is responsible for securing the cargo?\nES: ?Qui?n es responsable de asegurar la carga?",
     "option_a": "EN: The shipper | ES: El remitente",
     "option_b": "EN: The driver | ES: El conductor",
-    "option_c": "EN: The mechanic | ES: El mec�nico",
+    "option_c": "EN: The mechanic | ES: El mec?nico",
     "option_d": "EN: The dispatcher | ES: El despachador",
     "correct_option": "B"
   }
@@ -3539,9 +3539,9 @@
   "pk": 3503,
   "fields": {
     "definition": 206,
-    "text": "EN: When should cargo be inspected during a trip?\nES: �Cu�ndo debe inspeccionarse la carga durante el viaje?",
+    "text": "EN: When should cargo be inspected during a trip?\nES: ?Cu?ndo debe inspeccionarse la carga durante el viaje?",
     "option_a": "EN: Only at destination | ES: Solo al llegar",
-    "option_b": "EN: After first 50 miles and periodically | ES: Despu�s de 50 millas y peri�dicamente",
+    "option_b": "EN: After first 50 miles and periodically | ES: Despu?s de 50 millas y peri?dicamente",
     "option_c": "EN: Only before departure | ES: Solo antes de salir",
     "option_d": "EN: Only if it shifts | ES: Solo si se mueve",
     "correct_option": "B"
@@ -3552,10 +3552,10 @@
   "pk": 3504,
   "fields": {
     "definition": 206,
-    "text": "EN: What can happen if cargo is not secured?\nES: �Qu� puede pasar si la carga no est� asegurada?",
+    "text": "EN: What can happen if cargo is not secured?\nES: ?Qu? puede pasar si la carga no est? asegurada?",
     "option_a": "EN: Better fuel economy | ES: Mejor consumo",
-    "option_b": "EN: Loss of control or rollover | ES: P�rdida de control o volcadura",
-    "option_c": "EN: Faster delivery | ES: Entrega m�s r�pida",
+    "option_b": "EN: Loss of control or rollover | ES: P?rdida de control o volcadura",
+    "option_c": "EN: Faster delivery | ES: Entrega m?s r?pida",
     "option_d": "EN: Less braking | ES: Menos frenado",
     "correct_option": "B"
   }
@@ -3565,11 +3565,11 @@
   "pk": 3505,
   "fields": {
     "definition": 206,
-    "text": "EN: How often should cargo be checked?\nES: �Con qu� frecuencia debe revisarse la carga?",
+    "text": "EN: How often should cargo be checked?\nES: ?Con qu? frecuencia debe revisarse la carga?",
     "option_a": "EN: Every 10 miles | ES: Cada 10 millas",
     "option_b": "EN: After first 50 miles and every 150 miles or 3 hours | ES: A las 50 millas y cada 150 millas o 3 horas",
-    "option_c": "EN: Only once per day | ES: Una vez al d�a",
-    "option_d": "EN: Never if secured | ES: Nunca si est� asegurada",
+    "option_c": "EN: Only once per day | ES: Una vez al d?a",
+    "option_d": "EN: Never if secured | ES: Nunca si est? asegurada",
     "correct_option": "B"
   }
 },
@@ -3578,7 +3578,7 @@
   "pk": 3601,
   "fields": {
     "definition": 207,
-    "text": "EN: What is the first priority in an emergency?\nES: �Cu�l es la primera prioridad en una emergencia?",
+    "text": "EN: What is the first priority in an emergency?\nES: ?Cu?l es la primera prioridad en una emergencia?",
     "option_a": "EN: Finish delivery | ES: Terminar la entrega",
     "option_b": "EN: Safety and control | ES: Seguridad y control",
     "option_c": "EN: Call your dispatcher first | ES: Llamar al despachador primero",
@@ -3591,7 +3591,7 @@
   "pk": 3602,
   "fields": {
     "definition": 207,
-    "text": "EN: During a tire blowout, you should:\nES: Durante un revent�n de neum�tico, debes:",
+    "text": "EN: During a tire blowout, you should:\nES: Durante un revent?n de neum?tico, debes:",
     "option_a": "EN: Brake hard immediately | ES: Frenar fuerte inmediatamente",
     "option_b": "EN: Hold the wheel firmly and slow down gradually | ES: Sujetar el volante y reducir gradualmente",
     "option_c": "EN: Turn sharply to the shoulder | ES: Girar bruscamente a la orilla",
@@ -3604,11 +3604,11 @@
   "pk": 3603,
   "fields": {
     "definition": 207,
-    "text": "EN: After an accident, you should:\nES: Despu�s de un accidente, debes:",
+    "text": "EN: After an accident, you should:\nES: Despu?s de un accidente, debes:",
     "option_a": "EN: Leave the scene | ES: Irte del lugar",
     "option_b": "EN: Protect the scene and prevent another crash | ES: Proteger la escena y evitar otro choque",
     "option_c": "EN: Move injured people immediately | ES: Mover heridos de inmediato",
-    "option_d": "EN: Keep driving if the truck runs | ES: Seguir si el cami�n prende",
+    "option_d": "EN: Keep driving if the truck runs | ES: Seguir si el cami?n prende",
     "correct_option": "B"
   }
 },
@@ -3617,9 +3617,9 @@
   "pk": 3604,
   "fields": {
     "definition": 207,
-    "text": "EN: What should you use to warn other drivers after stopping?\nES: �Qu� debes usar para advertir a otros conductores despu�s de detenerte?",
-    "option_a": "EN: Music | ES: M�sica",
-    "option_b": "EN: Warning devices (triangles/reflectors) | ES: Dispositivos de advertencia (tri�ngulos/reflectores)",
+    "text": "EN: What should you use to warn other drivers after stopping?\nES: ?Qu? debes usar para advertir a otros conductores despu?s de detenerte?",
+    "option_a": "EN: Music | ES: M?sica",
+    "option_b": "EN: Warning devices (triangles/reflectors) | ES: Dispositivos de advertencia (tri?ngulos/reflectores)",
     "option_c": "EN: High speed | ES: Alta velocidad",
     "option_d": "EN: Headlights off | ES: Luces apagadas",
     "correct_option": "B"
@@ -3633,7 +3633,7 @@
     "text": "EN: Injured people should be moved only if:\nES: Los heridos deben moverse solo si:",
     "option_a": "EN: They ask to move | ES: Piden moverse",
     "option_b": "EN: There is immediate danger | ES: Hay peligro inmediato",
-    "option_c": "EN: Traffic is slow | ES: El tr�fico est� lento",
+    "option_c": "EN: Traffic is slow | ES: El tr?fico est? lento",
     "option_d": "EN: Your dispatcher says so | ES: Lo dice el despachador",
     "correct_option": "B"
   }
@@ -3643,11 +3643,11 @@
   "pk": 3701,
   "fields": {
     "definition": 208,
-    "text": "EN: What are hazardous materials (HazMat)?\nES: �Qu� son materiales peligrosos (HazMat)?",
+    "text": "EN: What are hazardous materials (HazMat)?\nES: ?Qu? son materiales peligrosos (HazMat)?",
     "option_a": "EN: Any cargo in boxes | ES: Cualquier carga en cajas",
     "option_b": "EN: Substances that can pose a risk to health/safety/environment | ES: Sustancias que pueden representar riesgo a salud/seguridad/ambiente",
     "option_c": "EN: Only food products | ES: Solo productos de comida",
-    "option_d": "EN: Only liquids | ES: Solo l�quidos",
+    "option_d": "EN: Only liquids | ES: Solo l?quidos",
     "correct_option": "B"
   }
 },
@@ -3656,7 +3656,7 @@
   "pk": 3702,
   "fields": {
     "definition": 208,
-    "text": "EN: What is the purpose of placards?\nES: �Cu�l es el prop�sito de los placards (r�tulos)?",
+    "text": "EN: What is the purpose of placards?\nES: ?Cu?l es el prop?sito de los placards (r?tulos)?",
     "option_a": "EN: To decorate the trailer | ES: Decorar el remolque",
     "option_b": "EN: To warn others about HazMat type | ES: Advertir sobre el tipo de material peligroso",
     "option_c": "EN: To show fuel level | ES: Mostrar nivel de combustible",
@@ -3669,10 +3669,10 @@
   "pk": 3703,
   "fields": {
     "definition": 208,
-    "text": "EN: What should a driver verify before transporting HazMat?\nES: �Qu� debe verificar un conductor antes de transportar HazMat?",
-    "option_a": "EN: Only tire pressure | ES: Solo presi�n de llantas",
-    "option_b": "EN: Shipping papers and correct placards | ES: Papeles de env�o y r�tulos correctos",
-    "option_c": "EN: Radio station | ES: Estaci�n de radio",
+    "text": "EN: What should a driver verify before transporting HazMat?\nES: ?Qu? debe verificar un conductor antes de transportar HazMat?",
+    "option_a": "EN: Only tire pressure | ES: Solo presi?n de llantas",
+    "option_b": "EN: Shipping papers and correct placards | ES: Papeles de env?o y r?tulos correctos",
+    "option_c": "EN: Radio station | ES: Estaci?n de radio",
     "option_d": "EN: Seat color | ES: Color del asiento",
     "correct_option": "B"
   }
@@ -3682,7 +3682,7 @@
   "pk": 3704,
   "fields": {
     "definition": 208,
-    "text": "EN: Which is a driver responsibility for HazMat?\nES: �Cu�l es una responsabilidad del conductor en HazMat?",
+    "text": "EN: Which is a driver responsibility for HazMat?\nES: ?Cu?l es una responsabilidad del conductor en HazMat?",
     "option_a": "EN: Ignore route restrictions | ES: Ignorar restricciones de ruta",
     "option_b": "EN: Know routes and restrictions | ES: Conocer rutas y restricciones",
     "option_c": "EN: Smoke near cargo | ES: Fumar cerca de la carga",
@@ -3767,7 +3767,7 @@
     "telefono": "9172135087",
     "numero_identidad": "018006249",
     "profesion": "Web Developer",
-    "roll": "Director de Tecnolog�a",
+    "roll": "Director de Tecnolog?a",
     "imagen": "profiles/default.jpg",
     "direccion": null,
     "old_cart": ""
@@ -3808,8 +3808,8 @@
   "model": "formbuilder.formdefinition",
   "pk": 4,
   "fields": {
-    "name": "Evidencias trimestrales sobre la implementaci�n del proyecto \"La educacion temprana sobre el Uso del Tabaco, Alcohol y otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial\".",
-    "description": "<p><strong>Objetivo/Raz�n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci�n de los talleres sobre prevenci�n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
+    "name": "Evidencias trimestrales sobre la implementaci?n del proyecto \"La educacion temprana sobre el Uso del Tabaco, Alcohol y otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial\".",
+    "description": "<p><strong>Objetivo/Raz?n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci?n de los talleres sobre prevenci?n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
     "created_at": "2025-12-25T03:42:07.572Z",
     "image": "",
     "image_left": "media/form_images/LogoEducacion2020_pfai5l",
@@ -3873,7 +3873,7 @@
   "pk": 19,
   "fields": {
     "form": 4,
-    "label": "Objetivo/Raz�n/Motivo",
+    "label": "Objetivo/Raz?n/Motivo",
     "name": "objetivo_razon_motivo",
     "field_type": "text",
     "required": false,
@@ -3886,7 +3886,7 @@
   "pk": 20,
   "fields": {
     "form": 4,
-    "label": "Como realizo la multiplicaci�n (metodolog�a)",
+    "label": "Como realizo la multiplicaci?n (metodolog?a)",
     "name": "metodologia",
     "field_type": "text",
     "required": false,
@@ -3964,7 +3964,7 @@
   "pk": 26,
   "fields": {
     "form": 4,
-    "label": "Impacto antes: Decepci�n Escolar",
+    "label": "Impacto antes: Decepci?n Escolar",
     "name": "impacto_antes_decepcion_escolar",
     "field_type": "integer",
     "required": false,
@@ -4029,7 +4029,7 @@
   "pk": 31,
   "fields": {
     "form": 4,
-    "label": "Impacto positivo a ra�z de la implementaci�n del proyecto: A nivel escolar",
+    "label": "Impacto positivo a ra?z de la implementaci?n del proyecto: A nivel escolar",
     "name": "impacto_positivo_nivel_escolar",
     "field_type": "text",
     "required": false,
@@ -4042,7 +4042,7 @@
   "pk": 32,
   "fields": {
     "form": 4,
-    "label": "Impacto positivo a ra�z de la implementaci�n del proyecto: A nivel familiar",
+    "label": "Impacto positivo a ra?z de la implementaci?n del proyecto: A nivel familiar",
     "name": "impacto_positivo_nivel_familiar",
     "field_type": "text",
     "required": false,
@@ -4055,7 +4055,7 @@
   "pk": 33,
   "fields": {
     "form": 4,
-    "label": "Impacto positivo a ra�z de la implementaci�n del proyecto: Social",
+    "label": "Impacto positivo a ra?z de la implementaci?n del proyecto: Social",
     "name": "impacto_positivo_social",
     "field_type": "text",
     "required": false,
@@ -4068,7 +4068,7 @@
   "pk": 34,
   "fields": {
     "form": 4,
-    "label": "Mejora en la decepci�n escolar",
+    "label": "Mejora en la decepci?n escolar",
     "name": "mejora_decepcion_escolar",
     "field_type": "text",
     "required": false,
@@ -4095,15 +4095,15 @@
   "fields": {
     "user": 71,
     "form": 4,
-    "form_name": "Evidencias trimestrales sobre la implementaci�n del proyecto \"La educacion temprana sobre el Uso del Tabaco, Alcohol y otras Drogas, previene que nuestros j�venes no se enfermen Bio-psicosocial\".",
+    "form_name": "Evidencias trimestrales sobre la implementaci?n del proyecto \"La educacion temprana sobre el Uso del Tabaco, Alcohol y otras Drogas, previene que nuestros j?venes no se enfermen Bio-psicosocial\".",
     "titulo": "",
-    "descripcion": "<p><strong>Objetivo/Raz�n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci�n de los talleres sobre prevenci�n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
+    "descripcion": "<p><strong>Objetivo/Raz?n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci?n de los talleres sobre prevenci?n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
     "form_data": {
       "centro_educativo": "Cristo Rey",
       "responsables": "Luis Pena",
       "fechas": "04/03/2026",
       "temas_impartidos": "lk;jkljljkljkjh",
-      "objetivo_razon_motivo": "<p><strong>Objetivo/Raz�n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci�n de los talleres sobre prevenci�n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
+      "objetivo_razon_motivo": "<p><strong>Objetivo/Raz?n/Motivo</strong></p><p>&nbsp;Medir el impacto de la implementaci?n de los talleres sobre prevenci?n de Tabaco, Alcohol y otras Drogas, en adolescentes, de centros educativos de la regional de educacion 07.</p>",
       "metodologia": "lkjlkj'lkjl",
       "puntos_destacados": "kljkljlj",
       "principales_incidencias": "lkjkljkl",
@@ -4238,7 +4238,7 @@
   "model": "contents.contentpost",
   "pk": 1,
   "fields": {
-    "title": "Preparaci�n de Psicolgos y Orientadores del Ministerio de Educaci�n, como Facilitadores sobre Prevenci�n del uso de Tabaco, Alcohol y Otras drogas y las Enfermedades Inducidas bio-psicosocial,para que",
+    "title": "Preparaci?n de Psicolgos y Orientadores del Ministerio de Educaci?n, como Facilitadores sobre Prevenci?n del uso de Tabaco, Alcohol y Otras drogas y las Enfermedades Inducidas bio-psicosocial,para que",
     "slug": "toad",
     "content": "<p>Preparaci&oacute;n de Psicolgos y Orientadores del Ministerio de Educaci&oacute;n, como Facilitadores sobre Prevenci&oacute;n del uso de Tabaco, Alcohol y Otras drogas y las Enfermedades Inducidas bio-psicosocial,para que</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Esta actividad estuvo dirigida a la capacitaci&oacute;n de psic&oacute;logos y orientadores del Ministerio de Educaci&oacute;n, con el prop&oacute;sito de fortalecer sus competencias como facilitadores en la prevenci&oacute;n del consumo de tabaco, alcohol y otras sustancias psicoactivas. Durante la jornada se abordaron las consecuencias bio-psicosociales asociadas al uso de estas sustancias, as&iacute; como estrategias educativas y de intervenci&oacute;n temprana. El objetivo principal fue proporcionar las herramientas necesarias para que los participantes puedan transmitir estos conocimientos de forma efectiva a estudiantes de nivel primario y secundario, fomentando ambientes escolares saludables y promoviendo estilos de vida libres de adicciones.</p>",
     "section": 1,
@@ -4257,7 +4257,7 @@
   "model": "contents.contentpost",
   "pk": 2,
   "fields": {
-    "title": "Nuestra Misi�n",
+    "title": "Nuestra Misi?n",
     "slug": "nuestra_mision",
     "content": "<p>Viviendo Mejor (Living Better Community Center) es una organizaci&oacute;n sin fines de lucro orientada a servir las necesidades de los individuos y las familias en nuestros entornos urbanos y rurales. Existimos para capacitar a nuestras comunidades y a los menos afortunados a trav&eacute;s de usar el conocimiento para prevenir y dar un apoyo que ayuda a nuestra sociedad. Utilizamos talleres y seminarios enfocados en estilos de vida saludable, prevenci&oacute;n en temas en torno al VIH/SIDA, abuso de alcohol y drogas, prevenci&oacute;n e intervenci&oacute;n de participaci&oacute;n en la sub-cultura de pandillas. Otros temas de educaci&oacute;n incluyen las preocupaciones alarmantes sobre diabetes, presi&oacute;n arterial alta, etc.</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>En Viviendo Mejor (Living Better Community Center) trabajamos hacia el logro de nuestra misi&oacute;n al asumir un rol de liderazgo en la construcci&oacute;n de bases hacia un futuro m&aacute;s seguro y m&aacute;s saludable. Abogamos por nuestras familias, ofrecemos el enriquecimiento de las experiencias con la utilizaci&oacute;n de nuestros recursos para apoyar y reforzar los resultados de una manera significativa y positiva que brinde mayores beneficios a la comunidad.</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Una de las caracter&iacute;sticas m&aacute;s prometedoras de nuestra organizaci&oacute;n es integrar arte y teatro como componentes de educaci&oacute;n presentados por profesionales de las bellas artes. Actividades de desarrollo personal tambi&eacute;n est&aacute;n disponibles para nuestra juventud. Nuestro sistema de talleres, seminarios, red de apoyo social y de refuerzo familiar representa una forma m&aacute;s completa de servicios integral, donde estos servicios est&aacute;n desarrollados y presentados primordialmente por l&iacute;deres y profesionales acreditados que son parte de nuestro programa. Ofrecemos referencias fiables con los proveedores de servicio apropiados.</p>",
     "section": 2,
@@ -4276,7 +4276,7 @@
   "model": "contents.contentpost",
   "pk": 3,
   "fields": {
-    "title": "Nuestra Visi�n",
+    "title": "Nuestra Visi?n",
     "slug": "Nuestra_Vision",
     "content": "<p>Viviendo Mejor (Living Better Community Center) proporcionar&aacute; una serie de servicios orientados a mejorar la calidad de vida de las familias y las comunidades a las que servimos. El continuo, compuesto por una amplia gama de servicios provistos de manera afable, fluida, que se ofrece a las familias con el grado m&aacute;s completo y mayor medida. Calidad, costo, necesidad, accesibilidad y facilidad de entrega son los par&aacute;metros que dan forma a todos nuestros servicios prestados. A trav&eacute;s de la evaluaci&oacute;n constante utilizando resultados medibles, podremos asegurar la calidad de vida y la satisfacci&oacute;n de seguir mejorando las familias.</p>",
     "section": 2,
@@ -4354,7 +4354,7 @@
   "fields": {
     "title": "Nuestra Historia",
     "slug": "nuestra_historia",
-    "content": "<p>El Centro Comunitario Viviendo Mejor (Living Better Cummunity Center) nace dentro de una comunidad de fe y comenz� a desarrollar sus servicios para la comunidad en el Bronx En ese momento, los servicios se proporcionaban a trav�s de la investigaci�n informal y de la evaluaci�n de las necesidades sociales sugeridas por los datos existentes y la observaci�n directa de quienes solicitaban nuestro servicio a trav�s de la iglesia Arca de Salvaci�n ACYM. En colaboraci�n con la Organizaci�n hermana, conocida como Arca de Salvaci�n ACyM, LBCC comenz� el servicio de la comunidad del Bronx bajo la direcci�n de su fundador el Revendo Jose Miguel N��ez y se incorporo como Organizaci�n sin fines de lucro a los 02(d�as) del mes Noviembre del 2017 en la Republica Dominicana. El Reverendo Nunez movilizo un equipo de proveedores de servicios comprometidos para ayudar, orientar y guiar a familias e individuos de bajos ingresos hacia un futuro mas prometedor en el �rea de la salud y el bienestar de la comunidad.</p><p><img src=\"/media/gallery/WhatsApp_Image_2024-11-08_at_1.08.17_PM.jpeg\" alt=\"\" width=\"1036\" height=\"540\">Caption</p><p>Desde sus inicios LBCC ha estado construyendo progresivamente las bases para expandir los servicios de intervenci�n, capacitando en la prevenci�n dentro de la comunidad del Bronx. Todo los cuales servicios son existentes a trav�s de la Iglesia Arca de Salvaci�n A C y M. La mayor�a quienes reciben nuestros servicios son la menor�a de latinos y afro-americano que pasan a ser una mayor�a en el Bronx, Sin embargo, los recursos y servicios est�n disponibles para cualquiera y todos los necesitados, sin importar la edad, raza, credo, origen �tnico, religi�n, preferencias y orientaci�n sexual. En repuesta a la necesidad de la comunidad, LBCC con sus perfecci�nales, est� vinculada con otras organizaciones y hospitales (Arca de salvaci�n, Promesa inc., Hospital Lincoln, Hospital S B, City Harbes, y otras) se han prestado servicio de salud, prueba de VIH con la consejer�a anticipada y despu�s, conferencia de prevenci�n sobre lo mismo. Seminario de nutrici�n, el uso del arte dram�tico, art�stico para ense�ar de problemas sociales actuales con participaciones j�venes. LBCC se centra en alcanzar a j�venes con problemas y a trav�s de la captaci�n busca cambiar la visi�n de su vida en edad temprana de su vida de</p><p>una manera m�s positiva y lo hemos ido logrando a trav�s de la educaci�n para prevenir.</p><p>&nbsp;</p><p>Lo que comenz� como un programa piloto se est� convirtiendo progresivamente y a trav�s de sus esfuerzos de investigaci�n y de alcance comunitario en una fuente de autogesti�n y bienestar. Las mayor�as de estas necesidades pueden y tienen la capacidad de mejorar la calidad de vida mediante la prevenci�n y la intervenci�n con el fin con el fin de modificar factores del ambiente social. Adiestramiento, referidos, asesoramiento familiar,</p><p>&nbsp;</p><p>&nbsp;</p><p>apoyo social, direcci�n espiritual, lugar de refugios, ense�ar como vivir independiente, programas vocacionales, referido a programa de educaci�n y tratamiento de drogas/ alcohol.</p><p>&nbsp;</p><p>Anualmente, estamos todav�a en etapa de desarrollo de los recursos y servicios, sin embargo, como una comunidad de fe creemos que nuestros esfuerzos y nuestra paci�n por ayudar al necesitado pueden resultar contagiosos de la manera m�s pasiva y los beneficiarios de estos servicios con el tiempo pueden convertirse en proveedores. Un paralelo de nuestro punto de vista sobre el concepto de �persona ayudando a otras personas�.</p><p>&nbsp;</p><p>Que hemos logrado en nuestro pa�s Republica Dominicana: Se logro incorporar y ser reconocida como SFL con su de Certificado sectorial por el Ministerio de Educaci�n.</p><p>&nbsp;</p><p>Se escribi� el �MANUAL DE ADIESTRAMIENTO Y CAPACITACION DE</p><p>PERSONAL ESCOLAR EN EL AREA DE PREVENCION E INTERVENCION,</p><p>CONTROL, USO DE ALCOHOL Y OTRAS DROGAS.� Este manual es para ir preparar e inducir a los psic�logo y orientadores que representan los centros escolares a compartir lo aprendido sobre los da�os que causa el tabaquismo, alcohol y otras drogas en las �reas biopsicosocial estas clases ser�a de gran importancia en su temprana edad especialmente para ni�os de 10-13 a�os que van a la secundaria, pues con ello prevenimos que le digan que si a este flagelo que est� acabando con nuestros j�venes, Este manual fue registrado y publicado, e imprimimos unos 200 ejemplares Presentamos el proyecto a los encargados de participaci�n Comunitaria y fue revisado por la asistente del ministro de educaci�n y seg�n informaci�n el proyecto es excelente. Me reun� con el 2021 con el ex director de participaci�n Comunitaria unas tres veces, el cual estuvo de acuerdo con el proyecto y se</p><p>qued� en llamarme para hacer una cita para establecer la log�stica como �bamos a organizar la preparaci�n de los facilitadores de cada distrito escolar para certificarlo por nuestra Organizaci�n, pero nunca recib� la cita, creo que este proyecto es el eje de muchas soluciones, hay otros pa�ses que me solicitaron, pero este programa de prevenci�n establecido en las escuelas se esparcir� desde nuestra Republica Dominicana hasta otros pa�ses como modelo.</p><p>&nbsp;</p><p>Como Organizaci�n Nueva en Rep�blica Dominicana, Centro Comunitario Viviendo Mejor (Living Better Cummunity Center, LBCC) hemos ido desarrollando una serie de ayuda sociales como, algunas series de conferencias para las familias con algunos temas como: Resoluci�n de conflictos, comunicaci�n efectiva, la finanza en el hogar, y varios temas de orientaci�n con el director del Hospital de Villa tapia con facilidad dada por el</p><p>mismo Director Dr. Darwin Hanuel Acevedo, incluyendo orientaci�n y prevenci�n sobre el corona virus 19 y esto incluye la vacuna en el mismo Hospital de Villa Tapia y en las escuelas de la comunidades de las diferentes secciones de Villa Tapia.</p><p>&nbsp;</p><p>En otras �reas sociales hemos podido ayudar a personas en un orden particular en la consejer�a y orientaci�n en algunas necesidades y tambi�n tuvimos la oportunidad de suplir algunos medicamentos, estos supervisado por el Dr. Darwin Hanuel Acevedo para que llegaran de una manera gratuita a las personas necesitadas.&nbsp; A�o 2022, gracias a las autoridades del Ministerio de Educacion, Ministerio de Econom�a y especialmente a los departamentos de Participaci�n Comunitaria, Orientaci�n y Psicolog�a se hiso posible aprobaci�n de la subvenci�n estatal de un $1,600,000.00 Pesos.</p><p>&nbsp;</p><p>La ASFL LBCC Adjunto del Ministerio de Educacion logro preparar 632: T�cnicos de participaci�n comunitaria, Orientadores y psic�logos los cuales impactan positivamente, a m�s de 130 mil ni�os y ni�as, con el proyecto �La educaci�n temprana sobre el uso de alcohol, tabaco, y otras drogas previene que nuestros j�venes no se enfermen bio-psicosocial. Seguimos en conexi�n con la necesidad comunitaria se hiso una feria de salud adjunto al centro de diagn�stico de Villa Tapia, desarrollamos un comit� nombrado �Comit� Pro- Desarrollo de Santa Villa Tapia, el cual es dependencia de LBCC que velara</p><p>por las necesidades de esta comunidad tan vulnerable.</p><p>&nbsp;</p><p>Hacemos esto y no dejaremos de hacerlo, pues en nuestra visi�n esta proporcionar una serie de servicios orientados a mejorar la calidad de vida de las familias y las comunidades a las que servimos. El continuo, compuesto por una amplia gama de servicios provisto de manera a fable, fluida, que se ofrece a las familias con la gama m�s completa y de mayor medida, calidad, costo, necesidad, accesibilidad y facilidad de entrega son los par�metros que dan forma a todos nuestros servicios prestados. A trav�s de la evaluaci�n constante utilizando resultandos medibles, podemos asegurar la calidad de vida y la satisfacci�n de seguir mejorando la familia.</p><p>&nbsp;</p><p>Hacemos esto y no dejaremos de hacerlo, pues en nuestra visi�n esta proporcionar una serie de servicios orientados a mejorar la calidad de vida de las familias y las comunidades a las que servimos. El continuo, compuesto por una amplia gama de servicios provisto de manera a fable, fluida, que se ofrece a las familias con la grada m�s completa y de mayor medida, calidad, costo, necesidad, accesibilidad y facilidad de entrega son los par�metros que dan forma a todos nuestros servicios prestados. A trav�s de la evaluaci�n constante utilizando resultandos medibles, podemos asegurar la calidad de vida y la satisfacci�n de seguir mejorando la familia.</p><p>&nbsp;</p><p>Es de suma importancia hacer saber que el enfoque primordial de nuestra Organizaci�n Living Better Cummunity Center es prevenci�n de donde surge, nuestro lema: �Es mejor construir una cerca en el borde de un acantilado que un hospital en la parte inferior de una monta�a�.</p>",
+    "content": "<p>El Centro Comunitario Viviendo Mejor (Living Better Cummunity Center) nace dentro de una comunidad de fe y comenz? a desarrollar sus servicios para la comunidad en el Bronx En ese momento, los servicios se proporcionaban a trav?s de la investigaci?n informal y de la evaluaci?n de las necesidades sociales sugeridas por los datos existentes y la observaci?n directa de quienes solicitaban nuestro servicio a trav?s de la iglesia Arca de Salvaci?n ACYM. En colaboraci?n con la Organizaci?n hermana, conocida como Arca de Salvaci?n ACyM, LBCC comenz? el servicio de la comunidad del Bronx bajo la direcci?n de su fundador el Revendo Jose Miguel N??ez y se incorporo como Organizaci?n sin fines de lucro a los 02(d?as) del mes Noviembre del 2017 en la Republica Dominicana. El Reverendo Nunez movilizo un equipo de proveedores de servicios comprometidos para ayudar, orientar y guiar a familias e individuos de bajos ingresos hacia un futuro mas prometedor en el ?rea de la salud y el bienestar de la comunidad.</p><p><img src=\"/media/gallery/WhatsApp_Image_2024-11-08_at_1.08.17_PM.jpeg\" alt=\"\" width=\"1036\" height=\"540\">Caption</p><p>Desde sus inicios LBCC ha estado construyendo progresivamente las bases para expandir los servicios de intervenci?n, capacitando en la prevenci?n dentro de la comunidad del Bronx. Todo los cuales servicios son existentes a trav?s de la Iglesia Arca de Salvaci?n A C y M. La mayor?a quienes reciben nuestros servicios son la menor?a de latinos y afro-americano que pasan a ser una mayor?a en el Bronx, Sin embargo, los recursos y servicios est?n disponibles para cualquiera y todos los necesitados, sin importar la edad, raza, credo, origen ?tnico, religi?n, preferencias y orientaci?n sexual. En repuesta a la necesidad de la comunidad, LBCC con sus perfecci?nales, est? vinculada con otras organizaciones y hospitales (Arca de salvaci?n, Promesa inc., Hospital Lincoln, Hospital S B, City Harbes, y otras) se han prestado servicio de salud, prueba de VIH con la consejer?a anticipada y despu?s, conferencia de prevenci?n sobre lo mismo. Seminario de nutrici?n, el uso del arte dram?tico, art?stico para ense?ar de problemas sociales actuales con participaciones j?venes. LBCC se centra en alcanzar a j?venes con problemas y a trav?s de la captaci?n busca cambiar la visi?n de su vida en edad temprana de su vida de</p><p>una manera m?s positiva y lo hemos ido logrando a trav?s de la educaci?n para prevenir.</p><p>&nbsp;</p><p>Lo que comenz? como un programa piloto se est? convirtiendo progresivamente y a trav?s de sus esfuerzos de investigaci?n y de alcance comunitario en una fuente de autogesti?n y bienestar. Las mayor?as de estas necesidades pueden y tienen la capacidad de mejorar la calidad de vida mediante la prevenci?n y la intervenci?n con el fin con el fin de modificar factores del ambiente social. Adiestramiento, referidos, asesoramiento familiar,</p><p>&nbsp;</p><p>&nbsp;</p><p>apoyo social, direcci?n espiritual, lugar de refugios, ense?ar como vivir independiente, programas vocacionales, referido a programa de educaci?n y tratamiento de drogas/ alcohol.</p><p>&nbsp;</p><p>Anualmente, estamos todav?a en etapa de desarrollo de los recursos y servicios, sin embargo, como una comunidad de fe creemos que nuestros esfuerzos y nuestra paci?n por ayudar al necesitado pueden resultar contagiosos de la manera m?s pasiva y los beneficiarios de estos servicios con el tiempo pueden convertirse en proveedores. Un paralelo de nuestro punto de vista sobre el concepto de ?persona ayudando a otras personas?.</p><p>&nbsp;</p><p>Que hemos logrado en nuestro pa?s Republica Dominicana: Se logro incorporar y ser reconocida como SFL con su de Certificado sectorial por el Ministerio de Educaci?n.</p><p>&nbsp;</p><p>Se escribi? el ?MANUAL DE ADIESTRAMIENTO Y CAPACITACION DE</p><p>PERSONAL ESCOLAR EN EL AREA DE PREVENCION E INTERVENCION,</p><p>CONTROL, USO DE ALCOHOL Y OTRAS DROGAS.? Este manual es para ir preparar e inducir a los psic?logo y orientadores que representan los centros escolares a compartir lo aprendido sobre los da?os que causa el tabaquismo, alcohol y otras drogas en las ?reas biopsicosocial estas clases ser?a de gran importancia en su temprana edad especialmente para ni?os de 10-13 a?os que van a la secundaria, pues con ello prevenimos que le digan que si a este flagelo que est? acabando con nuestros j?venes, Este manual fue registrado y publicado, e imprimimos unos 200 ejemplares Presentamos el proyecto a los encargados de participaci?n Comunitaria y fue revisado por la asistente del ministro de educaci?n y seg?n informaci?n el proyecto es excelente. Me reun? con el 2021 con el ex director de participaci?n Comunitaria unas tres veces, el cual estuvo de acuerdo con el proyecto y se</p><p>qued? en llamarme para hacer una cita para establecer la log?stica como ?bamos a organizar la preparaci?n de los facilitadores de cada distrito escolar para certificarlo por nuestra Organizaci?n, pero nunca recib? la cita, creo que este proyecto es el eje de muchas soluciones, hay otros pa?ses que me solicitaron, pero este programa de prevenci?n establecido en las escuelas se esparcir? desde nuestra Republica Dominicana hasta otros pa?ses como modelo.</p><p>&nbsp;</p><p>Como Organizaci?n Nueva en Rep?blica Dominicana, Centro Comunitario Viviendo Mejor (Living Better Cummunity Center, LBCC) hemos ido desarrollando una serie de ayuda sociales como, algunas series de conferencias para las familias con algunos temas como: Resoluci?n de conflictos, comunicaci?n efectiva, la finanza en el hogar, y varios temas de orientaci?n con el director del Hospital de Villa tapia con facilidad dada por el</p><p>mismo Director Dr. Darwin Hanuel Acevedo, incluyendo orientaci?n y prevenci?n sobre el corona virus 19 y esto incluye la vacuna en el mismo Hospital de Villa Tapia y en las escuelas de la comunidades de las diferentes secciones de Villa Tapia.</p><p>&nbsp;</p><p>En otras ?reas sociales hemos podido ayudar a personas en un orden particular en la consejer?a y orientaci?n en algunas necesidades y tambi?n tuvimos la oportunidad de suplir algunos medicamentos, estos supervisado por el Dr. Darwin Hanuel Acevedo para que llegaran de una manera gratuita a las personas necesitadas.&nbsp; A?o 2022, gracias a las autoridades del Ministerio de Educacion, Ministerio de Econom?a y especialmente a los departamentos de Participaci?n Comunitaria, Orientaci?n y Psicolog?a se hiso posible aprobaci?n de la subvenci?n estatal de un $1,600,000.00 Pesos.</p><p>&nbsp;</p><p>La ASFL LBCC Adjunto del Ministerio de Educacion logro preparar 632: T?cnicos de participaci?n comunitaria, Orientadores y psic?logos los cuales impactan positivamente, a m?s de 130 mil ni?os y ni?as, con el proyecto ?La educaci?n temprana sobre el uso de alcohol, tabaco, y otras drogas previene que nuestros j?venes no se enfermen bio-psicosocial. Seguimos en conexi?n con la necesidad comunitaria se hiso una feria de salud adjunto al centro de diagn?stico de Villa Tapia, desarrollamos un comit? nombrado ?Comit? Pro- Desarrollo de Santa Villa Tapia, el cual es dependencia de LBCC que velara</p><p>por las necesidades de esta comunidad tan vulnerable.</p><p>&nbsp;</p><p>Hacemos esto y no dejaremos de hacerlo, pues en nuestra visi?n esta proporcionar una serie de servicios orientados a mejorar la calidad de vida de las familias y las comunidades a las que servimos. El continuo, compuesto por una amplia gama de servicios provisto de manera a fable, fluida, que se ofrece a las familias con la gama m?s completa y de mayor medida, calidad, costo, necesidad, accesibilidad y facilidad de entrega son los par?metros que dan forma a todos nuestros servicios prestados. A trav?s de la evaluaci?n constante utilizando resultandos medibles, podemos asegurar la calidad de vida y la satisfacci?n de seguir mejorando la familia.</p><p>&nbsp;</p><p>Hacemos esto y no dejaremos de hacerlo, pues en nuestra visi?n esta proporcionar una serie de servicios orientados a mejorar la calidad de vida de las familias y las comunidades a las que servimos. El continuo, compuesto por una amplia gama de servicios provisto de manera a fable, fluida, que se ofrece a las familias con la grada m?s completa y de mayor medida, calidad, costo, necesidad, accesibilidad y facilidad de entrega son los par?metros que dan forma a todos nuestros servicios prestados. A trav?s de la evaluaci?n constante utilizando resultandos medibles, podemos asegurar la calidad de vida y la satisfacci?n de seguir mejorando la familia.</p><p>&nbsp;</p><p>Es de suma importancia hacer saber que el enfoque primordial de nuestra Organizaci?n Living Better Cummunity Center es prevenci?n de donde surge, nuestro lema: ?Es mejor construir una cerca en el borde de un acantilado que un hospital en la parte inferior de una monta?a?.</p>",
     "section": 2,
     "category": 3,
     "author": null,
@@ -4373,7 +4373,7 @@
   "fields": {
     "title": "Quienes Somos",
     "slug": "quienes_somos",
-    "content": "<p>Living Better Cummunity Center (Centro Comunitario Viviendo Mejor) nace dentro de una comunidad de fe y comenz� a desarrollar sus servicios para la comunidad en el Bronx en ese momento, los servicios se proporcionaban a trav�s de la investigaci�n informal y de la evaluaci�n de las necesidades sociales sugeridas por los datos existentes y la observaci�n directa de quienes solicitaban nuestro servicio a trav�s de la iglesia Arca de Salvaci�n ACYM.&nbsp;</p><p>LBCC comenz� el servicio de la comunidad del Bronx bajo la direcci�n de su fundador el Revendo Jos� Miguel N��ez y se incorpor� como Organizaci�n sin fines de lucro a los 02 d�as del mes Noviembre del 2017, en la Republica Dominicana.&nbsp;</p><p>En repuesta a la necesidad de la comunidad, LBCC con sus profesionales est� vinculada con otras organizaciones y hospitales (Arca de salvaci�n, Promesa inc., Hospital Lincoln, Hospital S B, City Harbes, y otras) se han prestado servicio de salud, prueba de VIH con la consejer�a anticipada y despu�s, conferencia de prevenci�n sobre lo mismo, etc.&nbsp;</p><p>En el a�o 2022, gracias al ministro, viceministro, director de participaci�n comunitaria, t�cnicos y otros ministerio como el de econom�a nacional por aprobar este programa que por nombre lleva �la educaci�n temprana sobre el uso de alcohol, tabaco y otras drogas, previene que nuestros j�venes no se enfermen bio-psicosocialmente�. Logros: 2021, 29 entrenadores a nivel nacional, de los docentes, orientadores y psic�logos del ministerio de educaci�n, 2022 a 88 t�cnicos regionales y distritales tanto de participaci�n comunitaria como de orientaci�n y psicolog�a. En el a�o 2023 actualizado, 1442 facilitadores y en el a�o 2024 certificamos a 816.</p><p>Incluyendo los 149 que se han certificados en el proyecto de prevenci�n del uso de TAOD y 149 mas sobre la competencia de comunicaci�n efectiva y resoluci�n de conflictos, actualizado a la fecha de hoy un total de 2,383 facilitadores certificados sobre prevenci�n del uso de TAOD y 173 sobre la competencia de comunicaci�n efectiva y resoluci�n de conflictos, que est�n impactando un promedio de 255,600 ni�os(as) . En las regionales 01, 05, 06, 07, 15, 11, 13 16. La ASFL esta habilitada por los Ministerios de Educaci�n y Salud de una manera permanente.</p>",
+    "content": "<p>Living Better Cummunity Center (Centro Comunitario Viviendo Mejor) nace dentro de una comunidad de fe y comenz? a desarrollar sus servicios para la comunidad en el Bronx en ese momento, los servicios se proporcionaban a trav?s de la investigaci?n informal y de la evaluaci?n de las necesidades sociales sugeridas por los datos existentes y la observaci?n directa de quienes solicitaban nuestro servicio a trav?s de la iglesia Arca de Salvaci?n ACYM.&nbsp;</p><p>LBCC comenz? el servicio de la comunidad del Bronx bajo la direcci?n de su fundador el Revendo Jos? Miguel N??ez y se incorpor? como Organizaci?n sin fines de lucro a los 02 d?as del mes Noviembre del 2017, en la Republica Dominicana.&nbsp;</p><p>En repuesta a la necesidad de la comunidad, LBCC con sus profesionales est? vinculada con otras organizaciones y hospitales (Arca de salvaci?n, Promesa inc., Hospital Lincoln, Hospital S B, City Harbes, y otras) se han prestado servicio de salud, prueba de VIH con la consejer?a anticipada y despu?s, conferencia de prevenci?n sobre lo mismo, etc.&nbsp;</p><p>En el a?o 2022, gracias al ministro, viceministro, director de participaci?n comunitaria, t?cnicos y otros ministerio como el de econom?a nacional por aprobar este programa que por nombre lleva ?la educaci?n temprana sobre el uso de alcohol, tabaco y otras drogas, previene que nuestros j?venes no se enfermen bio-psicosocialmente?. Logros: 2021, 29 entrenadores a nivel nacional, de los docentes, orientadores y psic?logos del ministerio de educaci?n, 2022 a 88 t?cnicos regionales y distritales tanto de participaci?n comunitaria como de orientaci?n y psicolog?a. En el a?o 2023 actualizado, 1442 facilitadores y en el a?o 2024 certificamos a 816.</p><p>Incluyendo los 149 que se han certificados en el proyecto de prevenci?n del uso de TAOD y 149 mas sobre la competencia de comunicaci?n efectiva y resoluci?n de conflictos, actualizado a la fecha de hoy un total de 2,383 facilitadores certificados sobre prevenci?n del uso de TAOD y 173 sobre la competencia de comunicaci?n efectiva y resoluci?n de conflictos, que est?n impactando un promedio de 255,600 ni?os(as) . En las regionales 01, 05, 06, 07, 15, 11, 13 16. La ASFL esta habilitada por los Ministerios de Educaci?n y Salud de una manera permanente.</p>",
     "section": 1,
     "category": 3,
     "author": null,
