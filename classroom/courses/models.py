@@ -120,3 +120,19 @@ class Lesson(models.Model):
             return url
         return f"https://www.youtube.com/embed/{video_id}"
 
+    @property
+    def video_is_youtube(self):
+        url = (self.video_url or "").strip()
+        if not url:
+            return False
+        host = (urlparse(url).netloc or "").lower()
+        return "youtube.com" in host or "youtu.be" in host or "youtube-nocookie.com" in host
+
+    @property
+    def video_is_cloudinary(self):
+        url = (self.video_url or "").strip()
+        if not url:
+            return False
+        host = (urlparse(url).netloc or "").lower()
+        return "res.cloudinary.com" in host
+

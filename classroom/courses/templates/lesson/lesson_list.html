@@ -1,10 +1,10 @@
-{% extends "classroom/classroom.html" %}
+﻿{% extends "classroom/classroom.html" %}
 
 {% block content %}
 <div class="container mt-4">
   <h1 class="h5 mb-3">Panel de Lecciones</h1>
   <div class="d-flex flex-wrap gap-2 mb-3">
-    <a href="{% url 'courses:lesson_list' %}" class="btn btn-primary">Panel de las lecciones</a>
+    <a href="{% url 'courses:lesson_create' %}" class="btn btn-primary">Crear Lección</a>
     <a class="btn btn-outline-success" href="{% url 'courses:module_list' %}">Panel de los módulos</a>
   </div>
 
@@ -30,3 +30,4 @@
   </div>
 </div>
 {% endblock %}
+

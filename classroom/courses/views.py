@@ -520,7 +520,7 @@ def lesson_list(request):
 def lesson_create(request):
     form = LessonForm()
     if request.method == 'POST':
-        form = LessonForm(request.POST)
+        form = LessonForm(request.POST, request.FILES)
 
         if form.is_valid():
             lesson = form.save(commit=False)
@@ -544,7 +544,7 @@ def lesson_create(request):
 def lesson_update(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
     if request.method == 'POST': #A
-        form = LessonForm(request.POST, instance=lesson)
+        form = LessonForm(request.POST, request.FILES, instance=lesson)
         if form.is_valid():
             form.save()
             messages.success(request, 'Lesson updated successfully.')

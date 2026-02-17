@@ -2,16 +2,22 @@
 {% block content %}
 <div class="container mt-4">
   <h1>{{ lesson.title|capfirst }}</h1>  {% if lesson.video_file %}
-    <h3>Video de la Lecci?n</h3>
+    <h3>Video de la Lección</h3>
     <div class="ratio ratio-16x9 mb-3">
       <video class="w-100 h-100" controls preload="metadata">
         <source src="{{ lesson.video_file.url }}">
       </video>
     </div>
   {% elif lesson.video_url %}
-    <h3>Video de la Lecci?n</h3>
+    <h3>Video de la Lección</h3>
     <div class="ratio ratio-16x9 mb-3">
-      <iframe src="{{ lesson.video_embed_url }}" class="w-100 h-100" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      {% if lesson.video_is_youtube %}
+        <iframe src="{{ lesson.video_embed_url }}" class="w-100 h-100" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      {% else %}
+        <video class="w-100 h-100" controls preload="metadata">
+          <source src="{{ lesson.video_url }}">
+        </video>
+      {% endif %}
     </div>
   {% endif %}
 

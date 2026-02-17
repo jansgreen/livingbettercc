@@ -1,13 +1,12 @@
-{% extends "classroom/classroom.html" %}
+﻿{% extends "classroom/classroom.html" %}
 
 {% block content %}
 <div class="container mt-4">
   <h1 class="h5 mb-3">Panel de Módulos</h1>
   <div class="d-flex flex-wrap gap-2 mb-3">
-    <a href="{% url 'courses:lesson_list' %}" class="btn btn-primary">Panel de las lecciones</a>
-    <a class="btn btn-outline-success" href="{% url 'courses:module_list' %}">Panel de los módulos</a>
+    <a href="{% url 'courses:module_create' %}" class="btn btn-primary">Crear módulo</a>
+    <a class="btn btn-success" href="{% url 'courses:lesson_list' %}">Panel de las lecciones</a>
   </div>
-
   <div class="list-group">
     {% for module in modules %}
       <div class="list-group-item d-flex align-items-center justify-content-between">
@@ -30,3 +29,4 @@
   </div>
 </div>
 {% endblock %}
+
