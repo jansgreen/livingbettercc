@@ -1,6 +1,7 @@
 # Create your models here.
 # courses/models.py
 from django.db import models
+from urllib.parse import urlparse, parse_qs
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.conf import settings
@@ -99,4 +100,23 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.module.title} - {self.title}"
+
+    @property
+    def video_embed_url(self):
+        url = (self.video_url or "").strip()
+        if not url:
+            return ""
+        parsed = urlparse(url)
+        host = (parsed.netloc or "").lower()
+        video_id = ""
+        if "youtu.be" in host:
+            video_id = parsed.path.lstrip("/")
+        elif "youtube.com" in host or "youtube-nocookie.com" in host:
+            if parsed.path.startswith("/embed/"):
+                video_id = parsed.path.split("/embed/")[1].split("/")[0]
+            else:
+                video_id = parse_qs(parsed.query).get("v", [""])[0]
+        if not video_id:
+            return url
+        return f"https://www.youtube.com/embed/{video_id}"
 
