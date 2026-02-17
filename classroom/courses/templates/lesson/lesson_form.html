@@ -25,7 +25,14 @@
     {% endif %}
 
     {{ field }}
-      <div id="emailHelp" class="form-text">{{ field.help_text }}</div>
+      {% if field.name == "video_url" %}
+        <div class="form-text">
+          Pega un enlace de Vimeo o YouTube. Para Vimeo con privacidad por dominio,
+          usa el enlace normal y asegúrate de permitir tu dominio en Vimeo.
+        </div>
+      {% else %}
+        <div id="emailHelp" class="form-text">{{ field.help_text }}</div>
+      {% endif %}
     </div>
   {% endfor %}
   

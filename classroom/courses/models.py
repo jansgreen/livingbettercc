@@ -109,6 +109,7 @@ class Lesson(models.Model):
         parsed = urlparse(url)
         host = (parsed.netloc or "").lower()
         video_id = ""
+        is_vimeo = "vimeo.com" in host
         if "youtu.be" in host:
             video_id = parsed.path.lstrip("/")
         elif "youtube.com" in host or "youtube-nocookie.com" in host:
@@ -116,8 +117,15 @@ class Lesson(models.Model):
                 video_id = parsed.path.split("/embed/")[1].split("/")[0]
             else:
                 video_id = parse_qs(parsed.query).get("v", [""])[0]
+        elif is_vimeo:
+            if parsed.path.startswith("/video/"):
+                video_id = parsed.path.split("/video/")[1].split("/")[0]
+            else:
+                video_id = parsed.path.strip("/").split("/")[0]
         if not video_id:
             return url
+        if is_vimeo:
+            return f"https://player.vimeo.com/video/{video_id}"
         return f"https://www.youtube.com/embed/{video_id}"
 
     @property
@@ -135,4 +143,12 @@ class Lesson(models.Model):
             return False
         host = (urlparse(url).netloc or "").lower()
         return "res.cloudinary.com" in host
+
+    @property
+    def video_is_vimeo(self):
+        url = (self.video_url or "").strip()
+        if not url:
+            return False
+        host = (urlparse(url).netloc or "").lower()
+        return "vimeo.com" in host
 

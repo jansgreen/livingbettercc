@@ -11,7 +11,7 @@
   {% elif lesson.video_url %}
     <h3>Video de la Lección</h3>
     <div class="ratio ratio-16x9 mb-3">
-      {% if lesson.video_is_youtube %}
+      {% if lesson.video_is_youtube or lesson.video_is_vimeo %}
         <iframe src="{{ lesson.video_embed_url }}" class="w-100 h-100" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
       {% else %}
         <video class="w-100 h-100" controls preload="metadata">
