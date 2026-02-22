@@ -1,7 +1,7 @@
-{% extends "frontend.html" %}
+{% extends "dashboard.html" %}
 {% load static %}
 {% block content %}
-<div class="contener m-5">
+<main class="container py-4">
     <div class="card shadow-sm">
         <div class="card-body">
             {% include "formbuilder/partials/taod_header.html" with header_title=form_obj.name form_obj=form_obj %}
@@ -94,6 +94,6 @@
         </form>
       </div>
     </div>
-  </div>
+  </main>
 
 {% endblock %}

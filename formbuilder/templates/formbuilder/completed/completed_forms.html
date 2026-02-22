@@ -1,7 +1,12 @@
 {% extends 'dashboard.html' %}
 {% load static %}
 {% block content %}
-<h1>Formularios Completados</h1>
+<h1>Panel Técnico del Distrito</h1>
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a href="{% url 'formbuilder:form_create' %}" class="btn btn-primary">Ver Informe Trimestral</a>
+  <a class="btn btn-outline-success" href="{% url 'formbuilder:facilitador_list_view' %}">Invitar Facilitador</a>
+</div>
 <div class="card m-3">
     <div class="card-body">
         <h5 class="card-title">Lista de Formularios Completados</h5>
@@ -18,7 +23,7 @@
                 <tbody class="table-group-divider">
                     {% for completed_form in completed_forms %}
                         <tr>
-                            <td>{{ completed_form.form_name }}</td>
+                            <td>{{ completed_form.form_name|truncatechars:30 }}</td>
                             <td>{{ completed_form.submitted_at }}</td>
                             <td>{{ completed_form.user.get_full_name|default:completed_form.user.username }}</td>
                             <td>

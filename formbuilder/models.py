@@ -97,3 +97,46 @@ class FormShareLink(models.Model):
     def is_valid(self) -> bool:
         # No expiration policy; only active links are valid.
         return self.is_active
+
+class EducationalCenter(models.Model):
+    name = models.CharField(max_length=255, blank=True, null=True)
+    number = models.CharField(max_length=50, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    distrito = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class ImpactsBefore(models.Model):
+    school_disappointment = models.IntegerField(max_length=6)
+    family_conflict = models.IntegerField(max_length=6)
+    dysfunctional_homes = models.IntegerField(max_length=6)
+    health_problems = models.IntegerField(max_length=6)
+    mental_health_problems = models.IntegerField(max_length=6)
+
+class ImpactsPositive(models.Model):
+    school_level = models.IntegerField(max_length=6) 
+    family_level = models.IntegerField(max_length=6) 
+    social = models.IntegerField(max_length=6) 
+    improvement_in_school_disappointment = models.IntegerField(max_length=6)
+
+class attached_files(models.Model):
+    file = models.FileField(upload_to='uploads/%Y/%m/%d/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+class TrimestralReport(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    educational_center = models.ForeignKey(EducationalCenter, on_delete=models.SET_NULL, null=True, blank=True)
+    attached_files = models.ManyToManyField(attached_files, blank=True)
+    name = models.CharField(max_length=255, unique=True)
+    tittle = models.TextField(blank=True, null=True)
+    distrite = models.CharField(max_length=100, blank=True, null=True, help_text="Distrito del facilitador")
+    goals = models.TextField(blank=True, null=True)
+    methodology = models.TextField(blank=True, null=True)
+    experience = models.TextField(blank=True, null=True)
+    observations = models.TextField(blank=True, null=True)
+    gender = models.CharField(max_length=50, choices=[('male', 'Masculino'), ('female', 'Femenino')], blank=True, null=True)
+    trimestre = models.CharField(max_length=20)
+    year = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+

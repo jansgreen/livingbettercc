@@ -49,4 +49,11 @@ class GroupFormCreate(forms.ModelForm):
 
 class InviteForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
-    group = forms.ModelChoiceField(queryset=Group.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
+    group = forms.ModelChoiceField(queryset=Group.objects.none(), widget=forms.Select(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, **kwargs):
+        group_queryset = kwargs.pop('group_queryset', None)
+        super().__init__(*args, **kwargs)
+        if group_queryset is None:
+            group_queryset = Group.objects.all()
+        self.fields['group'].queryset = group_queryset

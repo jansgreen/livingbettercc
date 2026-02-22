@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.text import slugify
-from .models import FormDefinition, FormField
+from .models import FormDefinition, FormField, TrimestralReport
 
 
 def _append_css_class(widget, css_class: str) -> None:
@@ -10,7 +10,6 @@ def _append_css_class(widget, css_class: str) -> None:
         if c and c not in existing:
             existing.append(c)
     widget.attrs['class'] = ' '.join(existing).strip()
-
 
 class FormDefinitionForm(forms.ModelForm):
     class Meta:
@@ -34,7 +33,6 @@ class FormDefinitionForm(forms.ModelForm):
 
         for field in self.fields.values():
             _append_css_class(field.widget, 'form-control')
-
 
 class FormFieldForm(forms.ModelForm):
     class Meta:
@@ -63,7 +61,6 @@ class FormFieldForm(forms.ModelForm):
         # normalize provided name
         return slugify(name)
 
-
 class FacilitadorRegistrationForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data['username']
@@ -90,3 +87,14 @@ class FacilitadorRegistrationForm(forms.Form):
         address = None
         return user, distrito, address
  
+class TrimestralReportForm(forms.ModelForm):
+    class Meta:
+        model = TrimestralReport
+        fields = '__all__'
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if field == 'gender':
+                _append_css_class(field.widget, 'form-select')
+            field.widget.attrs.update({'class': 'form-control'})

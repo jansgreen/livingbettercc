@@ -1,0 +1,91 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<main class="container py-4">
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <h1 class="h5 mb-1">Detalle del facilitador</h1>
+      <p class="text-muted mb-0">Informaci&#243;n del usuario y formularios completados.</p>
+    </div>
+  </div>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div>
+          {% if profile and profile.imagen %}
+            <img src="{{ profile.imagen.url }}" alt="Foto" class="rounded" style="width: 72px; height: 72px; object-fit: cover;" />
+          {% else %}
+            <img src="{% static 'profiles/default.webp' %}" alt="Foto" class="rounded" style="width: 72px; height: 72px; object-fit: cover;" />
+          {% endif %}
+        </div>
+        <div>
+          <div class="h6 mb-1">
+            {% if target_user.first_name %}
+              {{ target_user.first_name|capfirst }} {{ target_user.last_name|capfirst }}
+            {% else %}
+              {{ target_user.username|capfirst }}
+            {% endif %}
+          </div>
+          <div class="text-muted small">{{ target_user.email }}</div>
+        </div>
+      </div>
+
+      {% if profile %}
+        <div class="row mt-3">
+          <div class="col-12 col-md-4">
+            <div class="small text-muted">Tel&#233;fono</div>
+            <div>{{ profile.telefono|default:"(Sin datos)" }}</div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="small text-muted">Profesi&#243;n</div>
+            <div>{{ profile.profesion|default:"(Sin datos)" }}</div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="small text-muted">Rol</div>
+            <div>{{ profile.roll|default:"(Sin datos)" }}</div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Formularios del usuario</h2>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Centro educativo</th>
+              <th>T&#237;tulo del formulario</th>
+              <th>Fecha</th>
+              <th class="text-end">Acci&#243;n</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cf in completed_forms %}
+              <tr>
+                <td>{{ cf.form_data.centro_educativo|default:"(Sin datos)" }}</td>
+                <td>{{ cf.titulo|default:cf.form_name }}</td>
+                <td>{{ cf.submitted_at|date:"d/m/Y" }}</td>
+                <td class="text-end">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'formbuilder:completed_forms_detail' cf.pk %}">Ver formulario</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4" class="text-muted">(Sin formularios)</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex gap-2 mt-3">
+        <a class="btn btn-outline-secondary" href="{% url 'formbuilder:panel_tecnico' %}">Volver</a>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

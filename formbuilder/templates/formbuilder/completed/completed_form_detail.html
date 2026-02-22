@@ -8,6 +8,29 @@
         <div class="card-body">
             {% include "formbuilder/partials/taod_header.html" with header_title=completed_form.form_name form_obj=form_obj %}
 
+
+            {% if tecnico_summary %}
+                <div class="mb-4">
+                    <div class="taod-section-title">Panel del t&#233;cnico</div>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <a class="btn btn-outline-primary" href="{% url 'formbuilder:tecnico_report_general' %}">Informe general</a>
+                    </div>
+                    <div class="taod-section-title">Detalle por centro educativo</div>
+                    <ul class="taod-list mb-0">
+                        {% for c in tecnico_summary.centers %}
+                            <li>
+                                {{ c.name }}
+                                {% if c.pk %}
+                                    <a class="ms-2" href="{% url 'formbuilder:tecnico_report_detail' c.pk %}">Ver detalle</a>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="text-muted">(Sin datos)</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
             {% if completed_form.descripcion %}
                 <p class="text-muted mb-0 mt-3">{{ completed_form.descripcion|safe }}</p>
             {% elif form_obj and form_obj.description %}
@@ -21,7 +44,7 @@
                     {% else %}
                         Completado por {{ completed_form.user.username|capfirst }}
                     {% endif %}
-                    · {{ completed_form.submitted_at|date:"d/m/Y H:i" }}
+                    &#183; {{ completed_form.submitted_at|date:"d/m/Y H:i" }}
                 </div>
             </div>
 

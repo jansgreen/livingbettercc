@@ -25,6 +25,7 @@ def obtener_formbuilder_menu(request):
         submenus.extend([ ## colocar la firma y el sello original del certificado
             {'nombre': 'Panel del Formularios', 'url': _safe_url('formbuilder:form_list', '/formbuilder/')},
             {'nombre': 'Panel de Facilitadores', 'url': _safe_url('formbuilder:facilitador_list_view', '/formbuilder/facilitadores/')},
+            {'nombre': 'Panel Tecnico del Distrito', 'url': _safe_url('formbuilder:panel_tecnico', '/formbuilder/tecnico/panel/')},
             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
             {'nombre': 'Invitar Estudiante Becado', 'url': f"{_safe_url('invite_friend', '#')}?group=students_becados"},
             {'nombre': 'Invitar Facilitador', 'url': f"{_safe_url('invite_friend', '#')}?group=facilitador"},

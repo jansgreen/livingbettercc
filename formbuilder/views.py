@@ -4,8 +4,9 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
 from .models import FormDefinition, FormField, CompletedForm
-from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm
+from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm, TrimestralReportForm
 from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
 # formbuilder/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from .utils import generate_dynamic_form, build_ordered_responses
@@ -17,11 +18,16 @@ from django.contrib.auth import login, get_backends
 from django.utils.text import slugify
 import os
 from .models import FormDefinition, FormShareLink
+from authentication.models.profiles import Profiles
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.core.mail import EmailMessage
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from urllib.parse import urlencode
+from collections import defaultdict
 
 
 
@@ -424,6 +430,11 @@ def completed_forms_detail(request, pk):
         'anexos',
     }
     remaining_responses = [r for r in responses if r.get('name') not in handled_names]
+    tecnico_summary = None
+    if _is_tecnico(request.user) or _is_staff(request.user):
+        all_forms = CompletedForm.objects.filter(user__groups__name='facilitador')
+        tecnico_summary = _aggregate_completed_forms(all_forms)
+
     return render(
         request,
         'formbuilder/completed/completed_form_detail.html',
@@ -433,8 +444,137 @@ def completed_forms_detail(request, pk):
             'responses': responses,
             'responses_by_name': responses_by_name,
             'remaining_responses': remaining_responses,
+            'tecnico_summary': tecnico_summary,
         },
     )
+
+def _extract_numeric(value):
+    if value is None:
+        return 0
+    if isinstance(value, (int, float)):
+        return value
+    try:
+        s = str(value).strip()
+        if not s:
+            return 0
+        s = s.replace(",", ".")
+        return float(s)
+    except Exception:
+        return 0
+
+def _format_distrito(value):
+    if value is None:
+        return ""
+    s = str(value).strip()
+    if not s:
+        return ""
+    if s.isdigit():
+        return s.zfill(2)
+    return s
+
+def _aggregate_completed_forms(completed_forms):
+    totals = defaultdict(float)
+    centers = []
+    center_index = set()
+    districts = []
+    temas = ""
+    objetivo = ""
+
+    for cf in completed_forms:
+        data = cf.form_data or {}
+        center = data.get("centro_educativo")
+        if center and center not in center_index:
+            centers.append({"name": center, "pk": cf.pk})
+            center_index.add(center)
+        district = _format_distrito(cf.distrito)
+        if district and district not in districts:
+            districts.append(district)
+
+        if not temas:
+            temas = data.get("temas_impartidos") or ""
+        if not objetivo:
+            objetivo = data.get("objetivo_razon_motivo") or ""
+
+        for key, val in data.items():
+            num = _extract_numeric(val)
+            if num != 0:
+                totals[key] += num
+
+    return {
+        "totals": dict(totals),
+        "centers": centers,
+        "districts": districts,
+        "temas": temas,
+        "objetivo": objetivo,
+    }
+
+def panel_tecnico(request):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
+    forms = FormDefinition.objects.all()
+    completed_forms = (
+        CompletedForm.objects
+        .filter(user__groups__name='facilitador')
+        .select_related('user')
+        .order_by('-submitted_at')
+    )
+    paginator = Paginator(completed_forms, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    context = {
+        'forms': forms,
+        'completed_forms': page_obj.object_list,
+        'page_obj': page_obj,
+    }
+    return render(request, 'trimestral/panel_tecnico.html', context)
+
+def panel_tecnico_user(request, user_id):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
+    user = get_object_or_404(User, pk=user_id)
+    profile = Profiles.objects.filter(user=user).first()
+    completed_forms = (
+        CompletedForm.objects
+        .filter(user=user)
+        .order_by('-submitted_at')
+    )
+    context = {
+        'profile': profile,
+        'target_user': user,
+        'completed_forms': completed_forms,
+    }
+    return render(request, 'trimestral/panel_tecnico_user.html', context)
+
+def tecnico_report_general(request):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
+    completed_forms = CompletedForm.objects.filter(user__groups__name='facilitador')
+    summary = _aggregate_completed_forms(completed_forms)
+    form_obj = FormDefinition.objects.first()
+    return render(request, "trimestral/tecnico_general.html", {
+        "form_obj": form_obj,
+        "summary": summary,
+        "completed_forms": completed_forms,
+    })
+
+def tecnico_report_detail(request, pk):
+    if not (_is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
+    anchor = get_object_or_404(CompletedForm, pk=pk)
+    center = (anchor.form_data or {}).get("centro_educativo")
+    if not center:
+        raise Http404("No encontrado")
+    all_forms = CompletedForm.objects.filter(user__groups__name='facilitador')
+    center_forms = [cf for cf in all_forms if (cf.form_data or {}).get("centro_educativo") == center]
+    summary = _aggregate_completed_forms(center_forms)
+    form_obj = anchor.form or FormDefinition.objects.filter(name=anchor.form_name).first()
+    return render(request, "trimestral/tecnico_detail.html", {
+        "form_obj": form_obj,
+        "summary": summary,
+        "center": center,
+        "completed_forms": center_forms,
+        "anchor": anchor,
+    })
 
 def completed_forms_edit(request, pk):
     completed_form = get_object_or_404(CompletedForm, pk=pk)
@@ -566,16 +706,33 @@ def share_form_definition(request, pk):
 
     form_obj = get_object_or_404(FormDefinition, pk=pk)
 
-    # TODO: aquí validas permisos reales (staff/tecnico/etc)
-    # Ejemplo mínimo:
-    # if not request.user.is_staff and not request.user.groups.filter(name="tecnico").exists():
-    #     raise Http404("No encontrado")
-
     link = FormShareLink.objects.create(form=form_obj, created_by=request.user)
 
     share_url = request.build_absolute_uri(
         reverse("formbuilder:shared_form_definition", kwargs={"token": link.token})
     )
+
+    if request.method == "POST":
+        email = (request.POST.get("email") or "").strip()
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Ingresa un email válido.")
+        else:
+            subject = "Formulario para completar - LivingBetterCC"
+            message_text = (
+                "Hola,\n\n"
+                "Te compartimos el enlace para completar el formulario:\n\n"
+                f"{share_url}\n\n"
+                "Si no solicitaste esto, puedes ignorar este correo."
+            )
+            EmailMessage(
+                subject=subject,
+                body=message_text,
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", settings.EMAIL_HOST_USER),
+                to=[email],
+            ).send(fail_silently=False)
+            messages.success(request, "Enlace enviado correctamente.")
 
     return render(request, "formbuilder/shared/shared_link.html", {
         "share_url": share_url,
@@ -639,3 +796,16 @@ def my_user_complete_forms(request):
         'completed_forms': completed_forms
     }
     return render(request, 'formbuilder/completed/my_user_completed_forms.html', context)
+
+
+@login_required
+def tabla_trimestral(request):
+    form = TrimestralReportForm()
+    if request.method == 'POST':
+        form = TrimestralReportForm(request.POST, isinstance=request.user,)
+        if form.is_valid():
+            form.save()
+            return redirect('formbuilder:tabla_trimestral')
+    else:
+        form = TrimestralReportForm()
+    return render(request, 'formbuilder/trimestral/tabla_trimestral.html', {'form': form, 'reports': reports})

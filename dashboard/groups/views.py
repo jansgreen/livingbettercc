@@ -17,6 +17,12 @@ from .models import Invitation
 def _is_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
+def _is_tecnico(user):
+    return user.is_authenticated and user.groups.filter(name='tecnico').exists()
+
+def _can_invite(user):
+    return _is_staff(user) or _is_tecnico(user)
+
 
 
 @user_passes_test(_is_staff)
@@ -98,31 +104,37 @@ class InviteFriendView(View):
     template_name = 'invite_friend.html'
 
     def get(self, request):
-        if not _is_staff(request.user):
+        if not _can_invite(request.user):
             return redirect('login')
+        if _is_tecnico(request.user) and not _is_staff(request.user):
+            allowed_groups = Group.objects.filter(name__in=['facilitador', 'students_becados'])
+        else:
+            allowed_groups = Group.objects.all()
         initial = {}
         group_param = (request.GET.get('group') or '').strip()
         if group_param:
             try:
-                from django.contrib.auth.models import Group
-                g = Group.objects.get(name__iexact=group_param)
+                g = allowed_groups.get(name__iexact=group_param)
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
         else:
             try:
-                from django.contrib.auth.models import Group
-                g = Group.objects.get(name__iexact="students_becados")
+                g = allowed_groups.get(name__iexact="students_becados")
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
-        form = self.form_class(initial=initial)
+        form = self.form_class(initial=initial, group_queryset=allowed_groups)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        if not _is_staff(request.user):
+        if not _can_invite(request.user):
             return redirect('login')
-        form = self.form_class(request.POST)
+        if _is_tecnico(request.user) and not _is_staff(request.user):
+            allowed_groups = Group.objects.filter(name__in=['facilitador', 'students_becados'])
+        else:
+            allowed_groups = Group.objects.all()
+        form = self.form_class(request.POST, group_queryset=allowed_groups)
         if form.is_valid():
             email = form.cleaned_data['email']
             group = form.cleaned_data['group']

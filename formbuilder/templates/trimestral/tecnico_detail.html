@@ -1,0 +1,48 @@
+﻿{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<div class="py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      {% include "formbuilder/partials/taod_header.html" with header_title="Detalle por Centro" form_obj=form_obj %}
+
+      <div class="mb-4">
+        <div class="taod-section-title">Centro educativo</div>
+        <div class="taod-line">{{ center }}</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="taod-section-title">Distritos</div>
+        <div class="taod-line">{% if summary.districts %}{{ summary.districts|join:", " }}{% else %}(Sin datos){% endif %}</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="taod-section-title">Objetivo/Raz&#243;n/Motivo</div>
+        <div class="taod-box">{% if summary.objetivo %}{{ summary.objetivo|safe }}{% else %}(Sin datos){% endif %}</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="taod-section-title">Temas impartidos</div>
+        <div class="taod-line">{% if summary.temas %}{{ summary.temas }}{% else %}(Sin datos){% endif %}</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="taod-section-title">Totales (sumatoria)</div>
+        {% if summary.totals %}
+          <ul class="taod-list">
+            {% for key, value in summary.totals.items %}
+              <li>{{ key }}: <span class="taod-line">{{ value|floatformat:0 }}</span></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="taod-line">(Sin datos)</div>
+        {% endif %}
+      </div>
+
+      <div class="d-flex gap-2 mt-4">
+        <a class="btn btn-outline-secondary" href="{% url 'formbuilder:tecnico_report_general' %}">Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

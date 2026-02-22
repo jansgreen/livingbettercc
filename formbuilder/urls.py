@@ -55,5 +55,12 @@ urlpatterns = [
     path('completed/completed_forms_edit/<int:pk>/edit/', views.completed_forms_edit, name='completed_forms_edit_legacy'),
     path('completed/my_user_complete_forms/', views.my_user_complete_forms, name='my_user_completed_forms_legacy'),
 
+    # Tecnico panel (general and detail by center)
+    
+    path('tecnico/reporte_general/', views.tecnico_report_general, name='tecnico_report_general'),
+    path('tecnico/<int:pk>/', views.tecnico_report_detail, name='tecnico_report_detail'),
+    path('tecnico/panel/', views.panel_tecnico, name='panel_tecnico'),
+    path('tecnico/panel/user/<int:user_id>/', views.panel_tecnico_user, name='panel_tecnico_user'),
+
 ]
 

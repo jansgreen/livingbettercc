@@ -1,0 +1,98 @@
+﻿{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<div class="py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      {% include "formbuilder/partials/taod_header.html" with header_title="Informe General" form_obj=form_obj %}
+
+      <div class="mb-4">
+        <div class="small text-muted">Resumen general de todos los reportes de facilitadores.</div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="text-muted small">Formularios completados</div>
+            <div class="h4 mb-0">{{ completed_forms|length }}</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="text-muted small">Centros educativos</div>
+            <div class="h4 mb-0">{{ summary.centers|length }}</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="text-muted small">Distritos</div>
+            <div class="h4 mb-0">{{ summary.districts|length }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12 col-lg-6">
+          <div class="border rounded p-3 h-100">
+            <div class="taod-section-title">Distritos</div>
+            <div class="taod-line">{% if summary.districts %}{{ summary.districts|join:", " }}{% else %}(Sin datos){% endif %}</div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="border rounded p-3 h-100">
+            <div class="taod-section-title">Temas impartidos</div>
+            <div class="taod-line">{% if summary.temas %}{{ summary.temas }}{% else %}(Sin datos){% endif %}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border rounded p-3 mt-4">
+        <div class="taod-section-title">Centros Educativos</div>
+        <ul class="taod-list">
+          {% for c in summary.centers %}
+            <li>
+              {{ c.name }}
+              {% if c.pk %}
+                <a class="ms-2" href="{% url 'formbuilder:tecnico_report_detail' c.pk %}">Ver detalle</a>
+              {% endif %}
+            </li>
+          {% empty %}
+            <li class="text-muted">(Sin datos)</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="border rounded p-3 mt-4">
+        <div class="taod-section-title">Objetivo/Raz&#243;n/Motivo</div>
+        <div class="taod-box">{% if summary.objetivo %}{{ summary.objetivo|safe }}{% else %}(Sin datos){% endif %}</div>
+      </div>
+
+      <div class="border rounded p-3 mt-4">
+        <div class="taod-section-title">Totales (sumatoria)</div>
+        {% if summary.totals %}
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>Campo</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for key, value in summary.totals.items %}
+                  <tr>
+                    <td>{{ key }}</td>
+                    <td class="text-end">{{ value|floatformat:0 }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="taod-line">(Sin datos)</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
