@@ -40,7 +40,7 @@ class Directives(models.Model):
 #asigna un grupo a los Directives al crearlos
 def assign_Directives_group(sender, instance, created, **kwargs):
     if created:
-        group, _ = Group.objects.get_or_create(name="Directives")
+        group, _ = Group.objects.get_or_create(name="directivas")
         instance.user.groups.add(group)
 
 models.signals.post_save.connect(assign_Directives_group, sender=Directives)

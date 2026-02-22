@@ -19,7 +19,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from dashboard.groups.models import Invitation
+from authentication.groups.models import Invitation
 from django.urls import reverse
 
 def _resume_after_profile(request):
@@ -66,16 +66,19 @@ def _safe_next_url(request, next_url: str | None, fallback_name: str = "dashboar
 
     return next_url
 
-def _dedupe_student_groups(user):
-    """If both 'student' and 'students' are present, keep only 'students'."""
+def _normalize_student_groups(user):
+    """Move any legacy student groups to 'estudiantes'."""
     if not user or not getattr(user, 'is_authenticated', False):
         return
     names = set(user.groups.values_list('name', flat=True))
-    if 'student' in names and 'students' in names:
-        try:
-            user.groups.remove(Group.objects.get(name='student'))
-        except Group.DoesNotExist:
-            return
+    if names.intersection({'student', 'students', 'estudiante', 'estudiantes'}):
+        group, _ = Group.objects.get_or_create(name='estudiantes')
+        user.groups.add(group)
+        for legacy in ('student', 'students', 'estudiante'):
+            try:
+                user.groups.remove(Group.objects.get(name=legacy))
+            except Group.DoesNotExist:
+                pass
 
 def _apply_pending_invitation(request, user):
     token = request.session.get('pending_invitation_token')
@@ -105,7 +108,7 @@ def _apply_pending_invitation(request, user):
 
     user.groups.add(invitation.group)
     invitation.mark_used(user)
-    _dedupe_student_groups(user)
+    _normalize_student_groups(user)
 
     if request.session.get('selected_item') is None and request.session.get('post_register_role') == invitation.group.name:
         request.session.pop('post_register_role', None)
@@ -124,7 +127,7 @@ def facilitador_register_view(request):
         if form.is_valid():
             user, distrito, address = form.save()
             # Asignar grupo facilitador
-            group, _ = Group.objects.get_or_create(name='facilitador')
+            group, _ = Group.objects.get_or_create(name='facilitadores')
             user.groups.add(group)
             # Autenticar usuario
             backend = get_backends()[0]
@@ -144,7 +147,7 @@ def facilitador_register_view(request):
 def tecnico_register_view(request):
     """
     Registro para técnicos. Igual que el registro de facilitador pero asigna
-    al grupo 'tecnico'. Los técnicos pueden revisar qué formularios completaron
+    al grupo 'tecnicos'. Los técnicos pueden revisar qué formularios completaron
     los facilitadores (acceso de solo lectura).
     """
     next_url = request.GET.get('next', None)
@@ -154,7 +157,7 @@ def tecnico_register_view(request):
             user, distrito, address = form.save()
             # Asignar grupo tecnico
             from django.contrib.auth.models import Group
-            group, _ = Group.objects.get_or_create(name='tecnico')
+            group, _ = Group.objects.get_or_create(name='tecnicos')
             user.groups.add(group)
             # Autenticar usuario
             from django.contrib.auth import login, get_backends
@@ -273,7 +276,7 @@ def login_view(request):
 
             # Limpieza de grupos duplicados si la tienes
             try:
-                _dedupe_student_groups(user)
+                _normalize_student_groups(user)
             except Exception:
                 pass
 

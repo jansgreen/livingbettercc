@@ -1,4 +1,3 @@
-from urllib3 import request
 from authentication.models import Profiles
 import logging
 from django.urls import reverse
@@ -14,8 +13,8 @@ def obtener_menu_auth(request):
         return {'menu_auth': []}
 
     is_staff = request.user.is_staff or request.user.is_superuser
-    is_tecnico = request.user.groups.filter(name='tecnico').exists()
-    is_facilitador = request.user.groups.filter(name='facilitador').exists()
+    is_tecnico = request.user.groups.filter(name='tecnicos').exists()
+    is_facilitador = request.user.groups.filter(name='facilitadores').exists()
 
     submenus = []
     try:
@@ -44,7 +43,7 @@ def obtener_menu_directives(request):
     if not request.user.is_authenticated:
         return {'menu_directives': []}
 
-    is_directiva = request.user.groups.filter(name="Directiva").exists()
+    is_directiva = request.user.groups.filter(name="directivas").exists()
     is_admin = request.user.is_superuser
 
     if not is_directiva and not is_admin:
@@ -72,3 +71,15 @@ def safe_id(text: str) -> str:
     # Deprecated: use core.menu_builder.safe_id instead (kept for backward compat if imported elsewhere)
     from core.menu_builder import safe_id as _safe
     return _safe(text)
+
+
+def obtener_menu_groups(request):
+    submenus = []
+    if request.user.is_authenticated:
+        # Gate all group actions behind 'groups.access_module'
+        submenus.append({'nombre': 'Lista de Usuarios', 'url': reverse('user_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Lista de Grupos', 'url': reverse('group_list'), 'perm': 'groups.access_module'})
+        submenus.append({'nombre': 'Invitar Amigo', 'url': reverse('invite_friend'), 'perm': 'groups.access_module'})
+
+    menu = build_menu(request.user, 'Grupo', submenus, url='#')
+    return {'menu_groups': [menu] if menu else []}

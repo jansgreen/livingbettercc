@@ -150,7 +150,7 @@ INSTALLED_APPS = [
     'social_django',
     'dashboard',
     'dashboard.metadata',
-    'dashboard.groups',
+    'authentication.groups',
     'dashboard.contents',
     'django_ckeditor_5',
     'payments',
@@ -235,7 +235,7 @@ TEMPLATES = [
 
                 # Dashboard
                 'dashboard.context_processors.context_processor.obtener_menu_contents',
-                'dashboard.groups.context_processors.context_processor.obtener_menu_groups',
+                'authentication.context_processors.context_processor.obtener_menu_groups',
                 'dashboard.metadata.context_processors.context_processor.metadata_context',
                 'dashboard.context_processors.context_processor.obtener_menu_dashboard',
                 

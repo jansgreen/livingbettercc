@@ -46,7 +46,7 @@ def obtener_menu_classroom(request):
 
         # Student menu (added only if user is in student group)
         try:
-            is_student = request.user.groups.filter(name__in=['student', 'students']).exists()
+            is_student = request.user.groups.filter(name='estudiantes').exists()
         except Exception:
             is_student = False
         if is_student:

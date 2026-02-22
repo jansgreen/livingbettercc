@@ -32,9 +32,8 @@ class Students(models.Model):
 
 def assign_students_group(sender, instance, created, **kwargs):
     if created:
-        # Use singular 'student' group name to match other parts of the codebase
-        # and avoid creating a separate 'students' group.
-        group, _ = Group.objects.get_or_create(name="student")
+        # Use canonical plural group name.
+        group, _ = Group.objects.get_or_create(name="estudiantes")
         instance.user.groups.add(group)
 
 models.signals.post_save.connect(assign_students_group, sender=Students)

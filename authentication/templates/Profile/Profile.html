@@ -22,11 +22,11 @@
           <p class="form-label">Numero Identidad: {{ profile.numero_identidad|capfirst}}</p>
           <p class="form-label">Profesion: {{ profile.profesion|capfirst}}</p>
           <p class="form-label">Roll en Living Better: {{ profile.roll|capfirst}}</p>
-          {% if Register not in  profile.user.groups.all%}
-            {% for group in profile.user.groups.all%}
-            <p>Nivel de Acceso: {{group|capfirst}}</p>
-            {% endfor %}
-          {% endif %}
+          {% for group in profile.user.groups.all %}
+            <p>Nivel de Acceso: {{ group.name|capfirst }}</p>
+          {% empty %}
+            <p>Nivel de Acceso: Customers</p>
+          {% endfor %}
           <div class="card p-3 bg-ligth">
           <p class="form-label">Direccion: {{profile.user.direccion}}</p>
           {% if profile.direccion %}

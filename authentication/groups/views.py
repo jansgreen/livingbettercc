@@ -18,7 +18,7 @@ def _is_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 def _is_tecnico(user):
-    return user.is_authenticated and user.groups.filter(name='tecnico').exists()
+    return user.is_authenticated and user.groups.filter(name='tecnicos').exists()
 
 def _can_invite(user):
     return _is_staff(user) or _is_tecnico(user)
@@ -96,7 +96,7 @@ def user_list(request):
     users = User.objects.all().prefetch_related('groups')
     for user in users:
         user.is_customer = user.groups.filter(name='customers').exists()
-        user.is_student = user.groups.filter(name__in=['student', 'students']).exists()
+        user.is_student = user.groups.filter(name='estudiantes').exists()
     return render(request, 'user_list.html', {'users': users})
 
 class InviteFriendView(View):
@@ -107,7 +107,7 @@ class InviteFriendView(View):
         if not _can_invite(request.user):
             return redirect('login')
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(name__in=['facilitador', 'students_becados'])
+            allowed_groups = Group.objects.filter(name__in=['facilitadores', 'estudiantes_becados'])
         else:
             allowed_groups = Group.objects.all()
         initial = {}
@@ -120,7 +120,7 @@ class InviteFriendView(View):
                 pass
         else:
             try:
-                g = allowed_groups.get(name__iexact="students_becados")
+                g = allowed_groups.get(name__iexact="estudiantes_becados")
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
@@ -131,7 +131,7 @@ class InviteFriendView(View):
         if not _can_invite(request.user):
             return redirect('login')
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(name__in=['facilitador', 'students_becados'])
+            allowed_groups = Group.objects.filter(name__in=['facilitadores', 'estudiantes_becados'])
         else:
             allowed_groups = Group.objects.all()
         form = self.form_class(request.POST, group_queryset=allowed_groups)

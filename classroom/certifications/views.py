@@ -75,7 +75,7 @@ class UserCertificateListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["is_becado"] = self.request.user.groups.filter(name="students_becados").exists()
+        ctx["is_becado"] = self.request.user.groups.filter(name="estudiantes_becados").exists()
         return ctx
 
 
@@ -123,7 +123,7 @@ def create_certificate_for_user(user, course):
     """Create or get a certificate for a (user, course) pair, idempotent.
     Becados remain pending until staff approval.
     """
-    is_becado = user.groups.filter(name="students_becados").exists()
+    is_becado = user.groups.filter(name="estudiantes_becados").exists()
     with transaction.atomic():
         try:
             cert, _created = Certificate.objects.get_or_create(
@@ -190,7 +190,7 @@ def claim_certificate(request, uuid):
     if not cert.pending:
         return redirect("certifications:my_certificates_list")
 
-    is_becado = request.user.groups.filter(name="students_becados").exists()
+    is_becado = request.user.groups.filter(name="estudiantes_becados").exists()
     if not is_becado:
         raise Http404("No encontrado")
 

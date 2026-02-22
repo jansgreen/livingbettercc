@@ -107,17 +107,17 @@ class EducationalCenter(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class ImpactsBefore(models.Model):
-    school_disappointment = models.IntegerField(max_length=6)
-    family_conflict = models.IntegerField(max_length=6)
-    dysfunctional_homes = models.IntegerField(max_length=6)
-    health_problems = models.IntegerField(max_length=6)
-    mental_health_problems = models.IntegerField(max_length=6)
+    school_disappointment = models.IntegerField()
+    family_conflict = models.IntegerField()
+    dysfunctional_homes = models.IntegerField()
+    health_problems = models.IntegerField()
+    mental_health_problems = models.IntegerField()
 
 class ImpactsPositive(models.Model):
-    school_level = models.IntegerField(max_length=6) 
-    family_level = models.IntegerField(max_length=6) 
-    social = models.IntegerField(max_length=6) 
-    improvement_in_school_disappointment = models.IntegerField(max_length=6)
+    school_level = models.IntegerField()
+    family_level = models.IntegerField()
+    social = models.IntegerField()
+    improvement_in_school_disappointment = models.IntegerField()
 
 class attached_files(models.Model):
     file = models.FileField(upload_to='uploads/%Y/%m/%d/')

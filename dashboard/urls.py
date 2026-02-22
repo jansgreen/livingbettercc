@@ -8,7 +8,7 @@ urlpatterns = [
 
     # app acopladas
     path('metadata/', include('dashboard.metadata.urls')),
-    path('groups/', include('dashboard.groups.urls')),
+    path('groups/', include('authentication.groups.urls')),
     path('contents/', include('dashboard.contents.urls')),
 
     # Listado de aplicaciones a beca Minerd

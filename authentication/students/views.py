@@ -39,7 +39,8 @@ def student_create_view(request):
             profile.user.is_staff = False  # Ensure the user is not a staff member
             profile.user.save()
             profile.save()
-            request.user.groups.add(name='students')
+            group, _ = Group.objects.get_or_create(name='estudiantes')
+            request.user.groups.add(group)
             
             return redirect('course_list')  # Redirect to student list after creation
     else:
