@@ -1,0 +1,33 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-4 animate__animated animate__fadeIn">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card shadow-lg">
+        <div class="card-header bg-danger text-white d-flex align-items-center">
+          <i class="fas fa-trash-alt fa-lg me-2"></i>
+          <h4 class="mb-0">Eliminar Grupo</h4>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">
+            ¿Seguro que deseas eliminar el grupo
+            <strong>{{ group.name }}</strong>?
+          </p>
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Eliminar
+              </button>
+              <a href="{% url 'group_list' %}" class="btn btn-secondary">
+                Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

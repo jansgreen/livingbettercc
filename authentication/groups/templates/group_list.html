@@ -3,6 +3,14 @@
 {% load static %}
 {% block content %}
 <div class="container py-4 animate__animated animate__fadeIn">
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        <a href="{% url 'user_list' %}" class="btn btn-outline-primary">
+            <i class="fas fa-users me-1"></i> Ver Usuarios
+        </a>
+        <a href="{% url 'group_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Crear Grupo
+        </a>
+    </div>
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white d-flex align-items-center">
             <i class="fas fa-users fa-lg me-2"></i>
@@ -12,8 +20,8 @@
             <form method="POST" action="{% url 'group_create' %}" class="row g-3 align-items-center">
                 {% csrf_token %}
                 <div class="col-md-8">
-                    <label for="{{ form_0.id_for_label }}" class="form-label">{{ form_0.label }}</label>
-                    {{ form_0.name|capfirst }}
+                    <label for="{{ form_0.name.id_for_label }}" class="form-label">{{ form_0.name.label }}</label>
+                    {{ form_0.name }}
                 </div>
                 <div class="col-md-4 text-end">
                     <button type="submit" name="action" value="add" class="btn btn-success btn-lg animate__animated animate__pulse"><i class="fas fa-plus-circle"></i> Crear Grupo</button>
@@ -33,8 +41,18 @@
                 {% for group in groups %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 animate__animated animate__fadeInUp">
-                        <div class="card-header bg-secondary text-white">
-                            <i class="fas fa-user-tag"></i> {{ group.name }}
+                        <div class="card-header bg-secondary text-white d-flex align-items-center justify-content-between">
+                            <div>
+                                <i class="fas fa-user-tag"></i> {{ group.name }}
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'group_update' group.id %}" class="btn btn-sm btn-light">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'group_delete' group.id %}" class="btn btn-sm btn-outline-light">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </div>
                         </div>
                         <div class="card-body">
                             <h6 class="fw-bold">Permisos Asignados</h6>

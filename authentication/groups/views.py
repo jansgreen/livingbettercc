@@ -89,7 +89,15 @@ def group_update(request, pk):
     else:
         form = GroupFormCreate(instance=group)
     
-    form.fields['name'].widget.attrs.update
+    return render(request, 'group_form.html', {'form': form, 'group': group, 'title': 'Editar Grupo'})
+
+@user_passes_test(_is_staff)
+def group_delete(request, pk):
+    group = get_object_or_404(Group, pk=pk)
+    if request.method == 'POST':
+        group.delete()
+        return redirect('group_list')
+    return render(request, 'group_confirm_delete.html', {'group': group})
 
 @user_passes_test(_is_staff)
 def user_list(request):
