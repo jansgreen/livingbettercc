@@ -35,10 +35,6 @@ def obtener_menu_report_activity(request):
             {'nombre': 'Lista de Categorías', 'url': _safe_url('report_categories_list', '/report_categories/')},
             {'nombre': 'Nuevo Reporte', 'url': _safe_url('report_create', '/reportes/nuevo/')},
             {'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')},
-            {'nombre': 'Detalle de Reporte', 'url': _safe_url('report_detail', '/reportes/detalle/', pk=1)},  # pk=1 como ejemplo
-            {'nombre': 'Editar Reporte', 'url': _safe_url('report_update', '/reportes/editar/', pk=1)},
-            {'nombre': 'Eliminar Reporte', 'url': _safe_url('report_delete', '/reportes/eliminar/', pk=1)},
-
         ])
     # Técnico: solo ver lista y detalle
 
