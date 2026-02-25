@@ -5,31 +5,107 @@
       <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Crear curso</a>
     {% endif %}
     <a href="{% url 'courses:lesson_list' %}" class="btn btn-primary">Panel de las lecciones</a>
-    <a class="btn btn-outline-success" href="{% url 'courses:module_list' %}">Panel de los módulos</a>
+    <a class="btn btn-outline-success" href="{% url 'courses:module_list' %}">Panel de los modulos</a>
   </div>
 
-  <div class="list-group">
+  <div class="accordion accordion-flush" id="coursesAccordion">
     {% for course in courses %}
-      <div class="list-group-item d-flex align-items-center justify-content-between">
-        <div class="me-3">
-          <div class="fw-semibold">{{ course.title }}</div>
-          {% if course.description %}
-            <div class="text-muted small">{{ course.description|striptags|truncatewords:18 }}</div>
-          {% endif %}
-          <div class="small text-muted">
-            Módulos: {{ course.modules_count|default:0 }} · Lecciones: {{ course.lessons_count|default:0 }}
+      <div class="accordion-item">
+        <h2 class="accordion-header d-flex align-items-center justify-content-between gap-2" id="course-heading-{{ course.pk }}">
+          <button
+            class="accordion-button collapsed pe-2"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#course-collapse-{{ course.pk }}"
+            aria-expanded="false"
+            aria-controls="course-collapse-{{ course.pk }}"
+          >
+            <span class="fw-semibold">{{ course.title }}</span>
+          </button>
+          <span class="d-flex gap-2 me-2">
+            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
+            {% if can_access_module or request.user.is_superuser %}
+              <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-primary btn-sm">Editar</a>
+              <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+            {% endif %}
+          </span>
+        </h2>
+
+        <div
+          id="course-collapse-{{ course.pk }}"
+          class="accordion-collapse collapse"
+          aria-labelledby="course-heading-{{ course.pk }}"
+          data-bs-parent="#coursesAccordion"
+        >
+          <div class="accordion-body">
+            <div class="small text-muted mb-3">
+              Modulos: {{ course.modules_count|default:0 }} - Lecciones: {{ course.lessons_count|default:0 }}
+            </div>
+
+            {% if course.modules.exists %}
+              <div class="accordion" id="modules-accordion-{{ course.pk }}">
+                {% for module in course.modules.all %}
+                  <div class="accordion-item">
+                    <h3 class="accordion-header d-flex align-items-center justify-content-between gap-2" id="module-heading-{{ module.pk }}">
+                      <button
+                        class="accordion-button collapsed py-2 pe-2"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#module-collapse-{{ module.pk }}"
+                        aria-expanded="false"
+                        aria-controls="module-collapse-{{ module.pk }}"
+                      >
+                        <span>{{ module.title }}</span>
+                      </button>
+                      <span class="d-flex gap-2 me-2">
+                        <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
+                        {% if request.user.is_superuser or perms.groups.access_module %}
+                          <a href="{% url 'courses:module_update' module.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                          <a href="{% url 'courses:module_delete' module.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        {% endif %}
+                      </span>
+                    </h3>
+
+                    <div
+                      id="module-collapse-{{ module.pk }}"
+                      class="accordion-collapse collapse"
+                      aria-labelledby="module-heading-{{ module.pk }}"
+                      data-bs-parent="#modules-accordion-{{ course.pk }}"
+                    >
+                      <div class="accordion-body pt-2">
+                        {% if module.lessons.exists %}
+                          <ul class="list-group list-group-flush">
+                            {% for lesson in module.lessons.all %}
+                              <li class="list-group-item px-0 d-flex align-items-center justify-content-between gap-2">
+                                <span>{{ lesson.title }}</span>
+                                <span class="d-flex gap-2">
+                                  <a href="{% url 'courses:lesson_detail' lesson.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
+                                  {% if request.user.is_superuser or perms.groups.access_module %}
+                                    <a href="{% url 'courses:lesson_update' lesson.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                                    <a href="{% url 'courses:lesson_delete' lesson.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                  {% endif %}
+                                </span>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          <div class="small text-muted">Este modulo aun no tiene lecciones.</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="small text-muted">Este curso aun no tiene modulos.</div>
+            {% endif %}
           </div>
-        </div>
-        <div class="d-flex gap-2">
-          <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary btn-sm">Ver</a>
-          {% if can_access_module or request.user.is_superuser %}
-            <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-primary btn-sm">Editar</a>
-            <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
-          {% endif %}
         </div>
       </div>
     {% empty %}
-      <div class="list-group-item">No hay cursos publicados.</div>
+      <div class="accordion-item">
+        <div class="accordion-body">No hay cursos publicados.</div>
+      </div>
     {% endfor %}
   </div>
 </div>

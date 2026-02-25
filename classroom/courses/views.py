@@ -162,12 +162,19 @@ def course_enroll(request, pk):
 
 def course_list(request):
     can_access_module = request.user.has_perm('groups.access_module')
+    modules_prefetch = Prefetch(
+        "modules",
+        queryset=Module.objects.prefetch_related(
+            Prefetch("lessons", queryset=Lesson.objects.order_by("order", "id"))
+        ).order_by("order", "id"),
+    )
     if request.user.is_staff or request.user.is_superuser or can_access_module:
         courses = (
             Course.objects
             .all()
             .annotate(modules_count=Count("modules", distinct=True))
             .annotate(lessons_count=Count("modules__lessons", distinct=True))
+            .prefetch_related(modules_prefetch)
         )
     else:
         courses = (
@@ -175,6 +182,7 @@ def course_list(request):
             .filter(published=True)
             .annotate(modules_count=Count("modules", distinct=True))
             .annotate(lessons_count=Count("modules__lessons", distinct=True))
+            .prefetch_related(modules_prefetch)
         )
     context = {
         'courses': courses,
@@ -611,13 +619,8 @@ def lesson_detail(request, pk):
 @login_required
 def lesson_delete(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
-    if request.method == 'POST':
-        lesson.delete()
-        messages.success(request, 'Lesson deleted successfully.')
-        return redirect('courses:module_list')
-    else:
-        messages.error(request, 'Error deleting lesson.')
-        return redirect('courses:module_list')
+    lesson.delete()
+    return redirect('courses:lesson_list')
 
 # guarda los resultados del test 
 @csrf_exempt
