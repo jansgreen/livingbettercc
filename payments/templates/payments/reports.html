@@ -1,0 +1,34 @@
+{% extends "dashboards/dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h4 mb-3">Informes de pagos</h1>
+  <div class="card mb-3">
+    <div class="card-body">
+      <div>Total cobrado (PAID): <b>${{ total_paid|floatformat:2 }}</b></div>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>Estado</th>
+          <th>Cantidad</th>
+          <th>Total (cents)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in by_status %}
+          <tr>
+            <td>{{ row.status }}</td>
+            <td>{{ row.count }}</td>
+            <td>{{ row.total|default:0 }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3">Sin datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

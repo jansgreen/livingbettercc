@@ -1,0 +1,35 @@
+{% extends "dashboards/dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h4 mb-3">Facturas / Recibos</h1>
+  <div class="table-responsive">
+    <table class="table table-striped table-sm align-middle">
+      <thead>
+        <tr>
+          <th>Recibo</th>
+          <th>Pago</th>
+          <th>Usuario</th>
+          <th>Monto</th>
+          <th>Emitido</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in receipts %}
+          <tr>
+            <td>{{ r.receipt_number }}</td>
+            <td>{{ r.payment_id }}</td>
+            <td>{{ r.payment.user.username }}</td>
+            <td>${% widthratio r.amount_cents 100 1 %}</td>
+            <td>{{ r.issued_at }}</td>
+            <td><a href="{% url 'payments:receipt_detail' r.receipt_number %}">Ver</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6">No hay recibos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,19 +1,23 @@
 import json
-import os
 from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models import Sum, Count
+from django.utils import timezone
 
 import stripe
 
 from .models import Payment, Receipt, StripeEvent
 from .stripe_utils import create_checkout_session
+from .gateway import get_gateway_config, get_stripe_credentials, mask_secret
 
 from classroom.enrollments.models import Enrollment
 
@@ -52,7 +56,20 @@ def start_checkout_for_enrollment(request, enrollment_id: int):
 		metadata={"course_id": str(enrollment.course_id)},
 	)
 
-	session_id, session_url = create_checkout_session(payment, request)
+	try:
+		session_id, session_url = create_checkout_session(payment, request)
+	except stripe.error.StripeError:
+		messages.error(
+			request,
+			"No se pudo iniciar el pago con Stripe en este momento. Intenta de nuevo en unos minutos.",
+		)
+		return redirect("courses:my_course")
+	except Exception:
+		messages.error(
+			request,
+			"Ocurrio un error inesperado al conectar con el proveedor de pagos.",
+		)
+		return redirect("courses:my_course")
 	payment.stripe_session_id = session_id
 	payment.save(update_fields=["stripe_session_id"]) 
 
@@ -97,7 +114,20 @@ def start_checkout_for_order(request, order_id: int):
 		metadata={},
 	)
 
-	session_id, session_url = create_checkout_session(payment, request)
+	try:
+		session_id, session_url = create_checkout_session(payment, request)
+	except stripe.error.StripeError:
+		messages.error(
+			request,
+			"No se pudo iniciar el pago con Stripe en este momento. Intenta de nuevo en unos minutos.",
+		)
+		return redirect("shop:order_detail", order_id=order.id)
+	except Exception:
+		messages.error(
+			request,
+			"Ocurrio un error inesperado al conectar con el proveedor de pagos.",
+		)
+		return redirect("shop:order_detail", order_id=order.id)
 	payment.stripe_session_id = session_id
 	payment.save(update_fields=["stripe_session_id"]) 
 
@@ -113,9 +143,112 @@ def receipt_detail(request, receipt_number: str):
 	return render(request, "payments/receipt_detail.html", ctx)
 
 
+@staff_member_required
+def control_center(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+
+	config = get_gateway_config()
+	creds = get_stripe_credentials()
+	last_event = StripeEvent.objects.order_by("-created_at").first()
+	today = timezone.now().date()
+	today_stats = Payment.objects.filter(created_at__date=today).aggregate(
+		count=Count("id"),
+		total=Sum("amount_cents"),
+	)
+
+	ctx = {
+		"config": config,
+		"creds": creds,
+		"masked_secret": mask_secret(creds.secret_key),
+		"masked_publishable": mask_secret(creds.publishable_key),
+		"masked_webhook": mask_secret(creds.webhook_secret),
+		"last_event": last_event,
+		"today_count": today_stats.get("count") or 0,
+		"today_total": (today_stats.get("total") or 0) / 100,
+	}
+	return render(request, "payments/control_center.html", ctx)
+
+
+@staff_member_required
+def switch_mode(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	if request.method != "POST":
+		return HttpResponseBadRequest("POST required")
+
+	requested_mode = (request.POST.get("mode") or "").strip().lower()
+	if requested_mode not in {"test", "live"}:
+		return HttpResponseBadRequest("Invalid mode")
+
+	config = get_gateway_config()
+	config.mode = requested_mode
+	config.updated_by = request.user
+	config.save(update_fields=["mode", "updated_by", "updated_at"])
+
+	creds = get_stripe_credentials()
+	if not creds.secret_key:
+		messages.warning(
+			request,
+			f"Modo cambiado a {requested_mode.upper()}, pero no hay clave secreta configurada para ese modo.",
+		)
+	else:
+		messages.success(request, f"Stripe ahora esta en modo {requested_mode.upper()}.")
+	return redirect("payments:control_center")
+
+
+@staff_member_required
+def payments_list(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	payments = Payment.objects.select_related("user").order_by("-created_at")[:200]
+	return render(request, "payments/payments_list.html", {"payments": payments})
+
+
+@staff_member_required
+def receipts_list(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	receipts = Receipt.objects.select_related("payment", "payment__user").order_by("-issued_at")[:200]
+	return render(request, "payments/receipts_list.html", {"receipts": receipts})
+
+
+@staff_member_required
+def reports_view(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	agg = Payment.objects.values("status").annotate(count=Count("id"), total=Sum("amount_cents")).order_by("status")
+	total_paid = Payment.objects.filter(status=Payment.STATUS_PAID).aggregate(total=Sum("amount_cents")).get("total") or 0
+	return render(
+		request,
+		"payments/reports.html",
+		{
+			"by_status": agg,
+			"total_paid": total_paid / 100,
+		},
+	)
+
+
+@staff_member_required
+def disputes_view(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	disputed_payments = Payment.objects.select_related("user").filter(status=Payment.STATUS_DISPUTED).order_by("-updated_at")[:200]
+	dispute_events = StripeEvent.objects.filter(event_type__icontains="dispute").order_by("-created_at")[:200]
+	return render(
+		request,
+		"payments/disputes.html",
+		{
+			"disputed_payments": disputed_payments,
+			"dispute_events": dispute_events,
+		},
+	)
+
+
 @csrf_exempt
 def stripe_webhook(request):
-	webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+	creds = get_stripe_credentials()
+	webhook_secret = creds.webhook_secret
 	payload = request.body
 	sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
 	if not webhook_secret or not sig_header:

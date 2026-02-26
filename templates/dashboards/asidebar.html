@@ -115,6 +115,26 @@
                     {% endif %}
                 </div>
             {% endfor %}
+            {% for menu in menu_payments %}
+                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm"  style="background-color:#5ca3ff;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#shop-{{ menu.safe_id }}" aria-expanded="true" aria-controls="shop-{{ menu.safe_id }}">
+                            {{ menu.nombre }}
+                        </button>
+                    </h2>
+                    {% if menu.submenus %}
+                        <div id="shop-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
+                            <ul class="list-group-flush">
+                                {% for submenu in menu.submenus %}
+                                    <li class="ms-3 border-0 m-3">
+                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
 
             {% for menu in menu_contents %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
@@ -294,6 +314,27 @@
                     </h2>
                     {% if menu.submenus %}
                         <div id="classroom-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
+                            <ul class="list-group-flush">
+                                {% for submenu in menu.submenus %}
+                                    <li class="ms-3 border-0 m-3">
+                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            {% for menu in menu_payments %}
+                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#payments-{{ menu.safe_id }}" aria-expanded="true" aria-controls="payments-{{ menu.safe_id }}">
+                            {{ menu.nombre }}
+                        </button>
+                    </h2>
+                    {% if menu.submenus %}
+                        <div id="payments-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
                             <ul class="list-group-flush">
                                 {% for submenu in menu.submenus %}
                                     <li class="ms-3 border-0 m-3">

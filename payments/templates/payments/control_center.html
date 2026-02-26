@@ -1,0 +1,57 @@
+{% extends "dashboards/dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h4 mb-3">Payment Control Center</h1>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Modo activo</h2>
+          <p class="mb-2"><span class="badge {% if config.mode == 'live' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ config.mode|upper }}</span></p>
+          <p class="small text-muted mb-0">Actualizado: {{ config.updated_at }}</p>
+          <p class="small text-muted">Por: {{ config.updated_by|default:"-" }}</p>
+          <form method="post" action="{% url 'payments:switch_mode' %}" class="d-flex gap-2">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-warning" type="submit" name="mode" value="test">Cambiar a TEST</button>
+            <button class="btn btn-sm btn-outline-danger" type="submit" name="mode" value="live">Cambiar a LIVE</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Claves activas</h2>
+          <div class="small">Secret: <code>{{ masked_secret }}</code></div>
+          <div class="small">Publishable: <code>{{ masked_publishable }}</code></div>
+          <div class="small">Webhook: <code>{{ masked_webhook }}</code></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Actividad de hoy</h2>
+          <p class="mb-1">Pagos creados: <b>{{ today_count }}</b></p>
+          <p class="mb-1">Monto total: <b>${{ today_total|floatformat:2 }}</b></p>
+          <p class="small text-muted mb-0">Ultimo webhook: {{ last_event.event_type|default:"-" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h2 class="h6">Accesos rapidos</h2>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-primary btn-sm" href="{% url 'payments:payments_list' %}">Transacciones</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'payments:receipts_list' %}">Facturas</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'payments:reports' %}">Informes</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'payments:disputes' %}">Reclamos</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

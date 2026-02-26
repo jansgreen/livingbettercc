@@ -252,8 +252,11 @@ def start_course_payment(request, pk):
 
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
 
+    # Treat any course with a positive price as paid, even if payment_required was left unchecked.
+    is_paid_course = bool(course.payment_required or (course.price and course.price > 0))
+
     # For paid courses, even a newly created enrollment should go to pending_payment
-    if not course.payment_required:
+    if not is_paid_course:
         # Curso gratis: activar inscripción y redirigir a mis cursos
         enrollment.status = Enrollment.Status.ACTIVE
         enrollment.save(update_fields=['status'])

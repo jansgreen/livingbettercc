@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
-from .models import Payment, Receipt, StripeEvent
+from .models import Payment, Receipt, StripeEvent, PaymentGatewayConfig
 
 
 @admin.register(Payment)
@@ -71,4 +71,11 @@ class StripeEventAdmin(admin.ModelAdmin):
 	readonly_fields = ("event_id", "event_type", "processed_at", "payload", "created_at")
 
 
-# Register your models here.
+@admin.register(PaymentGatewayConfig)
+class PaymentGatewayConfigAdmin(admin.ModelAdmin):
+	list_display = ("mode", "updated_at", "updated_by")
+	readonly_fields = ("updated_at",)
+
+	def has_add_permission(self, request):
+		# Singleton config
+		return not PaymentGatewayConfig.objects.exists()

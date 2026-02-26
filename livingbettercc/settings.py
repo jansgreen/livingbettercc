@@ -244,6 +244,7 @@ TEMPLATES = [
 
                 # QuickTest
                 'classroom.quicktest.context_proccessors.context_proccessor.obtener_menu_quicktest',
+                'payments.context_processors.context_processor.obtener_menu_payments',
 
 
             ],

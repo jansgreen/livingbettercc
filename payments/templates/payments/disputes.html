@@ -1,0 +1,44 @@
+{% extends "dashboards/dashboard.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="h4 mb-3">Reclamos y disputas</h1>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6">Pagos marcados en disputa</h2>
+          <ul class="list-group list-group-flush">
+            {% for p in disputed_payments %}
+              <li class="list-group-item d-flex justify-content-between">
+                <span>#{{ p.id }} - {{ p.user.username }}</span>
+                <span>${% widthratio p.amount_cents 100 1 %}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item">No hay pagos disputados.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h2 class="h6">Eventos Stripe de disputa</h2>
+          <ul class="list-group list-group-flush">
+            {% for e in dispute_events %}
+              <li class="list-group-item">
+                <div><b>{{ e.event_type }}</b></div>
+                <div class="small text-muted">{{ e.created_at }}</div>
+              </li>
+            {% empty %}
+              <li class="list-group-item">No hay eventos de disputa.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

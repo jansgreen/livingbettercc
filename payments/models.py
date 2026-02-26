@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.core.validators import MinValueValidator
@@ -122,4 +123,29 @@ class Receipt(models.Model):
 		return f"{prefix}{seq:06d}"
 
 
-# Create your models here.
+class PaymentGatewayConfig(models.Model):
+	class Mode(models.TextChoices):
+		TEST = "test", "Test"
+		LIVE = "live", "Live"
+
+	mode = models.CharField(max_length=10, choices=Mode.choices, default=Mode.TEST)
+	updated_at = models.DateTimeField(auto_now=True)
+	updated_by = models.ForeignKey(
+		settings.AUTH_USER_MODEL,
+		on_delete=models.SET_NULL,
+		null=True,
+		blank=True,
+		related_name="payment_gateway_updates",
+	)
+
+	class Meta:
+		verbose_name = "Payment Gateway Configuration"
+		verbose_name_plural = "Payment Gateway Configuration"
+
+	def __str__(self):
+		return f"Stripe mode: {self.mode}"
+
+	@classmethod
+	def get_solo(cls):
+		obj, _ = cls.objects.get_or_create(pk=1, defaults={"mode": cls.Mode.TEST})
+		return obj

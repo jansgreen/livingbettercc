@@ -3,9 +3,7 @@ import stripe
 from django.urls import reverse
 
 from .models import Payment
-
-
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "")
+from .gateway import get_stripe_credentials
 
 
 def _build_success_cancel_urls(request):
@@ -37,6 +35,11 @@ def create_checkout_session(payment: Payment, request):
         name = f"Order #{payment.reference_id}"
 
     success_url, cancel_url = _build_success_cancel_urls(request)
+
+    creds = get_stripe_credentials()
+    if not creds.secret_key:
+        raise RuntimeError(f"Stripe secret key is not configured for mode '{creds.mode}'.")
+    stripe.api_key = creds.secret_key
 
     session = stripe.checkout.Session.create(
         mode="payment",
