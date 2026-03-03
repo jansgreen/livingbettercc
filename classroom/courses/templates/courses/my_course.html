@@ -39,9 +39,9 @@
         </div>
       </div>
 
-      {% if course.study_material %}
+      {% if course.study_material_drive_url or course.study_material %}
         <div class="mb-3">
-          <a href="{{ course.study_material.url }}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">
+          <a href="{% if course.study_material_drive_url %}{{ course.study_material_drive_url }}{% else %}{{ course.study_material.url }}{% endif %}" class="btn btn-outline-primary btn-sm" target="_blank" rel="noopener">
             Descarga el material de estudio
           </a>
         </div>

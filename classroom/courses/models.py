@@ -25,6 +25,7 @@ class Course(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True)
     study_material = models.FileField(upload_to='course_materials/', blank=True, null=True)
+    study_material_drive_url = models.URLField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
