@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group, User
 from django.core.mail import EmailMessage
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
@@ -12,6 +13,10 @@ from django.views import View
 
 from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm
 from .models import Invitation
+
+STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
+FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
+ROLE_GROUPS = ("customers", "estudiantes", "Facilitadores", "tecnicos")
 
 
 def _is_staff(user):
@@ -24,6 +29,72 @@ def _can_invite(user):
     return _is_staff(user) or _is_tecnico(user)
 
 
+def _normalize_student_membership(user):
+    names = set(user.groups.values_list('name', flat=True))
+    lowered = {name.lower() for name in names}
+    if not lowered.intersection(STUDENT_GROUP_ALIASES):
+        return
+
+    canonical, _ = Group.objects.get_or_create(name='estudiantes')
+    user.groups.add(canonical)
+
+    for name in names:
+        if name.lower() in STUDENT_GROUP_ALIASES and name != 'estudiantes':
+            legacy = Group.objects.filter(name=name).first()
+            if legacy:
+                user.groups.remove(legacy)
+
+
+def _normalize_facilitator_membership(user):
+    names = set(user.groups.values_list('name', flat=True))
+    lowered = {name.lower() for name in names}
+    if not lowered.intersection(FACILITATOR_GROUP_ALIASES):
+        return
+
+    canonical, _ = Group.objects.get_or_create(name='Facilitadores')
+    user.groups.add(canonical)
+
+    for name in names:
+        if name.lower() in FACILITATOR_GROUP_ALIASES and name != 'Facilitadores':
+            legacy = Group.objects.filter(name=name).first()
+            if legacy:
+                user.groups.remove(legacy)
+
+def _set_user_type(user, selected_type: str):
+    selected_type = (selected_type or "").strip().lower()
+    valid_types = {"customer", "estudiante", "facilitador", "tecnico", "staff", "superuser"}
+    if selected_type not in valid_types:
+        raise ValueError("Tipo de usuario invalido.")
+
+    for group_name in ROLE_GROUPS:
+        g = Group.objects.filter(name=group_name).first()
+        if g:
+            user.groups.remove(g)
+
+    user.is_staff = False
+    user.is_superuser = False
+
+    if selected_type == "customer":
+        g, _ = Group.objects.get_or_create(name="customers")
+        user.groups.add(g)
+    elif selected_type == "estudiante":
+        g, _ = Group.objects.get_or_create(name="estudiantes")
+        user.groups.add(g)
+    elif selected_type == "facilitador":
+        g, _ = Group.objects.get_or_create(name="Facilitadores")
+        user.groups.add(g)
+    elif selected_type == "tecnico":
+        g, _ = Group.objects.get_or_create(name="tecnicos")
+        user.groups.add(g)
+    elif selected_type == "staff":
+        user.is_staff = True
+    elif selected_type == "superuser":
+        user.is_staff = True
+        user.is_superuser = True
+
+    user.save(update_fields=["is_staff", "is_superuser"])
+
+
 
 @user_passes_test(_is_staff)
 def add_and_remove_group_to_user(request, user_id):
@@ -34,11 +105,35 @@ def add_and_remove_group_to_user(request, user_id):
         if action == 'add':
             # Lógica para agregar grupos al usuario
             user.groups.add(*group_ids)
+            _normalize_student_membership(user)
+            _normalize_facilitator_membership(user)
         elif action == 'remove':
             # Lógica para eliminar grupos del usuario
             groups_to_remove = Group.objects.filter(id__in=group_ids)
             user.groups.remove(*groups_to_remove)
     return redirect ('user_list')
+
+@user_passes_test(_is_staff)
+def update_user_type(request, user_id):
+    if request.method != "POST":
+        return redirect("user_list")
+
+    user = get_object_or_404(User, pk=user_id)
+    selected_type = request.POST.get("user_type", "")
+
+    if user.id == request.user.id and selected_type in {"customer", "estudiante", "facilitador", "tecnico"}:
+        messages.error(request, "No puedes quitarte tus propios permisos administrativos desde aqui.")
+        return redirect("user_list")
+
+    try:
+        _set_user_type(user, selected_type)
+        messages.success(request, f"Tipo de usuario actualizado para {user.username}.")
+    except ValueError:
+        messages.error(request, "Tipo de usuario invalido.")
+    except Exception:
+        messages.error(request, "No se pudo actualizar el tipo de usuario.")
+
+    return redirect("user_list")
 
 @user_passes_test(_is_staff)
 def add_and_remove_permission_to_groups(request, group_id):
@@ -102,10 +197,13 @@ def group_delete(request, pk):
 @user_passes_test(_is_staff)
 def user_list(request):
     users = User.objects.all().prefetch_related('groups')
+    all_groups = Group.objects.all().order_by('name')
     for user in users:
-        user.is_customer = user.groups.filter(name='customers').exists()
-        user.is_student = user.groups.filter(name='estudiantes').exists()
-    return render(request, 'user_list.html', {'users': users})
+        user.is_customer = user.groups.filter(name__iexact='customers').exists()
+        user.is_student = user.groups.filter(name__iexact='estudiantes').exists()
+        user.is_facilitador = user.groups.filter(name__iexact='Facilitadores').exists()
+        user.is_tecnico = user.groups.filter(name__iexact='tecnicos').exists()
+    return render(request, 'user_list.html', {'users': users, 'all_groups': all_groups})
 
 class InviteFriendView(View):
     form_class = InviteForm
@@ -115,7 +213,7 @@ class InviteFriendView(View):
         if not _can_invite(request.user):
             return redirect('login')
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(name__in=['facilitadores', 'estudiantes_becados'])
+            allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
         else:
             allowed_groups = Group.objects.all()
         initial = {}
@@ -139,7 +237,7 @@ class InviteFriendView(View):
         if not _can_invite(request.user):
             return redirect('login')
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(name__in=['facilitadores', 'estudiantes_becados'])
+            allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
         else:
             allowed_groups = Group.objects.all()
         form = self.form_class(request.POST, group_queryset=allowed_groups)
@@ -202,8 +300,21 @@ def accept_invite(request, token):
         request.session['invited_email'] = invitation.email
         messages.info(request, 'Inicia sesión o regístrate para aceptar la invitación.')
         return redirect(_safe_login_url())
-    # Si ya está autenticado, no aplicamos invitación automáticamente.
-    # El admin puede agregar el usuario al grupo desde el dashboard.
+
+    invited_email = (invitation.email or "").strip().lower()
+    user_email = (request.user.email or "").strip().lower()
+    if invited_email and user_email and invited_email != user_email:
+        messages.error(request, 'Esta invitación no corresponde a tu correo.')
+        return redirect('dashboard')
+
+    # Authenticated users can auto-accept invitations to 'estudiantes_becados',
+    # even if they already belong to other groups.
+    if invitation.group.name.lower() == 'estudiantes_becados':
+        request.user.groups.add(invitation.group)
+        invitation.mark_used(request.user)
+        messages.success(request, "Invitación aceptada. Ahora tienes acceso a 'estudiantes_becados'.")
+        return redirect('dashboard')
+
     messages.info(request, 'Esta invitación requiere registro nuevo. Si ya tienes cuenta, pide al admin que te agregue al grupo.')
     return redirect('dashboard')
 

@@ -16,7 +16,7 @@ def obtener_menu_report_activity(request):
 
     is_staff = request.user.is_staff or request.user.is_superuser
     is_tecnico = request.user.groups.filter(name='tecnicos').exists()
-    is_facilitador = request.user.groups.filter(name='facilitadores').exists()
+    is_facilitador = request.user.groups.filter(name__iexact='Facilitadores').exists()
 
     def _safe_url(name, fallback_url, **kwargs):
         try:

@@ -22,6 +22,33 @@ from django.urls import reverse_lazy
 from authentication.groups.models import Invitation
 from django.urls import reverse
 
+STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
+FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
+
+
+def _canonical_group_name(name: str | None) -> str:
+    raw = (name or "").strip()
+    if not raw:
+        return ""
+    if raw.lower() in STUDENT_GROUP_ALIASES:
+        return "estudiantes"
+    if raw.lower() in FACILITATOR_GROUP_ALIASES:
+        return "Facilitadores"
+    return raw
+
+
+def _assign_user_group(user, group_name: str | None):
+    canonical = _canonical_group_name(group_name)
+    if not canonical:
+        return
+    group, _ = Group.objects.get_or_create(name=canonical)
+    user.groups.add(group)
+    if canonical == "estudiantes":
+        _normalize_student_groups(user)
+    if canonical == "Facilitadores":
+        _normalize_facilitator_groups(user)
+
+
 def _resume_after_profile(request):
     """
     Reanuda la intención guardada en session luego de completar el profile.
@@ -71,14 +98,31 @@ def _normalize_student_groups(user):
     if not user or not getattr(user, 'is_authenticated', False):
         return
     names = set(user.groups.values_list('name', flat=True))
-    if names.intersection({'student', 'students', 'estudiante', 'estudiantes'}):
+    lowered = {name.lower() for name in names}
+    if lowered.intersection(STUDENT_GROUP_ALIASES):
         group, _ = Group.objects.get_or_create(name='estudiantes')
         user.groups.add(group)
-        for legacy in ('student', 'students', 'estudiante'):
-            try:
-                user.groups.remove(Group.objects.get(name=legacy))
-            except Group.DoesNotExist:
-                pass
+        for current_name in names:
+            if current_name.lower() in STUDENT_GROUP_ALIASES and current_name != 'estudiantes':
+                legacy_group = Group.objects.filter(name=current_name).first()
+                if legacy_group:
+                    user.groups.remove(legacy_group)
+
+
+def _normalize_facilitator_groups(user):
+    """Move any legacy facilitator groups to 'Facilitadores'."""
+    if not user or not getattr(user, 'is_authenticated', False):
+        return
+    names = set(user.groups.values_list('name', flat=True))
+    lowered = {name.lower() for name in names}
+    if lowered.intersection(FACILITATOR_GROUP_ALIASES):
+        group, _ = Group.objects.get_or_create(name='Facilitadores')
+        user.groups.add(group)
+        for current_name in names:
+            if current_name.lower() in FACILITATOR_GROUP_ALIASES and current_name != 'Facilitadores':
+                legacy_group = Group.objects.filter(name=current_name).first()
+                if legacy_group:
+                    user.groups.remove(legacy_group)
 
 def _apply_pending_invitation(request, user):
     token = request.session.get('pending_invitation_token')
@@ -109,6 +153,7 @@ def _apply_pending_invitation(request, user):
     user.groups.add(invitation.group)
     invitation.mark_used(user)
     _normalize_student_groups(user)
+    _normalize_facilitator_groups(user)
 
     if request.session.get('selected_item') is None and request.session.get('post_register_role') == invitation.group.name:
         request.session.pop('post_register_role', None)
@@ -127,7 +172,7 @@ def facilitador_register_view(request):
         if form.is_valid():
             user, distrito, address = form.save()
             # Asignar grupo facilitador
-            group, _ = Group.objects.get_or_create(name='facilitadores')
+            group, _ = Group.objects.get_or_create(name='Facilitadores')
             user.groups.add(group)
             # Autenticar usuario
             backend = get_backends()[0]
@@ -210,8 +255,7 @@ def register_view(request):
             # (si prefieres esperar al pago/invitación, muévelo al resume)
             role = intent.get("role")
             if role:
-                group, _ = Group.objects.get_or_create(name=role)
-                user.groups.add(group)
+                _assign_user_group(user, role)
 
             # ✅ Login seguro con múltiples backends:
             raw_password = form.cleaned_data.get("password1")
@@ -289,8 +333,7 @@ def login_view(request):
 
             # Asignar grupo por rol (si es parte de tu estrategia)
             if role:
-                group, _ = Group.objects.get_or_create(name=role)
-                user.groups.add(group)
+                _assign_user_group(user, role)
 
             # ---- Resolver intención ----
             # Classroom: delegar al flujo real

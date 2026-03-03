@@ -7,8 +7,8 @@ from authentication.groups.models import Invitation
 CANONICAL_GROUPS = {
     "coordinadores": ["coordinador", "coordinadores"],
     "tecnicos": ["tecnico", "tecnicos"],
-    "facilitadores": ["facilitador", "facilitadores", "Facilitadores"],
-    "estudiantes": ["student", "students", "estudiante", "estudiantes"],
+    "Facilitadores": ["facilitador", "facilitadores", "Facilitadores"],
+    "estudiantes": ["student", "students", "estudiante", "estudiantes", "Student", "Students", "Estudiante", "Estudiantes"],
     "estudiantes_becados": ["student_becados", "students_becados", "estudiante_becado", "estudiantes_becados"],
     "directivas": ["directiva", "directivas", "Directiva", "Directivas", "directives", "Directives"],
     "customers": ["customer", "customers", "custumer", "custumers"],

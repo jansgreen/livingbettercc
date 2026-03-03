@@ -10,7 +10,7 @@
     {% if request.user.is_staff or request.user.is_superuser %}
     <div class="d-flex flex-wrap gap-2 mb-3">
         <a class="btn btn-primary m-2" href="{% url 'formbuilder:enroll_facilitador' %}">Agregar Facilitador</a>
-        <a class="btn btn-primary m-2" href="{% url 'invite_friend' %}?group=facilitadores">Invitar</a>
+        <a class="btn btn-primary m-2" href="{% url 'invite_friend' %}?group=Facilitadores">Invitar</a>
     </div>
     {% endif %}
 

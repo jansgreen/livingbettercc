@@ -18,6 +18,24 @@ class QuickTestDefinitionForm(forms.ModelForm):
         else:
             qs = qs.exclude(id__in=taken_ids)
         self.fields["module"].queryset = qs.order_by("course__title", "order")
+        self.fields["module"].label_from_instance = self._module_label
+
+    @staticmethod
+    def _short(text, max_len=40):
+        if not text:
+            return ""
+        text = str(text).strip()
+        if len(text) <= max_len:
+            return text
+        return f"{text[: max_len - 1]}…"
+
+    def _module_label(self, module):
+        # Prioriza el nombre del modulo y acorta el curso para que se lea mejor en el select.
+        module_name = self._short(module.title, max_len=52)
+        course_name = self._short(getattr(module.course, "title", ""), max_len=28)
+        if course_name:
+            return f"{module_name}  |  {course_name}"
+        return module_name
 
 
 class QuickTestQuestionForm(forms.ModelForm):

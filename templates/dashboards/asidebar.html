@@ -13,7 +13,16 @@
                 <div class="accordion-item border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
                         <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-{{ menu.safe_id }}" aria-expanded="true" aria-controls="dashboard-{{ menu.safe_id }}">
-                            {{ request.user.username|capfirst }}
+                            <span class="d-flex flex-column align-items-start lh-sm">
+                                <span>{{ request.user.username|capfirst }}</span>
+                                <small class="text-white-50">
+                                    {% if request.user.groups.exists %}
+                                        {{ request.user.groups.all|join:", " }}
+                                    {% else %}
+                                        Sin grupo
+                                    {% endif %}
+                                </small>
+                            </span>
                         </button>
                     </h2>
                     {% if menu.submenus %}

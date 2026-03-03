@@ -16,7 +16,7 @@ def obtener_formbuilder_menu(request):
 
     is_staff = request.user.is_staff or request.user.is_superuser
     is_tecnico = request.user.groups.filter(name='tecnicos').exists()
-    is_facilitador = request.user.groups.filter(name='facilitadores').exists()
+    is_facilitador = request.user.groups.filter(name__iexact='Facilitadores').exists()
 
     submenus = []
 
@@ -28,7 +28,7 @@ def obtener_formbuilder_menu(request):
             {'nombre': 'Panel Tecnico del Distrito', 'url': _safe_url('formbuilder:panel_tecnico', '/formbuilder/tecnico/panel/')},
             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
             {'nombre': 'Invitar Estudiante Becado', 'url': f"{_safe_url('invite_friend', '#')}?group=estudiantes_becados"},
-            {'nombre': 'Invitar Facilitador', 'url': f"{_safe_url('invite_friend', '#')}?group=facilitadores"},
+            {'nombre': 'Invitar Facilitador', 'url': f"{_safe_url('invite_friend', '#')}?group=Facilitadores"},
             {'nombre': 'Invitar Tecnico', 'url': f"{_safe_url('invite_friend', '#')}?group=tecnicos"},
             {'nombre': 'Invitar Coordinador', 'url': f"{_safe_url('invite_friend', '#')}?group=coordinadores"},
 

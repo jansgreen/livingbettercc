@@ -69,7 +69,7 @@ def session_enroll_students(request, pk):
         # Unificamos formato de auth_intent para que login/profile resuelvan igual
         request.session["auth_intent"] = {
             "source": "classroom",
-            "role": "Student",
+            "role": "estudiantes",
             "item": {"type": "course", "id": pk},
             "next": next_url,
         }

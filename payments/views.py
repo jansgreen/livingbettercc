@@ -20,6 +20,7 @@ from .stripe_utils import create_checkout_session
 from .gateway import get_gateway_config, get_stripe_credentials, mask_secret
 
 from classroom.enrollments.models import Enrollment
+from django.contrib.auth.models import Group
 
 
 def _decimal_to_cents(amount: Decimal) -> int:
@@ -306,6 +307,9 @@ def stripe_webhook(request):
 				if enr:
 					enr.status = Enrollment.Status.ACTIVE
 					enr.save(update_fields=["status"])
+					# Ensure paid classroom users get student access.
+					student_group, _ = Group.objects.get_or_create(name="estudiantes")
+					enr.user.groups.add(student_group)
 			elif purpose == Payment.PURPOSE_SHOP_ORDER and reference_id:
 				from shop.models import Order
 				ord = Order.objects.filter(id=int(reference_id)).first()

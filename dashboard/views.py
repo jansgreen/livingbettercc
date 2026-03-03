@@ -190,9 +190,9 @@ def dashboards(request):
         "beca_applications_count": beca_applications_count,
         "becados_count": becados_count,
 
-        "is_student": "estudiantes" in user_groups,
-        "is_tecnico": "tecnicos" in user_groups,
-        "is_facilitador": "facilitadores" in user_groups,
+        "is_student": any(g.lower() == "estudiantes" for g in user_groups),
+        "is_tecnico": any(g.lower() == "tecnicos" for g in user_groups),
+        "is_facilitador": any(g.lower() == "facilitadores" for g in user_groups),
 
         "courses_stats": courses_stats,
         "inperson_stats": inperson_stats,
