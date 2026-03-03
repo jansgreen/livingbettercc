@@ -8,16 +8,29 @@
   {% if courses %}
     {% for course in courses %}
       <!-- Course header -->
-      <div class="d-flex align-items-center p-3 my-3 bg-white rounded shadow-sm">
-        {% if course.image %}
-          <img src="{{ course.image.url }}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
-        {% else %}
-          <img src="{% static 'profiles/default.webp' %}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
-        {% endif %}
+      <div class="d-flex justify-content-between align-items-start gap-3 p-3 my-3 bg-white rounded shadow-sm">
+        <div class="d-flex align-items-center">
+          {% if course.image %}
+            <img src="{{ course.image.url }}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
+          {% else %}
+            <img src="{% static 'profiles/default.webp' %}" class="me-3 rounded" alt="{{ course.title }}" width="48" height="38">
+          {% endif %}
 
-        <div class="lh-1">
-          <h1 class="h6 mb-0 text-dark lh-1">{{ course.title|capfirst }}</h1>
-          <small class="text-muted">Tu progreso por módulos y lecciones</small>
+          <div class="lh-1">
+            <h1 class="h6 mb-0 text-dark lh-1">{{ course.title|capfirst }}</h1>
+            <small class="text-muted">Tu progreso por modulos y lecciones</small>
+          </div>
+        </div>
+        <div class="text-end">
+          <form method="POST" action="{% url 'courses:course_unenroll' course.pk %}" onsubmit="return confirm('Seguro que deseas darte de baja de este curso?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">
+              Darse de baja en este curso
+            </button>
+          </form>
+          <small class="d-block text-muted mt-1">
+            El monto pagado quedara como credito para futuros cursos.
+          </small>
         </div>
       </div>
 

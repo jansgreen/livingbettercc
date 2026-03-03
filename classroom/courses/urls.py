@@ -12,6 +12,7 @@ urlpatterns = [
     path('my_course/', views.my_course, name='my_course'),
     path('course_create/', views.course_create, name='course_create'),
     path('course_detail/<int:pk>/', views.course_detail, name='course_detail'),
+    path('course_unenroll/<int:pk>/', views.course_unenroll, name='course_unenroll'),
     # Pay-now entry from course detail
     path('<int:pk>/pay/', views.start_course_payment, name='start_course_payment'),
     path('course_update/<int:pk>/', views.course_update, name='course_update'),

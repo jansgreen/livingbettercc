@@ -281,7 +281,10 @@ def start_course_payment(request, pk):
 
 @login_required
 def my_course(request):
-    enrollments = Enrollment.objects.filter(user=request.user, completed=False)
+    enrollments = Enrollment.objects.filter(
+        user=request.user,
+        completed=False,
+    ).exclude(status__in=[Enrollment.Status.REJECTED, Enrollment.Status.CANCELLED])
 
     courses = (
         Course.objects
@@ -382,6 +385,31 @@ def my_course(request):
         return HttpResponse(html)
 
     return resp
+
+
+@login_required
+def course_unenroll(request, pk):
+    if request.method != "POST":
+        return redirect("courses:my_course")
+
+    enrollment = Enrollment.objects.filter(user=request.user, course_id=pk).first()
+    if not enrollment:
+        messages.error(request, "No encontramos una inscripcion activa para ese curso.")
+        return redirect("courses:my_course")
+
+    if enrollment.status == Enrollment.Status.COMPLETED or enrollment.completed:
+        messages.warning(request, "No puedes darte de baja de un curso ya completado.")
+        return redirect("courses:my_course")
+
+    enrollment.status = Enrollment.Status.CANCELLED
+    enrollment.completed = False
+    enrollment.save(update_fields=["status", "completed"])
+
+    messages.success(
+        request,
+        "Te has dado de baja del curso. El monto pagado quedara como credito para futuros cursos."
+    )
+    return redirect("courses:my_course")
 
 @login_required
 def course_create(request):

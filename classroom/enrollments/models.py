@@ -36,6 +36,7 @@ class Enrollment(models.Model):
         ACTIVE           = 'active',           'Activo'
         COMPLETED        = 'completed',        'Completado'
         REJECTED         = 'rejected',         'Beca rechazada'
+        CANCELLED        = 'cancelled',        'Cancelado por usuario'
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey('courses.Course', on_delete=models.CASCADE, null=True, blank=True)
