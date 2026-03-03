@@ -65,6 +65,9 @@ def obtener_menu_classroom(request):
 
             if url_my_certs:
                 submenus.append({'nombre': 'Mis Certificados', 'url': url_my_certs})
+        else:
+            if url_course_list:
+                submenus.append({'nombre': 'Cursos Disponibles', 'url': url_course_list})
 
 
         menu = build_menu(request.user, 'Aula Virtual', submenus, url='#')

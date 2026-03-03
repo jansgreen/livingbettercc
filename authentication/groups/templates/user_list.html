@@ -53,6 +53,27 @@
       </div>
     </div>
 
+    <div class="card users-card mb-3">
+      <div class="card-body py-3">
+        <form id="bulkTypeForm" method="POST" action="{% url 'bulk_update_user_type' %}" class="d-flex flex-wrap align-items-center gap-2">
+          {% csrf_token %}
+          <span class="fw-semibold">Acciones:</span>
+          <select name="user_type" class="form-select form-select-sm" style="max-width: 220px;" required>
+            <option value="" selected disabled>Seleccionar tipo</option>
+            <option value="customer">Customer</option>
+            <option value="estudiante">Estudiante</option>
+            <option value="facilitador">Facilitador</option>
+            <option value="tecnico">Tecnico</option>
+            <option value="staff">Staff</option>
+            <option value="superuser">Superuser</option>
+          </select>
+          <input type="hidden" name="user_ids_csv" id="id_selected_users">
+          <button type="submit" class="btn btn-sm btn-primary">Aplicar a seleccionados</button>
+          <small class="text-muted">Marca usuarios en la lista y luego aplica el tipo.</small>
+        </form>
+      </div>
+    </div>
+
     {% if users %}
       <div class="users-card card d-none d-lg-block">
         <div class="card-body p-0">
@@ -60,6 +81,9 @@
             <table class="table table-hover align-middle mb-0">
               <thead class="table-dark">
                 <tr>
+                  <th class="ps-3" style="width: 44px;">
+                    <input type="checkbox" id="selectAllDesktop" class="form-check-input">
+                  </th>
                   <th class="ps-4">Usuario</th>
                   <th>Email</th>
                   <th>Grupos</th>
@@ -71,6 +95,9 @@
               <tbody>
                 {% for user in users %}
                   <tr>
+                    <td class="ps-3">
+                      <input type="checkbox" class="form-check-input js-user-select" value="{{ user.id }}">
+                    </td>
                     <td class="ps-4">
                       <div class="d-flex align-items-center gap-3">
                         <img
@@ -115,16 +142,19 @@
                       {% else %}
                         <span class="badge text-bg-dark users-badge">N/A</span>
                       {% endif %}
+                      {% if user.has_mixed_roles %}
+                        <div class="small text-warning mt-1">Roles mixtos detectados</div>
+                      {% endif %}
                       {% if request.user.is_staff or request.user.is_superuser %}
                         <form method="POST" action="{% url 'update_user_type' user.id %}" class="d-flex gap-2 mt-2">
                           {% csrf_token %}
                           <select name="user_type" class="form-select form-select-sm">
-                            <option value="customer">Customer</option>
-                            <option value="estudiante">Estudiante</option>
-                            <option value="facilitador">Facilitador</option>
-                            <option value="tecnico">Tecnico</option>
-                            <option value="staff">Staff</option>
-                            <option value="superuser">Superuser</option>
+                            <option value="customer" {% if user.current_user_type == "customer" %}selected{% endif %}>Customer</option>
+                            <option value="estudiante" {% if user.current_user_type == "estudiante" %}selected{% endif %}>Estudiante</option>
+                            <option value="facilitador" {% if user.current_user_type == "facilitador" %}selected{% endif %}>Facilitador</option>
+                            <option value="tecnico" {% if user.current_user_type == "tecnico" %}selected{% endif %}>Tecnico</option>
+                            <option value="staff" {% if user.current_user_type == "staff" %}selected{% endif %}>Staff</option>
+                            <option value="superuser" {% if user.current_user_type == "superuser" %}selected{% endif %}>Superuser</option>
                           </select>
                           <button type="submit" class="btn btn-sm btn-outline-dark">Cambiar</button>
                         </form>
@@ -157,6 +187,14 @@
                           <i class="fas fa-minus"></i>
                         </button>
                       </form>
+                      {% if request.user.is_superuser %}
+                        <form method="POST" action="{% url 'delete_user' user.id %}" class="mt-2" onsubmit="return confirm('¿Eliminar el usuario {{ user.username }}? Esta acción no se puede deshacer.');">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-danger" {% if user.id == request.user.id %}disabled{% endif %}>
+                            Eliminar usuario
+                          </button>
+                        </form>
+                      {% endif %}
                     </td>
                   </tr>
                 {% endfor %}
@@ -172,6 +210,9 @@
             <div class="col-12">
               <div class="users-card-mobile card">
                 <div class="card-body">
+                  <div class="d-flex justify-content-end mb-2">
+                    <input type="checkbox" class="form-check-input js-user-select" value="{{ user.id }}">
+                  </div>
                   <div class="d-flex align-items-center gap-3 mb-3">
                     <img
                       src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
@@ -204,17 +245,20 @@
                     {% else %}
                       <span class="badge text-bg-dark users-badge">N/A</span>
                     {% endif %}
+                    {% if user.has_mixed_roles %}
+                      <div class="small text-warning mt-1">Roles mixtos detectados</div>
+                    {% endif %}
                     {% if request.user.is_staff or request.user.is_superuser %}
                       <form method="POST" action="{% url 'update_user_type' user.id %}" class="mt-2">
                         {% csrf_token %}
                         <div class="input-group input-group-sm">
                           <select name="user_type" class="form-select">
-                            <option value="customer">Customer</option>
-                            <option value="estudiante">Estudiante</option>
-                            <option value="facilitador">Facilitador</option>
-                            <option value="tecnico">Tecnico</option>
-                            <option value="staff">Staff</option>
-                            <option value="superuser">Superuser</option>
+                            <option value="customer" {% if user.current_user_type == "customer" %}selected{% endif %}>Customer</option>
+                            <option value="estudiante" {% if user.current_user_type == "estudiante" %}selected{% endif %}>Estudiante</option>
+                            <option value="facilitador" {% if user.current_user_type == "facilitador" %}selected{% endif %}>Facilitador</option>
+                            <option value="tecnico" {% if user.current_user_type == "tecnico" %}selected{% endif %}>Tecnico</option>
+                            <option value="staff" {% if user.current_user_type == "staff" %}selected{% endif %}>Staff</option>
+                            <option value="superuser" {% if user.current_user_type == "superuser" %}selected{% endif %}>Superuser</option>
                           </select>
                           <button type="submit" class="btn btn-outline-dark">Cambiar</button>
                         </div>
@@ -258,6 +302,14 @@
                       <button type="submit" name="action" value="remove" class="btn btn-outline-danger" {% if not user.groups.all %}disabled{% endif %}>Remover</button>
                     </div>
                   </form>
+                  {% if request.user.is_superuser %}
+                    <form method="POST" action="{% url 'delete_user' user.id %}" class="mt-2" onsubmit="return confirm('¿Eliminar el usuario {{ user.username }}? Esta acción no se puede deshacer.');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-danger w-100" {% if user.id == request.user.id %}disabled{% endif %}>
+                        Eliminar usuario
+                      </button>
+                    </form>
+                  {% endif %}
                 </div>
               </div>
             </div>
@@ -271,4 +323,33 @@
     {% endif %}
   </div>
 </div>
+<script>
+  (function () {
+    const form = document.getElementById('bulkTypeForm');
+    const hidden = document.getElementById('id_selected_users');
+    const selectAll = document.getElementById('selectAllDesktop');
+
+    function getSelectedValues() {
+      return Array.from(document.querySelectorAll('.js-user-select:checked')).map(cb => cb.value);
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function () {
+        document.querySelectorAll('.js-user-select').forEach(cb => { cb.checked = selectAll.checked; });
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        const selected = getSelectedValues();
+        if (!selected.length) {
+          e.preventDefault();
+          alert('Selecciona al menos un usuario.');
+          return;
+        }
+        hidden.value = selected.join(',');
+      });
+    }
+  })();
+</script>
 {% endblock %}

@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group, User
 from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
@@ -135,6 +136,65 @@ def update_user_type(request, user_id):
 
     return redirect("user_list")
 
+
+@user_passes_test(_is_staff)
+def bulk_update_user_type(request):
+    if request.method != "POST":
+        return redirect("user_list")
+
+    selected_type = request.POST.get("user_type", "")
+    raw_ids = (request.POST.get("user_ids_csv") or "").strip()
+
+    if not raw_ids:
+        messages.error(request, "Debes seleccionar al menos un usuario.")
+        return redirect("user_list")
+
+    try:
+        user_ids = [int(x) for x in raw_ids.split(",") if x.strip().isdigit()]
+    except Exception:
+        messages.error(request, "Lista de usuarios invalida.")
+        return redirect("user_list")
+
+    if not user_ids:
+        messages.error(request, "Debes seleccionar al menos un usuario.")
+        return redirect("user_list")
+
+    updated = 0
+    skipped = 0
+
+    for user in User.objects.filter(id__in=user_ids):
+        if user.id == request.user.id and selected_type in {"customer", "estudiante", "facilitador", "tecnico"}:
+            skipped += 1
+            continue
+        try:
+            _set_user_type(user, selected_type)
+            updated += 1
+        except Exception:
+            skipped += 1
+
+    if updated:
+        messages.success(request, f"Tipo actualizado en {updated} usuario(s).")
+    if skipped:
+        messages.warning(request, f"{skipped} usuario(s) no se pudieron actualizar.")
+
+    return redirect("user_list")
+
+
+@user_passes_test(lambda u: u.is_authenticated and u.is_superuser)
+def delete_user(request, user_id):
+    if request.method != "POST":
+        return redirect("user_list")
+
+    target = get_object_or_404(User, pk=user_id)
+    if target.id == request.user.id:
+        messages.error(request, "No puedes eliminar tu propio usuario.")
+        return redirect("user_list")
+
+    username = target.username
+    target.delete()
+    messages.success(request, f"Usuario '{username}' eliminado correctamente.")
+    return redirect("user_list")
+
 @user_passes_test(_is_staff)
 def add_and_remove_permission_to_groups(request, group_id):
     if request.method == "POST":
@@ -190,7 +250,15 @@ def group_update(request, pk):
 def group_delete(request, pk):
     group = get_object_or_404(Group, pk=pk)
     if request.method == 'POST':
-        group.delete()
+        try:
+            group.delete()
+            messages.success(request, "Grupo eliminado correctamente.")
+        except ProtectedError:
+            invites_count = group.invitations.count()
+            messages.error(
+                request,
+                f"No se puede eliminar el grupo '{group.name}' porque tiene {invites_count} invitacion(es) asociadas."
+            )
         return redirect('group_list')
     return render(request, 'group_confirm_delete.html', {'group': group})
 
@@ -203,6 +271,31 @@ def user_list(request):
         user.is_student = user.groups.filter(name__iexact='estudiantes').exists()
         user.is_facilitador = user.groups.filter(name__iexact='Facilitadores').exists()
         user.is_tecnico = user.groups.filter(name__iexact='tecnicos').exists()
+        role_hits = sum(
+            int(flag) for flag in [
+                user.is_customer,
+                user.is_student,
+                user.is_facilitador,
+                user.is_tecnico,
+            ]
+        )
+
+        if user.is_superuser:
+            user.current_user_type = "superuser"
+        elif user.is_staff:
+            user.current_user_type = "staff"
+        elif user.is_tecnico:
+            user.current_user_type = "tecnico"
+        elif user.is_facilitador:
+            user.current_user_type = "facilitador"
+        elif user.is_student:
+            user.current_user_type = "estudiante"
+        elif user.is_customer:
+            user.current_user_type = "customer"
+        else:
+            user.current_user_type = ""
+
+        user.has_mixed_roles = role_hits > 1 or ((user.is_staff or user.is_superuser) and role_hits > 0)
     return render(request, 'user_list.html', {'users': users, 'all_groups': all_groups})
 
 class InviteFriendView(View):
