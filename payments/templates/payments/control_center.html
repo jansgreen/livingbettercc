@@ -90,5 +90,53 @@
       </form>
     </div>
   </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h6">Inscripciones pendientes</h2>
+      {% if pending_enrollments %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Curso</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enr in pending_enrollments %}
+                <tr>
+                  <td>{{ enr.user.username }}</td>
+                  <td>{{ enr.course.title }}</td>
+                  <td>
+                    {% if enr.status == "pending_payment" %}
+                      <span class="badge bg-warning text-dark">Pendiente de pago</span>
+                    {% else %}
+                      <span class="badge bg-info text-dark">Pendiente de aprobacion</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ enr.enrolled_at|date:"d/m/Y H:i" }}</td>
+                  <td>
+                    <form method="post" action="{% url 'payments:grant_course_access' %}">
+                      {% csrf_token %}
+                      <input type="hidden" name="user_id" value="{{ enr.user.id }}">
+                      <input type="hidden" name="course_id" value="{{ enr.course.id }}">
+                      <input type="hidden" name="note" value="Exoneracion desde pendientes en Control Center">
+                      <button type="submit" class="btn btn-sm btn-outline-success">Aprobar acceso</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="small text-muted mb-0">No hay inscripciones pendientes.</p>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

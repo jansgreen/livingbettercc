@@ -161,6 +161,11 @@ def control_center(request):
 		count=Count("id"),
 		total=Sum("amount_cents"),
 	)
+	pending_enrollments = (
+		Enrollment.objects.select_related("user", "course")
+		.filter(status__in=[Enrollment.Status.PENDING_PAYMENT, Enrollment.Status.PENDING_APPROVAL])
+		.order_by("-enrolled_at")[:100]
+	)
 
 	ctx = {
 		"config": config,
@@ -173,6 +178,7 @@ def control_center(request):
 		"today_total": (today_stats.get("total") or 0) / 100,
 		"users": User.objects.order_by("username"),
 		"courses": Course.objects.order_by("title"),
+		"pending_enrollments": pending_enrollments,
 	}
 	return render(request, "payments/control_center.html", ctx)
 
