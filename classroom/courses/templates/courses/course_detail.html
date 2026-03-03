@@ -9,13 +9,18 @@
   <div class="card-body">
     <p>{{ course.description|safe }}</p>
 
-    <!-- Si el usuario no esta registrado o autenticado muestra inscribirse -->
-    {% if is_enrolled and user.is_authenticated %}
+    {% if user.is_authenticated and is_enrolled and is_enrolled.status == 'active' %}
         <small class="text-success">Ya estás inscrito en este curso.</small>
-        <a href="{% url 'courses:my_course' %}" class="btn btn-primary"> Continuar ...</a>
-        {% if is_enrolled.status != 'active' and is_enrolled.status != 'completed' and course.price|floatformat:2 != '0.00' %}
-          <a href="{% url 'courses:start_course_payment' pk=course.pk %}" class="btn btn-warning ms-2">💳 Pagar ahora</a>
-        {% endif %}
+        <a href="{% url 'courses:my_course' %}" class="btn btn-primary">Continuar ...</a>
+    {% elif user.is_authenticated and is_enrolled and is_enrolled.status == 'completed' %}
+        <small class="text-success">Ya completaste este curso.</small>
+        <a href="{% url 'courses:my_course' %}" class="btn btn-primary">Ver mis cursos</a>
+    {% elif user.is_authenticated and is_enrolled and is_enrolled.status == 'pending_payment' %}
+        <small class="text-warning">Tienes una inscripción pendiente de pago.</small>
+        <a href="{% url 'courses:start_course_payment' pk=course.pk %}" class="btn btn-warning ms-2">Pagar ahora</a>
+    {% elif user.is_authenticated and is_enrolled and is_enrolled.status == 'pending_approval' %}
+        <small class="text-info">Tu inscripción está en revisión.</small>
+        <a href="{% url 'courses:my_course' %}" class="btn btn-outline-primary ms-2">Ir a mis cursos</a>
     {% else %}
       <p><strong>Precio:</strong> ${{ course.price }}</p>
       <a href="{% url 'courses:session_enroll_students' course.pk%}" class="btn btn-success">Inscribirse</a>

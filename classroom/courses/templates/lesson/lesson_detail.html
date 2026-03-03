@@ -12,7 +12,13 @@
     <h3>Video de la Lección</h3>
     <div class="ratio ratio-16x9 mb-3">
       {% if lesson.video_is_youtube or lesson.video_is_vimeo %}
-        <iframe src="{{ lesson.video_embed_url }}" class="w-100 h-100" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+        <iframe
+          src="{{ lesson.video_embed_url }}"
+          class="w-100 h-100"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        ></iframe>
       {% else %}
         <video class="w-100 h-100" controls preload="metadata">
           <source src="{{ lesson.video_url }}">
@@ -23,6 +29,13 @@
 
   {% if lesson.content %}
     <div class="mb-3">{{ lesson.content|safe }}</div>
+  {% endif %}
+  {% if lesson.video_url and lesson.video_is_youtube %}
+    <div class="mb-3">
+      <a href="{{ lesson.video_url }}" class="btn btn-outline-secondary btn-sm" target="_blank" rel="noopener">
+        Si no reproduce aquí, abrir en YouTube
+      </a>
+    </div>
   {% endif %}
 <a href="{% url 'enrollments:mark_lesson_complete' lesson.pk %}" class="btn btn-primary">Continuar</a>
 

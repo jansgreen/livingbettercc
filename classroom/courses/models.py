@@ -6,6 +6,7 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django_ckeditor_5.fields import CKEditor5Field
+import re
 
 
 class Program(models.Model):
@@ -23,6 +24,7 @@ class Course(models.Model):
     program = models.ForeignKey(Program, on_delete=models.SET_NULL, null=True, blank=True, related_name='courses')
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    study_material = models.FileField(upload_to='course_materials/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     published = models.BooleanField(default=False)
@@ -111,10 +113,14 @@ class Lesson(models.Model):
         video_id = ""
         is_vimeo = "vimeo.com" in host
         if "youtu.be" in host:
-            video_id = parsed.path.lstrip("/")
+            video_id = parsed.path.lstrip("/").split("/")[0]
         elif "youtube.com" in host or "youtube-nocookie.com" in host:
             if parsed.path.startswith("/embed/"):
                 video_id = parsed.path.split("/embed/")[1].split("/")[0]
+            elif parsed.path.startswith("/shorts/"):
+                video_id = parsed.path.split("/shorts/")[1].split("/")[0]
+            elif parsed.path.startswith("/live/"):
+                video_id = parsed.path.split("/live/")[1].split("/")[0]
             else:
                 video_id = parse_qs(parsed.query).get("v", [""])[0]
         elif is_vimeo:
@@ -126,7 +132,10 @@ class Lesson(models.Model):
             return url
         if is_vimeo:
             return f"https://player.vimeo.com/video/{video_id}"
-        return f"https://www.youtube.com/embed/{video_id}"
+        # Validación básica del ID de YouTube para evitar embeds rotos.
+        if not re.match(r"^[A-Za-z0-9_-]{11}$", video_id):
+            return url
+        return f"https://www.youtube-nocookie.com/embed/{video_id}?rel=0&modestbranding=1&playsinline=1"
 
     @property
     def video_is_youtube(self):

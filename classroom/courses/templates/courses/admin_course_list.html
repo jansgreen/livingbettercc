@@ -1,19 +1,159 @@
-{% extends "dashboard.html" %}
+{% extends "dashboards/dashboard.html" %}
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h4 mb-0">Cursos (Admin)</h1>
-    <a href="{% url 'courses:course_create' %}" class="btn btn-primary">Crear curso</a>
+<div class="container-fluid py-4">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center">
+      <div>
+        <h1 class="h4 mb-1">Panel CRUD de Cursos</h1>
+        <p class="text-muted mb-0">Gestiona cursos, módulos y lecciones desde un solo panel.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'courses:course_create' %}" class="btn btn-success">
+          Crear Curso
+        </a>
+        <a href="{% url 'courses:module_create' %}" class="btn btn-outline-primary">
+          Crear Módulo
+        </a>
+        <a href="{% url 'courses:lesson_create' %}" class="btn btn-outline-secondary">
+          Crear Lección
+        </a>
+      </div>
+    </div>
   </div>
-  <div class="list-group">
+
+  <div class="accordion" id="adminCoursesAccordion">
     {% for course in courses %}
-      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
-         href="{% url 'courses:course_admin_detail' course.pk %}">
-        <span>{{ course.title }}</span>
-        <span class="badge bg-secondary">{{ course.modules.count }} módulos</span>
-      </a>
+      <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="course-heading-{{ course.pk }}">
+          <div class="d-flex align-items-stretch">
+            <button
+              class="accordion-button collapsed fw-semibold"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#course-collapse-{{ course.pk }}"
+              aria-expanded="false"
+              aria-controls="course-collapse-{{ course.pk }}"
+            >
+              <div class="w-100 d-flex flex-wrap align-items-center justify-content-between gap-2 pe-3">
+                <span>{{ course.title }}</span>
+                <span class="d-flex flex-wrap gap-2">
+                  <span class="badge bg-light text-dark">Módulos: {{ course.modules_count|default:0 }}</span>
+                  <span class="badge bg-light text-dark">Lecciones: {{ course.lessons_count|default:0 }}</span>
+                  {% if course.published %}
+                    <span class="badge bg-success">Publicado</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Borrador</span>
+                  {% endif %}
+                </span>
+              </div>
+            </button>
+            <div class="d-none d-md-flex align-items-center gap-2 px-2 bg-white border-start">
+              <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+              <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-sm btn-primary">Editar</a>
+              <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </div>
+          </div>
+        </h2>
+
+        <div
+          id="course-collapse-{{ course.pk }}"
+          class="accordion-collapse collapse"
+          aria-labelledby="course-heading-{{ course.pk }}"
+          data-bs-parent="#adminCoursesAccordion"
+        >
+          <div class="accordion-body">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <a href="{% url 'courses:course_create' %}" class="btn btn-sm btn-success">Crear</a>
+              <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-sm btn-primary">Editar</a>
+              <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+              <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+              <a href="{% url 'courses:module_create' %}?course={{ course.pk }}" class="btn btn-sm btn-outline-primary">Nuevo módulo</a>
+            </div>
+
+            {% if course.modules.all %}
+              <div class="accordion" id="modulesAccordion-{{ course.pk }}">
+                {% for module in course.modules.all %}
+                  <div class="accordion-item border rounded-3 mb-2">
+                    <h3 class="accordion-header" id="module-heading-{{ module.pk }}">
+                      <button
+                        class="accordion-button collapsed py-2"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#module-collapse-{{ module.pk }}"
+                        aria-expanded="false"
+                        aria-controls="module-collapse-{{ module.pk }}"
+                      >
+                        <div class="w-100 d-flex flex-wrap justify-content-between gap-2 pe-3">
+                          <span>{{ module.order }}. {{ module.title }}</span>
+                          <span class="badge bg-light text-dark">Lecciones: {{ module.lessons.count }}</span>
+                        </div>
+                      </button>
+                    </h3>
+
+                    <div
+                      id="module-collapse-{{ module.pk }}"
+                      class="accordion-collapse collapse"
+                      aria-labelledby="module-heading-{{ module.pk }}"
+                      data-bs-parent="#modulesAccordion-{{ course.pk }}"
+                    >
+                      <div class="accordion-body">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                          <a href="{% url 'courses:module_create' %}?course={{ course.pk }}" class="btn btn-sm btn-success">Crear</a>
+                          <a href="{% url 'courses:module_update' module.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                          <a href="{% url 'courses:module_detail' module.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+                          <a href="{% url 'courses:module_delete' module.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+                          <a href="{% url 'courses:lesson_create' %}?module={{ module.pk }}" class="btn btn-sm btn-outline-primary">Nueva lección</a>
+                        </div>
+
+                        {% if module.lessons.all %}
+                          <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Lección</th>
+                                  <th class="text-end">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for lesson in module.lessons.all %}
+                                  <tr>
+                                    <td>{{ lesson.order }}</td>
+                                    <td>{{ lesson.title }}</td>
+                                    <td class="text-end">
+                                      <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'courses:lesson_create' %}?module={{ module.pk }}" class="btn btn-success">Crear</a>
+                                        <a href="{% url 'courses:lesson_update' lesson.pk %}" class="btn btn-primary">Editar</a>
+                                        <a href="{% url 'courses:lesson_detail' lesson.pk %}" class="btn btn-outline-info">Ver</a>
+                                        <a href="{% url 'courses:lesson_delete' lesson.pk %}" class="btn btn-danger">Eliminar</a>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        {% else %}
+                          <div class="alert alert-light border mb-0">Este módulo todavía no tiene lecciones.</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="alert alert-light border mb-0">Este curso todavía no tiene módulos.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     {% empty %}
-      <div class="list-group-item">No hay cursos.</div>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <p class="mb-3">No hay cursos registrados.</p>
+          <a href="{% url 'courses:course_create' %}" class="btn btn-success">Crear primer curso</a>
+        </div>
+      </div>
     {% endfor %}
   </div>
 </div>

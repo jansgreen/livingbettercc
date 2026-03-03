@@ -24,9 +24,14 @@ def obtener_menu_classroom(request):
 
         # Admin/staff actions gated by permission
 
-        url_course_list = safe_reverse('courses:course_list')  # Panel del Aula
-        if url_course_list:
-            submenus.append({'nombre': 'Panel del Aula', 'url': url_course_list, 'perm': 'groups.access_module'})
+        url_panel_aula = safe_reverse('courses:course_admin_list')
+        if url_panel_aula:
+            if request.user.is_superuser or request.user.is_staff:
+                submenus.append({'nombre': 'Panel del Aula', 'url': url_panel_aula})
+            else:
+                submenus.append({'nombre': 'Panel del Aula', 'url': url_panel_aula, 'perm': 'groups.access_module'})
+
+        url_course_list = safe_reverse('courses:course_list')
 
         url_certs_panel = safe_reverse('certifications:certificate_list')  # Panel de Certificaciones
         if url_certs_panel:

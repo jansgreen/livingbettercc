@@ -43,7 +43,9 @@ def _require_active_enrollment(request, *, course):
 
 
 def _require_staff(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
+    if not request.user.is_authenticated:
+        raise Http404("No encontrado")
+    if not (request.user.is_superuser or request.user.is_staff or request.user.has_perm("groups.access_module")):
         raise Http404("No encontrado")
     return None
 
@@ -194,7 +196,21 @@ def course_list(request):
 @login_required
 def course_admin_list(request):
     _require_staff(request)
-    courses = Course.objects.all().order_by('title')
+    courses = (
+        Course.objects
+        .all()
+        .annotate(modules_count=Count("modules", distinct=True))
+        .annotate(lessons_count=Count("modules__lessons", distinct=True))
+        .prefetch_related(
+            Prefetch(
+                "modules",
+                queryset=Module.objects.prefetch_related(
+                    Prefetch("lessons", queryset=Lesson.objects.order_by("order", "id"))
+                ).order_by("order", "id"),
+            )
+        )
+        .order_by("title")
+    )
     return render(request, 'courses/admin_course_list.html', {'courses': courses})
 
 
@@ -213,7 +229,13 @@ def course_detail(request, pk):
     is_enrolled = False
     beca_status = None
     if request.user.is_authenticated:
-        is_enrolled = Enrollment.objects.filter(user=request.user, course=course).first()
+        # Tomar la inscripción más reciente para evitar estados viejos.
+        is_enrolled = (
+            Enrollment.objects
+            .filter(user=request.user, course=course)
+            .order_by('-id')
+            .first()
+        )
         # Consultar estado de beca Minerd para este curso
         from classroom.enrollments.models import BecaApplication
         beca_app = BecaApplication.objects.filter(user=request.user, course=course).order_by('-fecha_aplicacion').first()
@@ -368,6 +390,19 @@ def my_course(request):
     for c in courses:
         for m in c.modules.all():
             m.status = module_status.get(m.id)
+
+    # Desbloqueo secuencial por módulo:
+    # primer módulo abierto; los siguientes dependen de completar/aprobar el anterior.
+    for c in courses:
+        modules_in_course = list(c.modules.all().order_by("order", "id"))
+        prev_ready = True
+        for m in modules_in_course:
+            st = module_status.get(m.id)
+            if not st:
+                continue
+            st["unlocked"] = prev_ready
+            current_ready = st["is_completed"] and ((not st["has_quicktest"]) or st["passed"])
+            prev_ready = current_ready
 
     context = {
         'enrollments': enrollments,
@@ -617,6 +652,24 @@ def lesson_detail(request, pk):
     if not enr:
         messages.error(request, "No tienes acceso a este curso (inscripción inactiva o pendiente).")
         return redirect("courses:my_course")
+
+    # Bloquear salto entre módulos: para entrar al módulo actual,
+    # el módulo anterior debe estar completo y (si aplica) con test aprobado.
+    ordered_modules = list(course.modules.all().order_by("order", "id"))
+    try:
+        module_idx = next(i for i, m in enumerate(ordered_modules) if m.id == module.id)
+    except StopIteration:
+        messages.error(request, "Módulo inválido para este curso.")
+        return redirect("courses:my_course")
+
+    if module_idx > 0:
+        prev_module = ordered_modules[module_idx - 1]
+        if not _module_lessons_completed(enrollment=enr, module=prev_module):
+            messages.warning(request, "Debes completar el módulo anterior antes de continuar.")
+            return redirect("courses:module_detail", pk=prev_module.pk)
+        if not _passed_quicktest(request.user, prev_module):
+            messages.warning(request, "Debes aprobar el test del módulo anterior antes de continuar.")
+            return redirect("courses:module_detail", pk=prev_module.pk)
 
     # Orden real de lessons (usa Meta ordering + id para estabilidad)
     ordered_lessons = list(module.lessons.order_by("order", "id"))
