@@ -21,6 +21,10 @@ from .gateway import get_gateway_config, get_stripe_credentials, mask_secret
 
 from classroom.enrollments.models import Enrollment
 from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
+from classroom.courses.models import Course
+
+User = get_user_model()
 
 
 def _decimal_to_cents(amount: Decimal) -> int:
@@ -167,8 +171,53 @@ def control_center(request):
 		"last_event": last_event,
 		"today_count": today_stats.get("count") or 0,
 		"today_total": (today_stats.get("total") or 0) / 100,
+		"users": User.objects.order_by("username"),
+		"courses": Course.objects.order_by("title"),
 	}
 	return render(request, "payments/control_center.html", ctx)
+
+
+@staff_member_required
+def grant_course_access(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	if request.method != "POST":
+		return HttpResponseBadRequest("POST required")
+
+	user_id = request.POST.get("user_id")
+	course_id = request.POST.get("course_id")
+	note = (request.POST.get("note") or "").strip()
+
+	if not user_id or not course_id:
+		messages.error(request, "Debes seleccionar usuario y curso.")
+		return redirect("payments:control_center")
+
+	try:
+		user = User.objects.get(pk=int(user_id))
+		course = Course.objects.get(pk=int(course_id))
+	except Exception:
+		messages.error(request, "Usuario o curso invalido.")
+		return redirect("payments:control_center")
+
+	enrollment, _ = Enrollment.objects.get_or_create(user=user, course=course)
+	enrollment.status = Enrollment.Status.ACTIVE
+	enrollment.completed = False
+	enrollment.save(update_fields=["status", "completed"])
+
+	student_group, _ = Group.objects.get_or_create(name="estudiantes")
+	user.groups.add(student_group)
+
+	if note:
+		messages.success(
+			request,
+			f"Acceso exonerado para {user.username} en '{course.title}'. Nota: {note}"
+		)
+	else:
+		messages.success(
+			request,
+			f"Acceso exonerado para {user.username} en '{course.title}'."
+		)
+	return redirect("payments:control_center")
 
 
 @staff_member_required

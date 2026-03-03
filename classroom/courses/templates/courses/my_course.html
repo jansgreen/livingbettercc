@@ -31,6 +31,11 @@
           <small class="d-block text-muted mt-1">
             El monto pagado quedara como credito para futuros cursos.
           </small>
+          {% if course.id not in active_course_ids %}
+            <small class="d-block text-danger mt-1">
+              Este curso no esta activo todavia. Verifica el pago o aprobacion.
+            </small>
+          {% endif %}
         </div>
       </div>
 
@@ -54,17 +59,17 @@
                   <div class="d-flex align-items-center">
 
                     {# 1) COMPLETADA -> verde + link #}
-                    {% if lesson.id in completed_ids %}
+                    {% if lesson.id in completed_ids and course.id in active_course_ids %}
                       <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
                           xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                         <rect width="100%" height="100%" fill="#00981c"></rect>
                       </svg>
-                      <a class="text-decoration-none fw-semibold" href="{% url 'courses:module_detail' module.pk %}">
+                      <a class="text-decoration-none fw-semibold" href="{% url 'courses:lesson_detail' lesson.pk %}">
                         {{ lesson.title|capfirst }}
                       </a>
 
                     {# 2) SIGUIENTE PERMITIDA -> gris + link #}
-                    {% elif st and lesson.id == st.next_lesson_id %}
+                    {% elif st and lesson.id == st.next_lesson_id and course.id in active_course_ids %}
                       <svg class="bd-placeholder-img flex-shrink-0 me-2 rounded" width="32" height="32"
                           xmlns="http://www.w3.org/2000/svg" role="img" preserveAspectRatio="xMidYMid slice" focusable="false">
                         <rect width="100%" height="100%" fill="#6c757d"></rect>
@@ -87,8 +92,10 @@
                   {# Badges #}
                   {% if lesson.id in completed_ids %}
                     <span class="badge bg-success">Completado</span>
-                  {% elif st and lesson.id == st.next_lesson_id %}
+                  {% elif st and lesson.id == st.next_lesson_id and course.id in active_course_ids %}
                     <span class="badge bg-primary">Siguiente</span>
+                  {% elif st and lesson.id == st.next_lesson_id and course.id not in active_course_ids %}
+                    <span class="badge bg-warning text-dark">Pago pendiente</span>
                   {% else %}
                     <span class="badge bg-secondary">Bloqueado</span>
                   {% endif %}

@@ -53,5 +53,42 @@
       </div>
     </div>
   </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
+      <h2 class="h6">Exonerar curso (acceso manual)</h2>
+      <p class="small text-muted mb-3">Activa la inscripcion del usuario sin pasar por checkout.</p>
+      <form method="post" action="{% url 'payments:grant_course_access' %}">
+        {% csrf_token %}
+        <div class="row g-2">
+          <div class="col-md-4">
+            <label class="form-label small">Usuario</label>
+            <select name="user_id" class="form-select" required>
+              <option value="">Selecciona un usuario</option>
+              {% for u in users %}
+                <option value="{{ u.id }}">{{ u.username }}{% if u.email %} ({{ u.email }}){% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Curso</label>
+            <select name="course_id" class="form-select" required>
+              <option value="">Selecciona un curso</option>
+              {% for c in courses %}
+                <option value="{{ c.id }}">{{ c.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small">Nota (opcional)</label>
+            <input type="text" name="note" class="form-control" maxlength="200" placeholder="Motivo de exoneracion">
+          </div>
+        </div>
+        <div class="mt-3">
+          <button class="btn btn-success btn-sm" type="submit">Conceder acceso</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -296,6 +296,9 @@ def my_course(request):
     )
 
     course_ids = [c.id for c in courses]
+    active_course_ids = {
+        e.course_id for e in enrollments if e.status == Enrollment.Status.ACTIVE
+    }
 
     # Fallback de imagen
     for c in courses:
@@ -373,6 +376,7 @@ def my_course(request):
         'completed_ids': completed_ids,   # ✅ lista
         'module_status': module_status,
         'has_active': any(e.status == Enrollment.Status.ACTIVE for e in enrollments),
+        'active_course_ids': list(active_course_ids),
     }
 
     resp = render(request, 'courses/my_course.html', context)

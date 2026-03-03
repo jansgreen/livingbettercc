@@ -6,6 +6,7 @@ app_name = "payments"
 urlpatterns = [
     path("control-center/", views.control_center, name="control_center"),
     path("control-center/switch-mode/", views.switch_mode, name="switch_mode"),
+    path("control-center/grant-course-access/", views.grant_course_access, name="grant_course_access"),
     path("transactions/", views.payments_list, name="payments_list"),
     path("receipts/", views.receipts_list, name="receipts_list"),
     path("reports/", views.reports_view, name="reports"),
