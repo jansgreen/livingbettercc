@@ -55,7 +55,7 @@ def obtener_formbuilder_menu(request):
                     "url": _safe_url("formbuilder:facilitador_list_view", "/formbuilder/facilitadores/"),
                 },
                 {
-                    "nombre": "Panel Tecnico del Distrito",
+                    "nombre": "Panel del Tecnico",
                     "url": _safe_url("formbuilder:panel_tecnico", "/formbuilder/tecnico/panel/"),
                 },
             ]

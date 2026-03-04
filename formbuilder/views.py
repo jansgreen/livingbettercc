@@ -760,7 +760,7 @@ def shared_form_definition(request, token):
     #     next_url = request.get_full_path()
     #     return redirect(f"{reverse('authentication:register')}?next={next_url}")
 
-    if not (_is_facilitador(request.user) or _is_staff(request.user)):
+    if not (_is_facilitador(request.user) or _is_tecnico(request.user) or _is_staff(request.user)):
         raise Http404("No encontrado")
 
     # Ya autenticado y autorizado → render_form normal
