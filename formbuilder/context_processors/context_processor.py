@@ -39,6 +39,7 @@ def obtener_formbuilder_menu(request):
         submenus.extend([
             {'nombre': 'Lista Formularios Completados', 'url': _safe_url('formbuilder:completed_forms_list', '/formbuilder/completed/')},
             {'nombre': 'Lista de Facilitadores', 'url': _safe_url('formbuilder:facilitador_list_view', '/formbuilder/facilitadores/')},
+            {'nombre': 'Panel Tecnico del Distrito', 'url': _safe_url('formbuilder:panel_tecnico', '/formbuilder/tecnico/panel/')},
         ])
     # Facilitador: ver/llenar formularios y ver sus completados
     elif is_facilitador:
