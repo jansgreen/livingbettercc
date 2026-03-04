@@ -78,8 +78,7 @@ def obtener_formbuilder_menu(request):
     else:
         submenus.append(
             {
-                "nombre": "Mis Formularios Completados",
-                "url": _safe_url("formbuilder:my_user_completed_forms", "/formbuilder/my-completed/"),
+                "nombre": "-- Invitar --",
             }
         )
         if is_customer:
