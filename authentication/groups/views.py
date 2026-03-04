@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.views import View
-from core.group_utils import has_group, ensure_group
+from core.group_utils import has_group, ensure_group, resolve_aliases
 
 from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm
 from .models import Invitation
@@ -28,7 +28,53 @@ def _is_tecnico(user):
     return has_group(user, "tecnicos")
 
 def _can_invite(user):
-    return _is_staff(user) or _is_tecnico(user)
+    if not user.is_authenticated:
+        return False
+    return (
+        _is_staff(user)
+        or has_group(user, "tecnicos")
+        or has_group(user, "facilitadores")
+        or has_group(user, "estudiantes")
+        or has_group(user, "estudiantes_becados")
+        or has_group(user, "customers")
+    )
+
+
+def _groups_for_aliases(*aliases_or_roles):
+    names = set()
+    for value in aliases_or_roles:
+        names.update(resolve_aliases(value))
+
+    query = Q()
+    for name in names:
+        normalized = (name or "").strip()
+        if not normalized:
+            continue
+        query |= Q(name__iexact=normalized)
+        query |= Q(name__iexact=normalized.replace(" ", "_"))
+        query |= Q(name__iexact=normalized.replace(" ", ""))
+
+    if not query:
+        return Group.objects.none()
+    return Group.objects.filter(query).order_by("name").distinct()
+
+
+def _allowed_groups_for_inviter(user):
+    if not user.is_authenticated:
+        return Group.objects.none()
+    if _is_staff(user):
+        return Group.objects.all().order_by("name")
+    if _is_tecnico(user):
+        return _groups_for_aliases("facilitadores", "estudiantes_becados")
+    if has_group(user, "facilitadores"):
+        return _groups_for_aliases("estudiantes")
+    if has_group(user, "estudiantes_becados"):
+        return _groups_for_aliases("estudiantes")
+    if has_group(user, "estudiantes"):
+        return _groups_for_aliases("estudiantes")
+    if has_group(user, "customers"):
+        return _groups_for_aliases("customers")
+    return Group.objects.none()
 
 
 def _normalize_student_membership(user):
@@ -306,12 +352,12 @@ class InviteFriendView(View):
     def get(self, request):
         if not _can_invite(request.user):
             return redirect(_safe_login_url())
-        
-        if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(Q(name__in=['Facilitadores', 'estudiantes becados'])
-)
-        else:
-            allowed_groups = Group.objects.all()
+
+        allowed_groups = _allowed_groups_for_inviter(request.user)
+        if not allowed_groups.exists():
+            messages.error(request, "No tienes permisos para enviar invitaciones.")
+            return redirect("dashboard")
+
         initial = {}
         group_param = (request.GET.get('group') or '').strip()
         if group_param:
@@ -320,22 +366,20 @@ class InviteFriendView(View):
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
-        else:
-            try:
-                g = allowed_groups.get(name__iexact="estudiantes becados")
-                initial['group'] = g.id
-            except Group.DoesNotExist:
-                pass
+        elif allowed_groups.count() == 1:
+            initial["group"] = allowed_groups.first().id
         form = self.form_class(initial=initial, group_queryset=allowed_groups)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
         if not _can_invite(request.user):
             return redirect(_safe_login_url())
-        if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(Q(name__in=['Facilitadores', 'estudiantes becados']))
-        else:
-            allowed_groups = Group.objects.all()
+
+        allowed_groups = _allowed_groups_for_inviter(request.user)
+        if not allowed_groups.exists():
+            messages.error(request, "No tienes permisos para enviar invitaciones.")
+            return redirect("dashboard")
+
         form = self.form_class(request.POST, group_queryset=allowed_groups)
         if form.is_valid():
             email = form.cleaned_data['email']

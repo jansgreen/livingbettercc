@@ -22,6 +22,9 @@ def obtener_formbuilder_menu(request):
     is_staff = request.user.is_staff or request.user.is_superuser
     is_tecnico = has_group(request.user, "tecnicos")
     is_facilitador = has_group(request.user, "facilitadores")
+    is_student = has_group(request.user, "estudiantes")
+    is_becado = has_group(request.user, "estudiantes_becados")
+    is_customer = has_group(request.user, "customers")
     submenus = []
 
     if is_staff:
@@ -58,6 +61,8 @@ def obtener_formbuilder_menu(request):
                     "nombre": "Panel del Tecnico",
                     "url": _safe_url("formbuilder:panel_tecnico", "/formbuilder/tecnico/panel/"),
                 },
+                {"nombre": "Invitar Estudiante Becado", "url": f"{_safe_url('invite_friend', '#')}?group=estudiantes_becados"},
+                {"nombre": "Invitar Facilitador", "url": f"{_safe_url('invite_friend', '#')}?group=Facilitadores"},
             ]
         )
     elif is_facilitador:
@@ -67,19 +72,21 @@ def obtener_formbuilder_menu(request):
                     "nombre": "Mis Formularios Completados",
                     "url": _safe_url("formbuilder:my_user_completed_forms", "/formbuilder/my-completed/"),
                 },
+                {"nombre": "Invitar", "url": f"{_safe_url('invite_friend', '#')}?group=estudiantes"},
             ]
         )
     else:
-        submenus.extend(
-            [
-                {
-                    "nombre": "Mis Formularios Completados",
-                    "url": _safe_url("formbuilder:my_user_completed_forms", "/formbuilder/my-completed/"),
-                },
-            ]
+        submenus.append(
+            {
+                "nombre": "Mis Formularios Completados",
+                "url": _safe_url("formbuilder:my_user_completed_forms", "/formbuilder/my-completed/"),
+            }
         )
+        if is_customer:
+            submenus.append({"nombre": "Invitar", "url": f"{_safe_url('invite_friend', '#')}?group=customers"})
+        elif is_student or is_becado:
+            submenus.append({"nombre": "Invitar", "url": f"{_safe_url('invite_friend', '#')}?group=estudiantes"})
 
     menu = build_menu(request.user, "Gestiones y Formularios", submenus, url="#")
     logger.warning(f"[CTX] obtener_formbuilder_menu => {type(menu)} | {menu}")
     return {"formbuilder_menu": [menu] if menu else []}
-

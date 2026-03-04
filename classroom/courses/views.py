@@ -279,13 +279,13 @@ def start_course_payment(request, pk):
     # Treat any course with a positive price as paid, even if payment_required was left unchecked.
     is_paid_course = bool(course.payment_required or (course.price and course.price > 0))
 
-    # Becados no pasan por checkout. Quedan en revisión para aprobación administrativa.
+    # Becados no pasan por checkout: se activan sin pago.
     if is_becado and is_paid_course:
         if enrollment.status != Enrollment.Status.COMPLETED:
-            if enrollment.status != Enrollment.Status.PENDING_APPROVAL:
-                enrollment.status = Enrollment.Status.PENDING_APPROVAL
+            if enrollment.status != Enrollment.Status.ACTIVE:
+                enrollment.status = Enrollment.Status.ACTIVE
                 enrollment.save(update_fields=["status"])
-            messages.info(request, "Tu inscripción becada quedó en revisión. No necesitas realizar pago.")
+            messages.success(request, "Inscripción becada activada. No necesitas realizar pago.")
         return redirect("courses:my_course")
 
     # For paid courses, even a newly created enrollment should go to pending_payment
