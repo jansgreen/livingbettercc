@@ -49,7 +49,7 @@ def obtener_formbuilder_menu(request):
     # Otros usuarios autenticados
     else:
         submenus.append(
-             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')}
+             {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
              {'nombre': 'Panel Tecnico del Distrito', 'url': _safe_url('formbuilder:panel_tecnico', '/formbuilder/tecnico/panel/')},
              )
 
