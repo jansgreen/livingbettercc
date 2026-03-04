@@ -702,7 +702,7 @@ def share_form_definition(request, pk):
     Genera un link compartible para un FormDefinition (plantilla).
     Recomendado: solo permitir a staff / tecnico / owner (según tu lógica).
     """
-    if not _is_staff(request.user):
+    if not (_is_staff(request.user) or _is_tecnico(request.user)):
         raise Http404("No encontrado")
 
     form_obj = get_object_or_404(FormDefinition, pk=pk)
