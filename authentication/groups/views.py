@@ -306,8 +306,10 @@ class InviteFriendView(View):
     def get(self, request):
         if not _can_invite(request.user):
             return redirect(_safe_login_url())
+        
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
+            allowed_groups = Group.objects.filter(Q(name__in=['Facilitadores', 'estudiantes becados'])
+)
         else:
             allowed_groups = Group.objects.all()
         initial = {}
@@ -320,7 +322,7 @@ class InviteFriendView(View):
                 pass
         else:
             try:
-                g = allowed_groups.get(name__iexact="estudiantes_becados")
+                g = allowed_groups.get(name__iexact="estudiantes becados")
                 initial['group'] = g.id
             except Group.DoesNotExist:
                 pass
@@ -331,7 +333,7 @@ class InviteFriendView(View):
         if not _can_invite(request.user):
             return redirect(_safe_login_url())
         if _is_tecnico(request.user) and not _is_staff(request.user):
-            allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
+            allowed_groups = Group.objects.filter(Q(name__in=['Facilitadores', 'estudiantes becados']))
         else:
             allowed_groups = Group.objects.all()
         form = self.form_class(request.POST, group_queryset=allowed_groups)
