@@ -2,6 +2,7 @@ from authentication.models import Profiles
 import logging
 from django.urls import reverse
 from authentication.models import Directives
+from core.group_utils import has_group
 from core.menu_builder import build_menu, safe_id
 from django.urls import NoReverseMatch
 
@@ -13,8 +14,8 @@ def obtener_menu_auth(request):
         return {'menu_auth': []}
 
     is_staff = request.user.is_staff or request.user.is_superuser
-    is_tecnico = request.user.groups.filter(name='tecnicos').exists()
-    is_facilitador = request.user.groups.filter(name__iexact='Facilitadores').exists()
+    is_tecnico = has_group(request.user, "tecnicos")
+    is_facilitador = has_group(request.user, "facilitadores")
 
     submenus = []
     try:
@@ -43,7 +44,7 @@ def obtener_menu_directives(request):
     if not request.user.is_authenticated:
         return {'menu_directives': []}
 
-    is_directiva = request.user.groups.filter(name="directivas").exists()
+    is_directiva = has_group(request.user, "directivas")
     is_admin = request.user.is_superuser
 
     if not is_directiva and not is_admin:

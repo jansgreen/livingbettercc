@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.views import View
+from core.group_utils import has_group, ensure_group
 
 from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm
 from .models import Invitation
@@ -24,7 +25,7 @@ def _is_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 def _is_tecnico(user):
-    return user.is_authenticated and user.groups.filter(name='tecnicos').exists()
+    return has_group(user, "tecnicos")
 
 def _can_invite(user):
     return _is_staff(user) or _is_tecnico(user)
@@ -36,7 +37,7 @@ def _normalize_student_membership(user):
     if not lowered.intersection(STUDENT_GROUP_ALIASES):
         return
 
-    canonical, _ = Group.objects.get_or_create(name='estudiantes')
+    canonical = ensure_group('estudiantes')
     user.groups.add(canonical)
 
     for name in names:
@@ -52,7 +53,7 @@ def _normalize_facilitator_membership(user):
     if not lowered.intersection(FACILITATOR_GROUP_ALIASES):
         return
 
-    canonical, _ = Group.objects.get_or_create(name='Facilitadores')
+    canonical = ensure_group('Facilitadores')
     user.groups.add(canonical)
 
     for name in names:
@@ -76,16 +77,16 @@ def _set_user_type(user, selected_type: str):
     user.is_superuser = False
 
     if selected_type == "customer":
-        g, _ = Group.objects.get_or_create(name="customers")
+        g = ensure_group("customers")
         user.groups.add(g)
     elif selected_type == "estudiante":
-        g, _ = Group.objects.get_or_create(name="estudiantes")
+        g = ensure_group("estudiantes")
         user.groups.add(g)
     elif selected_type == "facilitador":
-        g, _ = Group.objects.get_or_create(name="Facilitadores")
+        g = ensure_group("Facilitadores")
         user.groups.add(g)
     elif selected_type == "tecnico":
-        g, _ = Group.objects.get_or_create(name="tecnicos")
+        g = ensure_group("tecnicos")
         user.groups.add(g)
     elif selected_type == "staff":
         user.is_staff = True
@@ -267,10 +268,10 @@ def user_list(request):
     users = User.objects.all().prefetch_related('groups')
     all_groups = Group.objects.all().order_by('name')
     for user in users:
-        user.is_customer = user.groups.filter(name__iexact='customers').exists()
-        user.is_student = user.groups.filter(name__iexact='estudiantes').exists()
-        user.is_facilitador = user.groups.filter(name__iexact='Facilitadores').exists()
-        user.is_tecnico = user.groups.filter(name__iexact='tecnicos').exists()
+        user.is_customer = has_group(user, "customers")
+        user.is_student = has_group(user, "estudiantes")
+        user.is_facilitador = has_group(user, "facilitadores")
+        user.is_tecnico = has_group(user, "tecnicos")
         role_hits = sum(
             int(flag) for flag in [
                 user.is_customer,
@@ -304,7 +305,7 @@ class InviteFriendView(View):
 
     def get(self, request):
         if not _can_invite(request.user):
-            return redirect('login')
+            return redirect(_safe_login_url())
         if _is_tecnico(request.user) and not _is_staff(request.user):
             allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
         else:
@@ -328,7 +329,7 @@ class InviteFriendView(View):
 
     def post(self, request):
         if not _can_invite(request.user):
-            return redirect('login')
+            return redirect(_safe_login_url())
         if _is_tecnico(request.user) and not _is_staff(request.user):
             allowed_groups = Group.objects.filter(Q(name__iexact='Facilitadores') | Q(name__iexact='estudiantes_becados'))
         else:

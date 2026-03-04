@@ -21,6 +21,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from authentication.groups.models import Invitation
 from django.urls import reverse
+from core.group_utils import ensure_group
 
 STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
 FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
@@ -41,7 +42,7 @@ def _assign_user_group(user, group_name: str | None):
     canonical = _canonical_group_name(group_name)
     if not canonical:
         return
-    group, _ = Group.objects.get_or_create(name=canonical)
+    group = ensure_group(canonical)
     user.groups.add(group)
     if canonical == "estudiantes":
         _normalize_student_groups(user)
@@ -100,7 +101,7 @@ def _normalize_student_groups(user):
     names = set(user.groups.values_list('name', flat=True))
     lowered = {name.lower() for name in names}
     if lowered.intersection(STUDENT_GROUP_ALIASES):
-        group, _ = Group.objects.get_or_create(name='estudiantes')
+        group = ensure_group('estudiantes')
         user.groups.add(group)
         for current_name in names:
             if current_name.lower() in STUDENT_GROUP_ALIASES and current_name != 'estudiantes':
@@ -116,7 +117,7 @@ def _normalize_facilitator_groups(user):
     names = set(user.groups.values_list('name', flat=True))
     lowered = {name.lower() for name in names}
     if lowered.intersection(FACILITATOR_GROUP_ALIASES):
-        group, _ = Group.objects.get_or_create(name='Facilitadores')
+        group = ensure_group('Facilitadores')
         user.groups.add(group)
         for current_name in names:
             if current_name.lower() in FACILITATOR_GROUP_ALIASES and current_name != 'Facilitadores':
@@ -172,7 +173,7 @@ def facilitador_register_view(request):
         if form.is_valid():
             user, distrito, address = form.save()
             # Asignar grupo facilitador
-            group, _ = Group.objects.get_or_create(name='Facilitadores')
+            group = ensure_group('Facilitadores')
             user.groups.add(group)
             # Autenticar usuario
             backend = get_backends()[0]
@@ -202,7 +203,7 @@ def tecnico_register_view(request):
             user, distrito, address = form.save()
             # Asignar grupo tecnico
             from django.contrib.auth.models import Group
-            group, _ = Group.objects.get_or_create(name='tecnicos')
+            group = ensure_group('tecnicos')
             user.groups.add(group)
             # Autenticar usuario
             from django.contrib.auth import login, get_backends
@@ -560,7 +561,7 @@ def customer_view(request):
             username = form.cleaned_data.get('username')
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'El usuario ya existe. Por favor, elige otro nombre de usuario.')
-                return redirect('login')
+                return redirect('authentication:login')
             # Save the user
             user = form.save(commit=False)
             user.save()

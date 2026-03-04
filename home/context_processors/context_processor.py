@@ -1,6 +1,7 @@
 # your_project/context_processors.py
 from django.conf import settings
 from django.urls import reverse, NoReverseMatch
+from core.group_utils import has_group
 from core.menu_builder import build_menu, safe_id
 
 
@@ -15,8 +16,8 @@ def obtener_menu_report_activity(request):
         return {'menu_report_activity': []}
 
     is_staff = request.user.is_staff or request.user.is_superuser
-    is_tecnico = request.user.groups.filter(name='tecnicos').exists()
-    is_facilitador = request.user.groups.filter(name__iexact='Facilitadores').exists()
+    is_tecnico = has_group(request.user, "tecnicos")
+    is_facilitador = has_group(request.user, "facilitadores")
 
     def _safe_url(name, fallback_url, **kwargs):
         try:

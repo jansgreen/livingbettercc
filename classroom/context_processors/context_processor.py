@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from classroom.enrollments.models import Enrollment, LessonCompletion, ModuleCompletion
 from classroom.certifications.models import Certificate
 import logging
+from core.group_utils import has_group
 from core.menu_builder import build_menu, safe_id
 
 logger = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ def obtener_menu_classroom(request):
 
         # Student menu (added only if user is in student group)
         try:
-            is_student = request.user.groups.filter(name='estudiantes').exists()
+            is_student = has_group(request.user, "estudiantes")
         except Exception:
             is_student = False
         if is_student:

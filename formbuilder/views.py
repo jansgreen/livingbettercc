@@ -28,20 +28,15 @@ from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from urllib.parse import urlencode
 from collections import defaultdict
+from core.group_utils import has_group, group_q, ensure_group
 
 
 
 def _is_facilitador(user) -> bool:
-    if not (user and user.is_authenticated):
-        return False
-    group_names = {name.strip().lower() for name in user.groups.values_list("name", flat=True)}
-    return bool({"facilitadores", "facilitador"} & group_names)
+    return has_group(user, "facilitadores")
 
 def _is_tecnico(user) -> bool:
-    if not (user and user.is_authenticated):
-        return False
-    group_names = {name.strip().lower() for name in user.groups.values_list("name", flat=True)}
-    return bool({"tecnicos", "tecnico", "técnico"} & group_names)
+    return has_group(user, "tecnicos")
 
 def _is_staff(user) -> bool:
     return bool(user and user.is_authenticated and user.is_staff)
@@ -121,7 +116,7 @@ def enroll_facilitador(request):
                 return render(request, 'formbuilder/facilitador/enroll_facilitador.html', {'form': form})
 
             # Asignar grupo facilitador
-            group, _ = Group.objects.get_or_create(name='Facilitadores')
+            group = ensure_group('Facilitadores')
             user.groups.add(group)
 
             # Log in so address_create can bind address.user = request.user
@@ -145,7 +140,7 @@ def enroll_facilitador(request):
 def facilitador_list_view(request):
     if not (_is_tecnico(request.user) or _is_staff(request.user)):
         raise Http404("No encontrado")
-    facilitadores = User.objects.filter(groups__name__iexact='Facilitadores')
+    facilitadores = User.objects.filter(group_q('facilitadores')).distinct()
     context = {
         'facilitadores': facilitadores
     }
@@ -394,7 +389,7 @@ def completed_forms_list(request):
     if _is_staff(request.user):
         completed_forms = CompletedForm.objects.all()
     elif _is_tecnico(request.user):
-        completed_forms = CompletedForm.objects.filter(user__groups__name__iexact='Facilitadores')
+        completed_forms = CompletedForm.objects.filter(user__in=User.objects.filter(group_q('facilitadores'))).distinct()
     else:
         raise Http404("No encontrado")
     if not completed_forms:
@@ -438,7 +433,7 @@ def completed_forms_detail(request, pk):
     remaining_responses = [r for r in responses if r.get('name') not in handled_names]
     tecnico_summary = None
     if _is_tecnico(request.user) or _is_staff(request.user):
-        all_forms = CompletedForm.objects.filter(user__groups__name__iexact='Facilitadores')
+        all_forms = CompletedForm.objects.filter(user__in=User.objects.filter(group_q('facilitadores'))).distinct()
         tecnico_summary = _aggregate_completed_forms(all_forms)
 
     return render(
@@ -520,7 +515,7 @@ def panel_tecnico(request):
     forms = FormDefinition.objects.all()
     completed_forms = (
         CompletedForm.objects
-        .filter(user__groups__name__iexact='Facilitadores')
+        .filter(user__in=User.objects.filter(group_q('facilitadores')))
         .select_related('user')
         .order_by('-submitted_at')
     )
@@ -554,7 +549,7 @@ def panel_tecnico_user(request, user_id):
 def tecnico_report_general(request):
     if not (_is_tecnico(request.user) or _is_staff(request.user)):
         raise Http404("No encontrado")
-    completed_forms = CompletedForm.objects.filter(user__groups__name__iexact='Facilitadores')
+    completed_forms = CompletedForm.objects.filter(user__in=User.objects.filter(group_q('facilitadores'))).distinct()
     summary = _aggregate_completed_forms(completed_forms)
     form_obj = FormDefinition.objects.first()
     return render(request, "trimestral/tecnico_general.html", {
@@ -570,7 +565,7 @@ def tecnico_report_detail(request, pk):
     center = (anchor.form_data or {}).get("centro_educativo")
     if not center:
         raise Http404("No encontrado")
-    all_forms = CompletedForm.objects.filter(user__groups__name__iexact='Facilitadores')
+    all_forms = CompletedForm.objects.filter(user__in=User.objects.filter(group_q('facilitadores'))).distinct()
     center_forms = [cf for cf in all_forms if (cf.form_data or {}).get("centro_educativo") == center]
     summary = _aggregate_completed_forms(center_forms)
     form_obj = anchor.form or FormDefinition.objects.filter(name=anchor.form_name).first()

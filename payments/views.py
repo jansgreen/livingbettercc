@@ -23,6 +23,7 @@ from classroom.enrollments.models import Enrollment
 from django.contrib.auth.models import Group
 from django.contrib.auth import get_user_model
 from classroom.courses.models import Course
+from core.group_utils import ensure_group
 
 User = get_user_model()
 
@@ -210,7 +211,7 @@ def grant_course_access(request):
 	enrollment.completed = False
 	enrollment.save(update_fields=["status", "completed"])
 
-	student_group, _ = Group.objects.get_or_create(name="estudiantes")
+	student_group = ensure_group("estudiantes")
 	user.groups.add(student_group)
 
 	if note:
@@ -363,7 +364,7 @@ def stripe_webhook(request):
 					enr.status = Enrollment.Status.ACTIVE
 					enr.save(update_fields=["status"])
 					# Ensure paid classroom users get student access.
-					student_group, _ = Group.objects.get_or_create(name="estudiantes")
+					student_group = ensure_group("estudiantes")
 					enr.user.groups.add(student_group)
 			elif purpose == Payment.PURPOSE_SHOP_ORDER and reference_id:
 				from shop.models import Order
