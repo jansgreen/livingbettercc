@@ -1,6 +1,7 @@
 
 import logging
 from django.urls import reverse, NoReverseMatch
+from httpx import request
 from core.menu_builder import build_menu, safe_id
 logger = logging.getLogger(__name__)
 
@@ -14,10 +15,11 @@ def obtener_formbuilder_menu(request):
     if not request.user.is_authenticated:
         return {'formbuilder_menu': []}
 
-    is_staff = request.user.is_staff or request.user.is_superuser
-    is_tecnico = request.user.groups.filter(name='tecnicos').exists()
-    is_facilitador = request.user.groups.filter(name__iexact='Facilitadores').exists()
 
+    group_names = {name.strip().lower() for name in request.user.groups.values_list('name', flat=True)}
+    is_staff = request.user.is_staff or request.user.is_superuser
+    is_tecnico = bool({'tecnicos', 'tecnico', 'técnico', 'tecnico', 'Tecnicos', 'Tecnico', 'Técnico', 'Tecnico'} & group_names)
+    is_facilitador = bool({'facilitadores', 'facilitador', 'Facilitadores', 'Facilitador'} & group_names)
     submenus = []
 
     # Staff/admin: acceso total
@@ -48,10 +50,9 @@ def obtener_formbuilder_menu(request):
         ])
     # Otros usuarios autenticados
     else:
-        submenus.append(
+        submenus.extend([
              {'nombre': 'Mis Formularios Completados', 'url': _safe_url('formbuilder:my_user_completed_forms', '/formbuilder/my-completed/')},
-             {'nombre': 'Panel Tecnico del Distrito', 'url': _safe_url('formbuilder:panel_tecnico', '/formbuilder/tecnico/panel/')},
-             )
+        ])
 
     menu = build_menu(request.user, 'Gestiones y Formularios', submenus, url='#')
     logger.warning(f"[CTX] obtener_formbuilder_menu => {type(menu)} | {menu}")
