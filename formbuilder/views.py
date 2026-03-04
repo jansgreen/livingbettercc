@@ -32,10 +32,16 @@ from collections import defaultdict
 
 
 def _is_facilitador(user) -> bool:
-    return bool(user and user.is_authenticated and user.groups.filter(name__iexact='Facilitadores').exists())
+    if not (user and user.is_authenticated):
+        return False
+    group_names = {name.strip().lower() for name in user.groups.values_list("name", flat=True)}
+    return bool({"facilitadores", "facilitador"} & group_names)
 
 def _is_tecnico(user) -> bool:
-    return bool(user and user.is_authenticated and user.groups.filter(name='tecnicos').exists())
+    if not (user and user.is_authenticated):
+        return False
+    group_names = {name.strip().lower() for name in user.groups.values_list("name", flat=True)}
+    return bool({"tecnicos", "tecnico", "técnico"} & group_names)
 
 def _is_staff(user) -> bool:
     return bool(user and user.is_authenticated and user.is_staff)
