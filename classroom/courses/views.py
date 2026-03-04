@@ -27,6 +27,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.db import transaction
+from core.group_utils import has_group
 
 def _require_active_enrollment(request, *, course):
     enr = Enrollment.objects.filter(
@@ -273,9 +274,19 @@ def start_course_payment(request, pk):
         return redirect(f"{reverse('authentication:profile_create')}?next={next_url}")
 
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
+    is_becado = has_group(request.user, "estudiantes_becados")
 
     # Treat any course with a positive price as paid, even if payment_required was left unchecked.
     is_paid_course = bool(course.payment_required or (course.price and course.price > 0))
+
+    # Becados no pasan por checkout. Quedan en revisión para aprobación administrativa.
+    if is_becado and is_paid_course:
+        if enrollment.status != Enrollment.Status.COMPLETED:
+            if enrollment.status != Enrollment.Status.PENDING_APPROVAL:
+                enrollment.status = Enrollment.Status.PENDING_APPROVAL
+                enrollment.save(update_fields=["status"])
+            messages.info(request, "Tu inscripción becada quedó en revisión. No necesitas realizar pago.")
+        return redirect("courses:my_course")
 
     # For paid courses, even a newly created enrollment should go to pending_payment
     if not is_paid_course:
