@@ -1,7 +1,6 @@
 
 import logging
 from django.urls import reverse, NoReverseMatch
-from httpx import request
 from core.menu_builder import build_menu, safe_id
 logger = logging.getLogger(__name__)
 
