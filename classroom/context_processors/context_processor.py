@@ -53,8 +53,8 @@ def obtener_menu_classroom(request):
         # Student menu (added only if user is in student group)
         try:
             is_student = has_group(request.user, [
-                "estudiantes", "estudiante", "student", "students",
-                "estudiantes_becados", "estudiante_becado", "estudiantes becados"
+                "estudiantes", "estudiante", "student", "students", "Students",
+                "estudiantes_becados", "estudiante_becado", "estudiantes becados", "Estudiantes Becados",
             ])
         except Exception:
             is_student = False
