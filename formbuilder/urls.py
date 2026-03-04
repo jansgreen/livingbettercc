@@ -21,6 +21,7 @@ urlpatterns = [
 
     # Render dynamic form
     path('render/<str:form_name>/', views.render_form, name='render_form'),
+    path('render/id/<int:form_id>/', views.render_form_by_id, name='render_form_by_id'),
 
     # Facilitador flows
     path('facilitador/facilitador_list_view/', views.facilitador_list_view, name='facilitador_list_view'),

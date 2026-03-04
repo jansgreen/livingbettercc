@@ -379,6 +379,11 @@ def render_form(request, form_name):
     }
     return render(request, "formbuilder/render_form.html", context)
 
+
+def render_form_by_id(request, form_id):
+    form_obj = get_object_or_404(FormDefinition, pk=form_id)
+    return render_form(request, form_obj.name)
+
 # Completed Forms Views
 def completed_forms_list(request):
     if not request.user.is_authenticated:
@@ -764,7 +769,7 @@ def shared_form_definition(request, token):
         raise Http404("No encontrado")
 
     # Ya autenticado y autorizado → render_form normal
-    return redirect(reverse("formbuilder:render_form", kwargs={"form_name": form_obj.name}))
+    return redirect(reverse("formbuilder:render_form_by_id", kwargs={"form_id": form_obj.id}))
 
 def shared_form_entry(request, token):
     link = get_object_or_404(FormShareLink, token=token, is_active=True)
@@ -788,7 +793,7 @@ def shared_form_entry(request, token):
         return redirect("home")  # o 403
 
     # Redirige al form real (sin exponer ID público si no quieres)
-    return redirect("formbuilder:render_form", form_name=link.form.name)
+    return redirect("formbuilder:render_form_by_id", form_id=link.form.id)
 
 @login_required
 def my_user_complete_forms(request):
