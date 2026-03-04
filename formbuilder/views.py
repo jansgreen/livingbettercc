@@ -46,7 +46,7 @@ def _require_facilitador_or_staff(request):
         next_url = request.get_full_path()
         register_url = reverse('authentication:facilitador_register')
         return redirect(f"{register_url}?next={next_url}")
-    if not (_is_facilitador(request.user) or _is_staff(request.user)):
+    if not (_is_facilitador(request.user) or _is_tecnico(request.user) or _is_staff(request.user)):
         raise Http404("No encontrado")
     return None
 
