@@ -1,12 +1,110 @@
 {% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
 <div class="container mt-3">
   <h2>{% if question %}Editar pregunta{% else %}Agregar pregunta{% endif %}</h2>
-  <form method="post">
+
+  <form method="post" class="card border-0 shadow-sm p-3">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{% url 'quicktest:q_list' qdef.id %}" class="btn btn-outline-secondary">Cancelar</a>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.question_type.id_for_label }}">Tipo de pregunta</label>
+      {{ form.question_type }}
+      {% if form.question_type.errors %}<div class="text-danger small">{{ form.question_type.errors }}</div>{% endif %}
+      <div class="form-text">{{ form.question_type.help_text }}</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="{{ form.text.id_for_label }}">{{ form.text.label }}</label>
+      {{ form.text }}
+      {% if form.text.errors %}<div class="text-danger small">{{ form.text.errors }}</div>{% endif %}
+      <div class="form-text">
+        Aquí puedes pegar el código de ética completo. Si seleccionas tipo <b>Firma</b>, el usuario deberá escribir su nombre completo.
+      </div>
+    </div>
+
+    <div id="expected-text-group" class="mb-3">
+      <label class="form-label" for="{{ form.expected_text.id_for_label }}">{{ form.expected_text.label }}</label>
+      {{ form.expected_text }}
+      {% if form.expected_text.errors %}<div class="text-danger small">{{ form.expected_text.errors }}</div>{% endif %}
+    </div>
+
+    <div id="mcq-group">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.option_a.id_for_label }}">Opción A</label>
+          {{ form.option_a }}
+          {% if form.option_a.errors %}<div class="text-danger small">{{ form.option_a.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.option_b.id_for_label }}">Opción B</label>
+          {{ form.option_b }}
+          {% if form.option_b.errors %}<div class="text-danger small">{{ form.option_b.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.option_c.id_for_label }}">Opción C</label>
+          {{ form.option_c }}
+          {% if form.option_c.errors %}<div class="text-danger small">{{ form.option_c.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ form.option_d.id_for_label }}">Opción D</label>
+          {{ form.option_d }}
+          {% if form.option_d.errors %}<div class="text-danger small">{{ form.option_d.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <label class="form-label" for="{{ form.correct_option.id_for_label }}">Opción correcta</label>
+        {{ form.correct_option }}
+        {% if form.correct_option.errors %}<div class="text-danger small">{{ form.correct_option.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div id="signature-help" class="alert alert-info mt-3 mb-0">
+      El estudiante firmará escribiendo su nombre completo exactamente como aparece en su perfil.
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="{% url 'quicktest:q_list' qdef.id %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
   </form>
 </div>
+
+<script>
+  (function () {
+    const typeSelect = document.getElementById("{{ form.question_type.id_for_label }}");
+    const mcq = document.getElementById("mcq-group");
+    const expected = document.getElementById("expected-text-group");
+    const sign = document.getElementById("signature-help");
+
+    function refresh() {
+      const v = (typeSelect && typeSelect.value) || "mcq";
+      if (v === "mcq") {
+        mcq.style.display = "";
+        expected.style.display = "none";
+        sign.style.display = "none";
+      } else if (v === "text") {
+        mcq.style.display = "none";
+        expected.style.display = "";
+        sign.style.display = "none";
+      } else {
+        mcq.style.display = "none";
+        expected.style.display = "none";
+        sign.style.display = "";
+      }
+    }
+
+    if (typeSelect) {
+      typeSelect.addEventListener("change", refresh);
+      refresh();
+    }
+  })();
+</script>
 {% endblock %}

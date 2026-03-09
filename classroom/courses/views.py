@@ -324,7 +324,12 @@ def my_course(request):
         .filter(enrollment__in=enrollments)
         .distinct()
         .prefetch_related(
-            Prefetch("modules", queryset=Module.objects.prefetch_related("lessons"))
+            Prefetch(
+                "modules",
+                queryset=Module.objects.prefetch_related(
+                    Prefetch("lessons", queryset=Lesson.objects.order_by("order", "id"))
+                ).order_by("order", "id"),
+            )
         )
     )
 
@@ -362,7 +367,7 @@ def my_course(request):
 
     module_status = {}
     for m in modules:
-        lessons = list(m.lessons.all())  # ya prefetcheado + ordenado por Meta ordering
+        lessons = list(m.lessons.all())  # prefetcheado y ordenado por order,id
         total = len(lessons)
         done = sum(1 for l in lessons if l.id in completed_set)
         is_completed = total > 0 and done >= total
@@ -513,7 +518,7 @@ def module_create(request):
             module.course = get_object_or_404(Course, pk=course_id)
             module.save()
             messages.success(request, 'Module created successfully.')
-            return redirect('courses:module_create') #return redirect('courses:course-detail', pk=module.course.pk)
+            return redirect('courses:course_admin_list') #return redirect('courses:course-detail', pk=module.course.pk)
         else:
             messages.error(request, 'Error creating module. Please correct the errors below.')
             return redirect('courses:module_create')
@@ -542,7 +547,7 @@ def module_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Module updated successfully.')
-            return redirect('courses:module_list')
+            return redirect('courses:course_admin_list')
         else:
             messages.error(request, 'Error updating module. Please correct the errors below.')
             return redirect('courses:module_update', pk=pk)
@@ -557,7 +562,8 @@ def module_update(request, pk):
 @login_required
 def module_detail(request, pk):
     module = get_object_or_404(Module, pk=pk)
-    lessons = module.lessons.all()
+    lessons = module.lessons.order_by("order", "id")
+    first_lesson = lessons.first()
     quicktest_result = None
     has_qdef = QuickTestDefinition.objects.filter(module=module).exists()
     if has_qdef:
@@ -579,6 +585,7 @@ def module_detail(request, pk):
     context = {
         'module': module,
         'lessons': lessons,
+        'first_lesson': first_lesson,
         'quicktest_result': quicktest_result,
         'has_quicktest': has_qdef,
     }
@@ -590,7 +597,7 @@ def module_delete(request, pk):
     if request.method == 'POST':
         module.delete()
         messages.success(request, 'Module deleted successfully.')
-        return redirect('courses:module_list')
+        return redirect('courses:course_admin_list')
     context = {
         'module': module,
     }
@@ -607,18 +614,44 @@ def lesson_list(request):
 
 @login_required
 def lesson_create(request):
-    form = LessonForm()
+    module_param = request.GET.get("module") or request.POST.get("module")
+    fixed_module = None
+    if module_param and str(module_param).isdigit():
+        fixed_module = Module.objects.filter(pk=int(module_param)).first()
+
+    form = LessonForm(initial={"module": fixed_module.pk} if fixed_module else None)
+    if fixed_module:
+        form.fields["module"].queryset = Module.objects.filter(pk=fixed_module.pk)
+
     if request.method == 'POST':
         form = LessonForm(request.POST, request.FILES)
+        if fixed_module:
+            form.fields["module"].queryset = Module.objects.filter(pk=fixed_module.pk)
 
         if form.is_valid():
             lesson = form.save(commit=False)
-            module_id = request.POST.get('module')
-            lesson.module = get_object_or_404(Module, pk=module_id)
+            lesson.module = fixed_module or form.cleaned_data["module"]
+
+            # Evita colisiones de orden dentro del mismo módulo.
+            if Lesson.objects.filter(module=lesson.module, order=lesson.order).exists():
+                messages.error(
+                    request,
+                    f"Ya existe una lección con orden {lesson.order} en el módulo '{lesson.module.title}'."
+                )
+                return render(
+                    request,
+                    'lesson/lesson_form.html',
+                    {
+                        'form': form,
+                        'courses': Course.objects.all(),
+                        'object': False,
+                        'fixed_module': fixed_module,
+                    }
+                )
             lesson.save()
 
             messages.success(request, 'Lesson created successfully.')
-            return redirect('courses:module_list')
+            return redirect('courses:course_admin_list')
         else:
             messages.error(request, 'Error creating lesson. Please correct the errors below.')
             return redirect('courses:lesson_create')
@@ -626,6 +659,7 @@ def lesson_create(request):
         'form': form,
         'courses': Course.objects.all(),
         'object': False,  # Indica que no es una edición
+        'fixed_module': fixed_module,
     }
     return render(request, 'lesson/lesson_form.html', context)
 
@@ -637,7 +671,7 @@ def lesson_update(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Lesson updated successfully.')
-            return redirect('courses:module_list')
+            return redirect('courses:course_admin_list')
     else:
         form = LessonForm(instance=lesson)
     context = {
@@ -719,7 +753,7 @@ def lesson_detail(request, pk):
 def lesson_delete(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk)
     lesson.delete()
-    return redirect('courses:lesson_list')
+    return redirect('courses:course_admin_list')
 
 # guarda los resultados del test 
 @csrf_exempt

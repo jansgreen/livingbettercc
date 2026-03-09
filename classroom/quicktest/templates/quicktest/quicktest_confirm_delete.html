@@ -1,0 +1,16 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-3">Eliminar resultado</h3>
+      <p>¿Seguro que deseas eliminar el resultado del módulo <strong>{{ test.module.title }}</strong>?</p>
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'quicktest:quicktest_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

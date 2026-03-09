@@ -67,25 +67,43 @@
           <label class="form-label fw-bold">{{ forloop.counter }}. {{ question.text|safe }}</label>
 
           <div class="mt-2">
-            <label class="d-block mb-1">
-              <input type="radio" name="question_{{ question.id }}" value="A" required>
-              {{ question.option_a }}
-            </label>
-
-            <label class="d-block mb-1">
-              <input type="radio" name="question_{{ question.id }}" value="B" required>
-              {{ question.option_b }}
-            </label>
-
-            <label class="d-block mb-1">
-              <input type="radio" name="question_{{ question.id }}" value="C" required>
-              {{ question.option_c }}
-            </label>
-
-            <label class="d-block">
-              <input type="radio" name="question_{{ question.id }}" value="D" required>
-              {{ question.option_d }}
-            </label>
+            {% if question.question_type == 'mcq' %}
+              <label class="d-block mb-1">
+                <input type="radio" name="question_{{ question.id }}" value="A" required>
+                {{ question.option_a }}
+              </label>
+              <label class="d-block mb-1">
+                <input type="radio" name="question_{{ question.id }}" value="B" required>
+                {{ question.option_b }}
+              </label>
+              <label class="d-block mb-1">
+                <input type="radio" name="question_{{ question.id }}" value="C" required>
+                {{ question.option_c }}
+              </label>
+              <label class="d-block">
+                <input type="radio" name="question_{{ question.id }}" value="D" required>
+                {{ question.option_d }}
+              </label>
+            {% elif question.question_type == 'text' %}
+              <textarea
+                class="form-control"
+                rows="3"
+                name="question_{{ question.id }}"
+                placeholder="Escribe tu respuesta"
+                required
+              ></textarea>
+            {% elif question.question_type == 'signature' %}
+              <div class="alert alert-info py-2">
+                Firma: escribe tu nombre completo exactamente como aparece en tu perfil.
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                name="question_{{ question.id }}"
+                placeholder="Nombre completo"
+                required
+              >
+            {% endif %}
           </div>
         </div>
       {% empty %}

@@ -14,13 +14,14 @@ def obtener_menu_quicktest(request):
         return {"menu_quicktest": []}
 
     submenus = [
+        {"nombre": "Panel Tests", "url": reverse("quicktest:quicktest_list")},
         {"nombre": "Listar QuickTests", "url": reverse("quicktest:qdef_list")},
         {"nombre": "Crear QuickTest", "url": reverse("quicktest:qdef_create")},
     ]
 
     menu_quicktest = [
         {
-            "nombre": "QuickTests",
+            "nombre": "Examenes y Firmas",
             "safe_id": "quicktests",
             "submenus": submenus,
         }

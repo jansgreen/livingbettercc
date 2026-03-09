@@ -1,0 +1,58 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <h3 class="mb-3">Importar cuestionario (JSON)</h3>
+      <p class="text-muted mb-2"><strong>QuickTest:</strong> {{ qdef.title }}</p>
+      <p class="text-muted mb-4"><strong>Módulo:</strong> {{ qdef.module.title }}</p>
+
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Archivo JSON</label>
+          <input type="file" name="json_file" class="form-control" accept=".json,application/json" required>
+        </div>
+
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" name="replace_existing" id="replace_existing" checked>
+          <label class="form-check-label" for="replace_existing">
+            Reemplazar preguntas existentes
+          </label>
+        </div>
+
+        <div class="alert alert-light border small">
+          Formato aceptado:
+          <pre class="mb-0">{
+  "questions": [
+    {
+      "question_type": "mcq",
+      "text": "Pregunta...",
+      "option_a": "Opción A",
+      "option_b": "Opción B",
+      "option_c": "Opción C",
+      "option_d": "Opción D",
+      "correct_option": "A"
+    },
+    {
+      "question_type": "text",
+      "text": "Explica brevemente...",
+      "expected_text": "respuesta esperada opcional"
+    },
+    {
+      "question_type": "signature",
+      "text": "Firma el compromiso escribiendo tu nombre completo"
+    }
+  ]
+}</pre>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary">Importar</button>
+          <a href="{% url 'quicktest:qdef_list' %}" class="btn btn-outline-secondary">Volver</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

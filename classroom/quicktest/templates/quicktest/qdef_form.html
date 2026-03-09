@@ -1,9 +1,11 @@
 {% extends 'dashboard.html' %}
+{% load static %}
 {% block content %}
 <div class="container mt-3">
-  <h2>{% if qdef %}Editar QuickTest{% else %}Crear QuickTest{% endif %}</h2>
+  <h2>{% if qdef %}Editar Examen {% else %}Crear Examen{% endif %}</h2>
   <form method="post">
     {% csrf_token %}
+    {{ form.media}}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Guardar</button>
     <a href="{% url 'quicktest:qdef_list' %}" class="btn btn-outline-secondary">Cancelar</a>

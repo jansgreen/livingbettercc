@@ -3,7 +3,10 @@
 <div class="container mt-3">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>QuickTests</h2>
-    <a href="{% url 'quicktest:qdef_create' %}" class="btn btn-primary btn-sm">Crear QuickTest</a>
+    <div class="d-flex gap-2">
+      <a href="{% url 'quicktest:qdef_import_course_json' %}" class="btn btn-outline-primary btn-sm">Importar Curso (JSON)</a>
+      <a href="{% url 'quicktest:qdef_create' %}" class="btn btn-primary btn-sm">Crear QuickTest</a>
+    </div>
   </div>
 
   <table class="table table-striped align-middle">
@@ -23,6 +26,9 @@
           <td>{{ d.title }}</td>
           <td class="text-end">
             <a href="{% url 'quicktest:q_list' d.id %}" class="btn btn-outline-secondary btn-sm">Ver preguntas</a>
+            <a href="{% url 'quicktest:qdef_import_json' d.id %}" class="btn btn-outline-primary btn-sm">Importar JSON</a>
+            <a href="{% url 'quicktest:qdef_export_csv' d.id %}" class="btn btn-outline-success btn-sm">Exportar CSV</a>
+            <a href="{% url 'quicktest:qdef_export_pdf' d.id %}" class="btn btn-outline-dark btn-sm">Exportar PDF</a>
             <a href="{% url 'quicktest:qdef_update' d.id %}" class="btn btn-warning btn-sm">Editar</a>
             <a href="{% url 'quicktest:qdef_delete' d.id %}" class="btn btn-danger btn-sm">Eliminar</a>
           </td>

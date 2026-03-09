@@ -1,24 +1,135 @@
 {% extends 'dashboard.html' %}
 {% block content %}
-<h2>Mis QuickTests</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Módulo</th>
-            <th>Puntaje</th>
-            <th>Fecha</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for test in tests %}
-        <tr>
-            <td>{{ test.module.title }}</td>
-            <td>{{ test.score }}</td>
-            <td>{{ test.completed_at|date:'d/m/Y H:i' }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="3">No has realizado ningún QuickTest.</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h2 class="mb-1">Panel de QuickTests</h2>
+        <p class="text-muted mb-0">Resultados del estudiante y acceso rápido a definiciones.</p>
+      </div>
+      {% if is_staff_panel %}
+        <a href="{% url 'quicktest:qdef_list' %}" class="btn btn-primary">Gestionar Definiciones</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Tests realizados</div>
+          <div class="display-6">{{ total_tests }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Tests aprobados (>= {{ passing_score }})</div>
+          <div class="display-6">{{ passed_tests }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Promedio</div>
+          <div class="display-6">{{ avg_score }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="mb-3">Mis resultados</h5>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Curso</th>
+              <th>Módulo</th>
+              <th>Puntaje</th>
+              <th>Fecha</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for test in tests %}
+              <tr>
+                <td>{{ test.module.course.title }}</td>
+                <td>{{ test.module.title }}</td>
+                <td>
+                  <span class="badge {% if test.score >= passing_score %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ test.score }}
+                  </span>
+                </td>
+                <td>{{ test.completed_at|date:'d/m/Y H:i' }}</td>
+                <td class="text-end">
+                  <a href="{% url 'quicktest:quicktest_detail' test.pk %}" class="btn btn-sm btn-outline-info">Ver</a>
+                  <a href="{% url 'quicktest:quicktest_update' test.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                  <a href="{% url 'quicktest:quicktest_delete' test.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-muted">No has realizado ningún QuickTest.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  {% if is_staff_panel %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Definiciones (vista rápida)</h5>
+          <div class="d-flex gap-2">
+            <a href="{% url 'quicktest:qdef_import_course_json' %}" class="btn btn-sm btn-outline-primary">Importar Curso JSON</a>
+            <a href="{% url 'quicktest:qdef_create' %}" class="btn btn-sm btn-success">Nueva Definición</a>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Curso</th>
+                <th>Módulo</th>
+                <th>Título</th>
+                <th>Preguntas</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for d in definitions %}
+                <tr>
+                  <td>{{ d.module.course.title }}</td>
+                  <td>{{ d.module.title }}</td>
+                  <td>{{ d.title }}</td>
+                  <td>{{ d.questions_count }}</td>
+                  <td class="text-end">
+                    <a href="{% url 'quicktest:quicktest_taking' d.module.id %}" class="btn btn-sm btn-outline-info">Ver</a>
+                    <a href="{% url 'quicktest:q_list' d.id %}" class="btn btn-sm btn-outline-secondary">Preguntas</a>
+                    <a href="{% url 'quicktest:qdef_update' d.id %}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    <a href="{% url 'quicktest:qdef_delete' d.id %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                    <a href="{% url 'quicktest:qdef_import_json' d.id %}" class="btn btn-sm btn-outline-primary">Importar JSON</a>
+                    <a href="{% url 'quicktest:qdef_export_csv' d.id %}" class="btn btn-sm btn-outline-success">Exportar CSV</a>
+                    <a href="{% url 'quicktest:qdef_export_pdf' d.id %}" class="btn btn-sm btn-outline-dark">Exportar PDF</a>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-muted">No hay definiciones registradas.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

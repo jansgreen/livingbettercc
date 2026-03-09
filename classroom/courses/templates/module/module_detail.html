@@ -4,12 +4,11 @@
 <div class="container mt-4">
   <h1>{{ module.title }}</h1>
   <p>{{ module.descriptionsafe }}</p>
-  {% if module.lessons.exists %}
-    <a href="{% url 'courses:lesson_detail' module.lessons.first.id %}" class="btn btn-primary">Ir lección</a>
+  {% if first_lesson %}
+    <a href="{% url 'courses:lesson_detail' first_lesson.id %}" class="btn btn-primary">Ir lección</a>
   {% endif %}
 </div>
 
-  <!-- ✅ TEST -->
   {% if module.test %}
     {% if quicktest_result %}
       {% if quicktest_result.passed %}
@@ -17,7 +16,7 @@
         <a href="{% url 'courses:next_module' module.id %}" class="btn btn-success">Ir al siguiente módulo</a>
       {% else %}
         <div class="alert alert-danger">No aprobaste el test. Repasa la lección y vuelve a intentarlo.</div>
-        <a href="{% url 'quicktest:quicktest_taking' module.id %}" class="btn btn-warning">Tomar test </a>
+        <a href="{% url 'quicktest:quicktest_taking' module.id %}" class="btn btn-warning">Tomar test</a>
       {% endif %}
     {% else %}
       <a href="{% url 'courses:my_course' %}" class="btn btn-primary">Siguiente Lección</a>
@@ -28,8 +27,3 @@
 </div>
 
 {% endblock %}
-
-
-
-
-

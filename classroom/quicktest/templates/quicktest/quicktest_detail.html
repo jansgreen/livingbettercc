@@ -1,0 +1,20 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-3">Detalle de resultado</h3>
+      <p class="mb-1"><strong>Curso:</strong> {{ test.module.course.title }}</p>
+      <p class="mb-1"><strong>Módulo:</strong> {{ test.module.title }}</p>
+      <p class="mb-1"><strong>Puntaje:</strong> {{ test.score }}</p>
+      <p class="mb-3"><strong>Fecha:</strong> {{ test.completed_at|date:'d/m/Y H:i' }}</p>
+
+      <div class="d-flex gap-2">
+        <a href="{% url 'quicktest:quicktest_update' test.pk %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'quicktest:quicktest_delete' test.pk %}" class="btn btn-danger">Eliminar</a>
+        <a href="{% url 'quicktest:quicktest_list' %}" class="btn btn-outline-secondary">Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
