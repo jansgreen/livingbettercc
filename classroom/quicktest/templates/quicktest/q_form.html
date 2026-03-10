@@ -13,12 +13,18 @@
       </div>
     {% endif %}
 
-    <div class="mb-3">
-      <label class="form-label" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
-      {{ form.order }}
-      {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors }}</div>{% endif %}
-      <div class="form-text">{{ form.order.help_text }}</div>
-    </div>
+    {% if form.order %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+        {{ form.order }}
+        {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors }}</div>{% endif %}
+        <div class="form-text">{{ form.order.help_text }}</div>
+      </div>
+    {% else %}
+      <div class="alert alert-light border mb-3">
+        El orden se asignará automáticamente al crear la pregunta.
+      </div>
+    {% endif %}
 
     <div class="mb-3">
       <label class="form-label" for="{{ form.question_type.id_for_label }}">Tipo de pregunta</label>

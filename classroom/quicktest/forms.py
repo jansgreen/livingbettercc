@@ -58,11 +58,15 @@ class QuickTestQuestionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.definition = kwargs.pop("definition", None)
+        self.allow_order_edit = kwargs.pop("allow_order_edit", True)
         super().__init__(*args, **kwargs)
 
-        self.fields["order"].label = "Orden"
-        self.fields["order"].help_text = "Empieza en 0. Se mostrará en orden ascendente."
-        self.fields["order"].widget = forms.NumberInput(attrs={"class": "form-control", "min": "0"})
+        if self.allow_order_edit:
+            self.fields["order"].label = "Orden"
+            self.fields["order"].help_text = "Empieza en 0. Se mostrará en orden ascendente."
+            self.fields["order"].widget = forms.NumberInput(attrs={"class": "form-control", "min": "0"})
+        else:
+            self.fields.pop("order", None)
 
         self.fields["question_type"].widget.attrs.update({"class": "form-select form-select-lg mb-3"})
         self.fields["question_type"].initial = (
@@ -104,10 +108,11 @@ class QuickTestQuestionForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         qtype = cleaned.get("question_type")
-        order = cleaned.get("order")
+        order = cleaned.get("order") if "order" in self.fields else None
 
-        if order is None or int(order) < 0:
-            self.add_error("order", "El orden debe ser 0 o mayor.")
+        if "order" in self.fields:
+            if order is None or int(order) < 0:
+                self.add_error("order", "El orden debe ser 0 o mayor.")
 
         if qtype == QuickTestQuestion.QuestionType.MULTIPLE_CHOICE:
             for field in ("option_a", "option_b", "option_c", "option_d", "correct_option"):
@@ -126,7 +131,7 @@ class QuickTestQuestionForm(forms.ModelForm):
         definition = self.definition
         if not definition and self.instance and getattr(self.instance, "pk", None):
             definition = self.instance.definition
-        if definition and order is not None:
+        if "order" in self.fields and definition and order is not None:
             clash = QuickTestQuestion.objects.filter(definition=definition, order=order)
             if self.instance and getattr(self.instance, "pk", None):
                 clash = clash.exclude(pk=self.instance.pk)

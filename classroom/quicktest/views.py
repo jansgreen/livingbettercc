@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Max
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -309,16 +309,17 @@ def q_list(request, def_id):
 def q_create(request, def_id):
     qdef = get_object_or_404(QuickTestDefinition, pk=def_id)
     if request.method == "POST":
-        form = QuickTestQuestionForm(request.POST, definition=qdef)
+        form = QuickTestQuestionForm(request.POST, definition=qdef, allow_order_edit=False)
         if form.is_valid():
             question = form.save(commit=False)
             question.definition = qdef
+            last_order = qdef.questions.aggregate(last=Max("order")).get("last")
+            question.order = (last_order + 1) if last_order is not None else 0
             question.save()
             messages.success(request, "Pregunta creada.")
             return redirect("quicktest:q_list", def_id=qdef.id)
     else:
-        next_order = qdef.questions.count()
-        form = QuickTestQuestionForm(initial={"order": next_order}, definition=qdef)
+        form = QuickTestQuestionForm(definition=qdef, allow_order_edit=False)
     return render(request, "quicktest/q_form.html", {"form": form, "qdef": qdef})
 
 @staff_required
