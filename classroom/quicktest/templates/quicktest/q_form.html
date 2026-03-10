@@ -13,7 +13,7 @@
       </div>
     {% endif %}
 
-    {% if form.order %}
+    {% if show_order_field and form.order %}
       <div class="mb-3">
         <label class="form-label" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
         {{ form.order }}

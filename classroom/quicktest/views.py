@@ -320,7 +320,15 @@ def q_create(request, def_id):
             return redirect("quicktest:q_list", def_id=qdef.id)
     else:
         form = QuickTestQuestionForm(definition=qdef, allow_order_edit=False)
-    return render(request, "quicktest/q_form.html", {"form": form, "qdef": qdef})
+    return render(
+        request,
+        "quicktest/q_form.html",
+        {
+            "form": form,
+            "qdef": qdef,
+            "show_order_field": False,
+        },
+    )
 
 @staff_required
 def q_update(request, pk):
@@ -333,7 +341,16 @@ def q_update(request, pk):
             return redirect("quicktest:q_list", def_id=question.definition_id)
     else:
         form = QuickTestQuestionForm(instance=question, definition=question.definition)
-    return render(request, "quicktest/q_form.html", {"form": form, "qdef": question.definition, "question": question})
+    return render(
+        request,
+        "quicktest/q_form.html",
+        {
+            "form": form,
+            "qdef": question.definition,
+            "question": question,
+            "show_order_field": True,
+        },
+    )
 
 @staff_required
 def q_delete(request, pk):
