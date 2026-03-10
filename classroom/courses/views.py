@@ -114,7 +114,7 @@ def quicktest_view(request, module_id):
         def count(self):
             return self._qs.count()
 
-    questions_qs = qdef.questions.all()
+    questions_qs = qdef.questions.all().order_by("order", "id")
     test_proxy = SimpleNamespace(questions=_QWrap(questions_qs))
 
     # POST: evaluar y mostrar resultados (NO redirect inmediato)
@@ -212,7 +212,23 @@ def course_admin_list(request):
         )
         .order_by("title")
     )
-    return render(request, 'courses/admin_course_list.html', {'courses': courses})
+
+    pending_certifications = (
+        Certificate.objects
+        .filter(pending=True)
+        .select_related("user", "course")
+        .prefetch_related("becado_request")
+        .order_by("-issued_date")
+    )
+
+    return render(
+        request,
+        'courses/admin_course_list.html',
+        {
+            'courses': courses,
+            'pending_certifications': pending_certifications,
+        },
+    )
 
 
 @login_required
@@ -575,7 +591,7 @@ def module_detail(request, pk):
                 return self._qs
             def count(self):
                 return self._qs.count()
-        module.test = SimpleNamespace(questions=_QWrap(qdef.questions.all()))
+        module.test = SimpleNamespace(questions=_QWrap(qdef.questions.all().order_by("order", "id")))
 
     if request.user.is_authenticated and has_qdef:
         qt = QuickTest.objects.filter(user=request.user, module=module).order_by('-completed_at').first()
@@ -873,8 +889,14 @@ def next_module(request, module_id):
         enrollment.progress = 100
         enrollment.save(update_fields=["completed", "status", "progress"])
 
-        cert, _ = Certificate.objects.get_or_create(user=request.user, course=course)
-        cert.save()  # genera cert_no si faltaba
+        cert = create_certificate_for_user(request.user, course)
+
+    if cert.pending:
+        messages.success(
+            request,
+            "¡Curso completado! Antes de ver tu certificado, debes completar la retroalimentación presencial."
+        )
+        return redirect("certifications:certificate_claim", uuid=cert.uuid)
 
     messages.success(request, "¡Curso completado! Tu certificado está disponible.")
     return redirect("certifications:my_certificate_detail", uuid=cert.uuid)

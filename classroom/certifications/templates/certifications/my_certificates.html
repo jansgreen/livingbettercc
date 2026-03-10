@@ -15,17 +15,18 @@
             {% if c.pending %}
               <span class="badge bg-warning text-dark mt-2">Pendiente</span>
               <div class="alert alert-info mt-2 mb-0">
-                Debes completar una retroalimentación presencial de 4 horas. El coordinador o un personal de LivingBetterCC se pondrá en contacto contigo. Esto aplica solo para estudiantes becados.
+                Debe de completar unas horas de retroalimentacion presencial.
               </div>
             {% endif %}
           </div>
           <div class="card-footer bg-transparent">
             {% if c.pending %}
               {% if is_becado %}
-                <form method="post" action="{% url 'certifications:certificate_claim' c.uuid %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-sm btn-outline-primary w-100">Reclamar certificado</button>
-                </form>
+                <a class="btn btn-sm btn-outline-primary w-100" href="{% url 'certifications:certificate_claim' c.uuid %}">
+                  Completar formulario de retroalimentacion
+                </a>
+              {% else %}
+                <span class="text-muted small">Pendiente de autorizacion</span>
               {% endif %}
             {% else %}
               <a class="btn btn-sm btn-primary w-100" href="{% url 'certifications:my_certificate_detail' c.uuid %}">
@@ -37,7 +38,7 @@
       </div>
     {% empty %}
       <div class="col-12">
-        <div class="alert alert-warning">Aún no tienes certificados.</div>
+        <div class="alert alert-warning">Aun no tienes certificados.</div>
       </div>
     {% endfor %}
   </div>

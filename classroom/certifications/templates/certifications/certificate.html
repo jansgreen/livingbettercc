@@ -4,6 +4,9 @@
 {% include "certifications/certificate_styles.html" %}
 <div class="toolbar">
   <button class="btn primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+  {% if certificate and certificate.public_uuid %}
+    <button class="btn primary" id="share-certificate-btn">Compartir</button>
+  {% endif %}
 </div>
 
 <div class="stage">
@@ -120,7 +123,31 @@
 
 {% block extra_js %}
 <script>
-  // Placeholder for future enhancements.
+  (function () {
+    const btn = document.getElementById("share-certificate-btn");
+    if (!btn) return;
+
+    const shareUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'certifications:certificate_public_view' certificate.public_uuid %}";
+    const shareText = "Certificado Living Better Community Center";
+
+    btn.addEventListener("click", async function () {
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: shareText, text: shareText, url: shareUrl });
+          return;
+        }
+      } catch (err) {
+        // fallback below
+      }
+
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Enlace copiado al portapapeles.");
+      } catch (err) {
+        window.prompt("Copia este enlace:", shareUrl);
+      }
+    });
+  })();
 </script>
 {% endblock %}
 {% endblock %}

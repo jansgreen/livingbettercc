@@ -77,3 +77,46 @@ class Certificate(models.Model):
         if not self.certificate_number:
             self.certificate_number = self.cert_no
         super().save(*args, **kwargs)
+
+
+class BecadoCertificateRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pendiente"
+        AUTHORIZED = "authorized", "Autorizado"
+
+    certificate = models.OneToOneField(
+        Certificate,
+        on_delete=models.CASCADE,
+        related_name="becado_request",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="becado_certificate_requests",
+    )
+    course = models.ForeignKey(
+        "courses.Course",
+        on_delete=models.CASCADE,
+        related_name="becado_certificate_requests",
+    )
+    full_name = models.CharField(max_length=180)
+    educational_center = models.CharField(max_length=200)
+    regional = models.CharField(max_length=120)
+    email = models.EmailField(max_length=254)
+    phone = models.CharField(max_length=40)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True)
+    sent_at = models.DateTimeField(default=timezone.now, db_index=True)
+    authorized_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    authorized_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="authorized_becado_certificate_requests",
+    )
+
+    class Meta:
+        ordering = ("-sent_at",)
+
+    def __str__(self):
+        return f"{self.full_name} | {self.course} | {self.status}"

@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.shortcuts import get_object_or_404, render, redirect
@@ -7,10 +9,11 @@ from django.utils import timezone
 from django.http import Http404
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.views.decorators.http import require_POST
 from core.group_utils import has_group
 
-from .models import Certificate
-from .forms import CertificateForm
+from .models import Certificate, BecadoCertificateRequest
+from .forms import CertificateForm, BecadoCertificateRequestForm
 from authentication.models.profiles import Profiles
 from authentication.models.students import Students
 
@@ -72,20 +75,18 @@ class UserCertificateListView(LoginRequiredMixin, ListView):
     context_object_name = "certificates"
 
     def get_queryset(self):
-        return Certificate.objects.select_related("course").filter(user=self.request.user).order_by("-issued_date")
+        return (
+            Certificate.objects
+            .select_related("course")
+            .prefetch_related("becado_request")
+            .filter(user=self.request.user)
+            .order_by("-issued_date")
+        )
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["is_becado"] = has_group(self.request.user, "estudiantes_becados")
         return ctx
-
-
-# certifications/views.py
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView
-
-from classroom.certifications.models import Certificate
 
 
 class UserCertificateDetailView(LoginRequiredMixin, DetailView):
@@ -97,6 +98,8 @@ class UserCertificateDetailView(LoginRequiredMixin, DetailView):
     def get_object(self, queryset=None):
         uuid = self.kwargs.get("uuid")
         cert = get_object_or_404(Certificate, uuid=uuid, user=self.request.user)
+        if cert.pending and not self.request.user.is_staff:
+            raise Http404("No encontrado")
         return cert
 
     def get_context_data(self, **kwargs):
@@ -191,8 +194,7 @@ def claim_certificate(request, uuid):
     if not cert.pending:
         return redirect("certifications:my_certificates_list")
 
-    is_becado = has_group(request.user, "estudiantes_becados")
-    if not is_becado:
+    if not has_group(request.user, "estudiantes_becados"):
         raise Http404("No encontrado")
 
     profile = Profiles.objects.filter(user=request.user).first()
@@ -203,30 +205,86 @@ def claim_certificate(request, uuid):
     elif student and getattr(student, "telefono", None):
         telefono = student.telefono
 
-    full_name = (request.user.get_full_name() or request.user.username).strip()
-    to_emails = [getattr(settings, "EMAIL_HOST_DEST", settings.EMAIL_HOST_USER)]
-    body = (
-        "Solicitud de certificación (estudiante becado)\n\n"
-        f"Nombre: {full_name}\n"
-        f"Usuario: {request.user.username}\n"
-        f"Email: {request.user.email}\n"
-        f"Teléfono: {telefono}\n"
-        f"Curso: {cert.course.title}\n"
-        f"Cert No: {cert.cert_no}\n"
-        f"UUID público: {cert.public_uuid}\n"
+    initial = {
+        "full_name": (request.user.get_full_name() or request.user.username).strip(),
+        "email": request.user.email or "",
+        "phone": telefono or "",
+    }
+
+    existing_request = getattr(cert, "becado_request", None)
+    if request.method == "POST":
+        form = BecadoCertificateRequestForm(request.POST, instance=existing_request)
+        if form.is_valid():
+            claim = form.save(commit=False)
+            claim.certificate = cert
+            claim.user = request.user
+            claim.course = cert.course
+            claim.status = BecadoCertificateRequest.Status.PENDING
+            claim.sent_at = timezone.now()
+            claim.authorized_at = None
+            claim.authorized_by = None
+            claim.save()
+
+            body = (
+                "Solicitud de certificación (estudiante becado)\n\n"
+                f"Nombre: {claim.full_name}\n"
+                f"Centro educativo: {claim.educational_center}\n"
+                f"Regional: {claim.regional}\n"
+                f"Correo: {claim.email}\n"
+                f"Teléfono: {claim.phone}\n"
+                f"Curso: {cert.course.title}\n"
+                f"Usuario: {request.user.username}\n"
+                f"Cert No: {cert.cert_no}\n"
+                f"UUID público: {cert.public_uuid}\n"
+            )
+            email_message = EmailMessage(
+                subject=f"[CERTIFICACION PENDIENTE] {claim.full_name} - {cert.course.title}",
+                body=body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=[settings.EMAIL_HOST_USER],
+                reply_to=[claim.email] if claim.email else None,
+            )
+            email_message.send(fail_silently=False)
+            messages.success(
+                request,
+                "Formulario enviado correctamente. Un administrador se contactará con usted."
+            )
+            return redirect("certifications:my_certificates_list")
+    else:
+        form = BecadoCertificateRequestForm(instance=existing_request, initial=initial)
+
+    return render(
+        request,
+        "certifications/certificate_claim_form.html",
+        {
+            "certificate": cert,
+            "form": form,
+        },
     )
 
-    email_message = EmailMessage(
-        subject=f"[CERTIFICACION] Reclamo de certificado - {full_name}",
-        body=body,
-        from_email=settings.EMAIL_HOST_USER,
-        to=to_emails,
-        reply_to=[request.user.email] if request.user.email else None,
-        cc=getattr(settings, "EMAIL_HOST_CC", None),
-    )
-    email_message.send(fail_silently=False)
-    messages.success(request, "Solicitud enviada. Te contactaremos pronto.")
-    return redirect("certifications:my_certificates_list")
+
+@login_required
+@require_POST
+def certificate_authorize(request, uuid):
+    if not (request.user.is_staff or request.user.is_superuser):
+        raise Http404("No encontrado")
+
+    cert = get_object_or_404(Certificate, uuid=uuid)
+    cert.pending = False
+    cert.save(update_fields=["pending"])
+
+    claim = getattr(cert, "becado_request", None)
+    if claim:
+        claim.status = BecadoCertificateRequest.Status.AUTHORIZED
+        claim.authorized_at = timezone.now()
+        claim.authorized_by = request.user
+        claim.save(update_fields=["status", "authorized_at", "authorized_by"])
+
+    messages.success(request, f"Certificación autorizada para {cert.user.get_full_name() or cert.user.username}.")
+    next_url = request.POST.get("next")
+    if next_url:
+        return redirect(next_url)
+    return redirect("courses:course_admin_list")
 
 def certificate_pdf_download(request, uuid):
     # Stub: render the same template; swap to real PDF generation if needed
@@ -257,6 +315,8 @@ class UserCertificateDetailByUUIDView(UserCertificateDetailView):
     def get_object(self, queryset=None):
         obj = get_object_or_404(Certificate, uuid=self.kwargs.get("uuid"))
         if obj.user_id != self.request.user.id and not self.request.user.is_staff:
+            raise Http404()
+        if obj.pending and not self.request.user.is_staff:
             raise Http404()
         return obj
 

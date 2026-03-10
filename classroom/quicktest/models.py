@@ -28,6 +28,7 @@ class QuickTestQuestion(models.Model):
         SIGNATURE = "signature", "Firma por nombre completo"
 
     definition = models.ForeignKey(QuickTestDefinition, on_delete=models.CASCADE, related_name='questions')
+    order = models.PositiveIntegerField(default=0, db_index=True)
     text = models.TextField()
     question_type = models.CharField(max_length=16, choices=QuestionType.choices, default=QuestionType.MULTIPLE_CHOICE)
     option_a = models.CharField(max_length=255, blank=True, default="")
@@ -38,6 +39,9 @@ class QuickTestQuestion(models.Model):
         ('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')
     ])
     expected_text = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["order", "id"]
 
     def __str__(self):
         return f"Q: {self.text[:40]}..."

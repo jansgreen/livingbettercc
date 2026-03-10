@@ -45,6 +45,7 @@ class QuickTestQuestionForm(forms.ModelForm):
     class Meta:
         model = QuickTestQuestion
         fields = [
+            "order",
             "question_type",
             "text",
             "expected_text",
@@ -56,7 +57,12 @@ class QuickTestQuestionForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        self.definition = kwargs.pop("definition", None)
         super().__init__(*args, **kwargs)
+
+        self.fields["order"].label = "Orden"
+        self.fields["order"].help_text = "Empieza en 0. Se mostrará en orden ascendente."
+        self.fields["order"].widget = forms.NumberInput(attrs={"class": "form-control", "min": "0"})
 
         self.fields["question_type"].widget.attrs.update({"class": "form-select form-select-lg mb-3"})
         self.fields["question_type"].initial = (
@@ -79,7 +85,7 @@ class QuickTestQuestionForm(forms.ModelForm):
         )
 
         for name, field in self.fields.items():
-            if name in {"question_type", "text", "expected_text"}:
+            if name in {"order", "question_type", "text", "expected_text"}:
                 continue
             if name == "correct_option":
                 field.widget = forms.Select(
@@ -98,6 +104,10 @@ class QuickTestQuestionForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         qtype = cleaned.get("question_type")
+        order = cleaned.get("order")
+
+        if order is None or int(order) < 0:
+            self.add_error("order", "El orden debe ser 0 o mayor.")
 
         if qtype == QuickTestQuestion.QuestionType.MULTIPLE_CHOICE:
             for field in ("option_a", "option_b", "option_c", "option_d", "correct_option"):
@@ -112,5 +122,15 @@ class QuickTestQuestionForm(forms.ModelForm):
 
         if qtype == QuickTestQuestion.QuestionType.SIGNATURE:
             cleaned["expected_text"] = ""
+
+        definition = self.definition
+        if not definition and self.instance and getattr(self.instance, "pk", None):
+            definition = self.instance.definition
+        if definition and order is not None:
+            clash = QuickTestQuestion.objects.filter(definition=definition, order=order)
+            if self.instance and getattr(self.instance, "pk", None):
+                clash = clash.exclude(pk=self.instance.pk)
+            if clash.exists():
+                self.add_error("order", "Ya existe otra pregunta con ese orden en este test.")
 
         return cleaned

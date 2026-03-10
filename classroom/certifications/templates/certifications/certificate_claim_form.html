@@ -1,0 +1,60 @@
+{% extends "frontend.html" %}
+{% block content %}
+<div class="container py-4" style="max-width: 760px;">
+  <h3 class="mb-3">Retroalimentacion Presencial</h3>
+
+  <div class="alert alert-warning">
+    Debe de completar unas horas de retroalimentacion presencial antes de habilitar su certificado.
+  </div>
+
+  <div class="card border-0 shadow-sm">
+    <div class="card-body">
+      <div class="mb-3">
+        <div class="text-muted small">Curso</div>
+        <div class="fw-semibold">{{ certificate.course.title }}</div>
+      </div>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label" for="id_full_name">{{ form.full_name.label }}</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="id_educational_center">{{ form.educational_center.label }}</label>
+          {{ form.educational_center }}
+          {% if form.educational_center.errors %}<div class="text-danger small">{{ form.educational_center.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="id_regional">{{ form.regional.label }}</label>
+          {{ form.regional }}
+          {% if form.regional.errors %}<div class="text-danger small">{{ form.regional.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="id_email">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="id_phone">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors|striptags }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar</button>
+      </form>
+
+      <p class="mt-3 mb-0 text-muted">Administrador se contactara con usted.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

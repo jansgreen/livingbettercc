@@ -14,6 +14,13 @@
     {% endif %}
 
     <div class="mb-3">
+      <label class="form-label" for="{{ form.order.id_for_label }}">{{ form.order.label }}</label>
+      {{ form.order }}
+      {% if form.order.errors %}<div class="text-danger small">{{ form.order.errors }}</div>{% endif %}
+      <div class="form-text">{{ form.order.help_text }}</div>
+    </div>
+
+    <div class="mb-3">
       <label class="form-label" for="{{ form.question_type.id_for_label }}">Tipo de pregunta</label>
       {{ form.question_type }}
       {% if form.question_type.errors %}<div class="text-danger small">{{ form.question_type.errors }}</div>{% endif %}

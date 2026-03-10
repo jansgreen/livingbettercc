@@ -43,6 +43,7 @@ def _normalize_question_payload(item, idx):
         return None, f"Pregunta #{idx}: text es obligatorio."
 
     payload = {
+        "order": item.get("order"),
         "question_type": qtype,
         "text": text,
         "expected_text": str(item.get("expected_text", "")).strip(),
@@ -168,7 +169,7 @@ def quicktest_taking(request, module_id):
         def count(self):
             return self._qs.count()
 
-    questions_qs = qdef.questions.all()
+    questions_qs = qdef.questions.all().order_by("order", "id")
     test_proxy = SimpleNamespace(questions=_QWrap(questions_qs))
     base_context = {
         "module": module,
@@ -301,14 +302,14 @@ def qdef_delete(request, pk):
 @staff_required
 def q_list(request, def_id):
     qdef = get_object_or_404(QuickTestDefinition, pk=def_id)
-    questions = qdef.questions.all().order_by("id")
+    questions = qdef.questions.all().order_by("order", "id")
     return render(request, "quicktest/q_list.html", {"qdef": qdef, "questions": questions})
 
 @staff_required
 def q_create(request, def_id):
     qdef = get_object_or_404(QuickTestDefinition, pk=def_id)
     if request.method == "POST":
-        form = QuickTestQuestionForm(request.POST)
+        form = QuickTestQuestionForm(request.POST, definition=qdef)
         if form.is_valid():
             question = form.save(commit=False)
             question.definition = qdef
@@ -316,20 +317,21 @@ def q_create(request, def_id):
             messages.success(request, "Pregunta creada.")
             return redirect("quicktest:q_list", def_id=qdef.id)
     else:
-        form = QuickTestQuestionForm()
+        next_order = qdef.questions.count()
+        form = QuickTestQuestionForm(initial={"order": next_order}, definition=qdef)
     return render(request, "quicktest/q_form.html", {"form": form, "qdef": qdef})
 
 @staff_required
 def q_update(request, pk):
     question = get_object_or_404(QuickTestQuestion, pk=pk)
     if request.method == "POST":
-        form = QuickTestQuestionForm(request.POST, instance=question)
+        form = QuickTestQuestionForm(request.POST, instance=question, definition=question.definition)
         if form.is_valid():
             form.save()
             messages.success(request, "Pregunta actualizada.")
             return redirect("quicktest:q_list", def_id=question.definition_id)
     else:
-        form = QuickTestQuestionForm(instance=question)
+        form = QuickTestQuestionForm(instance=question, definition=question.definition)
     return render(request, "quicktest/q_form.html", {"form": form, "qdef": question.definition, "question": question})
 
 @staff_required
@@ -376,7 +378,16 @@ def qdef_import_json(request, def_id):
     with transaction.atomic():
         if replace_existing:
             qdef.questions.all().delete()
-        QuickTestQuestion.objects.bulk_create([QuickTestQuestion(definition=qdef, **row) for row in normalized])
+        base_order = 0 if replace_existing else (qdef.questions.count())
+        rows = []
+        for idx, row in enumerate(normalized):
+            row_order = row.get("order")
+            if row_order is None or str(row_order).strip() == "":
+                row["order"] = base_order + idx
+            else:
+                row["order"] = int(row_order)
+            rows.append(QuickTestQuestion(definition=qdef, **row))
+        QuickTestQuestion.objects.bulk_create(rows)
 
     messages.success(request, f"Importación completada: {len(normalized)} pregunta(s).")
     return redirect("quicktest:q_list", def_id=qdef.id)
@@ -467,7 +478,16 @@ def qdef_import_course_json(request):
 
             if replace_existing:
                 qdef.questions.all().delete()
-            QuickTestQuestion.objects.bulk_create([QuickTestQuestion(definition=qdef, **row) for row in normalized])
+            base_order = 0 if replace_existing else qdef.questions.count()
+            rows = []
+            for idx, row in enumerate(normalized):
+                row_order = row.get("order")
+                if row_order is None or str(row_order).strip() == "":
+                    row["order"] = base_order + idx
+                else:
+                    row["order"] = int(row_order)
+                rows.append(QuickTestQuestion(definition=qdef, **row))
+            QuickTestQuestion.objects.bulk_create(rows)
             imported_questions += len(normalized)
 
     messages.success(
@@ -480,7 +500,7 @@ def qdef_import_course_json(request):
 def qdef_export_csv(request, def_id):
     try:
         qdef = get_object_or_404(QuickTestDefinition, pk=def_id)
-        questions = qdef.questions.all().order_by("id")
+        questions = qdef.questions.all().order_by("order", "id")
 
         response = HttpResponse(content_type="text/csv; charset=utf-8")
         response["Content-Disposition"] = f'attachment; filename="quicktest_{qdef.id}_questions.csv"'
@@ -489,6 +509,7 @@ def qdef_export_csv(request, def_id):
         writer.writerow(
             [
                 "question_type",
+                "order",
                 "text",
                 "expected_text",
                 "option_a",
@@ -502,6 +523,7 @@ def qdef_export_csv(request, def_id):
             writer.writerow(
                 [
                     q.question_type,
+                    q.order,
                     q.text,
                     q.expected_text,
                     q.option_a,
@@ -521,7 +543,7 @@ def qdef_export_csv(request, def_id):
 def qdef_export_pdf(request, def_id):
     try:
         qdef = get_object_or_404(QuickTestDefinition, pk=def_id)
-        questions = qdef.questions.all().order_by("id")
+        questions = qdef.questions.all().order_by("order", "id")
 
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=36, rightMargin=36, topMargin=36, bottomMargin=36)
@@ -534,7 +556,7 @@ def qdef_export_pdf(request, def_id):
         ]
 
         for idx, q in enumerate(questions, start=1):
-            story.append(Paragraph(f"{idx}. {q.text}", styles["Normal"]))
+            story.append(Paragraph(f"{idx}. [Orden {q.order}] {q.text}", styles["Normal"]))
             story.append(Paragraph(f"Tipo: {q.get_question_type_display()}", styles["Normal"]))
             if q.question_type == QuickTestQuestion.QuestionType.MULTIPLE_CHOICE:
                 story.append(Paragraph(f"A) {q.option_a}", styles["Normal"]))
