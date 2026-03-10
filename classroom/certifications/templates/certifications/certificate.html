@@ -4,9 +4,7 @@
 {% include "certifications/certificate_styles.html" %}
 <div class="toolbar">
   <button class="btn primary" onclick="window.print()">Imprimir / Guardar PDF</button>
-  {% if certificate and certificate.public_uuid %}
-    <button class="btn primary" id="share-certificate-btn">Compartir</button>
-  {% endif %}
+  <button class="btn primary" id="share-certificate-btn">Compartir</button>
 </div>
 
 <div class="stage">
@@ -127,7 +125,8 @@
     const btn = document.getElementById("share-certificate-btn");
     if (!btn) return;
 
-    const shareUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'certifications:certificate_public_view' certificate.public_uuid %}";
+    const publicUrl = "{% if certificate and certificate.public_uuid %}{{ request.scheme }}://{{ request.get_host }}{% url 'certifications:certificate_public_view' certificate.public_uuid %}{% endif %}";
+    const shareUrl = publicUrl || window.location.href;
     const shareText = "Certificado Living Better Community Center";
 
     btn.addEventListener("click", async function () {
