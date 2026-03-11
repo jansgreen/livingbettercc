@@ -16,6 +16,7 @@ def backfill_question_order(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
         ('quicktest', '0003_quicktestquestion_expected_text_and_more'),
