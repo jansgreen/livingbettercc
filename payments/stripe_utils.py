@@ -22,6 +22,14 @@ def _build_success_cancel_urls(request):
     return success_url, cancel_url
 
 
+def _build_checkout_urls_for_payment(request, payment: Payment):
+    if payment.purpose == Payment.PURPOSE_CLASSROOM_ENROLLMENT:
+        success_url = request.build_absolute_uri(reverse("courses:course_list"))
+        cancel_url = request.build_absolute_uri(reverse("courses:course_list"))
+        return success_url, cancel_url
+    return _build_success_cancel_urls(request)
+
+
 def create_checkout_session(payment: Payment, request):
     """
     Create a Stripe Checkout session for the given Payment.
@@ -34,7 +42,7 @@ def create_checkout_session(payment: Payment, request):
     elif payment.purpose == Payment.PURPOSE_SHOP_ORDER:
         name = f"Order #{payment.reference_id}"
 
-    success_url, cancel_url = _build_success_cancel_urls(request)
+    success_url, cancel_url = _build_checkout_urls_for_payment(request, payment)
 
     creds = get_stripe_credentials()
     if not creds.secret_key:
