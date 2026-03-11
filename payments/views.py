@@ -46,6 +46,11 @@ def start_checkout_for_enrollment(request, enrollment_id: int):
 	enrollment = get_object_or_404(Enrollment, id=enrollment_id)
 	if enrollment.user_id != request.user.id:
 		return HttpResponse(status=404)
+	if not enrollment.course.payment_required:
+		enrollment.status = Enrollment.Status.ACTIVE
+		enrollment.save(update_fields=["status"])
+		messages.info(request, "Este curso no requiere pago.")
+		return redirect("courses:my_course")
 	if enrollment.status != Enrollment.Status.PENDING_PAYMENT:
 		return HttpResponseBadRequest("Enrollment not pending payment")
 
@@ -182,6 +187,32 @@ def control_center(request):
 		"pending_enrollments": pending_enrollments,
 	}
 	return render(request, "payments/control_center.html", ctx)
+
+
+@staff_member_required
+def toggle_course_payment_required(request):
+	if not request.user.is_superuser:
+		return HttpResponse(status=404)
+	if request.method != "POST":
+		return HttpResponseBadRequest("POST required")
+
+	course_id = request.POST.get("course_id")
+	if not course_id:
+		messages.error(request, "Debes seleccionar un curso valido.")
+		return redirect("payments:control_center")
+
+	try:
+		course = Course.objects.get(pk=int(course_id))
+	except Exception:
+		messages.error(request, "Curso invalido.")
+		return redirect("payments:control_center")
+
+	course.payment_required = request.POST.get("payment_required") == "on"
+	course.save(update_fields=["payment_required", "updated_at"])
+
+	state = "requiere pago" if course.payment_required else "es gratis"
+	messages.success(request, f"El curso '{course.title}' ahora {state}.")
+	return redirect("payments:control_center")
 
 
 @staff_member_required

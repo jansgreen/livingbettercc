@@ -56,6 +56,55 @@
 
   <div class="card mt-3">
     <div class="card-body">
+      <h2 class="h6">Cursos y requerimiento de pago</h2>
+      <p class="small text-muted mb-3">El switch decide si el curso requiere pago. El precio no cambia esa regla.</p>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Titulo del curso</th>
+              <th>Precio</th>
+              <th>Requiere pago</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in courses %}
+              <tr>
+                <td>{{ c.id }}</td>
+                <td>{{ c.title }}</td>
+                <td>${{ c.price|floatformat:2 }}</td>
+                <td>
+                  <form method="post" action="{% url 'payments:toggle_course_payment_required' %}" class="d-flex align-items-center gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="course_id" value="{{ c.id }}">
+                    <div class="form-check form-switch m-0">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="course-payment-{{ c.id }}"
+                        name="payment_required"
+                        value="on"
+                        {% if c.payment_required %}checked{% endif %}
+                        onchange="this.form.submit()"
+                      >
+                      <label class="form-check-label small" for="course-payment-{{ c.id }}">
+                        {% if c.payment_required %}De pago{% else %}Gratis{% endif %}
+                      </label>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-body">
       <h2 class="h6">Exonerar curso (acceso manual)</h2>
       <p class="small text-muted mb-3">Activa la inscripcion del usuario sin pasar por checkout.</p>
       <form method="post" action="{% url 'payments:grant_course_access' %}">

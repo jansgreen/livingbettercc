@@ -292,8 +292,8 @@ def start_course_payment(request, pk):
     enrollment, created = Enrollment.objects.get_or_create(user=request.user, course=course)
     is_becado = has_group(request.user, "estudiantes_becados")
 
-    # Treat any course with a positive price as paid, even if payment_required was left unchecked.
-    is_paid_course = bool(course.payment_required or (course.price and course.price > 0))
+    # Payment rules depend only on the admin toggle, not on the numeric price.
+    is_paid_course = bool(course.payment_required)
 
     # Becados no pasan por checkout: se activan sin pago.
     if is_becado and is_paid_course:
