@@ -46,15 +46,16 @@
       </span>
     </div>
 
-    <div class="card students-card d-none d-lg-block">
+    <div class="card students-card d-none d-xl-block">
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
               <tr>
-                <th class="ps-4">Username</th>
+                <th class="ps-4">Usuario</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
+                <th>Correo</th>
                 <th>Grupo</th>
                 <th>Regional</th>
                 <th>Distrito</th>
@@ -68,9 +69,14 @@
             <tbody>
               {% for student in students %}
                 <tr>
-                  <td class="ps-4 fw-semibold">{{ student.user.username|capfirst }}</td>
-                  <td class="ps-4 fw-semibold">{{ student.first_name }}</td>
+                  <td class="ps-4 fw-semibold">@{{ student.user.username }}</td>
+                  <td class="fw-semibold">
+                    <a href="{% url 'authentication:profile_detail' student.user.id %}" class="text-decoration-none">
+                      {{ student.first_name }}
+                    </a>
+                  </td>
                   <td>{{ student.last_name|default:"No registrado" }}</td>
+                  <td>{{ student.email }}</td>
                   <td>
                     {% if student.student_type == 'Becado' %}
                       <span class="badge text-bg-success students-badge">Becado</span>
@@ -90,7 +96,7 @@
                 </tr>
               {% empty %}
                 <tr>
-                  <td colspan="10" class="text-center text-muted py-5">No hay estudiantes registrados.</td>
+                  <td colspan="12" class="text-center text-muted py-5">No hay estudiantes registrados.</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -99,13 +105,18 @@
       </div>
     </div>
 
-    <div class="d-lg-none d-grid gap-3">
+    <div class="d-xl-none d-grid gap-3">
       {% for student in students %}
         <div class="students-mobile-item bg-white">
           <div class="d-flex justify-content-between gap-3 mb-3">
             <div>
-              <div class="fw-bold">{{ student.first_name }} {{ student.last_name }}</div>
-              <div class="text-muted small">{{ student.profession }}</div>
+              <div class="fw-bold">
+                <a href="{% url 'authentication:profile_detail' student.user.id %}" class="text-decoration-none">
+                  {{ student.first_name }} {{ student.last_name }}
+                </a>
+              </div>
+              <div class="text-muted small">@{{ student.user.username }}</div>
+              <div class="text-muted small">{{ student.email }}</div>
             </div>
             {% if student.student_type == 'Becado' %}
               <span class="badge text-bg-success students-badge align-self-start">Becado</span>
@@ -137,6 +148,10 @@
             <div class="col-6">
               <div class="students-label">Nivel académico</div>
               <div>{{ student.academic_level }}</div>
+            </div>
+            <div class="col-12">
+              <div class="students-label">Profesión</div>
+              <div>{{ student.profession }}</div>
             </div>
           </div>
         </div>

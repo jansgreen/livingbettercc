@@ -113,6 +113,7 @@ def student_list_view(request):
             'user': user,
             'first_name': user.first_name or user.username,
             'last_name': user.last_name or '',
+            'email': user.email or 'Sin correo',
             'student_type': 'Becado' if is_scholarship else 'Regular',
             'regional': getattr(scholarship_info, 'regional', None) or getattr(student_record, 'regional', '') or 'No registrada',
             'district': getattr(scholarship_info, 'district', None) or getattr(student_record, 'distrito_educativo', '') or 'No registrado',
