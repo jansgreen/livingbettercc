@@ -147,13 +147,17 @@ def create_certificate_for_user(user, course):
         cert.save(update_fields=["pending"])
     return cert
 
-def certificate_public_view(request, uuid):
-    cert = get_object_or_404(Certificate, public_uuid=uuid)
-    if cert.pending and not (request.user.is_authenticated and request.user.is_staff):
-        raise Http404("No encontrado")
-    ctx = {
+def _certificate_template_context(cert):
+    student_name = (cert.user.get_full_name() or cert.user.username).strip()
+    return {
         "certificate": cert,
         "certificado": cert,
+        "user": cert.user,
+        "student_name": student_name,
+        "course": cert.course,
+        "course_title": cert.course.title,
+        "issue_date": cert.issued_date,
+        "cert_no": cert.cert_no,
         "cert_left_ref": getattr(settings, "CERT_LEFT_REF", None),
         "cert_right_ref": getattr(settings, "CERT_RIGHT_REF", None),
         "cert_brand": getattr(settings, "CERT_BRAND", None),
@@ -163,6 +167,13 @@ def certificate_public_view(request, uuid):
         "cert_sig2_role": getattr(settings, "CERT_SIG2_ROLE", None),
         "cert_quote": getattr(settings, "CERT_QUOTE", None),
     }
+
+
+def certificate_public_view(request, uuid):
+    cert = get_object_or_404(Certificate.objects.select_related("user", "course"), public_uuid=uuid)
+    if cert.pending and not (request.user.is_authenticated and request.user.is_staff):
+        raise Http404("No encontrado")
+    ctx = _certificate_template_context(cert)
     return render(request, "certifications/certificate.html", ctx)
 
 
@@ -172,18 +183,7 @@ def certificate_toggle_pending(request, uuid):
     cert = get_object_or_404(Certificate, uuid=uuid)
     cert.pending = not cert.pending
     cert.save(update_fields=["pending"])
-    ctx = {
-        "certificate": cert,
-        "certificado": cert,
-        "cert_left_ref": getattr(settings, "CERT_LEFT_REF", None),
-        "cert_right_ref": getattr(settings, "CERT_RIGHT_REF", None),
-        "cert_brand": getattr(settings, "CERT_BRAND", None),
-        "cert_sig1_name": getattr(settings, "CERT_SIG1_NAME", None),
-        "cert_sig1_role": getattr(settings, "CERT_SIG1_ROLE", None),
-        "cert_sig2_name": getattr(settings, "CERT_SIG2_NAME", None),
-        "cert_sig2_role": getattr(settings, "CERT_SIG2_ROLE", None),
-        "cert_quote": getattr(settings, "CERT_QUOTE", None),
-    }
+    ctx = _certificate_template_context(cert)
     return render(request, "certifications/certificate.html", ctx)
 
 
@@ -288,19 +288,8 @@ def certificate_authorize(request, uuid):
 
 def certificate_pdf_download(request, uuid):
     # Stub: render the same template; swap to real PDF generation if needed
-    cert = get_object_or_404(Certificate, public_uuid=uuid)
-    ctx = {
-        "certificate": cert,
-        "certificado": cert,
-        "cert_left_ref": getattr(settings, "CERT_LEFT_REF", None),
-        "cert_right_ref": getattr(settings, "CERT_RIGHT_REF", None),
-        "cert_brand": getattr(settings, "CERT_BRAND", None),
-        "cert_sig1_name": getattr(settings, "CERT_SIG1_NAME", None),
-        "cert_sig1_role": getattr(settings, "CERT_SIG1_ROLE", None),
-        "cert_sig2_name": getattr(settings, "CERT_SIG2_NAME", None),
-        "cert_sig2_role": getattr(settings, "CERT_SIG2_ROLE", None),
-        "cert_quote": getattr(settings, "CERT_QUOTE", None),
-    }
+    cert = get_object_or_404(Certificate.objects.select_related("user", "course"), public_uuid=uuid)
+    ctx = _certificate_template_context(cert)
     return render(request, "certifications/certificate.html", ctx)
 
 class CertificateUpdateByUUIDView(CertificateUpdateView):
