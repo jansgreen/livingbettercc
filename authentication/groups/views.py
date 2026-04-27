@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group, User
 from django.core.mail import EmailMessage
 from django.db.models import Q
@@ -13,12 +13,14 @@ from django.utils import timezone
 from django.views import View
 from core.group_utils import has_group, ensure_group, resolve_aliases
 
-from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm
+from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm, ScholarshipStudentInfoForm
 from .models import Invitation
+from authentication.models.profiles import ScholarshipStudentInfo
 
 STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
 FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
 ROLE_GROUPS = ("customers", "estudiantes", "Facilitadores", "tecnicos")
+SCHOLARSHIP_GROUP_NAME = "estudiantes_becados"
 
 
 def _is_staff(user):
@@ -40,6 +42,17 @@ def _can_invite(user):
     )
 
 
+def _is_scholarship_group(group) -> bool:
+    return bool(group and (group.name or "").strip().lower() == SCHOLARSHIP_GROUP_NAME)
+
+
+def _scholarship_info_is_complete(user) -> bool:
+    try:
+        return user.scholarship_info.is_complete()
+    except ScholarshipStudentInfo.DoesNotExist:
+        return False
+
+
 def _groups_for_aliases(*aliases_or_roles):
     names = set()
     for value in aliases_or_roles:
@@ -58,7 +71,6 @@ def _groups_for_aliases(*aliases_or_roles):
         return Group.objects.none()
     return Group.objects.filter(query).order_by("name").distinct()
 
-
 def _allowed_groups_for_inviter(user):
     if not user.is_authenticated:
         return Group.objects.none()
@@ -76,7 +88,6 @@ def _allowed_groups_for_inviter(user):
         return _groups_for_aliases("customers")
     return Group.objects.none()
 
-
 def _normalize_student_membership(user):
     names = set(user.groups.values_list('name', flat=True))
     lowered = {name.lower() for name in names}
@@ -91,7 +102,6 @@ def _normalize_student_membership(user):
             legacy = Group.objects.filter(name=name).first()
             if legacy:
                 user.groups.remove(legacy)
-
 
 def _normalize_facilitator_membership(user):
     names = set(user.groups.values_list('name', flat=True))
@@ -142,8 +152,6 @@ def _set_user_type(user, selected_type: str):
 
     user.save(update_fields=["is_staff", "is_superuser"])
 
-
-
 @user_passes_test(_is_staff)
 def add_and_remove_group_to_user(request, user_id):
     if request.method == "POST":
@@ -182,7 +190,6 @@ def update_user_type(request, user_id):
         messages.error(request, "No se pudo actualizar el tipo de usuario.")
 
     return redirect("user_list")
-
 
 @user_passes_test(_is_staff)
 def bulk_update_user_type(request):
@@ -225,7 +232,6 @@ def bulk_update_user_type(request):
         messages.warning(request, f"{skipped} usuario(s) no se pudieron actualizar.")
 
     return redirect("user_list")
-
 
 @user_passes_test(lambda u: u.is_authenticated and u.is_superuser)
 def delete_user(request, user_id):
@@ -391,6 +397,10 @@ class InviteFriendView(View):
                 group=group,
                 created_by=request.user,
                 expires_at=expires_at,
+                scholarship_country=form.cleaned_data.get('scholarship_country') or '',
+                scholarship_district=form.cleaned_data.get('scholarship_district'),
+                scholarship_regional=form.cleaned_data.get('scholarship_regional') or '',
+                scholarship_province=form.cleaned_data.get('scholarship_province') or '',
             )
 
             invite_url = request.build_absolute_uri(
@@ -449,14 +459,35 @@ def accept_invite(request, token):
 
     # Authenticated users can auto-accept invitations to 'estudiantes_becados',
     # even if they already belong to other groups.
-    if invitation.group.name.lower() == 'estudiantes_becados':
+    if _is_scholarship_group(invitation.group):
         request.user.groups.add(invitation.group)
+        invitation.apply_scholarship_info(request.user)
         invitation.mark_used(request.user)
+        if not _scholarship_info_is_complete(request.user):
+            messages.info(request, "Completa tus datos de estudiante becado para continuar.")
+            return redirect('complete_scholarship_info')
         messages.success(request, "Invitación aceptada. Ahora tienes acceso a 'estudiantes_becados'.")
         return redirect('dashboard')
 
     messages.info(request, 'Esta invitación requiere registro nuevo. Si ya tienes cuenta, pide al admin que te agregue al grupo.')
     return redirect('dashboard')
+
+@login_required
+def complete_scholarship_info(request):
+    info = ScholarshipStudentInfo.objects.filter(user=request.user).first()
+    if request.method == "POST":
+        form = ScholarshipStudentInfoForm(request.POST, instance=info)
+        if form.is_valid():
+            scholarship_info = form.save(commit=False)
+            scholarship_info.user = request.user
+            scholarship_info.save()
+            messages.success(request, "Datos de estudiante becado actualizados correctamente.")
+            return redirect('dashboard')
+    else:
+        form = ScholarshipStudentInfoForm(instance=info)
+
+    return render(request, 'complete_scholarship_info.html', {'form': form})
+
 
 def invite_success(request):
     """Vista que muestra un mensaje de éxito después de enviar la invitación."""

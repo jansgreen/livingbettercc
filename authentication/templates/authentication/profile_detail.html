@@ -2,38 +2,404 @@
 {% load static %}
 
 {% block content %}
-<h2>Profile Detail</h2>
-{% if profile %}
-    {% for field in profile %}
-        <p><strong>{{ field.label }}:</strong> {{ field.user.username }}</p>
-        <p><strong>{{ field.first_name.label }}:</strong> {{ field.first_name }}</p>
-        <p><strong>{{ field.last_name.label }}:</strong> {{ field.last_name }}</p>
-        <p><strong>{{ field.email.label }}:</strong> {{ field.email }}</p>
-        <p><strong>{{ field.telefono.label }}:</strong> {{ field.telefono }}</p>
-        <p><strong>{{ field.direccion.label }}:</strong> {{ field.direccion }}</p>
-        <p><strong>{{ field.genero.label }}:</strong> {{ field.genero }}</p>
-        <p><strong>{{ field.fecha_nacimiento.label }}:</strong> {{ field.fecha_nacimiento }}</p>
-        <p><strong>{{ field.numero_identidad.label }}:</strong> {{ field.numero_identidad }}</p>
-        <p><strong>{{ field.profesion.label }}:</strong> {{ field.profesion }}</p>
-        <p><strong>{{ field.roll.label }}:</strong> {{ field.roll }}</p>
-        <p><strong>{{ field.imagen.label }}:</strong> <img src="{{ field.imagen.url }}" alt="Profile Image"></p>
+<style>
+  .profile-page {
+    background: #f8fafc;
+    min-height: calc(100vh - 80px);
+  }
+  .profile-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 58%, #2563eb 100%);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    color: #fff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  }
+  .profile-avatar {
+    width: 118px;
+    height: 118px;
+    object-fit: cover;
+    border-radius: 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.82);
+    background: #fff;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.24);
+  }
+  .profile-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.85rem;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  }
+  .profile-section-title {
+    color: #0f172a;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .profile-data-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+  .profile-data-item {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.65rem;
+    padding: 0.85rem;
+  }
+  .profile-data-label {
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+  }
+  .profile-data-value {
+    color: #0f172a;
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .profile-pill {
+    border-radius: 999px;
+    padding: 0.42rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .profile-muted-panel {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.85rem;
+  }
+  .profile-cert-list {
+    display: grid;
+    gap: 0.85rem;
+  }
+  .profile-cert-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .profile-cert-item:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.1);
+    transform: translateY(-1px);
+  }
+  .profile-cert-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  .profile-cert-title {
+    color: #0f172a;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .profile-cert-meta {
+    color: #64748b;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    font-size: 0.82rem;
+    margin-top: 0.25rem;
+  }
+  @media (max-width: 767.98px) {
+    .profile-hero {
+      text-align: center;
+    }
+    .profile-data-grid {
+      grid-template-columns: 1fr;
+    }
+    .profile-avatar {
+      width: 96px;
+      height: 96px;
+    }
+    .profile-cert-item {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
+</style>
 
-    {% endfor %}
-    {% if beca_status %}
-      <div class="alert alert-info mt-3">
-        Estado de tu aplicación a beca Minerd:
-        {% if beca_status == 'pendiente' %}
-          <span class="badge bg-warning text-dark">Pendiente / En revisión</span>
-        {% elif beca_status == 'aprobada' %}
-          <span class="badge bg-success">Aprobada</span>
-        {% else %}
-          <span class="badge bg-danger">Rechazada</span>
-        {% endif %}
+<div class="profile-page py-4">
+  <div class="container">
+    {% if profile %}
+      {% for field in profile %}
+        <div class="profile-hero mb-4">
+          <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+            <div class="d-flex flex-column flex-md-row align-items-center gap-3">
+              <img
+                src="{% if field.imagen %}{{ field.imagen.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
+                alt="Foto de {{ field.user.username }}"
+                class="profile-avatar"
+                onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"
+              />
+              <div>
+                <div class="text-white-50 small fw-semibold mb-1">Perfil de usuario</div>
+                <h1 class="h3 mb-1">
+                  {% if field.user.get_full_name %}
+                    {{ field.user.get_full_name }}
+                  {% else %}
+                    {{ field.user.username|capfirst }}
+                  {% endif %}
+                </h1>
+                <div class="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                  <span class="badge bg-light text-dark profile-pill">@{{ field.user.username }}</span>
+                  {% if field.roll %}
+                    <span class="badge bg-info-subtle text-info-emphasis profile-pill">{{ field.roll }}</span>
+                  {% endif %}
+                  {% if field.profesion %}
+                    <span class="badge bg-success-subtle text-success-emphasis profile-pill">{{ field.profesion }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
+              <a href="{% url 'user_list' %}" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Usuarios
+              </a>
+              {% if request.user.id == field.user.id or request.user.is_staff or request.user.is_superuser %}
+                <a href="{% url 'authentication:profile_update' field.id %}" class="btn btn-light btn-sm text-dark">
+                  <i class="fas fa-pen me-1"></i> Editar
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-12 col-xl-8">
+            <div class="card profile-card">
+              <div class="card-body p-4">
+                <div class="profile-section-title mb-3">Información personal</div>
+                <div class="profile-data-grid">
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Nombre</div>
+                    <div class="profile-data-value">{{ field.first_name|default:"No registrado" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Apellido</div>
+                    <div class="profile-data-value">{{ field.last_name|default:"No registrado" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Género</div>
+                    <div class="profile-data-value">{{ field.get_genero_display|default:"No registrado" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Fecha de nacimiento</div>
+                    <div class="profile-data-value">{{ field.fecha_nacimiento|date:"d/m/Y"|default:"No registrada" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Identificación</div>
+                    <div class="profile-data-value">{{ field.numero_identidad|default:"No registrada" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Profesión</div>
+                    <div class="profile-data-value">{{ field.profesion|default:"No registrada" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Nivel académico</div>
+                    <div class="profile-data-value">{{ field.get_nivel_academico_display|default:"No registrado" }}</div>
+                  </div>
+                  <div class="profile-data-item">
+                    <div class="profile-data-label">Estado académico</div>
+                    <div class="profile-data-value">{{ field.get_estado_academico_display|default:"No registrado" }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-xl-4">
+            <div class="card profile-card h-100">
+              <div class="card-body p-4">
+                <div class="profile-section-title mb-3">Contacto y acceso</div>
+                <div class="d-grid gap-3">
+                  <div>
+                    <div class="profile-data-label">Correo</div>
+                    <div class="profile-data-value">{{ field.email|default:"Sin correo" }}</div>
+                  </div>
+                  <div>
+                    <div class="profile-data-label">Teléfono</div>
+                    <div class="profile-data-value">{{ field.telefono|default:"No registrado" }}</div>
+                  </div>
+                  <div>
+                    <div class="profile-data-label">Dirección</div>
+                    <div class="profile-data-value">{{ field.direccion|default:"No registrada" }}</div>
+                  </div>
+                  <div>
+                    <div class="profile-data-label">Grupos</div>
+                    <div class="d-flex flex-wrap gap-2">
+                      {% for group in field.user.groups.all %}
+                        <span class="badge text-bg-secondary profile-pill">{{ group.name }}</span>
+                      {% empty %}
+                        <span class="badge text-bg-warning profile-pill">Sin grupo</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="profile-data-label">Hoja de vida / CV</div>
+                    {% if field.curriculum_vitae %}
+                      <a href="{{ field.curriculum_vitae.url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary mt-1">
+                        <i class="fas fa-file-alt me-1"></i> Ver CV
+                      </a>
+                    {% else %}
+                      <div class="profile-data-value">No registrado</div>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <div class="profile-data-label">Ficha becado</div>
+                    {% if field.user.scholarship_info %}
+                      <div class="profile-data-value">{{ field.user.scholarship_info.get_country_display }}</div>
+                      <div class="text-muted small">
+                        Regional {{ field.user.scholarship_info.regional }} · Distrito {{ field.user.scholarship_info.district }} · {{ field.user.scholarship_info.province }}
+                      </div>
+                    {% else %}
+                      <a href="{% url 'complete_scholarship_info' %}" class="btn btn-sm btn-outline-primary mt-1">
+                        Completar ficha
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card profile-card">
+              <div class="card-body p-4">
+                <div class="profile-section-title mb-3">Evidencias académicas</div>
+                <div class="profile-cert-list">
+                  {% for evidence in field.academic_evidences.all %}
+                    <div class="profile-cert-item">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="profile-cert-icon">
+                          <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div>
+                          <div class="profile-cert-title">{{ evidence.get_evidence_type_display }}</div>
+                          <div class="profile-cert-meta">
+                            <span>Subida {{ evidence.uploaded_at|date:"d/m/Y" }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <a href="{{ evidence.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt me-1"></i> Ver archivo
+                      </a>
+                    </div>
+                  {% empty %}
+                    <div class="profile-muted-panel p-4 text-center">
+                      <div class="fw-semibold mb-1">Sin evidencias académicas</div>
+                      <div class="text-muted">Las evidencias aparecerán aquí cuando el usuario las cargue.</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="card profile-card">
+              <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                  <div>
+                    <div class="profile-section-title mb-1">Certificaciones</div>
+                    <div class="text-muted">Certificados emitidos para este usuario.</div>
+                  </div>
+                  <span class="badge text-bg-light profile-pill align-self-md-start">{{ certificates|length }} certificado{{ certificates|length|pluralize }}</span>
+                </div>
+
+                <div class="profile-cert-list">
+                  {% for certificate in certificates %}
+                    <div class="profile-cert-item">
+                      <div class="d-flex align-items-center gap-3">
+                        <div class="profile-cert-icon">
+                          <i class="fas fa-award"></i>
+                        </div>
+                        <div>
+                          <div class="profile-cert-title">{{ certificate.course.title|default:"Certificado" }}</div>
+                          <div class="profile-cert-meta">
+                            <span>No. {{ certificate.cert_no|default:"Pendiente" }}</span>
+                            <span>Emitido {{ certificate.issued_date|date:"d/m/Y" }}</span>
+                            {% if certificate.pending %}
+                              <span class="text-warning fw-semibold">Pendiente</span>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                      <div class="d-flex flex-wrap gap-2">
+                        <a
+                          href="{% url 'certifications:certificate_public_view' certificate.public_uuid %}"
+                          class="btn btn-sm btn-primary"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          <i class="fas fa-external-link-alt me-1"></i> Ver certificado
+                        </a>
+                        <a
+                          href="{% url 'certifications:certificate_pdf_download' certificate.public_uuid %}"
+                          class="btn btn-sm btn-outline-secondary"
+                        >
+                          <i class="fas fa-file-pdf me-1"></i> PDF
+                        </a>
+                      </div>
+                    </div>
+                  {% empty %}
+                    <div class="profile-muted-panel p-4 text-center">
+                      <div class="fw-semibold mb-1">Sin certificaciones emitidas</div>
+                      <div class="text-muted">Cuando este usuario complete un curso certificado, aparecerá aquí.</div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% if beca_status %}
+            <div class="col-12">
+              <div class="card profile-card">
+                <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                  <div>
+                    <div class="profile-section-title mb-1">Beca Minerd</div>
+                    <div class="text-muted">Estado de la aplicación asociada a este perfil.</div>
+                  </div>
+                  {% if beca_status == 'pendiente' %}
+                    <span class="badge bg-warning text-dark profile-pill">Pendiente / En revisión</span>
+                  {% elif beca_status == 'aprobada' %}
+                    <span class="badge bg-success profile-pill">Aprobada</span>
+                  {% else %}
+                    <span class="badge bg-danger profile-pill">Rechazada</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="card profile-card">
+        <div class="card-body p-5 text-center">
+          <div class="profile-muted-panel p-4 mx-auto" style="max-width: 560px;">
+            <h1 class="h4 mb-2">Perfil no encontrado</h1>
+            <p class="text-muted mb-4">Este usuario todavía no tiene una ficha de perfil creada.</p>
+            <a href="{% url 'user_list' %}" class="btn btn-primary">
+              <i class="fas fa-arrow-left me-1"></i> Volver a usuarios
+            </a>
+          </div>
+        </div>
       </div>
     {% endif %}
-{% else %}
-<p>No profile found.</p>
-{% endif %}
+  </div>
+</div>
 {% endblock %}
-    <a href="{% url 'profile_list' %}">Back to Profile List</a>
-

@@ -1,4 +1,4 @@
-from .profiles import Profiles
+from .profiles import AcademicEvidence, Profiles, ScholarshipStudentInfo
 from .customers import Customers
 from .students import Students
 from .staffs import Staffs

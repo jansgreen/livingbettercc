@@ -16,7 +16,7 @@
                         <p class="card-text display-6">{{ students_count }}</p>
                         <p class="text-muted">Total de registros en el módulo de estudiantes.</p>
                         <div class="mt-auto">
-                            <a href="/auth/students/" class="btn btn-primary">Ir a Estudiantes</a>
+                            <a href="{% url 'authentication:students:student_list_view' %}" class="btn btn-primary">Ir a Estudiantes</a>
                         </div>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                         <p class="card-text display-6">{{ users_count }}</p>
                         <p class="text-muted">Usuarios registrados (tabla User / Profiles).</p>
                         <div class="mt-auto">
-                            <a href="/auth/profile/list/" class="btn btn-primary">Ir a Usuarios</a>
+                            <a href="{% url 'user_list' %}" class="btn btn-primary">Ir a Usuarios</a>
                         </div>
                     </div>
                 </div>

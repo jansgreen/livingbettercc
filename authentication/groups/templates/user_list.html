@@ -107,8 +107,10 @@
                           onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"
                         />
                         <div>
-                          <div class="fw-semibold">{{ user|capfirst }}</div>
-                          <div class="text-muted small">@{{ user.username }}</div>
+                          <div class="fw-semibold">
+                            <a href="{% url 'authentication:profile_detail' user.id %}" class="text-decoration-none text-dark">{{ user|capfirst }}</a>
+                          </div>
+                          <div class="text-muted small"><a href="{% url 'authentication:profile_detail' user.id %}">@{{ user.username }}</a></div>
                         </div>
                       </div>
                     </td>
@@ -221,7 +223,9 @@
                       onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"
                     />
                     <div>
-                      <div class="fw-semibold">{{ user|capfirst }}</div>
+                      <div class="fw-semibold">
+                        <a href="{% url 'authentication:profile_detail' user.id %}" class="text-decoration-none text-dark">{{ user|capfirst }}</a>
+                      </div>
                       <div class="text-muted small">{{ user.email|default:"Sin correo" }}</div>
                     </div>
                   </div>

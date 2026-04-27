@@ -7,6 +7,17 @@ from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Profiles(models.Model):
+    NIVEL_ACADEMICO_CHOICES = [
+            ('basico', 'Estudio Basico'),
+            ('secundario', 'Estudio Secundario'),
+            ('tecnico', 'Estudio Tecnico'),
+            ('universitario', 'Estudio Universitario'),
+            ]
+    ESTADO_ACADEMICO_CHOICES = [
+            ('graduado', 'Graduado'),
+            ('no_graduado', 'No graduado'),
+            ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # Add fields from the related User model
     @property
@@ -31,11 +42,68 @@ class Profiles(models.Model):
     numero_identidad = models.CharField(max_length=11, blank=True, null=True)
     profesion = models.CharField(max_length=140, blank=True, null=True)
     roll = models.CharField(max_length=100, blank=True, null=True)
-    imagen = models.ImageField(upload_to='profiles/', default='profiles/default.jpg')
+    nivel_academico = models.CharField(max_length=20, choices=NIVEL_ACADEMICO_CHOICES, blank=True, null=True)
+    estado_academico = models.CharField(max_length=20, choices=ESTADO_ACADEMICO_CHOICES, blank=True, null=True)
+    imagen = models.ImageField(upload_to='profiles/', default='profiles/default.jpg') 
+    curriculum_vitae = models.FileField(upload_to='profiles/cv/', blank=True, null=True)
     direccion = models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, blank=True, related_name='Direcciones')
     old_cart = models.JSONField(default=dict, blank=True, null=True)  # Assuming this is a JSON field for cart data
     def __str__(self):
         return self.user.username
+
+
+class AcademicEvidence(models.Model):
+    EVIDENCE_TYPE_CHOICES = [
+            ('certificacion', 'Certificacion'),
+            ('diploma', 'Diploma'),
+            ('licenciatura', 'Licenciatura'),
+            ]
+
+    profile = models.ForeignKey(Profiles, on_delete=models.CASCADE, related_name='academic_evidences')
+    evidence_type = models.CharField(max_length=20, choices=EVIDENCE_TYPE_CHOICES)
+    file = models.FileField(upload_to='profiles/evidencias_academicas/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-uploaded_at',)
+
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.get_evidence_type_display()}"
+
+
+class ScholarshipStudentInfo(models.Model):
+    COUNTRY_CHOICES = [
+            ('republica_dominicana', 'Republica Dominicana'),
+            ('estados_unidos', 'Estados Unidos'),
+            ('canada', 'Canada'),
+            ('mexico', 'Mexico'),
+            ('colombia', 'Colombia'),
+            ('venezuela', 'Venezuela'),
+            ('argentina', 'Argentina'),
+            ('chile', 'Chile'),
+            ('peru', 'Peru'),
+            ('ecuador', 'Ecuador'),
+            ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='scholarship_info')
+    country = models.CharField(max_length=50, choices=COUNTRY_CHOICES)
+    district = models.PositiveIntegerField()
+    regional = models.CharField(max_length=255)
+    province = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def is_complete(self):
+        return bool(self.country and self.district and self.regional and self.province)
+
+    def save(self, *args, **kwargs):
+        if self.province:
+            province = self.province.strip()
+            self.province = province[:1].upper() + province[1:].lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.get_country_display()}"
 
 def profile_image_upload_path(instance, filename):
     product_name = instance.product.nombre
@@ -54,7 +122,6 @@ class ProfileImage(models.Model):
 
     class Meta:
         unique_together = ('product', 'image') 
-
 
 class Biography(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -24,7 +24,7 @@
                     {{ form_0.name }}
                 </div>
                 <div class="col-md-4 text-end">
-                    <button type="submit" name="action" value="add" class="btn btn-success btn-lg animate__animated animate__pulse"><i class="fas fa-plus-circle"></i> Crear Grupo</button>
+                    <button type="submit" name="action" value="add" class="btn btn-success btn-lg animate__animated animate__pulse"><i class="fas fa-plus-circle"></i> Crear Grupo </button>
                 </div>
             </form>
         </div>
@@ -43,7 +43,7 @@
                     <div class="card h-100 animate__animated animate__fadeInUp">
                         <div class="card-header bg-secondary text-white d-flex align-items-center justify-content-between">
                             <div>
-                                <i class="fas fa-user-tag"></i> {{ group.name }}
+                                <i class="fas fa-user-tag"></i> {{ group.name }}</a>
                             </div>
                             <div class="d-flex gap-2">
                                 <a href="{% url 'group_update' group.id %}" class="btn btn-sm btn-light">

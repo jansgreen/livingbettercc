@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import group_list, group_create, \
     group_update, group_delete, user_list, add_and_remove_group_to_user, add_and_remove_permission_to_groups, update_user_type, bulk_update_user_type, delete_user,\
-    InviteFriendView, accept_invite, invite_success
+    InviteFriendView, accept_invite, invite_success, complete_scholarship_info
+
 
 urlpatterns = [
     path('user_list/', user_list, name='user_list'),
@@ -18,6 +19,7 @@ urlpatterns = [
 
     path('invite/', InviteFriendView.as_view(), name='invite_friend'), 
     path('accept-invite/<uuid:token>/', accept_invite, name='accept_invite'),
+    path('scholarship-info/', complete_scholarship_info, name='complete_scholarship_info'),
     path('invite_success/', invite_success, name='invite_success'), 
 
 ]

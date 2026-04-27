@@ -7,6 +7,7 @@ from .forms import StudentByDistrictForm
 from authentication.forms import BootstrapUserCreationForm
 from django.contrib import messages
 from django.contrib.auth.models import Group
+from django.db.models import Count, Q
 from .exequatur import exequatur_consurt
 from django.contrib.auth.models import User
 import logging
@@ -14,6 +15,15 @@ from classroom.enrollments.models import Enrollment
 from classroom.courses.models import Course, Module, Lesson
 
 logger = logging.getLogger(__name__)
+
+STUDENT_GROUP_ALIASES = (
+    "student",
+    "students",
+    "estudiante",
+    "estudiantes",
+    "estudiante_becado",
+    "estudiantes_becados",
+)
 
 
 
@@ -74,7 +84,45 @@ def student_my_info(request, pk):
     return render(request, 'my_student.html', context)
 
 def student_list_view(request):
-    students = Students.objects.all()
+    group_query = Q()
+    for group_name in STUDENT_GROUP_ALIASES:
+        group_query |= Q(groups__name__iexact=group_name)
+
+    users = (
+        User.objects
+        .filter(group_query | Q(students__isnull=False) | Q(scholarship_info__isnull=False))
+        .select_related('profiles', 'students', 'scholarship_info')
+        .prefetch_related('groups')
+        .annotate(certificates_count=Count('certificates', distinct=True))
+        .distinct()
+        .order_by('first_name', 'last_name', 'username')
+    )
+
+    students = []
+    for user in users:
+        profile = getattr(user, 'profiles', None)
+        student_record = getattr(user, 'students', None)
+        scholarship_info = getattr(user, 'scholarship_info', None)
+        group_names = {name.lower() for name in user.groups.values_list('name', flat=True)}
+        is_scholarship = bool(
+            scholarship_info
+            or group_names.intersection({'estudiante_becado', 'estudiantes_becados'})
+        )
+
+        students.append({
+            'user': user,
+            'first_name': user.first_name or user.username,
+            'last_name': user.last_name or '',
+            'student_type': 'Becado' if is_scholarship else 'Regular',
+            'regional': getattr(scholarship_info, 'regional', None) or getattr(student_record, 'regional', '') or 'No registrada',
+            'district': getattr(scholarship_info, 'district', None) or getattr(student_record, 'distrito_educativo', '') or 'No registrado',
+            'province': getattr(scholarship_info, 'province', None) or 'No registrada',
+            'country': scholarship_info.get_country_display() if scholarship_info else 'No registrado',
+            'certificates_count': user.certificates_count,
+            'academic_level': profile.get_nivel_academico_display() if profile and profile.nivel_academico else 'No registrado',
+            'profession': getattr(profile, 'profesion', '') or 'No registrada',
+        })
+
     context = {
         'students': students
     }

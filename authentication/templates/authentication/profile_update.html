@@ -1,10 +1,132 @@
-{% extends 'dashboard.html' %}    
+{% extends 'dashboard.html' %}
 
 {% block content %}
-<h2>Update Profile</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-</form>
+<style>
+  .profile-form-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.85rem;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  }
+  .profile-form-section {
+    color: #0f172a;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .academic-evidence-panel {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+  .evidence-link {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.65rem;
+    padding: 0.7rem 0.85rem;
+  }
+</style>
+
+<div class="container py-4">
+  <div class="card profile-form-card">
+    <div class="card-body p-4">
+      <div class="mb-4">
+        <h2 class="h4 mb-1">Editar perfil</h2>
+        <div class="text-muted">{{ form.instance.user.username|capfirst }}</div>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="profile-form-section mb-3">Datos del perfil</div>
+        <div class="row g-3">
+          {% for field in form %}
+            {% if field.name != 'tipo_evidencia_academica' and field.name != 'evidencias_academicas' %}
+              <div class="col-12 col-md-6">
+                <label for="{{ field.id_for_label }}" class="form-label fw-semibold">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div id="academicEvidencePanel" class="academic-evidence-panel mt-4 d-none">
+          <div class="profile-form-section mb-3">Evidencias académicas</div>
+
+          {% if form.instance.academic_evidences.exists %}
+            <div class="mb-3">
+              <div class="form-label fw-semibold">Evidencias subidas</div>
+              <div class="d-grid gap-2">
+                {% for evidence in form.instance.academic_evidences.all %}
+                  <div class="evidence-link d-flex flex-column flex-md-row justify-content-between gap-2">
+                    <span>{{ evidence.get_evidence_type_display }} · {{ evidence.uploaded_at|date:"d/m/Y" }}</span>
+                    <a href="{{ evidence.file.url }}" target="_blank" rel="noopener">Ver archivo</a>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="row g-3">
+            <div class="col-12 col-md-5">
+              <label for="{{ form.tipo_evidencia_academica.id_for_label }}" class="form-label fw-semibold">{{ form.tipo_evidencia_academica.label }}</label>
+              {{ form.tipo_evidencia_academica }}
+              {% for error in form.tipo_evidencia_academica.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div class="col-12 col-md-7">
+              <label for="{{ form.evidencias_academicas.id_for_label }}" class="form-label fw-semibold">{{ form.evidencias_academicas.label }}</label>
+              {{ form.evidencias_academicas }}
+              <div class="form-text">Puedes subir más evidencias sin borrar las anteriores.</div>
+              {% for error in form.evidencias_academicas.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-4">
+          <button class="btn btn-primary" type="submit">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const nivel = document.getElementById('id_nivel_academico');
+    const estado = document.getElementById('id_estado_academico');
+    const panel = document.getElementById('academicEvidencePanel');
+    const tipo = document.getElementById('id_tipo_evidencia_academica');
+    const files = document.getElementById('id_evidencias_academicas');
+    const hasExistingEvidence = {{ form.instance.academic_evidences.exists|yesno:"true,false" }};
+
+    function requiresEvidence() {
+      return ['tecnico', 'universitario'].includes(nivel?.value) && estado?.value === 'graduado';
+    }
+
+    function syncEvidencePanel() {
+      const show = requiresEvidence();
+      panel.classList.toggle('d-none', !show);
+      if (tipo) tipo.required = show && !hasExistingEvidence;
+      if (files) files.required = show && !hasExistingEvidence;
+    }
+
+    nivel?.addEventListener('change', syncEvidencePanel);
+    estado?.addEventListener('change', syncEvidencePanel);
+    syncEvidencePanel();
+  })();
+</script>
 {% endblock %}

@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.forms import inlineformset_factory
 from django.forms import NumberInput, TextInput
 
-from django.db.models import Count, Sum, Value, IntegerField
+from django.db.models import Count, Q, Sum, Value, IntegerField
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 
@@ -57,6 +57,27 @@ def get_report_activity_stats():
         "by_course": by_course,
         "by_year": by_year,
     }
+
+
+def _student_users_count():
+    student_group_aliases = (
+        "student",
+        "students",
+        "estudiante",
+        "estudiantes",
+        "estudiante_becado",
+        "estudiantes_becados",
+    )
+    group_query = Q()
+    for group_name in student_group_aliases:
+        group_query |= Q(groups__name__iexact=group_name)
+
+    return (
+        User.objects
+        .filter(group_query | Q(students__isnull=False) | Q(scholarship_info__isnull=False))
+        .distinct()
+        .count()
+    )
 
 
 # -----------------------------
@@ -115,7 +136,7 @@ def dashboards(request):
     - stats por curso (online + presencial)
     - stats TAOD (KPIs, por año, top cursos) usando tu nueva lógica
     """
-    students_count = Students.objects.count()
+    students_count = _student_users_count()
     users_count = User.objects.count()
     forms_count = FormDefinition.objects.count()
     courses_count = Course.objects.count()

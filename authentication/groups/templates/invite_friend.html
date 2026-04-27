@@ -1,17 +1,17 @@
-
 {% extends 'dashboard.html' %}
 {% load static %}
+
 {% block content %}
 <div class="container py-5 animate__animated animate__fadeIn">
     <div class="row justify-content-center">
-        <div class="col-md-7">
-            <div class="card shadow-lg">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
                 <div class="card-header bg-primary text-white d-flex align-items-center">
                     <i class="fas fa-paper-plane fa-lg me-2"></i>
                     <h4 class="mb-0">Invitar a un Amigo</h4>
                 </div>
-                <div class="card-body">
-                    <p>Ingresa el email de la persona y selecciona un grupo para enviarle una invitación.</p>
+                <div class="card-body p-4">
+                    <p class="text-muted">Ingresa el email de la persona y selecciona un grupo para enviarle una invitación.</p>
                     <form method="post" autocomplete="off">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -28,6 +28,41 @@
                                 <div class="text-danger animate__animated animate__shakeX">{{ form.group.errors }}</div>
                             {% endif %}
                         </div>
+
+                        <div id="scholarshipFields" class="border rounded p-3 mb-3 bg-light d-none">
+                            <div class="fw-semibold mb-2">Datos del estudiante becado</div>
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    {{ form.scholarship_country.label_tag }}
+                                    {{ form.scholarship_country }}
+                                    {% if form.scholarship_country.errors %}
+                                        <div class="text-danger animate__animated animate__shakeX">{{ form.scholarship_country.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {{ form.scholarship_regional.label_tag }}
+                                    {{ form.scholarship_regional }}
+                                    {% if form.scholarship_regional.errors %}
+                                        <div class="text-danger animate__animated animate__shakeX">{{ form.scholarship_regional.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {{ form.scholarship_district.label_tag }}
+                                    {{ form.scholarship_district }}
+                                    {% if form.scholarship_district.errors %}
+                                        <div class="text-danger animate__animated animate__shakeX">{{ form.scholarship_district.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {{ form.scholarship_province.label_tag }}
+                                    {{ form.scholarship_province }}
+                                    {% if form.scholarship_province.errors %}
+                                        <div class="text-danger animate__animated animate__shakeX">{{ form.scholarship_province.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-success btn-lg w-100 animate__animated animate__pulse">
                             <i class="fas fa-paper-plane"></i> Enviar Invitación
                         </button>
@@ -37,4 +72,33 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        const groupSelect = document.getElementById('id_group');
+        const panel = document.getElementById('scholarshipFields');
+        const fields = [
+            document.getElementById('id_scholarship_country'),
+            document.getElementById('id_scholarship_regional'),
+            document.getElementById('id_scholarship_district'),
+            document.getElementById('id_scholarship_province')
+        ];
+
+        function selectedGroupText() {
+            const option = groupSelect?.options[groupSelect.selectedIndex];
+            return (option?.text || '').trim().toLowerCase();
+        }
+
+        function syncScholarshipFields() {
+            const show = selectedGroupText() === 'estudiantes_becados';
+            panel?.classList.toggle('d-none', !show);
+            fields.forEach(field => {
+                if (field) field.required = show;
+            });
+        }
+
+        groupSelect?.addEventListener('change', syncScholarshipFields);
+        syncScholarshipFields();
+    })();
+</script>
 {% endblock %}

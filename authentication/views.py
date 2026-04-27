@@ -3,11 +3,12 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from classroom.certifications.models import Certificate
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.conf import settings
 from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm, BootstrapAuthenticationForm
 from authentication.address.forms import AddressForm
-from authentication.models.profiles import Profiles 
+from authentication.models.profiles import AcademicEvidence, Profiles, ScholarshipStudentInfo
 from authentication.models.customers import Customers
 from authentication.models.directives import Directives
 from authentication.address.models import Address
@@ -152,6 +153,13 @@ def _apply_pending_invitation(request, user):
         return False
 
     user.groups.add(invitation.group)
+    if invitation.group.name.lower() == "estudiantes_becados":
+        invitation.apply_scholarship_info(user)
+        try:
+            if not user.scholarship_info.is_complete():
+                request.session["needs_scholarship_info"] = "1"
+        except ScholarshipStudentInfo.DoesNotExist:
+            request.session["needs_scholarship_info"] = "1"
     invitation.mark_used(user)
     _normalize_student_groups(user)
     _normalize_facilitator_groups(user)
@@ -350,6 +358,8 @@ def login_view(request):
 
             # Invitación aplicada -> dashboard (o donde tú quieras)
             if invite_applied:
+                if request.session.pop("needs_scholarship_info", None):
+                    return redirect("complete_scholarship_info")
                 return redirect("dashboard")
 
             # Default: next seguro
@@ -418,7 +428,6 @@ def _resolve_intent_redirect(request, fallback_name="dashboard"):
     return redirect(reverse(fallback_name))
 
 
-
 @login_required
 def profile_create_view(request):
     """
@@ -438,12 +447,19 @@ def profile_create_view(request):
     next_url = _safe_next_url(request, raw_next, fallback_name="dashboard")
 
     if request.method == "POST":
-        form = ProfileForm(request.POST)
+        form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
             profile = form.save(commit=False)
             profile.user = request.user
             profile.old_cart = ""
             profile.save()
+            evidence_type = form.cleaned_data.get("tipo_evidencia_academica")
+            for evidence_file in form.cleaned_data.get("evidencias_academicas") or []:
+                AcademicEvidence.objects.create(
+                    profile=profile,
+                    evidence_type=evidence_type,
+                    file=evidence_file,
+                )
 
             # Asegurar Address residencial
             address = Address.objects.filter(user=request.user, address_type="residencial").first()
@@ -472,6 +488,8 @@ def profile_create_view(request):
                 return redirect(f"{addr_url}?next={reverse('authentication:profile_create')}")
 
             # ✅ Ya Profile + Address listos -> ahora sí consume intent y redirige
+            if request.session.pop("needs_scholarship_info", None):
+                return redirect("complete_scholarship_info")
             return _resolve_intent_redirect(request, fallback_name="dashboard")
 
         messages.error(request, f"Por favor verifica los datos del formulario: {form.errors}")
@@ -487,15 +505,18 @@ def profile_list_view(request):
     return render(request, 'authentication/profile_list.html', context)
 
 @login_required
-def profile_view(request):
-    profile = Profiles.objects.filter(user=request.user)
+def profile_view(request, user_id=None):
+    profile_user = get_object_or_404(User, pk=user_id) if user_id else request.user
+    profile = Profiles.objects.filter(user=profile_user)
     beca_status = None
     from classroom.enrollments.models import BecaApplication
-    beca_app = BecaApplication.objects.filter(user=request.user).order_by('-fecha_aplicacion').first()
+    beca_app = BecaApplication.objects.filter(user=profile_user).order_by('-fecha_aplicacion').first()
     if beca_app:
         beca_status = beca_app.status
     context = {
         'profile': profile,
+        'profile_user': profile_user,
+        'certificates': Certificate.objects.filter(user=profile_user).select_related("course"),
         'beca_status': beca_status,
     }
     return render(request, 'authentication/profile_detail.html', context)
@@ -504,9 +525,16 @@ def profile_view(request):
 def profile_update_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save()
+            profile = form.save()
+            evidence_type = form.cleaned_data.get("tipo_evidencia_academica")
+            for evidence_file in form.cleaned_data.get("evidencias_academicas") or []:
+                AcademicEvidence.objects.create(
+                    profile=profile,
+                    evidence_type=evidence_type,
+                    file=evidence_file,
+                )
             return redirect('profile_list')  # Redirect to profile list after update
     else:
         form = ProfileForm(instance=profile)
