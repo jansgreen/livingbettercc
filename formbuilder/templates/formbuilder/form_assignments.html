@@ -1,0 +1,104 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+{% include "formbuilder/partials/taod_header.html" with header_title="Asignacion de formulario" %}
+
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+  <h1 class="h5 mb-0">Asignacion de formulario</h1>
+  <a class="btn btn-outline-secondary btn-sm" href="{% url 'formbuilder:form_list' %}">Volver</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="list-group">
+      {% for system_form in system_forms %}
+        <a
+          class="list-group-item list-group-item-action {% if selected_system_form.key == system_form.key %}active{% endif %}"
+          href="{% url 'formbuilder:system_form_assignments' system_form.key %}"
+        >
+          <div class="fw-semibold">{{ system_form }}</div>
+          <div class="small {% if selected_system_form.key == system_form.key %}text-white-50{% else %}text-muted{% endif %}">
+            {% with groups=system_form.assigned_groups.all %}
+              {% if groups %}
+                {% for group in groups %}{{ group.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              {% else %}
+                Sin grupos asignados
+              {% endif %}
+            {% endwith %}
+          </div>
+        </a>
+      {% endfor %}
+
+      {% for form_obj in forms %}
+        <a
+          class="list-group-item list-group-item-action {% if selected_form.pk == form_obj.pk %}active{% endif %}"
+          href="{% url 'formbuilder:form_assignments_for_form' form_obj.pk %}"
+        >
+          <div class="fw-semibold">{{ form_obj.name }}</div>
+          <div class="small {% if selected_form.pk == form_obj.pk %}text-white-50{% else %}text-muted{% endif %}">
+            {% with groups=form_obj.assigned_groups.all %}
+              {% if groups %}
+                {% for group in groups %}{{ group.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+              {% else %}
+                Sin grupos asignados
+              {% endif %}
+            {% endwith %}
+          </div>
+        </a>
+      {% empty %}
+        <div class="list-group-item text-muted">No hay formularios.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    {% if selected_system_form %}
+      <form method="post" class="border rounded p-3 bg-white">
+        {% csrf_token %}
+        <input type="hidden" name="assignment_type" value="system">
+        <input type="hidden" name="system_key" value="{{ selected_system_form.key }}">
+        <h2 class="h6 mb-3">{{ selected_system_form }}</h2>
+        <div class="mb-3">
+          {{ assignment_form.assigned_groups.label_tag }}
+          <div class="row row-cols-1 row-cols-md-2 g-2 mt-1">
+            {% for checkbox in assignment_form.assigned_groups %}
+              <label class="col d-flex align-items-center gap-2">
+                {{ checkbox.tag }}
+                <span>{{ checkbox.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if assignment_form.assigned_groups.errors %}
+            <div class="text-danger small mt-2">{{ assignment_form.assigned_groups.errors }}</div>
+          {% endif %}
+        </div>
+        <button class="btn btn-primary" type="submit">Guardar asignacion</button>
+      </form>
+    {% elif selected_form %}
+      <form method="post" class="border rounded p-3 bg-white">
+        {% csrf_token %}
+        <input type="hidden" name="assignment_type" value="dynamic">
+        <input type="hidden" name="form_id" value="{{ selected_form.pk }}">
+        <h2 class="h6 mb-3">{{ selected_form.name }}</h2>
+        <div class="mb-3">
+          {{ assignment_form.assigned_groups.label_tag }}
+          <div class="row row-cols-1 row-cols-md-2 g-2 mt-1">
+            {% for checkbox in assignment_form.assigned_groups %}
+              <label class="col d-flex align-items-center gap-2">
+                {{ checkbox.tag }}
+                <span>{{ checkbox.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          {% if assignment_form.assigned_groups.errors %}
+            <div class="text-danger small mt-2">{{ assignment_form.assigned_groups.errors }}</div>
+          {% endif %}
+        </div>
+        <button class="btn btn-primary" type="submit">Guardar asignacion</button>
+      </form>
+    {% else %}
+      <div class="alert alert-info">Crea un formulario antes de asignarlo a grupos.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

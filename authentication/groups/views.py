@@ -12,6 +12,11 @@ from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.views import View
 from core.group_utils import has_group, ensure_group, resolve_aliases
+from formbuilder.system_forms import (
+    SCHOLARSHIP_STUDENT_INFO_KEY,
+    get_group_ids_for_system_form,
+    group_activates_system_form,
+)
 
 from .forms import GroupForm, GroupFormCreate, InviteForm, PermissionForm, ScholarshipStudentInfoForm
 from .models import Invitation
@@ -43,7 +48,7 @@ def _can_invite(user):
 
 
 def _is_scholarship_group(group) -> bool:
-    return bool(group and (group.name or "").strip().lower() == SCHOLARSHIP_GROUP_NAME)
+    return group_activates_system_form(group, SCHOLARSHIP_STUDENT_INFO_KEY)
 
 
 def _scholarship_info_is_complete(user) -> bool:
@@ -375,7 +380,11 @@ class InviteFriendView(View):
         elif allowed_groups.count() == 1:
             initial["group"] = allowed_groups.first().id
         form = self.form_class(initial=initial, group_queryset=allowed_groups)
-        return render(request, self.template_name, {'form': form})
+        scholarship_group_ids = get_group_ids_for_system_form(SCHOLARSHIP_STUDENT_INFO_KEY)
+        return render(request, self.template_name, {
+            'form': form,
+            'scholarship_group_ids': scholarship_group_ids,
+        })
 
     def post(self, request):
         if not _can_invite(request.user):
@@ -386,7 +395,12 @@ class InviteFriendView(View):
             messages.error(request, "No tienes permisos para enviar invitaciones.")
             return redirect("dashboard")
 
-        form = self.form_class(request.POST, group_queryset=allowed_groups)
+        scholarship_group_ids = get_group_ids_for_system_form(SCHOLARSHIP_STUDENT_INFO_KEY)
+        form = self.form_class(
+            request.POST,
+            group_queryset=allowed_groups,
+            scholarship_group_ids=scholarship_group_ids,
+        )
         if form.is_valid():
             email = form.cleaned_data['email']
             group = form.cleaned_data['group']
@@ -426,7 +440,10 @@ class InviteFriendView(View):
             messages.success(request, 'Tu invitación se ha enviado exitosamente.')
             return redirect('invite_success')
         
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {
+            'form': form,
+            'scholarship_group_ids': scholarship_group_ids,
+        })
 
 def _safe_login_url() -> str:
     # Try common login route names, then fall back to settings.LOGIN_URL or a default path

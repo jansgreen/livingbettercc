@@ -4,6 +4,7 @@ from django_ckeditor_5.fields import CKEditor5Field
 from authentication.address.models import Address
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import Group
 
 from payments.models import User
 
@@ -16,6 +17,12 @@ class FormDefinition(models.Model):
     image = models.ImageField(upload_to='form_images/', blank=True, null=True)
     image_left = models.ImageField(upload_to='form_images/', blank=True, null=True)
     image_right = models.ImageField(upload_to='form_images/', blank=True, null=True)
+    assigned_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name='assigned_form_definitions',
+        help_text='Grupos que pueden ver y completar este formulario.',
+    )
 
     def __str__(self):
         return self.name
@@ -36,6 +43,29 @@ class FormDefinition(models.Model):
     @property
     def image_right_url(self) -> str:
         return self._safe_image_url("image_right")
+
+
+class SystemFormAssignment(models.Model):
+    SCHOLARSHIP_STUDENT_INFO = 'scholarship_student_info'
+
+    FORM_CHOICES = [
+        (SCHOLARSHIP_STUDENT_INFO, 'Datos del estudiante becado'),
+    ]
+
+    key = models.CharField(max_length=100, choices=FORM_CHOICES, unique=True)
+    assigned_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name='assigned_system_forms',
+        help_text='Grupos para los que se activa este formulario del sistema.',
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['key']
+
+    def __str__(self):
+        return self.get_key_display()
 
 FIELD_TYPES = [
     ('char', 'Campo de texto'),

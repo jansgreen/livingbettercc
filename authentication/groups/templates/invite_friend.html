@@ -77,6 +77,9 @@
     (function () {
         const groupSelect = document.getElementById('id_group');
         const panel = document.getElementById('scholarshipFields');
+        const scholarshipGroupIds = new Set([
+            {% for group_id in scholarship_group_ids %}'{{ group_id }}'{% if not forloop.last %}, {% endif %}{% endfor %}
+        ]);
         const fields = [
             document.getElementById('id_scholarship_country'),
             document.getElementById('id_scholarship_regional'),
@@ -84,13 +87,8 @@
             document.getElementById('id_scholarship_province')
         ];
 
-        function selectedGroupText() {
-            const option = groupSelect?.options[groupSelect.selectedIndex];
-            return (option?.text || '').trim().toLowerCase();
-        }
-
         function syncScholarshipFields() {
-            const show = selectedGroupText() === 'estudiantes_becados';
+            const show = scholarshipGroupIds.has(groupSelect?.value || '');
             panel?.classList.toggle('d-none', !show);
             fields.forEach(field => {
                 if (field) field.required = show;

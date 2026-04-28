@@ -31,6 +31,7 @@ def obtener_formbuilder_menu(request):
         submenus.extend(
             [
                 {"nombre": "Panel del Formularios", "url": _safe_url("formbuilder:form_list", "/formbuilder/")},
+                {"nombre": "Asignacion de formulario", "url": _safe_url("formbuilder:form_assignments", "/formbuilder/forms/assignments/")},
                 {
                     "nombre": "Panel de Facilitadores",
                     "url": _safe_url("formbuilder:facilitador_list_view", "/formbuilder/facilitadores/"),
@@ -52,6 +53,7 @@ def obtener_formbuilder_menu(request):
     elif is_tecnico:
         submenus.extend(
             [
+                {"nombre": "Formularios Pendientes", "url": _safe_url("formbuilder:pending_forms", "/formbuilder/facilitador/pending/")},
                 {"nombre": "Lista Formularios Completados", "url": _safe_url("formbuilder:completed_forms_list", "/formbuilder/completed/")},
                 {
                     "nombre": "Lista de Facilitadores",
@@ -68,6 +70,7 @@ def obtener_formbuilder_menu(request):
     elif is_facilitador:
         submenus.extend(
             [
+                {"nombre": "Formularios Pendientes", "url": _safe_url("formbuilder:pending_forms", "/formbuilder/facilitador/pending/")},
                 {
                     "nombre": "Mis Formularios Completados",
                     "url": _safe_url("formbuilder:my_user_completed_forms", "/formbuilder/my-completed/"),
@@ -84,6 +87,7 @@ def obtener_formbuilder_menu(request):
         if is_customer:
             submenus.append({"nombre": "Invitar", "url": f"{_safe_url('invite_friend', '#')}?group=customers"})
         elif is_student or is_becado:
+            submenus.append({"nombre": "Formularios Pendientes", "url": _safe_url("formbuilder:pending_forms", "/formbuilder/facilitador/pending/")})
             submenus.append({"nombre": "Invitar", "url": f"{_safe_url('invite_friend', '#')}?group=estudiantes"})
 
     menu = build_menu(request.user, "Gestiones y Formularios", submenus, url="#")

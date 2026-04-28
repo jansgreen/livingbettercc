@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import Group, Permission
 from authentication.models.profiles import ScholarshipStudentInfo
+from formbuilder.system_forms import SCHOLARSHIP_STUDENT_INFO_KEY, get_group_ids_for_system_form
 
 
 def _capitalize_province(value):
@@ -85,15 +86,19 @@ class InviteForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         group_queryset = kwargs.pop('group_queryset', None)
+        scholarship_group_ids = kwargs.pop('scholarship_group_ids', None)
         super().__init__(*args, **kwargs)
         if group_queryset is None:
             group_queryset = Group.objects.all()
         self.fields['group'].queryset = group_queryset
+        if scholarship_group_ids is None:
+            scholarship_group_ids = get_group_ids_for_system_form(SCHOLARSHIP_STUDENT_INFO_KEY)
+        self.scholarship_group_ids = {int(group_id) for group_id in scholarship_group_ids}
 
     def clean(self):
         cleaned_data = super().clean()
         group = cleaned_data.get('group')
-        is_scholarship = bool(group and group.name.lower() == 'estudiantes_becados')
+        is_scholarship = bool(group and group.id in self.scholarship_group_ids)
         province = cleaned_data.get('scholarship_province')
         if province:
             cleaned_data['scholarship_province'] = _capitalize_province(province)

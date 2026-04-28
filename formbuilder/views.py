@@ -3,8 +3,9 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-from .models import FormDefinition, FormField, CompletedForm
-from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm, TrimestralReportForm
+from .models import FormDefinition, FormField, CompletedForm, SystemFormAssignment
+from .forms import FormDefinitionForm, FormFieldForm, FacilitadorRegistrationForm, TrimestralReportForm, FormAssignmentForm, SystemFormAssignmentForm
+from .system_forms import get_system_form_assignment
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 # formbuilder/views.py
@@ -41,22 +42,50 @@ def _is_tecnico(user) -> bool:
 def _is_staff(user) -> bool:
     return bool(user and user.is_authenticated and user.is_staff)
 
-def _require_facilitador_or_staff(request):
+def _user_group_ids(user) -> list[int]:
+    if not user or not user.is_authenticated:
+        return []
+    return list(user.groups.values_list("id", flat=True))
+
+def _form_is_assigned_to_user(form_obj, user) -> bool:
+    if not user or not user.is_authenticated:
+        return False
+    if _is_staff(user) or _is_tecnico(user):
+        return True
+    group_ids = _user_group_ids(user)
+    if not group_ids:
+        return False
+    return form_obj.assigned_groups.filter(id__in=group_ids).exists()
+
+def _available_forms_for_user(user):
+    qs = FormDefinition.objects.prefetch_related("assigned_groups").all()
+    if not user or not user.is_authenticated:
+        return qs.none()
+    if _is_staff(user) or _is_tecnico(user):
+        return qs
+    assigned = qs.filter(assigned_groups__in=user.groups.all()).distinct()
+    if _is_facilitador(user):
+        return qs.filter(Q(assigned_groups__isnull=True) | Q(pk__in=assigned.values("pk"))).distinct()
+    return assigned
+
+def _require_facilitador_or_staff(request, form_obj=None):
     if False:
         next_url = request.get_full_path()
         register_url = reverse('authentication:facilitador_register')
         return redirect(f"{register_url}?next={next_url}")
-    if not (_is_facilitador(request.user) or _is_tecnico(request.user) or _is_staff(request.user)):
+    has_assigned_access = bool(form_obj and _form_is_assigned_to_user(form_obj, request.user))
+    if not (_is_facilitador(request.user) or _is_tecnico(request.user) or _is_staff(request.user) or has_assigned_access):
         raise Http404("No encontrado")
     return None
 
 def pending_forms(request):
-    guard = _require_facilitador_or_staff(request)
-    if guard:
-        return guard
+    if not request.user.is_authenticated:
+        raise Http404("No encontrado")
     # Aquí puedes implementar la lógica para obtener los formularios pendientes
     # Por simplicidad, asumiremos que todos los formularios están pendientes
-    pending_forms = FormDefinition.objects.all()
+    pending_forms = _available_forms_for_user(request.user)
+    if not pending_forms.exists() and not (_is_facilitador(request.user) or _is_tecnico(request.user) or _is_staff(request.user)):
+        raise Http404("No encontrado")
     # Adjuntar el pk del último formulario completado por el usuario para cada definición,
     # de modo que el botón "Editar" pueda apuntar al recurso correcto.
     for f in pending_forms:
@@ -150,7 +179,7 @@ def facilitador_list_view(request):
 def form_list(request):
     if not _is_staff(request.user):
         raise Http404("No encontrado")
-    forms = FormDefinition.objects.all()
+    forms = FormDefinition.objects.prefetch_related("assigned_groups").all()
     return render(request, 'formbuilder/form_list.html', {'forms': forms})
 
 def form_detail(request, pk):
@@ -195,6 +224,57 @@ def form_delete(request, pk):
         instance.delete()
         return redirect(reverse('formbuilder:form_list'))
     return render(request, 'formbuilder/form_confirm_delete.html', {'object': instance})
+
+@require_http_methods(["GET", "POST"])
+def form_assignments(request, pk=None, system_key=None):
+    if not _is_staff(request.user):
+        raise Http404("No encontrado")
+
+    selected_form = None
+    selected_system_form = None
+    assignment_form = None
+    system_forms = [
+        get_system_form_assignment(SystemFormAssignment.SCHOLARSHIP_STUDENT_INFO),
+    ]
+
+    if system_key:
+        selected_system_form = get_object_or_404(SystemFormAssignment, key=system_key)
+    elif request.method == "POST" and request.POST.get("assignment_type") == "system":
+        selected_system_form = get_object_or_404(SystemFormAssignment, key=request.POST.get("system_key"))
+    elif pk:
+        selected_form = get_object_or_404(FormDefinition, pk=pk)
+    elif request.method == "POST":
+        selected_form = get_object_or_404(FormDefinition, pk=request.POST.get("form_id"))
+    else:
+        selected_system_form = system_forms[0] if system_forms else None
+        if selected_system_form is None:
+            selected_form = FormDefinition.objects.order_by("name").first()
+
+    if selected_system_form:
+        assignment_form = SystemFormAssignmentForm(request.POST or None, instance=selected_system_form)
+        if request.method == "POST" and assignment_form.is_valid():
+            assignment_form.save()
+            messages.success(request, "Asignacion de formulario actualizada correctamente.")
+            return redirect("formbuilder:system_form_assignments", system_key=selected_system_form.key)
+    elif selected_form:
+        assignment_form = FormAssignmentForm(request.POST or None, instance=selected_form)
+        if request.method == "POST" and assignment_form.is_valid():
+            assignment_form.save()
+            messages.success(request, "Asignacion de formulario actualizada correctamente.")
+            return redirect("formbuilder:form_assignments_for_form", pk=selected_form.pk)
+
+    forms = FormDefinition.objects.prefetch_related("assigned_groups").order_by("name")
+    return render(
+        request,
+        "formbuilder/form_assignments.html",
+        {
+            "forms": forms,
+            "system_forms": system_forms,
+            "selected_form": selected_form,
+            "selected_system_form": selected_system_form,
+            "assignment_form": assignment_form,
+        },
+    )
 
 # FormField CRUD - function-based views
 @require_http_methods(["GET", "POST"])
@@ -252,7 +332,7 @@ def render_form(request, form_name):
     if not DynamicForm:
         return render(request, "formbuilder/not_found.html", {"form_name": form_name})
 
-    guard = _require_facilitador_or_staff(request)
+    guard = _require_facilitador_or_staff(request, form_obj)
     if guard:
         return guard
 
@@ -789,7 +869,7 @@ def shared_form_entry(request, token):
         return redirect(f"{reverse('authentication:facilitador_register')}?next={next_url}")
 
     # Ya autenticado: aquí validas rol/grupo (facilitador)
-    if not _is_facilitador(request.user) and not _is_staff(request.user):
+    if not _is_facilitador(request.user) and not _is_staff(request.user) and not _form_is_assigned_to_user(link.form, request.user):
         return redirect("home")  # o 403
 
     # Redirige al form real (sin exponer ID público si no quieres)

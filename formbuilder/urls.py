@@ -13,6 +13,9 @@ urlpatterns = [
     path('forms/<int:pk>/', views.form_detail, name='form_detail'),
     path('forms/<int:pk>/edit/', views.form_update, name='form_update'),
     path('forms/<int:pk>/delete/', views.form_delete, name='form_delete'),
+    path('forms/assignments/', views.form_assignments, name='form_assignments'),
+    path('forms/assignments/system/<str:system_key>/', views.form_assignments, name='system_form_assignments'),
+    path('forms/<int:pk>/assignments/', views.form_assignments, name='form_assignments_for_form'),
 
     # FormField CRUD
     path('forms/<int:form_pk>/fields/add/', views.field_create, name='field_add'),

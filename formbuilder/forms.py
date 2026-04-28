@@ -1,7 +1,8 @@
 from django import forms
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.utils.text import slugify
-from .models import FormDefinition, FormField, TrimestralReport
+from .models import FormDefinition, FormField, SystemFormAssignment, TrimestralReport
 
 
 def _append_css_class(widget, css_class: str) -> None:
@@ -14,7 +15,7 @@ def _append_css_class(widget, css_class: str) -> None:
 class FormDefinitionForm(forms.ModelForm):
     class Meta:
         model = FormDefinition
-        fields = ['name', 'description', 'image_left', 'image_right', 'image']
+        fields = ['name', 'description', 'image_left', 'image_right', 'image', 'assigned_groups']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,8 +32,44 @@ class FormDefinitionForm(forms.ModelForm):
         if 'image_right' in self.fields:
             _append_css_class(self.fields['image_right'].widget, 'form-control')
 
+        if 'assigned_groups' in self.fields:
+            self.fields['assigned_groups'].label = 'Grupos asignados'
+            self.fields['assigned_groups'].help_text = 'Deja vacio para mantener el acceso general de administradores, tecnicos y facilitadores.'
+            self.fields['assigned_groups'].queryset = Group.objects.order_by('name')
+            _append_css_class(self.fields['assigned_groups'].widget, 'form-select')
+
         for field in self.fields.values():
             _append_css_class(field.widget, 'form-control')
+
+
+class FormAssignmentForm(forms.ModelForm):
+    class Meta:
+        model = FormDefinition
+        fields = ['assigned_groups']
+        widgets = {
+            'assigned_groups': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['assigned_groups'].label = 'Grupos'
+        self.fields['assigned_groups'].required = False
+        self.fields['assigned_groups'].queryset = Group.objects.order_by('name')
+
+
+class SystemFormAssignmentForm(forms.ModelForm):
+    class Meta:
+        model = SystemFormAssignment
+        fields = ['assigned_groups']
+        widgets = {
+            'assigned_groups': forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['assigned_groups'].label = 'Grupos'
+        self.fields['assigned_groups'].required = False
+        self.fields['assigned_groups'].queryset = Group.objects.order_by('name')
 
 class FormFieldForm(forms.ModelForm):
     class Meta:

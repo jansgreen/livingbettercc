@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import FormDefinition, FormField, FormShareLink
+from .models import FormDefinition, FormField, FormShareLink, SystemFormAssignment
 
 class FormFieldInline(admin.TabularInline):
     model = FormField
@@ -8,6 +8,7 @@ class FormFieldInline(admin.TabularInline):
 @admin.register(FormDefinition)
 class FormDefinitionAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at')
+    filter_horizontal = ('assigned_groups',)
     inlines = [FormFieldInline]
     
 @admin.register(FormShareLink)
@@ -19,3 +20,8 @@ class FormShareLinkAdmin(admin.ModelAdmin):
 class FormFieldAdmin(admin.ModelAdmin):
     list_display = ('label', 'form', 'field_type', 'order')
     list_filter = ('form', 'field_type')
+
+@admin.register(SystemFormAssignment)
+class SystemFormAssignmentAdmin(admin.ModelAdmin):
+    list_display = ('key', 'updated_at')
+    filter_horizontal = ('assigned_groups',)
