@@ -84,8 +84,8 @@
                 <div class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Estudiantes Becados Minerd</h5>
-                        <p class="card-text display-6">{{ beca_applications_count }}</p>
-                        <p class="text-muted">Total de aplicaciones a beca Minerd. <br> <span class="fw-bold">Becados:</span> {{ becados_count }}</p>
+                        <p class="card-text display-6">{{ becados_count }}</p>
+                        <p class="text-muted">Total de estudiantes becados Minerd. <br> <span class="fw-bold">Aplicaciones:</span> {{ beca_applications_count }}</p>
                         <div class="mt-auto">
                             <a href="{% url 'beca_applications_list' %}" class="btn btn-primary">Ver aplicaciones</a>
                         </div>

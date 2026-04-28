@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.views import View
-from core.group_utils import has_group, ensure_group, resolve_aliases
+from core.group_utils import group_q, has_group, ensure_group, resolve_aliases
 from formbuilder.system_forms import (
     SCHOLARSHIP_STUDENT_INFO_KEY,
     get_group_ids_for_system_form,
@@ -24,7 +24,7 @@ from authentication.models.profiles import ScholarshipStudentInfo
 
 STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
 FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
-ROLE_GROUPS = ("customers", "estudiantes", "Facilitadores", "tecnicos")
+ROLE_GROUPS = ("customers", "estudiantes", "estudiantes_becados", "Facilitadores", "tecnicos")
 SCHOLARSHIP_GROUP_NAME = "estudiantes_becados"
 
 
@@ -125,7 +125,7 @@ def _normalize_facilitator_membership(user):
 
 def _set_user_type(user, selected_type: str):
     selected_type = (selected_type or "").strip().lower()
-    valid_types = {"customer", "estudiante", "facilitador", "tecnico", "staff", "superuser"}
+    valid_types = {"customer", "estudiante", "becado", "facilitador", "tecnico", "staff", "superuser"}
     if selected_type not in valid_types:
         raise ValueError("Tipo de usuario invalido.")
 
@@ -142,6 +142,9 @@ def _set_user_type(user, selected_type: str):
         user.groups.add(g)
     elif selected_type == "estudiante":
         g = ensure_group("estudiantes")
+        user.groups.add(g)
+    elif selected_type == "becado":
+        g = ensure_group("estudiantes_becados")
         user.groups.add(g)
     elif selected_type == "facilitador":
         g = ensure_group("Facilitadores")
@@ -322,17 +325,52 @@ def group_delete(request, pk):
 
 @user_passes_test(_is_staff)
 def user_list(request):
+    search = (request.GET.get("q") or "").strip()
+    group_id = (request.GET.get("group") or "").strip()
+    user_type = (request.GET.get("type") or "").strip().lower()
+
     users = User.objects.all().prefetch_related('groups')
     all_groups = Group.objects.all().order_by('name')
+
+    if search:
+        users = users.filter(
+            Q(username__icontains=search)
+            | Q(email__icontains=search)
+            | Q(first_name__icontains=search)
+            | Q(last_name__icontains=search)
+        )
+
+    if group_id.isdigit():
+        users = users.filter(groups__id=int(group_id))
+
+    if user_type == "customer":
+        users = users.filter(groups__name__iexact="customers")
+    elif user_type == "estudiante":
+        users = users.filter(group_q("estudiantes") | Q(students__isnull=False))
+    elif user_type == "becado":
+        users = users.filter(group_q("estudiantes_becados") | Q(scholarship_info__isnull=False))
+    elif user_type == "facilitador":
+        users = users.filter(group_q("facilitadores"))
+    elif user_type == "tecnico":
+        users = users.filter(group_q("tecnicos"))
+    elif user_type == "staff":
+        users = users.filter(is_staff=True, is_superuser=False)
+    elif user_type == "superuser":
+        users = users.filter(is_superuser=True)
+
+    users = users.distinct().order_by("username")
+
     for user in users:
         user.is_customer = has_group(user, "customers")
         user.is_student = has_group(user, "estudiantes")
+        user.is_scholarship = has_group(user, "estudiantes_becados") or hasattr(user, "scholarship_info")
         user.is_facilitador = has_group(user, "facilitadores")
         user.is_tecnico = has_group(user, "tecnicos")
         role_hits = sum(
             int(flag) for flag in [
                 user.is_customer,
                 user.is_student,
+                user.is_scholarship,
                 user.is_facilitador,
                 user.is_tecnico,
             ]
@@ -346,6 +384,8 @@ def user_list(request):
             user.current_user_type = "tecnico"
         elif user.is_facilitador:
             user.current_user_type = "facilitador"
+        elif user.is_scholarship:
+            user.current_user_type = "becado"
         elif user.is_student:
             user.current_user_type = "estudiante"
         elif user.is_customer:
@@ -354,7 +394,17 @@ def user_list(request):
             user.current_user_type = ""
 
         user.has_mixed_roles = role_hits > 1 or ((user.is_staff or user.is_superuser) and role_hits > 0)
-    return render(request, 'user_list.html', {'users': users, 'all_groups': all_groups})
+    filters = {
+        "q": search,
+        "group": group_id,
+        "type": user_type,
+    }
+    return render(request, 'user_list.html', {
+        'users': users,
+        'all_groups': all_groups,
+        'filters': filters,
+        'filtered_count': users.count(),
+    })
 
 class InviteFriendView(View):
     form_class = InviteForm

@@ -13,8 +13,8 @@
     box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
   }
   .users-avatar {
-    width: 56px;
-    height: 56px;
+    width: 44px;
+    height: 44px;
     object-fit: cover;
     border-radius: 0.8rem;
     border: 2px solid #e2e8f0;
@@ -33,6 +33,65 @@
     border: 0;
     border-radius: 1rem;
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  }
+  .users-filter-card {
+    border: 0;
+    border-radius: 0.9rem;
+  }
+  .users-table {
+    table-layout: fixed;
+    min-width: 1180px;
+  }
+  .users-table th,
+  .users-table td {
+    vertical-align: middle;
+  }
+  .users-email {
+    display: inline-block;
+    max-width: 190px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .users-actions-stack {
+    display: grid;
+    gap: 0.45rem;
+    max-width: 280px;
+  }
+  .users-control-select {
+    min-width: 0;
+    font-size: 0.84rem;
+  }
+  .users-type-form {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) auto;
+    gap: 0.4rem;
+    max-width: 235px;
+  }
+  .users-action-btn {
+    min-width: 2.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+  .users-delete-btn {
+    width: fit-content;
+    padding-inline: 0.7rem;
+  }
+  .users-muted-action {
+    border-color: #cbd5e1;
+    color: #475569;
+  }
+  @media (max-width: 575.98px) {
+    .users-shell {
+      padding: 0.85rem;
+      border-radius: 0.75rem;
+    }
+    .users-avatar {
+      width: 40px;
+      height: 40px;
+    }
   }
 </style>
 
@@ -53,6 +112,51 @@
       </div>
     </div>
 
+    <div class="card users-filter-card mb-3">
+      <div class="card-body">
+        <form method="get" class="row g-2 align-items-end" id="userFilterForm">
+          <div class="col-12 col-lg-4">
+            <label class="form-label small text-muted" for="id_user_search">Buscar usuario</label>
+            <input
+              type="search"
+              name="q"
+              id="id_user_search"
+              class="form-control"
+              value="{{ filters.q }}"
+              placeholder="Nombre, usuario o email"
+            >
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label small text-muted" for="id_group_filter">Grupo</label>
+            <select name="group" id="id_group_filter" class="form-select">
+              <option value="">Todos los grupos</option>
+              {% for group in all_groups %}
+                <option value="{{ group.id }}" {% if filters.group == group.id|stringformat:"s" %}selected{% endif %}>{{ group.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label small text-muted" for="id_type_filter">Tipo</label>
+            <select name="type" id="id_type_filter" class="form-select">
+              <option value="">Todos los tipos</option>
+              <option value="estudiante" {% if filters.type == "estudiante" %}selected{% endif %}>Estudiantes</option>
+              <option value="becado" {% if filters.type == "becado" %}selected{% endif %}>Estudiantes becados</option>
+              <option value="facilitador" {% if filters.type == "facilitador" %}selected{% endif %}>Facilitadores</option>
+              <option value="tecnico" {% if filters.type == "tecnico" %}selected{% endif %}>Tecnicos</option>
+              <option value="customer" {% if filters.type == "customer" %}selected{% endif %}>Customers</option>
+              <option value="staff" {% if filters.type == "staff" %}selected{% endif %}>Staff</option>
+              <option value="superuser" {% if filters.type == "superuser" %}selected{% endif %}>Superuser</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-fill">Filtrar</button>
+            <a href="{% url 'user_list' %}" class="btn btn-outline-secondary">Limpiar</a>
+          </div>
+        </form>
+        <div class="small text-muted mt-2">{{ filtered_count }} usuario(s) encontrados.</div>
+      </div>
+    </div>
+
     <div class="card users-card mb-3">
       <div class="card-body py-3">
         <form id="bulkTypeForm" method="POST" action="{% url 'bulk_update_user_type' %}" class="d-flex flex-wrap align-items-center gap-2">
@@ -62,6 +166,7 @@
             <option value="" selected disabled>Seleccionar tipo</option>
             <option value="customer">Customer</option>
             <option value="estudiante">Estudiante</option>
+            <option value="becado">Estudiante becado</option>
             <option value="facilitador">Facilitador</option>
             <option value="tecnico">Tecnico</option>
             <option value="staff">Staff</option>
@@ -78,18 +183,17 @@
       <div class="users-card card d-none d-lg-block">
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 users-table">
               <thead class="table-dark">
                 <tr>
                   <th class="ps-3" style="width: 44px;">
                     <input type="checkbox" id="selectAllDesktop" class="form-check-input">
                   </th>
-                  <th class="ps-4">Usuario</th>
-                  <th>Email</th>
-                  <th>Grupos</th>
-                  <th>Tipo</th>
-                  <th>Asignar Grupo</th>
-                  <th class="pe-4">Remover Grupo</th>
+                  <th class="ps-4" style="width: 28%;">Usuario</th>
+                  <th style="width: 18%;">Email</th>
+                  <th style="width: 18%;">Grupos</th>
+                  <th style="width: 17%;">Tipo</th>
+                  <th class="pe-4" style="width: 19%;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,7 +219,7 @@
                       </div>
                     </td>
                     <td>
-                      <span class="badge text-bg-light users-badge">{{ user.email|default:"Sin correo" }}</span>
+                      <span class="badge text-bg-light users-badge users-email" title="{{ user.email|default:'Sin correo' }}">{{ user.email|default:"Sin correo" }}</span>
                     </td>
                     <td>
                       <div class="users-group-list">
@@ -127,7 +231,9 @@
                       </div>
                     </td>
                     <td>
-                      {% if user.is_customer %}
+                      {% if user.is_scholarship %}
+                        <span class="badge text-bg-success users-badge">Becado</span>
+                      {% elif user.is_customer %}
                         <span class="badge text-bg-primary users-badge">Customer</span>
                       {% elif user.is_staff %}
                         {% if user.is_superuser %}
@@ -148,52 +254,53 @@
                         <div class="small text-warning mt-1">Roles mixtos detectados</div>
                       {% endif %}
                       {% if request.user.is_staff or request.user.is_superuser %}
-                        <form method="POST" action="{% url 'update_user_type' user.id %}" class="d-flex gap-2 mt-2">
+                        <form method="POST" action="{% url 'update_user_type' user.id %}" class="users-type-form mt-2">
                           {% csrf_token %}
-                          <select name="user_type" class="form-select form-select-sm">
+                          <select name="user_type" class="form-select form-select-sm users-control-select" aria-label="Cambiar tipo de usuario">
                             <option value="customer" {% if user.current_user_type == "customer" %}selected{% endif %}>Customer</option>
                             <option value="estudiante" {% if user.current_user_type == "estudiante" %}selected{% endif %}>Estudiante</option>
+                            <option value="becado" {% if user.current_user_type == "becado" %}selected{% endif %}>Becado</option>
                             <option value="facilitador" {% if user.current_user_type == "facilitador" %}selected{% endif %}>Facilitador</option>
                             <option value="tecnico" {% if user.current_user_type == "tecnico" %}selected{% endif %}>Tecnico</option>
                             <option value="staff" {% if user.current_user_type == "staff" %}selected{% endif %}>Staff</option>
                             <option value="superuser" {% if user.current_user_type == "superuser" %}selected{% endif %}>Superuser</option>
                           </select>
-                          <button type="submit" class="btn btn-sm btn-outline-dark">Cambiar</button>
+                          <button type="submit" class="btn btn-sm btn-outline-dark users-action-btn" title="Aplicar tipo">OK</button>
                         </form>
                       {% endif %}
                     </td>
-                    <td style="min-width: 260px;">
-                      <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="d-flex gap-2">
-                        {% csrf_token %}
-                        <select name="group" class="form-select form-select-sm" required>
-                          {% for g in all_groups %}
-                            <option value="{{ g.id }}">{{ g.name }}</option>
-                          {% endfor %}
-                        </select>
-                        <button type="submit" name="action" value="add" class="btn btn-sm btn-primary">
-                          <i class="fas fa-plus"></i>
-                        </button>
-                      </form>
-                    </td>
-                    <td class="pe-4" style="min-width: 260px;">
-                      <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="d-flex gap-2">
-                        {% csrf_token %}
-                        <select name="group" class="form-select form-select-sm" required>
-                          {% for group in user.groups.all %}
-                            <option value="{{ group.id }}">{{ group.name }}</option>
-                          {% empty %}
-                            <option value="" disabled selected>Sin grupos</option>
-                          {% endfor %}
-                        </select>
-                        <button type="submit" name="action" value="remove" class="btn btn-sm btn-outline-danger" {% if not user.groups.all %}disabled{% endif %}>
-                          <i class="fas fa-minus"></i>
-                        </button>
-                      </form>
+                    <td class="pe-4">
+                      <div class="users-actions-stack">
+                        <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="input-group input-group-sm">
+                          {% csrf_token %}
+                          <select name="group" class="form-select users-control-select" required aria-label="Asignar grupo">
+                            {% for g in all_groups %}
+                              <option value="{{ g.id }}">{{ g.name }}</option>
+                            {% endfor %}
+                          </select>
+                          <button type="submit" name="action" value="add" class="btn btn-primary users-action-btn" title="Asignar grupo">
+                            +
+                          </button>
+                        </form>
+                        <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="input-group input-group-sm">
+                          {% csrf_token %}
+                          <select name="group" class="form-select users-control-select" required aria-label="Remover grupo">
+                            {% for group in user.groups.all %}
+                              <option value="{{ group.id }}">{{ group.name }}</option>
+                            {% empty %}
+                              <option value="" disabled selected>Sin grupos</option>
+                            {% endfor %}
+                          </select>
+                          <button type="submit" name="action" value="remove" class="btn btn-outline-danger users-action-btn" {% if not user.groups.all %}disabled{% endif %} title="Remover grupo">
+                            -
+                          </button>
+                        </form>
+                      </div>
                       {% if request.user.is_superuser %}
                         <form method="POST" action="{% url 'delete_user' user.id %}" class="mt-2" onsubmit="return confirm('¿Eliminar el usuario {{ user.username }}? Esta acción no se puede deshacer.');">
                           {% csrf_token %}
-                          <button type="submit" class="btn btn-sm btn-danger" {% if user.id == request.user.id %}disabled{% endif %}>
-                            Eliminar usuario
+                          <button type="submit" class="btn btn-sm btn-outline-danger users-delete-btn" {% if user.id == request.user.id %}disabled{% endif %}>
+                            Eliminar
                           </button>
                         </form>
                       {% endif %}
@@ -232,7 +339,9 @@
 
                   <div class="mb-3">
                     <div class="small text-muted mb-1">Tipo</div>
-                    {% if user.is_customer %}
+                    {% if user.is_scholarship %}
+                      <span class="badge text-bg-success users-badge">Becado</span>
+                    {% elif user.is_customer %}
                       <span class="badge text-bg-primary users-badge">Customer</span>
                     {% elif user.is_staff %}
                       {% if user.is_superuser %}
@@ -259,6 +368,7 @@
                           <select name="user_type" class="form-select">
                             <option value="customer" {% if user.current_user_type == "customer" %}selected{% endif %}>Customer</option>
                             <option value="estudiante" {% if user.current_user_type == "estudiante" %}selected{% endif %}>Estudiante</option>
+                            <option value="becado" {% if user.current_user_type == "becado" %}selected{% endif %}>Becado</option>
                             <option value="facilitador" {% if user.current_user_type == "facilitador" %}selected{% endif %}>Facilitador</option>
                             <option value="tecnico" {% if user.current_user_type == "tecnico" %}selected{% endif %}>Tecnico</option>
                             <option value="staff" {% if user.current_user_type == "staff" %}selected{% endif %}>Staff</option>
@@ -334,12 +444,17 @@
     const selectAll = document.getElementById('selectAllDesktop');
 
     function getSelectedValues() {
-      return Array.from(document.querySelectorAll('.js-user-select:checked')).map(cb => cb.value);
+      const values = Array.from(document.querySelectorAll('.js-user-select:checked'))
+        .filter(cb => cb.offsetParent !== null)
+        .map(cb => cb.value);
+      return Array.from(new Set(values));
     }
 
     if (selectAll) {
       selectAll.addEventListener('change', function () {
-        document.querySelectorAll('.js-user-select').forEach(cb => { cb.checked = selectAll.checked; });
+        document.querySelectorAll('.js-user-select').forEach(cb => {
+          if (cb.offsetParent !== null) cb.checked = selectAll.checked;
+        });
       });
     }
 
@@ -352,6 +467,27 @@
           return;
         }
         hidden.value = selected.join(',');
+      });
+    }
+
+    const filterForm = document.getElementById('userFilterForm');
+    const searchInput = document.getElementById('id_user_search');
+    const groupFilter = document.getElementById('id_group_filter');
+    const typeFilter = document.getElementById('id_type_filter');
+    let searchTimer = null;
+
+    function submitFilters() {
+      if (filterForm) filterForm.requestSubmit();
+    }
+
+    [groupFilter, typeFilter].forEach(select => {
+      if (select) select.addEventListener('change', submitFilters);
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function () {
+        window.clearTimeout(searchTimer);
+        searchTimer = window.setTimeout(submitFilters, 450);
       });
     }
   })();

@@ -20,6 +20,7 @@ from classroom.courses.services.taod_stats import get_taod_stats  # <- usa el ac
 
 from classroom.certifications.models import Certificate
 from classroom.enrollments.models import BecaApplication
+from core.group_utils import group_q
 
 # 🔁 AJUSTA ESTE IMPORT a tu ubicación real
 from home.models import ReportActivity
@@ -75,6 +76,22 @@ def _student_users_count():
     return (
         User.objects
         .filter(group_query | Q(students__isnull=False) | Q(scholarship_info__isnull=False))
+        .distinct()
+        .count()
+    )
+
+
+def _scholarship_students_count():
+    scholarship_users = User.objects.filter(
+        group_q("estudiantes_becados") | Q(scholarship_info__isnull=False)
+    ).values("id")
+    approved_application_users = BecaApplication.objects.filter(
+        status="approved"
+    ).values("user_id")
+
+    return (
+        User.objects
+        .filter(Q(id__in=scholarship_users) | Q(id__in=approved_application_users))
         .distinct()
         .count()
     )
@@ -143,7 +160,7 @@ def dashboards(request):
     customers_count = Customers.objects.count()
 
     beca_applications_count = BecaApplication.objects.count()
-    becados_count = BecaApplication.objects.filter(status="approved").count()
+    becados_count = _scholarship_students_count()
 
     user_groups = (
         set(request.user.groups.values_list("name", flat=True))
