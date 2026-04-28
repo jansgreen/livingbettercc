@@ -83,6 +83,12 @@
     border-color: #cbd5e1;
     color: #475569;
   }
+  .users-location {
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
   @media (max-width: 575.98px) {
     .users-shell {
       padding: 0.85rem;
@@ -189,11 +195,12 @@
                   <th class="ps-3" style="width: 44px;">
                     <input type="checkbox" id="selectAllDesktop" class="form-check-input">
                   </th>
-                  <th class="ps-4" style="width: 28%;">Usuario</th>
-                  <th style="width: 18%;">Email</th>
-                  <th style="width: 18%;">Grupos</th>
-                  <th style="width: 17%;">Tipo</th>
-                  <th class="pe-4" style="width: 19%;">Acciones</th>
+                  <th class="ps-4" style="width: 24%;">Usuario</th>
+                  <th style="width: 16%;">Email</th>
+                  <th style="width: 16%;">Grupos</th>
+                  <th style="width: 14%;">Regional/Distrito</th>
+                  <th style="width: 14%;">Tipo</th>
+                  <th class="pe-4" style="width: 16%;">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,6 +236,13 @@
                           <span class="badge text-bg-warning users-badge">Sin grupo</span>
                         {% endfor %}
                       </div>
+                    </td>
+                    <td>
+                      {% if user.has_district_regional %}
+                        <span class="users-location" title="Regional-Distrito">{{ user.region_district_code|default:"No registrado" }}</span>
+                      {% else %}
+                        <span class="text-muted small">No registrado</span>
+                      {% endif %}
                     </td>
                     <td>
                       {% if user.is_scholarship %}
@@ -389,6 +403,15 @@
                         <span class="badge text-bg-warning users-badge">Sin grupo</span>
                       {% endfor %}
                     </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="small text-muted mb-1">Regional/Distrito</div>
+                    {% if user.has_district_regional %}
+                      <span class="users-location" title="Regional-Distrito">{{ user.region_district_code|default:"No registrado" }}</span>
+                    {% else %}
+                      <span class="text-muted small">No registrado</span>
+                    {% endif %}
                   </div>
 
                   <form method="POST" action="{% url 'add_and_remove_group_to_user' user.id %}" class="mb-2">

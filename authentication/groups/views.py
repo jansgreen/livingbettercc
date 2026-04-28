@@ -28,6 +28,22 @@ ROLE_GROUPS = ("customers", "estudiantes", "estudiantes_becados", "Facilitadores
 SCHOLARSHIP_GROUP_NAME = "estudiantes_becados"
 
 
+def _region_district_code(regional, district) -> str:
+    def digits(value):
+        text = "".join(ch for ch in str(value or "") if ch.isdigit())
+        return text
+
+    regional_code = digits(regional)
+    district_code = digits(district)
+    if regional_code and len(regional_code) < 2:
+        regional_code = regional_code.zfill(2)
+    if district_code and len(district_code) < 2:
+        district_code = district_code.zfill(2)
+    if regional_code and district_code:
+        return f"{regional_code}-{district_code}"
+    return regional_code or district_code
+
+
 def _is_staff(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
@@ -329,7 +345,7 @@ def user_list(request):
     group_id = (request.GET.get("group") or "").strip()
     user_type = (request.GET.get("type") or "").strip().lower()
 
-    users = User.objects.all().prefetch_related('groups')
+    users = User.objects.all().select_related('students', 'scholarship_info').prefetch_related('groups')
     all_groups = Group.objects.all().order_by('name')
 
     if search:
@@ -366,6 +382,19 @@ def user_list(request):
         user.is_scholarship = has_group(user, "estudiantes_becados") or hasattr(user, "scholarship_info")
         user.is_facilitador = has_group(user, "facilitadores")
         user.is_tecnico = has_group(user, "tecnicos")
+        scholarship_info = getattr(user, "scholarship_info", None)
+        student_info = getattr(user, "students", None)
+        if scholarship_info:
+            user.regional_display = scholarship_info.regional or ""
+            user.district_display = scholarship_info.district or ""
+        elif student_info:
+            user.regional_display = student_info.regional or ""
+            user.district_display = student_info.distrito_educativo or ""
+        else:
+            user.regional_display = ""
+            user.district_display = ""
+        user.has_district_regional = bool(user.regional_display or user.district_display)
+        user.region_district_code = _region_district_code(user.regional_display, user.district_display)
         role_hits = sum(
             int(flag) for flag in [
                 user.is_customer,
