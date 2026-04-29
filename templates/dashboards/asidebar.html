@@ -439,6 +439,17 @@
     .list-group-flush {
         padding-left: 0;
         margin-bottom: 0;
+        list-style: none;
+    }
+
+    .list-group-flush > li {
+        list-style: none;
+        margin: 0.75rem !important;
+        padding-left: 0 !important;
+    }
+
+    .list-group-flush > li::marker {
+        content: "";
     }
 
     .list-group-item-action {
@@ -466,6 +477,10 @@
         .list-group-item-action {
             min-height: 38px;
             font-size: 0.9rem;
+        }
+
+        .list-group-flush > li {
+            margin: 0.6rem !important;
         }
     }
 
