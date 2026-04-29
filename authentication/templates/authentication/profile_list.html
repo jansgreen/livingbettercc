@@ -1,4 +1,4 @@
-{% extends 'dashboard.html' %}    
+{% extends 'dashboard.html' %}
 {% load static %}
 {% block content %}
 <h2>Profile List</h2>
@@ -23,49 +23,60 @@
             {% for obj in object_list %}
             <tr>
                 <td>
-                    {% if obj.imagen %}
-                    <img src="{{ obj.imagen.url }}" alt="Profile Image" width="50" height="50">
+                    {% if obj.profile and obj.profile.imagen %}
+                    <img src="{{ obj.profile.imagen.url }}" alt="Profile Image" width="50" height="50">
                     {% else %}
                     <span>No Image</span>
                     {% endif %}
-
                 </td>
-                <td>{{ obj |capfirst}}</td>
+                <td>{{ obj.username|capfirst }}</td>
                 <td>{{ obj.first_name }} {{ obj.last_name }}</td>
                 <td>{{ obj.email }}</td>
-                {% if obj.telefono %}
-                <td>{{ obj.telefono }}</td>
-                {% else %}
-                <td>No</td>
-                {% endif %}
-                {% if obj.numero_identidad %}
-                <td>{{ obj.numero_identidad }}</td>
-                {% else %}
-                <td>No</td>
-                {% endif %}
-                {% if obj.profesion %}
-                <td>{{ obj.profesion }}</td>
-                {% else %}
-                <td>No</td>
-                {% endif %}
-                {% if obj.roll %}
-                <td>{{ obj.roll }}</td>
-                {% else %}
-                <td>No</td>
-                {% endif %}
                 <td>
-                    {% if not profile.user.addresses.exists %}
-                        <a href="{% url 'authentication:address:address_create' address_type='residencial' pk=obj.id %}?next={% url 'authentication:profile_list' %}" class="btn btn-sm btn-success">Agregar Dirección</a>
+                    {% if obj.profile and obj.profile.telefono %}
+                        {{ obj.profile.telefono }}
                     {% else %}
-                        {% with first_address=profile.user.addresses.first %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if obj.profile and obj.profile.numero_identidad %}
+                        {{ obj.profile.numero_identidad }}
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if obj.profile and obj.profile.profesion %}
+                        {{ obj.profile.profesion }}
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if obj.profile and obj.profile.roll %}
+                        {{ obj.profile.roll }}
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not obj.addresses.exists %}
+                        <a href="{% url 'authentication:address:address_create' address_type='residencial' pk=obj.id %}?next={% url 'authentication:profile_list' %}" class="btn btn-sm btn-success">Agregar Direccion</a>
+                    {% else %}
+                        {% with first_address=obj.addresses.first %}
                             <a href="{% url 'authentication:address:address_update' first_address.pk %}">Ver Direcciones</a>
                         {% endwith %}
                     {% endif %}
                 </td>
-                <td>{{ obj.user.groups.all|join:", "|capfirst }}</td>
+                <td>{{ obj.groups.all|join:", "|capfirst }}</td>
                 <td>
-                    <a href="{% url 'profile_update' obj.pk %}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{% url 'profile_delete' obj.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    {% if obj.profile %}
+                        <a href="{% url 'authentication:profile_update' obj.profile.pk %}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{% url 'authentication:profile_delete' obj.profile.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    {% else %}
+                        <a href="{% url 'authentication:profile_create' %}" class="btn btn-sm btn-outline-primary">Crear</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

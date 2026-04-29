@@ -9,7 +9,7 @@
     <div class="card-body">
       <p>Email: {{user.email}}</p>
       {% if profile %}
-        <img src="{{ profile.imagen.url }}" alt="" width="300" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
+        <img src="{{ profile.imagen.url }}" alt="" style="max-width: 150px; max-height: 150px;" class="rounded me-2" alt="Profile Image" onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"/>
         <div class="mb-3">
           <p>{{ profile.imagen }}</p>
           <p class="form-label">Nombres: {{ profile.user.first_name|capfirst}} </p>

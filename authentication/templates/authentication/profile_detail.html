@@ -141,7 +141,7 @@
               <img
                 src="{% if field.imagen %}{{ field.imagen.url }}{% else %}{% static 'profiles/default.webp' %}{% endif %}"
                 alt="Foto de {{ field.user.username }}"
-                class="profile-avatar"
+                class="profile-avatar" style="max-width: 150px; max-height: 150px;"
                 onerror="this.onerror=null; this.src='{% static 'profiles/default.webp' %}'"
               />
               <div>
@@ -251,9 +251,13 @@
                   <div>
                     <div class="profile-data-label">Hoja de vida / CV</div>
                     {% if field.curriculum_vitae %}
-                      <a href="{{ field.curriculum_vitae.url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary mt-1">
-                        <i class="fas fa-file-alt me-1"></i> Ver CV
-                      </a>
+                      {% if can_download_profile_files %}
+                        <a href="{% url 'authentication:profile_curriculum_download' field.pk %}" class="btn btn-sm btn-outline-primary mt-1">
+                          <i class="fas fa-file-alt me-1"></i> Descargar CV
+                        </a>
+                      {% else %}
+                        <div class="profile-data-value">Archivo disponible solo para personal autorizado.</div>
+                      {% endif %}
                     {% else %}
                       <div class="profile-data-value">No registrado</div>
                     {% endif %}
@@ -294,9 +298,13 @@
                           </div>
                         </div>
                       </div>
-                      <a href="{{ evidence.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener">
-                        <i class="fas fa-external-link-alt me-1"></i> Ver archivo
-                      </a>
+                      {% if can_download_profile_files %}
+                        <a href="{% url 'authentication:academic_evidence_download' evidence.pk %}" class="btn btn-sm btn-outline-primary">
+                          <i class="fas fa-download me-1"></i> Descargar
+                        </a>
+                      {% else %}
+                        <span class="text-muted small">Solo personal autorizado</span>
+                      {% endif %}
                     </div>
                   {% empty %}
                     <div class="profile-muted-panel p-4 text-center">

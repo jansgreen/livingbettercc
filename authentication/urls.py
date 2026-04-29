@@ -12,6 +12,8 @@ urlpatterns = [
     path('profile/list/', views.profile_list_view, name='profile_list'),
     path('profile/update/<int:pk>/', views.profile_update_view, name='profile_update'),
     path('profile/delete/<int:pk>/', views.profile_delete_view, name='profile_delete'),
+    path('profile/<int:pk>/download/curriculum/', views.profile_curriculum_download, name='profile_curriculum_download'),
+    path('profile/evidence/<int:pk>/download/', views.academic_evidence_download, name='academic_evidence_download'),
    # Registro de usuarios y 
 
     path('login/', views.login_view, name='login'),

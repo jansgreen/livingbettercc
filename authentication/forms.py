@@ -8,6 +8,29 @@ from .models.directives import Directives
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User, Group
 from authentication.address.models import Address
+import os
+
+
+ALLOWED_CURRICULUM_EXTENSIONS = {'.pdf', '.doc', '.docx'}
+ALLOWED_EVIDENCE_EXTENSIONS = {'.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'}
+BLOCKED_ARCHIVE_EXTENSIONS = {'.zip', '.rar', '.7z', '.tar', '.gz'}
+
+
+def _validate_uploaded_extension(uploaded_file, *, allowed_extensions, field_label: str):
+    if not uploaded_file:
+        return uploaded_file
+    extension = os.path.splitext(uploaded_file.name or '')[1].lower()
+    if extension in BLOCKED_ARCHIVE_EXTENSIONS:
+        raise forms.ValidationError(
+            f"{field_label}: los archivos comprimidos no son compatibles. "
+            f"Sube el documento descomprimido en formato {', '.join(sorted(allowed_extensions))}."
+        )
+    if extension not in allowed_extensions:
+        raise forms.ValidationError(
+            f"{field_label}: formato no permitido. "
+            f"Usa uno de estos formatos: {', '.join(sorted(allowed_extensions))}."
+        )
+    return uploaded_file
 
 def _append_css_class(widget, css_class: str) -> None:
     existing = (widget.attrs.get('class') or '').split()
@@ -113,6 +136,26 @@ class ProfileForm(forms.ModelForm):
             self.add_error('tipo_evidencia_academica', 'Selecciona el tipo de evidencia academica.')
 
         return cleaned_data
+
+    def clean_curriculum_vitae(self):
+        return _validate_uploaded_extension(
+            self.cleaned_data.get('curriculum_vitae'),
+            allowed_extensions=ALLOWED_CURRICULUM_EXTENSIONS,
+            field_label='Hoja de vida',
+        )
+
+    def clean_evidencias_academicas(self):
+        files = self.cleaned_data.get('evidencias_academicas') or []
+        validated_files = []
+        for uploaded_file in files:
+            validated_files.append(
+                _validate_uploaded_extension(
+                    uploaded_file,
+                    allowed_extensions=ALLOWED_EVIDENCE_EXTENSIONS,
+                    field_label='Evidencias academicas',
+                )
+            )
+        return validated_files
 
 class CustomerForm(forms.ModelForm):
     username = forms.CharField(

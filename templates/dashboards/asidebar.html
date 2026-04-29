@@ -230,27 +230,6 @@
                 </div>
             {% endfor %}
             
-            {% for menu in menu_auth %}
-                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow sm" type="button" data-bs-toggle="collapse" data-bs-target="#auth-{{ menu.safe_id }}" aria-expanded="true" aria-controls="auth-{{ menu.safe_id }}">
-                            {{ menu.nombre }}
-                        </button>
-                    </h2>
-                    {% if menu.submenus %}
-                        <div id="auth-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
-                            <ul class="list-group-flush">
-                                {% for submenu in menu.submenus %}
-                                    <li class="ms-3 border-0 m-3">
-                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
-
             {% for menu in menu_directives %}
                 <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
                     <h2 class="accordion-header">
@@ -397,6 +376,27 @@
                     {% endif %}
                 </div>
             {% endfor %}
+
+            {% for menu in menu_auth %}
+                <div class="accordion-item  border-0 border-bottom border-secondary rounded shadow-sm" style="background-color:#5ca3ff;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button bg-gradient text-white collapsed rounded shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#auth-{{ menu.safe_id }}" aria-expanded="true" aria-controls="auth-{{ menu.safe_id }}">
+                            {{ menu.nombre }}
+                        </button>
+                    </h2>
+                    {% if menu.submenus %}
+                        <div id="auth-{{ menu.safe_id }}" class="accordion-collapse collapse show" data-bs-parent="#accordionFlushExample">
+                            <ul class="list-group-flush">
+                                {% for submenu in menu.submenus %}
+                                    <li class="ms-3 border-0 m-3">
+                                        <a class="list-group-item list-group-item-action  text-white border-0  rounded shadow-sm" href="{{ submenu.url }}">- {{ submenu.nombre }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -411,6 +411,10 @@
         background: linear-gradient(90deg,#5ca3ff 0%,#0069f3 100%) !important;
         border-radius: 5px !important; /* Rounded corners */
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        min-height: 48px;
+        padding: 0.75rem 1rem;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 
     /* Hover effect for accordion button */
@@ -430,6 +434,39 @@
     /* Remove underline from links */
     .list-group-item-action, .accordion-button {
         text-decoration: none !important;
+    }
+
+    .list-group-flush {
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .list-group-item-action {
+        display: block;
+        width: 100%;
+        min-height: 40px;
+        padding: 0.6rem 0.75rem;
+        font-size: 0.92rem;
+        line-height: 1.2;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 768px) {
+        .accordion.accordion-flush {
+            max-height: none !important;
+            margin-top: 1rem !important;
+        }
+
+        .accordion-button.bg-gradient {
+            min-height: 44px;
+            font-size: 0.95rem;
+        }
+
+        .list-group-item-action {
+            min-height: 38px;
+            font-size: 0.9rem;
+        }
     }
 
     /* Accordion item styling */

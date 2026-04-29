@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_backends
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from classroom.certifications.models import Certificate
 from classroom.enrollments.models import Enrollment, LessonCompletion
@@ -22,7 +22,7 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from authentication.groups.models import Invitation
 from django.urls import reverse
-from core.group_utils import ensure_group
+from core.group_utils import ensure_group, has_group
 
 STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
 FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
@@ -518,12 +518,50 @@ def profile_view(request, user_id=None):
         'profile_user': profile_user,
         'certificates': Certificate.objects.filter(user=profile_user).select_related("course"),
         'beca_status': beca_status,
+        'can_download_profile_files': _can_download_profile_files(request.user, profile_user),
     }
     return render(request, 'authentication/profile_detail.html', context)
+
+
+def _can_download_profile_files(request_user, profile_user) -> bool:
+    if not request_user or not request_user.is_authenticated:
+        return False
+    if request_user == profile_user:
+        return True
+    if request_user.is_staff or request_user.is_superuser:
+        return True
+    if has_group(request_user, "tecnicos"):
+        return True
+    return False
+
+
+@login_required
+def profile_curriculum_download(request, pk):
+    profile = get_object_or_404(Profiles.objects.select_related("user"), pk=pk)
+    if not _can_download_profile_files(request.user, profile.user):
+        raise Http404("No encontrado")
+    if not profile.curriculum_vitae:
+        raise Http404("No encontrado")
+    return redirect(profile.curriculum_vitae.url)
+
+
+@login_required
+def academic_evidence_download(request, pk):
+    evidence = get_object_or_404(
+        AcademicEvidence.objects.select_related("profile", "profile__user"),
+        pk=pk,
+    )
+    if not _can_download_profile_files(request.user, evidence.profile.user):
+        raise Http404("No encontrado")
+    if not evidence.file:
+        raise Http404("No encontrado")
+    return redirect(evidence.file.url)
 
 @login_required
 def profile_update_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
+    if profile.user != request.user and not request.user.is_staff:
+        raise Http404("No encontrado")
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
@@ -535,7 +573,7 @@ def profile_update_view(request, pk):
                     evidence_type=evidence_type,
                     file=evidence_file,
                 )
-            return redirect('profile_list')  # Redirect to profile list after update
+            return redirect('authentication:profile_detail')  # Redirect to own profile after update
     else:
         form = ProfileForm(instance=profile)
     return render(request, 'authentication/profile_update.html', {'form': form})
