@@ -4,6 +4,7 @@ from .forms import ContactoForm
 from django.core.mail import EmailMessage
 from django.conf import settings
 from authentication.models.directives import Directives
+from authentication.models.profiles import Biography
 from django.db.models import Case, When, IntegerField, Count, F, Sum
 from django.db.models.functions import Coalesce
 from dashboard.contents.models import ContentPost, ContentCategory
@@ -23,6 +24,20 @@ from dashboard.contents.models import ContentCategory, ContentPost
 from django.contrib.auth.decorators import login_required
 
 
+
+
+def _prepare_directive_card(directive):
+    full_name = (directive.user.get_full_name() or "").strip()
+    directive.display_name = full_name or directive.user.username
+    profile_role = getattr(directive.profile, "roll", "") if getattr(directive, "profile", None) else ""
+    directive.display_role = directive.cargo or profile_role or "Miembro de la directiva"
+    directive.social_links = [
+        {"name": "facebook", "label": "Facebook", "icon": "bi bi-facebook", "url": directive.facebook},
+        {"name": "instagram", "label": "Instagram", "icon": "bi bi-instagram", "url": directive.instagram},
+        {"name": "linkedin", "label": "LinkedIn", "icon": "bi bi-linkedin", "url": directive.linkedin},
+    ]
+    directive.has_social_links = any(link["url"] for link in directive.social_links)
+    return directive
 
 
 def home(request):
@@ -59,7 +74,20 @@ def home(request):
 
 def quienes_somos(request):
     category = ContentCategory.objects.filter(slug="quienes_somos").first()
-    directives = Directives.objects.all()
+    directives = list(
+        Directives.objects.select_related("user", "profile")
+        .filter(user__groups__name__iexact="directivas")
+        .distinct()
+        .order_by("cargo", "user__first_name", "user__last_name", "user__username")
+    )
+    biographies = {
+        biography.user_id: biography
+        for biography in Biography.objects.filter(user_id__in=[directive.user_id for directive in directives])
+    }
+    for directive in directives:
+        biography_obj = biographies.get(directive.user_id)
+        directive.public_biography = biography_obj.biography if biography_obj else (directive.biografia or "")
+        _prepare_directive_card(directive)
 
     tabs, issues_by_cat = get_report_activity_grouped_for_tabs()
 
@@ -124,14 +152,25 @@ def contactanos(request):
     return render(request, 'contact_us.html', {'form': form})
 
 def view_bio(request, pk):
-    directives_list = Directives.objects.annotate(
-    prioridad=Case( 
-        When(role__iexact="CEO", then=0),
-        default=1,
-        output_field=IntegerField()
+    directives_list = list(
+        Directives.objects.select_related("user", "profile")
+        .filter(user__groups__name__iexact="directivas")
+        .distinct()
+        .order_by("cargo", "user__first_name", "user__last_name", "user__username")
     )
-).order_by('prioridad', 'role')
-    articles = Directives.objects.get(pk=pk)
+    biographies = {
+        biography.user_id: biography
+        for biography in Biography.objects.filter(user_id__in=[directive.user_id for directive in directives_list])
+    }
+    for directive in directives_list:
+        biography_obj = biographies.get(directive.user_id)
+        directive.public_biography = biography_obj.biography if biography_obj else (directive.biografia or "")
+        _prepare_directive_card(directive)
+
+    articles = get_object_or_404(Directives.objects.select_related("user", "profile"), pk=pk)
+    biography_obj = biographies.get(articles.user_id)
+    articles.public_biography = biography_obj.biography if biography_obj else (articles.biografia or "")
+    _prepare_directive_card(articles)
     context = {
         'directives': directives_list,
         'articles': articles,

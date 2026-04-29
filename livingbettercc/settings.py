@@ -220,6 +220,7 @@ TEMPLATES = [
                 # authentication
                 'authentication.context_processors.context_processor.obtener_menu_auth',
                 'authentication.context_processors.context_processor.obtener_menu_directives',
+                'authentication.context_processors.context_processor.obtener_menu_messages',
 
                 # formbuilder
                 'formbuilder.context_processors.context_processor.obtener_formbuilder_menu',

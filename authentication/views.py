@@ -2,13 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, get_backends
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import JsonResponse, Http404
+from django.core.mail import EmailMessage
 from django.views.decorators.csrf import csrf_exempt
 from classroom.certifications.models import Certificate
 from classroom.enrollments.models import Enrollment, LessonCompletion
 from django.conf import settings
-from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm, BootstrapAuthenticationForm
+from .forms import BootstrapUserCreationForm, ProfileForm, CustomerForm, DirectivesForm, BootstrapAuthenticationForm, CertifiedMessageForm
 from authentication.address.forms import AddressForm
-from authentication.models.profiles import AcademicEvidence, Profiles, ScholarshipStudentInfo
+from authentication.models.profiles import AcademicEvidence, Profiles, ScholarshipStudentInfo, Biography
 from authentication.models.customers import Customers
 from authentication.models.directives import Directives
 from authentication.address.models import Address
@@ -451,6 +452,7 @@ def profile_create_view(request):
         if form.is_valid():
             profile = form.save(commit=False)
             profile.user = request.user
+            form.apply_user_fields(request.user)
             profile.old_cart = ""
             profile.save()
             evidence_type = form.cleaned_data.get("tipo_evidencia_academica")
@@ -533,6 +535,20 @@ def _can_download_profile_files(request_user, profile_user) -> bool:
     if has_group(request_user, "tecnicos"):
         return True
     return False
+
+
+def _can_access_directives_menu(user) -> bool:
+    return bool(user and user.is_authenticated and (user.is_superuser or has_group(user, "directivas")))
+
+
+def _can_manage_directive_record(user, directive) -> bool:
+    if not _can_access_directives_menu(user):
+        return False
+    return user.is_superuser or directive.user_id == user.id
+
+
+def _can_send_certified_messages(user) -> bool:
+    return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))
 
 
 @login_required
@@ -676,42 +692,154 @@ def DirectivesCreate(request):
 # CRUD de la Directiva
 @login_required
 def directives_list(request):
-    directives = Directives.objects.all()
+    if not request.user.is_superuser:
+        raise Http404("No encontrado")
+    directives = Directives.objects.select_related("user", "profile").order_by("cargo", "user__first_name", "user__last_name", "user__username")
     return render(request, "directivas/directives_list.html", {"directives": directives})
 
 @login_required
 def directives_create(request):
+    if not _can_access_directives_menu(request.user):
+        raise Http404("No encontrado")
+    existing_directive = None if request.user.is_superuser else Directives.objects.filter(user=request.user).first()
+    if existing_directive and not request.user.is_superuser:
+        return redirect("authentication:directives_update", pk=existing_directive.pk)
+
+    include_user = request.user.is_superuser
     if request.method == "POST":
-        form = DirectivesForm(request.POST, request.FILES)
+        form = DirectivesForm(request.POST, request.FILES, user=request.user, include_user=include_user)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Tu perfil se ha creado con exitos')
-            return redirect("directives_list")
+            directive = form.save()
+            messages.success(request, 'Tu perfil de directivo se ha guardado correctamente.')
+            if request.user.is_superuser:
+                return redirect("authentication:directives_list")
+            return redirect("view_bio", pk=directive.pk)
         else:
             messages.error(request, f'{form.errors} Corrije el siguiente error')
     else:
-        form = DirectivesForm()
+        form = DirectivesForm(user=request.user, include_user=include_user)
     return render(request, "directivas/directives_form.html", {"form": form, "title": "Crear Directivo"})
 
 @login_required
 def directives_update(request, pk):
     directive = get_object_or_404(Directives, pk=pk)
+    if not _can_manage_directive_record(request.user, directive):
+        raise Http404("No encontrado")
+    include_user = request.user.is_superuser
     if request.method == "POST":
-        form = DirectivesForm(request.POST, request.FILES, instance=directive)
+        form = DirectivesForm(request.POST, request.FILES, instance=directive, user=request.user, include_user=include_user)
         if form.is_valid():
-            form.save()
-            return redirect("directives_list")
+            directive = form.save()
+            messages.success(request, "Perfil de directivo actualizado.")
+            if request.user.is_superuser:
+                return redirect("authentication:directives_list")
+            return redirect("view_bio", pk=directive.pk)
     else:
-        form = DirectivesForm(instance=directive)
+        form = DirectivesForm(instance=directive, user=request.user, include_user=include_user)
     return render(request, "directivas/directives_form.html", {"form": form, "title": "Editar Directivo"})
 
 @login_required
 def directives_delete(request, pk):
+    if not request.user.is_superuser:
+        raise Http404("No encontrado")
     directive = get_object_or_404(Directives, pk=pk)
     if request.method == "POST":
         directive.delete()
-        return redirect("directives_list")
+        return redirect("authentication:directives_list")
     return render(request, "directivas/directives_confirm_delete.html", {"directive": directive})
+
+
+@login_required
+def send_certified_message_view(request):
+    if not _can_send_certified_messages(request.user):
+        raise Http404("No encontrado")
+
+    certified_users = User.objects.filter(
+        certificates__isnull=False,
+    ).exclude(
+        email__isnull=True,
+    ).exclude(
+        email__exact='',
+    ).distinct().order_by('first_name', 'last_name', 'username')
+    registered_users = User.objects.filter(
+        is_active=True,
+    ).exclude(
+        email__isnull=True,
+    ).exclude(
+        email__exact='',
+    ).distinct().order_by('first_name', 'last_name', 'username')
+
+    if request.method == 'POST':
+        form = CertifiedMessageForm(
+            request.POST,
+            recipients_queryset=certified_users,
+            registered_queryset=registered_users,
+        )
+        if form.is_valid():
+            audience = form.cleaned_data['audience']
+            recipient_mode = form.cleaned_data['recipient_mode']
+            certified_selected_users = form.cleaned_data['certified_recipients']
+            registered_selected_users = form.cleaned_data['registered_recipients']
+            subject = form.cleaned_data['subject'].strip()
+            body = form.cleaned_data['body'].strip()
+
+            if audience == 'registered':
+                target_queryset = registered_users
+                selected_users = registered_selected_users
+                audience_label = 'registrado(s)'
+            else:
+                target_queryset = certified_users
+                selected_users = certified_selected_users
+                audience_label = 'certificado(s)'
+
+            target_users = target_queryset if recipient_mode == 'all' else selected_users
+            delivered = 0
+            failed_emails = []
+
+            for user in target_users:
+                email = (user.email or '').strip()
+                if not email:
+                    continue
+                try:
+                    EmailMessage(
+                        subject=subject,
+                        body=body,
+                        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', settings.EMAIL_HOST_USER),
+                        to=[email],
+                    ).send(fail_silently=False)
+                    delivered += 1
+                except Exception:
+                    failed_emails.append(email)
+
+            if delivered:
+                messages.success(request, f"Mensaje enviado a {delivered} usuario(s) {audience_label}.")
+            if failed_emails:
+                messages.warning(request, f"No se pudo enviar a {len(failed_emails)} correo(s): {', '.join(failed_emails[:5])}")
+            if not delivered and not failed_emails:
+                messages.warning(request, "No habia destinatarios validos con correo electronico.")
+
+            return redirect('authentication:send_certified_message')
+    else:
+        form = CertifiedMessageForm(
+            recipients_queryset=certified_users,
+            registered_queryset=registered_users,
+        )
+
+    certified_count = certified_users.count()
+    certificate_count = Certificate.objects.count()
+    registered_count = registered_users.count()
+    return render(
+        request,
+        'authentication/send_certified_message.html',
+        {
+            'form': form,
+            'certified_count': certified_count,
+            'certificate_count': certificate_count,
+            'registered_count': registered_count,
+            'has_certified_users': certified_count > 0,
+            'has_registered_users': registered_count > 0,
+        },
+    )
 # Address view aliases for legacy URL patterns
 def address_list(request):
     return redirect('authentication:address:address_list')

@@ -2,15 +2,42 @@
 {% block content %}
 
 <div class="container py-4">
-  <h2>{{ title }}</h2>
+  <div class="row justify-content-center">
+    <div class="col-xl-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-lg-5">
+          <h2 class="mb-2">{{ title }}</h2>
+          <p class="text-muted mb-4">Completa la informacion publica que se mostrara en la seccion Quienes Somos.</p>
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    {{ form.media }}
-    <button class="btn btn-success">Guardar</button>
-    <a href="{% url 'directives_list' %}" class="btn btn-secondary">Cancelar</a>
-  </form>
+          <form method="post" enctype="multipart/form-data" class="row g-3">
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="{% if field.name == 'biography' %}col-12{% else %}col-md-6{% endif %}">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+            {{ form.media }}
+
+            <div class="col-12 d-flex flex-wrap gap-2 pt-2">
+              <button class="btn btn-success">Guardar</button>
+              {% if request.user.is_superuser %}
+                <a href="{% url 'authentication:directives_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+              {% else %}
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

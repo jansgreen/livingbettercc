@@ -1,0 +1,116 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-xl-9">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+            <div>
+              <h2 class="mb-1">Enviar mensaje</h2>
+              <p class="text-muted mb-0">Envio de correos a usuarios certificados o usuarios registrados con correo electronico.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge text-bg-primary">Usuarios certificados: {{ certified_count }}</span>
+              <span class="badge text-bg-success">Usuarios registrados: {{ registered_count }}</span>
+              <span class="badge text-bg-light border">Certificaciones emitidas: {{ certificate_count }}</span>
+            </div>
+          </div>
+
+          {% if not has_certified_users %}
+            <div class="alert alert-warning" role="alert">
+              Aun no hay usuarios con certificaciones emitidas en este entorno, por eso la lista de usuarios certificados aparece vacia.
+            </div>
+          {% endif %}
+
+          <form method="post" class="row g-3">
+            {% csrf_token %}
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.audience.id_for_label }}">{{ form.audience.label }}</label>
+              {{ form.audience }}
+              {% for error in form.audience.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.recipient_mode.id_for_label }}">{{ form.recipient_mode.label }}</label>
+              {{ form.recipient_mode }}
+              {% for error in form.recipient_mode.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-12 recipient-list" data-audience="certified">
+              <label class="form-label" for="{{ form.certified_recipients.id_for_label }}">{{ form.certified_recipients.label }}</label>
+              {{ form.certified_recipients }}
+              {% if has_certified_users %}
+                <div class="form-text">Puedes seleccionar un usuario certificado o varios. Usa `Ctrl` + click para seleccionar varios.</div>
+              {% else %}
+                <div class="form-text">Cuando existan certificaciones emitidas, aqui se mostrara la lista de usuarios certificados.</div>
+              {% endif %}
+              {% for error in form.certified_recipients.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-12 recipient-list" data-audience="registered" style="display:none;">
+              <label class="form-label" for="{{ form.registered_recipients.id_for_label }}">{{ form.registered_recipients.label }}</label>
+              {{ form.registered_recipients }}
+              {% if has_registered_users %}
+                <div class="form-text">Puedes seleccionar un usuario registrado o varios. Usa `Ctrl` + click para seleccionar varios.</div>
+              {% else %}
+                <div class="form-text">No hay usuarios registrados con correo electronico disponible.</div>
+              {% endif %}
+              {% for error in form.registered_recipients.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+              {{ form.subject }}
+              {% for error in form.subject.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="{{ form.body.id_for_label }}">{{ form.body.label }}</label>
+              {{ form.body }}
+              {% for error in form.body.errors %}
+                <div class="text-danger small mt-1">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="col-12 d-flex gap-2 pt-2">
+              <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+              <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const audienceSelect = document.getElementById("id_audience");
+    const recipientLists = document.querySelectorAll(".recipient-list");
+    if (!audienceSelect || !recipientLists.length) return;
+
+    function syncAudience() {
+      const selectedAudience = audienceSelect.value;
+      recipientLists.forEach((block) => {
+        block.style.display = block.dataset.audience === selectedAudience ? "" : "none";
+      });
+    }
+
+    audienceSelect.addEventListener("change", syncAudience);
+    syncAudience();
+  })();
+</script>
+
+{% endblock %}

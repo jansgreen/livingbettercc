@@ -1,6 +1,6 @@
 from django import forms
 from authentication.address.models import Address
-from .models.profiles import Profiles
+from .models.profiles import Profiles, Biography
 from .models.customers import Customers
 from .models.students import Students
 from .models.staffs import Staffs
@@ -97,6 +97,11 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        user = getattr(self.instance, 'user', None)
+        if user and user.pk:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
         if 'fecha_nacimiento' in self.fields:
             self.fields['fecha_nacimiento'].widget.attrs.update({
                 'placeholder': 'dd/mm/aaaa',
@@ -157,6 +162,25 @@ class ProfileForm(forms.ModelForm):
             )
         return validated_files
 
+    def apply_user_fields(self, user):
+        if not user:
+            return None
+        user.first_name = self.cleaned_data.get('first_name', user.first_name)
+        user.last_name = self.cleaned_data.get('last_name', user.last_name)
+        user.email = self.cleaned_data.get('email', user.email)
+        user.save(update_fields=['first_name', 'last_name', 'email'])
+        return user
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        user = getattr(profile, 'user', None)
+        if user and user.pk:
+            self.apply_user_fields(user)
+        if commit:
+            profile.save()
+            self.save_m2m()
+        return profile
+
 class CustomerForm(forms.ModelForm):
     username = forms.CharField(
         max_length=150,
@@ -207,15 +231,121 @@ class StaffForm(forms.ModelForm):
             _append_css_class(field.widget, 'form-control')
 
 class DirectivesForm(forms.ModelForm):
+    biography = forms.CharField(
+        required=False,
+        label='Biografia',
+        widget=forms.Textarea(attrs={'rows': 8, 'class': 'form-control'})
+    )
+
     class Meta:
         model = Directives
-        fields = ('__all__')  # Ensure 'biografia' is included
+        fields = ['user', 'cargo', 'foto', 'facebook', 'instagram', 'linkedin']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Accept the user as a parameter
+        self.request_user = kwargs.pop('user', None)
+        self.include_user = kwargs.pop('include_user', False)
         super().__init__(*args, **kwargs)
+        if not self.include_user:
+            self.fields.pop('user', None)
+        biography_value = ''
+        if self.instance and self.instance.pk and self.instance.user_id:
+            biography_obj = Biography.objects.filter(user=self.instance.user).first()
+            biography_value = biography_obj.biography if biography_obj else (self.instance.biografia or '')
+        self.fields['biography'].initial = biography_value
         for field in self.fields.values():
             _append_css_class(field.widget, 'form-control')
+
+    def save(self, commit=True):
+        directive = super().save(commit=False)
+        if not directive.user_id and self.request_user:
+            directive.user = self.request_user
+
+        biography_text = self.cleaned_data.get('biography', '')
+        directive.biografia = biography_text
+
+        if commit:
+            directive.save()
+            Biography.objects.update_or_create(
+                user=directive.user,
+                defaults={'biography': biography_text},
+            )
+        return directive
+
+
+class CertifiedRecipientMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        full_name = (obj.get_full_name() or '').strip()
+        base = full_name or obj.username
+        email = (obj.email or '').strip()
+        return f"{base} - {email}" if email else base
+
+
+class CertifiedMessageForm(forms.Form):
+    AUDIENCE_CHOICES = [
+        ('certified', 'Usuarios certificados'),
+        ('registered', 'Usuarios registrados'),
+    ]
+    RECIPIENT_MODE_CHOICES = [
+        ('selected', 'Usuarios seleccionados'),
+        ('all', 'Todos los usuarios del grupo elegido'),
+    ]
+
+    audience = forms.ChoiceField(
+        choices=AUDIENCE_CHOICES,
+        initial='certified',
+        label='Grupo de destinatarios',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    recipient_mode = forms.ChoiceField(
+        choices=RECIPIENT_MODE_CHOICES,
+        initial='selected',
+        label='Destinatarios',
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    certified_recipients = CertifiedRecipientMultipleChoiceField(
+        queryset=User.objects.none(),
+        required=False,
+        label='Usuarios certificados',
+        widget=forms.SelectMultiple(attrs={'class': 'form-select', 'size': 12})
+    )
+    registered_recipients = CertifiedRecipientMultipleChoiceField(
+        queryset=User.objects.none(),
+        required=False,
+        label='Usuarios registrados',
+        widget=forms.SelectMultiple(attrs={'class': 'form-select', 'size': 12})
+    )
+    subject = forms.CharField(
+        max_length=180,
+        label='Asunto',
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Escribe el asunto del mensaje'})
+    )
+    body = forms.CharField(
+        label='Cuerpo del mensaje',
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 8, 'placeholder': 'Escribe aqui el mensaje'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        recipients_queryset = kwargs.pop('recipients_queryset', User.objects.none())
+        registered_queryset = kwargs.pop('registered_queryset', User.objects.none())
+        super().__init__(*args, **kwargs)
+        self.fields['certified_recipients'].queryset = recipients_queryset
+        self.fields['registered_recipients'].queryset = registered_queryset
+        if not recipients_queryset.exists():
+            self.fields['certified_recipients'].widget.attrs['disabled'] = True
+        if not registered_queryset.exists():
+            self.fields['registered_recipients'].widget.attrs['disabled'] = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        audience = cleaned_data.get('audience')
+        recipient_mode = cleaned_data.get('recipient_mode')
+        certified_recipients = cleaned_data.get('certified_recipients')
+        registered_recipients = cleaned_data.get('registered_recipients')
+        target_field = 'certified_recipients' if audience == 'certified' else 'registered_recipients'
+        target_recipients = certified_recipients if audience == 'certified' else registered_recipients
+        if recipient_mode == 'selected' and not target_recipients:
+            self.add_error(target_field, 'Selecciona al menos un usuario o cambia a "Todos los usuarios del grupo elegido".')
+        return cleaned_data
 
 class BootstrapUserCreationForm(UserCreationForm):
     class Meta:

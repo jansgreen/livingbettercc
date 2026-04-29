@@ -2,12 +2,17 @@
 {% block content %}
 
 <div class="container py-4">
-  <h3>¿Eliminar a {{ directive.user.get_full_name }}?</h3>
-  <form method="post">
-    {% csrf_token %}
-    <button class="btn btn-danger">Eliminar</button>
-    <a href="{% url 'directives_list' %}" class="btn btn-secondary">Cancelar</a>
-  </form>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+      <h3 class="mb-2">Eliminar directivo</h3>
+      <p class="text-muted">Se eliminara el perfil publico de {{ directive.user.get_full_name|default:directive.user.username }}.</p>
+      <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        <button class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'authentication:directives_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

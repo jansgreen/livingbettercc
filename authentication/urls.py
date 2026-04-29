@@ -32,6 +32,7 @@ urlpatterns = [
     path('directives/create/', views.directives_create, name='directives_create'),
     path('directives/<int:pk>/edit/', views.directives_update, name='directives_update'),
     path('directives/<int:pk>/delete/', views.directives_delete, name='directives_delete'),
+    path('messages/certified/', views.send_certified_message_view, name='send_certified_message'),
     
     # students registration
     path('students/', include('authentication.students.urls')),

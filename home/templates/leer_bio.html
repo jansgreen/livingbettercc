@@ -2,15 +2,130 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
-    <div class="row justify-content-md-center">
-        <div class="col-md-7">
-            {{articles.biografia |safe}}
+<style>
+  .directive-hero {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+  }
+  .directive-hero-photo {
+    width: 180px !important;
+    min-width: 180px;
+    max-width: 180px !important;
+    height: 180px !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 10px;
+  }
+  .directive-hero-fallback {
+    width: 180px;
+    height: 180px;
+    border-radius: 10px;
+    background: #e9f2ff;
+    color: #0d6efd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.4rem;
+  }
+  .directive-social {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #0f172a;
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+  }
+  .directive-social:hover {
+    color: #0d6efd;
+    border-color: rgba(13, 110, 253, 0.35);
+  }
+  .directive-aside-card {
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 8px;
+    background: #fff;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .directive-aside-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+  }
+  .directive-aside-card img {
+    width: 60px !important;
+    min-width: 60px;
+    max-width: 60px !important;
+    height: 60px !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+</style>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="directive-hero p-4 p-lg-5">
+        <div class="d-flex flex-column flex-md-row gap-4 align-items-start">
+          {% if articles.foto %}
+            <img src="{{ articles.foto.url }}" alt="{{ articles.user.get_full_name|default:articles.user.username }}" class="directive-hero-photo">
+          {% elif articles.profile and articles.profile.imagen %}
+            <img src="{{ articles.profile.imagen.url }}" alt="{{ articles.user.get_full_name|default:articles.user.username }}" class="directive-hero-photo">
+          {% else %}
+            <div class="directive-hero-fallback">
+              <i class="bi bi-person-badge"></i>
+            </div>
+          {% endif %}
+          <div class="flex-grow-1">
+            <div class="text-primary text-uppercase small fw-semibold mb-2">Directiva</div>
+            <h1 class="h2 mb-2">{{ articles.display_name }}</h1>
+            <div class="text-muted mb-3">{{ articles.display_role }}</div>
+            <div class="d-flex flex-wrap gap-2">
+              {% for social in articles.social_links %}
+                {% if social.url %}
+                  <a href="{{ social.url }}" class="directive-social" target="_blank" rel="noopener noreferrer" aria-label="{{ social.label }}">
+                    <i class="{{ social.icon }}"></i>
+                  </a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
         </div>
-        <div class="col-md-4">
-            {% include 'manager.html' %}
+
+        <div class="mt-4 pt-3 border-top">
+          {{ articles.public_biography|safe }}
         </div>
+      </div>
     </div>
+
+    <div class="col-lg-4">
+      <div class="d-flex flex-column gap-3">
+        {% for directive in directives %}
+          {% if directive.pk != articles.pk %}
+            <a href="{% url 'view_bio' directive.pk %}" class="directive-aside-card text-decoration-none text-dark p-3 d-flex gap-3 align-items-start">
+              {% if directive.foto %}
+                <img src="{{ directive.foto.url }}" alt="{{ directive.user.get_full_name|default:directive.user.username }}" width="60" height="60" class="rounded-3 object-fit-cover">
+              {% elif directive.profile and directive.profile.imagen %}
+                <img src="{{ directive.profile.imagen.url }}" alt="{{ directive.user.get_full_name|default:directive.user.username }}" width="60" height="60" class="rounded-3 object-fit-cover">
+              {% else %}
+                <span class="rounded-3 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width:60px;height:60px;">
+                  <i class="bi bi-person-badge"></i>
+                </span>
+              {% endif %}
+              <div>
+                <div class="fw-semibold">{{ directive.display_name }}</div>
+                <div class="small text-muted mb-1">{{ directive.display_role }}</div>
+                <div class="small text-muted">{{ directive.public_biography|striptags|truncatewords:10 }}</div>
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
