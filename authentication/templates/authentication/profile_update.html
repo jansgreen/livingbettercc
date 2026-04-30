@@ -35,7 +35,7 @@
         <div class="text-muted">{{ form.instance.user.username|capfirst }}</div>
       </div>
 
-      <form method="post" enctype="multipart/form-data" novalidate>
+      <form method="post" enctype="multipart/form-data" novalidate data-max-file-size-mb="10">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -112,6 +112,9 @@
     const tipo = document.getElementById('id_tipo_evidencia_academica');
     const files = document.getElementById('id_evidencias_academicas');
     const hasExistingEvidence = {{ form.instance.academic_evidences.exists|yesno:"true,false" }};
+    const form = document.querySelector('form[data-max-file-size-mb]');
+    const maxFileSizeMb = Number(form?.dataset.maxFileSizeMb || 10);
+    const maxFileSize = maxFileSizeMb * 1024 * 1024;
 
     function requiresEvidence() {
       return ['tecnico', 'universitario'].includes(nivel?.value) && estado?.value === 'graduado';
@@ -126,6 +129,15 @@
 
     nivel?.addEventListener('change', syncEvidencePanel);
     estado?.addEventListener('change', syncEvidencePanel);
+    form?.addEventListener('submit', function (event) {
+      const oversized = Array.from(form.querySelectorAll('input[type="file"]'))
+        .flatMap((input) => Array.from(input.files || []))
+        .find((file) => file.size > maxFileSize);
+      if (oversized) {
+        event.preventDefault();
+        alert(`El archivo "${oversized.name}" supera ${maxFileSizeMb} MB. Reduce el tamano del archivo e intentalo de nuevo.`);
+      }
+    });
     syncEvidencePanel();
   })();
 </script>

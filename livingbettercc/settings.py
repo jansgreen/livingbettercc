@@ -340,9 +340,11 @@ else:
     MEDIA_URL = "/media/"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage" 
+        "BACKEND": "core.storage.MixedMediaCloudinaryStorage" 
         if USE_CLOUDINARY else 
         "django.core.files.storage.FileSystemStorage"
     },

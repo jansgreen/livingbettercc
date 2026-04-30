@@ -11,18 +11,29 @@ from authentication.address.models import Address
 import os
 
 
-ALLOWED_CURRICULUM_EXTENSIONS = {'.pdf', '.doc', '.docx'}
+ALLOWED_CURRICULUM_EXTENSIONS = {'.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'}
 ALLOWED_EVIDENCE_EXTENSIONS = {'.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'}
-BLOCKED_ARCHIVE_EXTENSIONS = {'.zip', '.rar', '.7z', '.tar', '.gz'}
+BLOCKED_FILE_EXTENSIONS = {
+    '.7z', '.bat', '.cmd', '.com', '.exe', '.gz', '.js', '.msi', '.ps1',
+    '.rar', '.sh', '.tar', '.vbs', '.zip',
+}
+DOCUMENT_ACCEPT_ATTR = '.pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png'
+MAX_PROFILE_UPLOAD_SIZE_MB = 10
+MAX_PROFILE_UPLOAD_SIZE = MAX_PROFILE_UPLOAD_SIZE_MB * 1024 * 1024
 
 
 def _validate_uploaded_extension(uploaded_file, *, allowed_extensions, field_label: str):
     if not uploaded_file:
         return uploaded_file
-    extension = os.path.splitext(uploaded_file.name or '')[1].lower()
-    if extension in BLOCKED_ARCHIVE_EXTENSIONS:
+    if getattr(uploaded_file, 'size', 0) > MAX_PROFILE_UPLOAD_SIZE:
         raise forms.ValidationError(
-            f"{field_label}: los archivos comprimidos no son compatibles. "
+            f"{field_label}: el archivo supera {MAX_PROFILE_UPLOAD_SIZE_MB} MB. "
+            "Reduce el tamano del archivo e intentalo de nuevo."
+        )
+    extension = os.path.splitext(uploaded_file.name or '')[1].lower()
+    if extension in BLOCKED_FILE_EXTENSIONS:
+        raise forms.ValidationError(
+            f"{field_label}: este tipo de archivo no es compatible. "
             f"Sube el documento descomprimido en formato {', '.join(sorted(allowed_extensions))}."
         )
     if extension not in allowed_extensions:
@@ -63,7 +74,11 @@ class ProfileForm(forms.ModelForm):
     evidencias_academicas = MultipleFileField(
         required=False,
         label='Evidencias academicas',
-        widget=MultipleFileInput(attrs={'class': 'form-control', 'multiple': True})
+        widget=MultipleFileInput(attrs={
+            'class': 'form-control',
+            'multiple': True,
+            'accept': DOCUMENT_ACCEPT_ATTR,
+        })
     )
 
 
@@ -109,9 +124,12 @@ class ProfileForm(forms.ModelForm):
             })
         if 'imagen' in self.fields:
             self.fields['imagen'].label = 'Foto de Perfil'
+            self.fields['imagen'].widget.attrs.update({'accept': 'image/*'})
         if 'curriculum_vitae' in self.fields:
             self.fields['curriculum_vitae'].label = 'Hoja de vida (Curriculum vitae)'
             self.fields['curriculum_vitae'].required = True
+            self.fields['curriculum_vitae'].help_text = f"Formatos: PDF, DOC, DOCX, JPG o PNG. Maximo {MAX_PROFILE_UPLOAD_SIZE_MB} MB."
+            self.fields['curriculum_vitae'].widget.attrs.update({'accept': DOCUMENT_ACCEPT_ATTR})
         if 'nivel_academico' in self.fields:
             self.fields['nivel_academico'].label = 'Nivel Academico'
             self.fields['nivel_academico'].required = True
