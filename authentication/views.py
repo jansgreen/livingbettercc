@@ -24,6 +24,9 @@ from django.urls import reverse_lazy
 from authentication.groups.models import Invitation
 from django.urls import reverse
 from core.group_utils import ensure_group, has_group
+import cloudinary.utils
+import os
+import requests
 
 STUDENT_GROUP_ALIASES = {"student", "students", "estudiante", "estudiantes"}
 FACILITATOR_GROUP_ALIASES = {"facilitador", "facilitadores"}
@@ -551,6 +554,34 @@ def _can_send_certified_messages(user) -> bool:
     return bool(user and user.is_authenticated and (user.is_staff or user.is_superuser))
 
 
+def _cloudinary_file_url(file_field, *, attachment=False):
+    name = getattr(file_field, "name", "")
+    if not getattr(settings, "USE_CLOUDINARY", False) or not name:
+        return file_field.url
+
+    extension = os.path.splitext(name)[1].lower()
+    if extension in {".avif", ".gif", ".jpeg", ".jpg", ".png", ".svg", ".webp"}:
+        resource_types = ("image", "raw")
+    elif extension in {".avi", ".m4v", ".mov", ".mp4", ".mpeg", ".mpg", ".webm"}:
+        resource_types = ("video", "raw")
+    else:
+        resource_types = ("raw", "image")
+
+    for resource_type in resource_types:
+        options = {"resource_type": resource_type, "secure": True}
+        if attachment:
+            options["flags"] = "attachment"
+        url, _ = cloudinary.utils.cloudinary_url(name, **options)
+        try:
+            response = requests.head(url, timeout=5, allow_redirects=True)
+        except requests.RequestException:
+            continue
+        if response.status_code < 400:
+            return url
+
+    return file_field.url
+
+
 @login_required
 def profile_curriculum_download(request, pk):
     profile = get_object_or_404(Profiles.objects.select_related("user"), pk=pk)
@@ -558,7 +589,7 @@ def profile_curriculum_download(request, pk):
         raise Http404("No encontrado")
     if not profile.curriculum_vitae:
         raise Http404("No encontrado")
-    return redirect(profile.curriculum_vitae.url)
+    return redirect(_cloudinary_file_url(profile.curriculum_vitae, attachment=True))
 
 
 @login_required
@@ -571,7 +602,7 @@ def academic_evidence_download(request, pk):
         raise Http404("No encontrado")
     if not evidence.file:
         raise Http404("No encontrado")
-    return redirect(evidence.file.url)
+    return redirect(_cloudinary_file_url(evidence.file, attachment=True))
 
 @login_required
 def profile_update_view(request, pk):
