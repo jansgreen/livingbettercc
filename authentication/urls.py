@@ -12,7 +12,9 @@ urlpatterns = [
     path('profile/list/', views.profile_list_view, name='profile_list'),
     path('profile/update/<int:pk>/', views.profile_update_view, name='profile_update'),
     path('profile/delete/<int:pk>/', views.profile_delete_view, name='profile_delete'),
+    path('profile/<int:pk>/view/curriculum/', views.profile_curriculum_view, name='profile_curriculum_view'),
     path('profile/<int:pk>/download/curriculum/', views.profile_curriculum_download, name='profile_curriculum_download'),
+    path('profile/evidence/<int:pk>/view/', views.academic_evidence_view, name='academic_evidence_view'),
     path('profile/evidence/<int:pk>/download/', views.academic_evidence_download, name='academic_evidence_download'),
    # Registro de usuarios y 
 

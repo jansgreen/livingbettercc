@@ -149,6 +149,15 @@ def create_certificate_for_user(user, course):
 
 def _certificate_template_context(cert):
     student_name = (cert.user.get_full_name() or cert.user.username).strip()
+    scholarship_info = getattr(cert.user, "scholarship_info", None)
+    cert_location_text = ""
+    if scholarship_info and scholarship_info.is_complete():
+        cert_location_text = (
+            f"para la Regional {scholarship_info.regional}, "
+            f"Distrito {scholarship_info.district}, "
+            f"{scholarship_info.province}, "
+            f"{scholarship_info.get_country_display()}"
+        )
     return {
         "certificate": cert,
         "certificado": cert,
@@ -166,6 +175,7 @@ def _certificate_template_context(cert):
         "cert_sig2_name": getattr(settings, "CERT_SIG2_NAME", None),
         "cert_sig2_role": getattr(settings, "CERT_SIG2_ROLE", None),
         "cert_quote": getattr(settings, "CERT_QUOTE", None),
+        "cert_location_text": cert_location_text,
     }
 
 

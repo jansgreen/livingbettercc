@@ -593,6 +593,16 @@ def profile_curriculum_download(request, pk):
 
 
 @login_required
+def profile_curriculum_view(request, pk):
+    profile = get_object_or_404(Profiles.objects.select_related("user"), pk=pk)
+    if not _can_download_profile_files(request.user, profile.user):
+        raise Http404("No encontrado")
+    if not profile.curriculum_vitae:
+        raise Http404("No encontrado")
+    return redirect(_cloudinary_file_url(profile.curriculum_vitae, attachment=False))
+
+
+@login_required
 def academic_evidence_download(request, pk):
     evidence = get_object_or_404(
         AcademicEvidence.objects.select_related("profile", "profile__user"),
@@ -603,6 +613,19 @@ def academic_evidence_download(request, pk):
     if not evidence.file:
         raise Http404("No encontrado")
     return redirect(_cloudinary_file_url(evidence.file, attachment=True))
+
+
+@login_required
+def academic_evidence_view(request, pk):
+    evidence = get_object_or_404(
+        AcademicEvidence.objects.select_related("profile", "profile__user"),
+        pk=pk,
+    )
+    if not _can_download_profile_files(request.user, evidence.profile.user):
+        raise Http404("No encontrado")
+    if not evidence.file:
+        raise Http404("No encontrado")
+    return redirect(_cloudinary_file_url(evidence.file, attachment=False))
 
 @login_required
 def profile_update_view(request, pk):

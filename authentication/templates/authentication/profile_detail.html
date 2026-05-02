@@ -252,9 +252,19 @@
                     <div class="profile-data-label">Hoja de vida / CV</div>
                     {% if field.curriculum_vitae %}
                       {% if can_download_profile_files %}
-                        <a href="{% url 'authentication:profile_curriculum_download' field.pk %}" class="btn btn-sm btn-outline-primary mt-1">
-                          <i class="fas fa-file-alt me-1"></i> Descargar CV
-                        </a>
+                        <div class="d-flex flex-wrap gap-2 mt-1">
+                          <a
+                            href="{% url 'authentication:profile_curriculum_view' field.pk %}"
+                            class="btn btn-sm btn-primary"
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            <i class="fas fa-eye me-1"></i> Ver CV
+                          </a>
+                          <a href="{% url 'authentication:profile_curriculum_download' field.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i> Descargar CV
+                          </a>
+                        </div>
                       {% else %}
                         <div class="profile-data-value">Archivo disponible solo para personal autorizado.</div>
                       {% endif %}
@@ -299,9 +309,19 @@
                         </div>
                       </div>
                       {% if can_download_profile_files %}
-                        <a href="{% url 'authentication:academic_evidence_download' evidence.pk %}" class="btn btn-sm btn-outline-primary">
-                          <i class="fas fa-download me-1"></i> Descargar
-                        </a>
+                        <div class="d-flex flex-wrap gap-2">
+                          <a
+                            href="{% url 'authentication:academic_evidence_view' evidence.pk %}"
+                            class="btn btn-sm btn-primary"
+                            target="_blank"
+                            rel="noopener"
+                          >
+                            <i class="fas fa-eye me-1"></i> Ver certificacion
+                          </a>
+                          <a href="{% url 'authentication:academic_evidence_download' evidence.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i> Descargar
+                          </a>
+                        </div>
                       {% else %}
                         <span class="text-muted small">Solo personal autorizado</span>
                       {% endif %}
