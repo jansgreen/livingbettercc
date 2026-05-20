@@ -223,6 +223,21 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
             certs_by_course_year[key]["districts"].add(district_str)
         certs_by_course_year[key]["count"] += row["count"]
 
+    # Auto-crear registros OnlineCertificateReport si no existen
+    for (course_id, year), cert_info in certs_by_course_year.items():
+        districts_str = ", ".join(sorted(cert_info["districts"]))
+        total_qty = cert_info["count"]
+
+        # Crear o actualizar OnlineCertificateReport
+        report, created = OnlineCertificateReport.objects.update_or_create(
+            course_id=course_id,
+            issued_year=year,
+            defaults={
+                "total_quantity": total_qty,
+                "districts_list": districts_str,
+            }
+        )
+
     # Obtener cursos para acceso a títulos
     from classroom.courses.models import Course
     courses = {c.id: c for c in Course.objects.filter(id__in=set(k[0] for k in certs_by_course_year.keys()))}
