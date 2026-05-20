@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from django.contrib.messages import constants as messages
 import dj_database_url
+from google.oauth2 import service_account
 
 
 
@@ -31,12 +32,12 @@ IS_HEROKU = os.getenv("DYNO") is not None or os.getenv("DJANGO_ENV", "").strip()
 
 # Seguridad HTTPS: por defecto solo en producción/Heroku.
 # Si quieres forzarlo en local (solo si realmente sirves HTTPS), exporta SECURE_MODE=1.
-SECURE_MODE = os.getenv("SECURE_MODE") is not None and os.getenv("SECURE_MODE").strip().lower() in {"1", "true", "yes", "y", "on"}
+SECURE_MODE =  os.getenv("SECURE_MODE") is not None and os.getenv("SECURE_MODE").strip().lower() in {"1", "true", "yes", "y", "on"}
 
 SECRET_KEY_CARDNET = os.getenv('SECRET_KEY_CARDNET')
 
 if SECURE_MODE:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -69,55 +70,54 @@ def _parse_hosts_csv(value: str) -> list[str]:
     return list(dict.fromkeys(hosts))
 
 
-if not DEBUG:
-    # Si HOSTS está definido en Heroku, úsalo; pero siempre agrega defaults seguros.
-    _env_hosts = _parse_hosts_csv(os.getenv("HOSTS", ""))
-    _required_hosts = [
-        "livingbettercc.herokuapp.com",
-        # Acepta cualquier subdominio de herokuapp (p.ej. livingbettercc-xxxx.herokuapp.com)
-        ".herokuapp.com",
-        "livingbettercc.com",
-        "www.livingbettercc.com",
-        "livingbettercc.info",
-        "www.livingbettercc.info",
-        "livingbettercc.net",
-        "www.livingbettercc.net",
-        "livingbettercc.org",
-        "www.livingbettercc.org",
-        "livingbettercc.xyz",
-        "www.livingbettercc.xyz",
-        # Acepta cualquier subdominio (p.ej. blog., api.)
-        ".livingbettercc.com",
-        ".livingbettercc.info",
-        ".livingbettercc.net",
-        ".livingbettercc.org",
-        ".livingbettercc.xyz",
-        "livingbettercc-dev-5e915f7fc878.herokuapp.com",
-        "livingbettercc-ba2163025eea.herokuapp.com",
-    ]
-    ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_required_hosts]))
+_common_hosts = [
+    "136.116.129.2",
+    "136.116.129.21",
+    "localhost",
+    "127.0.0.1",
 
-    CSRF_TRUSTED_ORIGINS = [
-        "https://livingbettercc.herokuapp.com",
-        "https://livingbettercc.com",
-        "https://www.livingbettercc.com",
-        "https://livingbettercc.info",
-        "https://www.livingbettercc.info",
-        "https://livingbettercc.net",
-        "https://www.livingbettercc.net",
-        "https://livingbettercc.org",
-        "https://www.livingbettercc.org",
-        "https://livingbettercc.xyz",
-        "https://www.livingbettercc.xyz",
-    ]
-else:
-    _dev_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0")
-    _env_hosts = _parse_hosts_csv(_dev_hosts)
-    if IS_HEROKU:
-        _env_hosts.extend([".herokuapp.com"])
-    ALLOWED_HOSTS = list(dict.fromkeys(_env_hosts))
+    "livingbettercc.herokuapp.com",
+    ".herokuapp.com",
 
+    "livingbettercc.com",
+    "www.livingbettercc.com",
+    "livingbettercc.info",
+    "www.livingbettercc.info",
+    "livingbettercc.net",
+    "www.livingbettercc.net",
+    "livingbettercc.org",
+    "www.livingbettercc.org",
+    "livingbettercc.xyz",
+    "www.livingbettercc.xyz",
 
+    ".livingbettercc.com",
+    ".livingbettercc.info",
+    ".livingbettercc.net",
+    ".livingbettercc.org",
+    ".livingbettercc.xyz",
+
+    "livingbettercc-dev-5e915f7fc878.herokuapp.com",
+    "livingbettercc-ba2163025eea.herokuapp.com",
+]
+
+_env_hosts = _parse_hosts_csv(os.getenv("HOSTS", ""))
+_dev_hosts = _parse_hosts_csv(os.getenv("ALLOWED_HOSTS", ""))
+
+ALLOWED_HOSTS = list(dict.fromkeys([*_env_hosts, *_dev_hosts, *_common_hosts]))
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://livingbettercc.com",
+    "https://www.livingbettercc.com",
+    "https://livingbettercc.info",
+    "https://www.livingbettercc.info",
+    "https://livingbettercc.net",
+    "https://www.livingbettercc.net",
+    "https://livingbettercc.org",
+    "https://www.livingbettercc.org",
+    "https://livingbettercc.xyz",
+    "https://www.livingbettercc.xyz",
+    "https://livingbettercc.herokuapp.com",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -154,6 +154,7 @@ INSTALLED_APPS = [
     'dashboard.contents',
     'django_ckeditor_5',
     'payments',
+    'storages',
 
 ]
 
@@ -264,11 +265,16 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 IS_HEROKU = os.getenv("DYNO") is not None
 
-if IS_HEROKU:
-    if not DATABASE_URL:
-        raise Exception("DATABASE_URL not defined in production.")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
     DATABASES = {
-        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=False,
+        )
     }
 else:
     DATABASES = {
@@ -277,6 +283,20 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
+#if IS_HEROKU:
+#    if not DATABASE_URL:
+#        raise Exception("DATABASE_URL not defined in production.")
+#    DATABASES = {
+#        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+#    }
+#else:
+#    DATABASES = {
+#        "default": {
+#            "ENGINE": "django.db.backends.sqlite3",
+#            "NAME": BASE_DIR / "db.sqlite3",
+#        }
+#    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -321,37 +341,72 @@ WHITENOISE_MANIFEST_STRICT = False
 # Archivos de medios (subidos por los usuarios)
 
 
-# Cloudinary Storage si está habilitado
-
+# Cloudinary Storage si está habilitado actualizado con google cloud storage
 USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
+USE_GCS = os.getenv("USE_GCS", "false").lower() == "true"
+
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+
 if USE_CLOUDINARY and not CLOUDINARY_URL:
-    # Fail-safe: if Cloudinary isn't configured, fall back to local media.
     USE_CLOUDINARY = False
 
-if USE_CLOUDINARY:
-    # Use empty prefix for Cloudinary storage to avoid None prefix errors.
+
+GS_BUCKET_NAME = "livingbettercc-media-2026"
+
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    "/home/livingbettercc/spheric-wonder-449401-f5-a94a652cdc7b.json"
+)
+
+
+if USE_GCS:
+
+    MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "core.storage.SafeGoogleCloudStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+elif USE_CLOUDINARY:
+
     MEDIA_URL = ""
+
     CLOUDINARY_STORAGE = {
         "SECURE": True,
         "PREFIX": "",
     }
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "core.storage.MixedMediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
 else:
+
     MEDIA_URL = "/media/"
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25 * 1024 * 1024
-STORAGES = {
-    "default": {
-        "BACKEND": "core.storage.MixedMediaCloudinaryStorage" 
-        if USE_CLOUDINARY else 
-        "django.core.files.storage.FileSystemStorage"
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    },
-}
 
 # Loguea errores de requests a consola (aparece en heroku logs)
 if not DEBUG:
@@ -509,4 +564,3 @@ CKEDITOR_5_CONFIGS = {
             }
         }
     }
-

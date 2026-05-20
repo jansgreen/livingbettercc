@@ -1,6 +1,8 @@
 import os
 
 from cloudinary_storage.storage import MediaCloudinaryStorage, RESOURCE_TYPES
+from storages.backends.gcloud import GoogleCloudStorage
+from google.cloud.exceptions import NotFound
 
 
 class MixedMediaCloudinaryStorage(MediaCloudinaryStorage):
@@ -14,3 +16,31 @@ class MixedMediaCloudinaryStorage(MediaCloudinaryStorage):
         if extension in self.video_extensions:
             return RESOURCE_TYPES['VIDEO']
         return RESOURCE_TYPES['RAW']
+
+
+class SafeGoogleCloudStorage(GoogleCloudStorage):
+    """
+    Wrapper around GoogleCloudStorage that handles missing files gracefully.
+    When a file doesn't exist in the bucket, methods like size() and
+    get_modified_time() return None instead of raising NotFound exceptions.
+    This prevents errors when Django's FileField tries to delete old files
+    that don't exist in Google Cloud Storage.
+    """
+
+    def size(self, name):
+        try:
+            return super().size(name)
+        except NotFound:
+            return 0
+
+    def get_modified_time(self, name):
+        try:
+            return super().get_modified_time(name)
+        except NotFound:
+            return None
+
+    def get_created_time(self, name):
+        try:
+            return super().get_created_time(name)
+        except NotFound:
+            return None
