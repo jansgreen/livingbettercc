@@ -186,20 +186,26 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
       issues_by_cat: {tab_id: [dict reporte, ...]}
     """
     from classroom.certifications.models import OnlineCertificateReport
-    from django.db.models import Q, F, CharField, Value
+    from django.db.models import Q, F, CharField
     from django.db.models.functions import Coalesce
 
     current_year = timezone.now().year
     min_year = current_year - max(0, limit_years - 1)
 
     # Obtener certificados con info de distrito del usuario
+    # Solo incluir certificados donde el usuario tiene scholarship_info con district válido
     cert_data = (
         Certificate.objects
-        .filter(pending=False, issued_date__year__gte=min_year)
+        .filter(
+            pending=False,
+            issued_date__year__gte=min_year,
+            user__scholarship_info__isnull=False,
+            user__scholarship_info__district__isnull=False
+        )
         .select_related("course", "user__scholarship_info")
         .annotate(
             y=ExtractYear("issued_date"),
-            district=Coalesce(F("user__scholarship_info__district"), Value("Unknown"), output_field=CharField())
+            district=F("user__scholarship_info__district")
         )
         .values("course_id", "y", "district")
         .annotate(count=Count("id"))
@@ -211,7 +217,10 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
 
     for row in cert_data:
         key = (row["course_id"], row["y"])
-        certs_by_course_year[key]["districts"].add(str(row["district"]))
+        # Formatear distrito como string con leading zero si es necesario
+        district_str = f"{int(row['district']):02d}" if row["district"] else None
+        if district_str:
+            certs_by_course_year[key]["districts"].add(district_str)
         certs_by_course_year[key]["count"] += row["count"]
 
     # Obtener cursos para acceso a títulos
