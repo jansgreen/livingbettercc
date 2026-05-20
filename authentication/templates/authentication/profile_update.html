@@ -52,6 +52,20 @@
                 {% if field.help_text %}
                   <div class="form-text">{{ field.help_text }}</div>
                 {% endif %}
+                {% if field.name == 'imagen' and form.instance.imagen and form.instance.imagen.name != 'profiles/default.jpg' %}
+                  <div class="mt-2">
+                    <a href="{% url 'authentication:profile_clear_image' form.instance.pk %}" class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash"></i> Eliminar foto actual
+                    </a>
+                  </div>
+                {% endif %}
+                {% if field.name == 'curriculum_vitae' and form.instance.curriculum_vitae %}
+                  <div class="mt-2">
+                    <a href="{% url 'authentication:profile_clear_curriculum' form.instance.pk %}" class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash"></i> Eliminar CV actual
+                    </a>
+                  </div>
+                {% endif %}
                 {% for error in field.errors %}
                   <div class="text-danger small mt-1">{{ error }}</div>
                 {% endfor %}
@@ -68,9 +82,16 @@
               <div class="form-label fw-semibold">Evidencias subidas</div>
               <div class="d-grid gap-2">
                 {% for evidence in form.instance.academic_evidences.all %}
-                  <div class="evidence-link d-flex flex-column flex-md-row justify-content-between gap-2">
+                  <div class="evidence-link d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                     <span>{{ evidence.get_evidence_type_display }} · {{ evidence.uploaded_at|date:"d/m/Y" }}</span>
-                    <a href="{{ evidence.file.url }}" target="_blank" rel="noopener">Ver archivo</a>
+                    <div class="d-flex gap-2">
+                      <a href="{{ evidence.file.url }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i> Ver
+                      </a>
+                      <a href="{% url 'authentication:academic_evidence_delete' evidence.pk %}" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                      </a>
+                    </div>
                   </div>
                 {% endfor %}
               </div>

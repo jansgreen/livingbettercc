@@ -14,8 +14,11 @@ urlpatterns = [
     path('profile/delete/<int:pk>/', views.profile_delete_view, name='profile_delete'),
     path('profile/<int:pk>/view/curriculum/', views.profile_curriculum_view, name='profile_curriculum_view'),
     path('profile/<int:pk>/download/curriculum/', views.profile_curriculum_download, name='profile_curriculum_download'),
+    path('profile/<int:pk>/clear/curriculum/', views.profile_clear_curriculum, name='profile_clear_curriculum'),
+    path('profile/<int:pk>/clear/image/', views.profile_clear_image, name='profile_clear_image'),
     path('profile/evidence/<int:pk>/view/', views.academic_evidence_view, name='academic_evidence_view'),
     path('profile/evidence/<int:pk>/download/', views.academic_evidence_download, name='academic_evidence_download'),
+    path('profile/evidence/<int:pk>/delete/', views.academic_evidence_delete, name='academic_evidence_delete'),
    # Registro de usuarios y 
 
     path('login/', views.login_view, name='login'),

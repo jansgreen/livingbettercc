@@ -649,6 +649,51 @@ def profile_update_view(request, pk):
     return render(request, 'authentication/profile_update.html', {'form': form})
 
 @login_required
+def academic_evidence_delete(request, pk):
+    evidence = get_object_or_404(AcademicEvidence, pk=pk)
+    if evidence.profile.user != request.user and not request.user.is_staff:
+        raise Http404("No encontrado")
+    if request.method == 'POST':
+        evidence.delete()
+        messages.success(request, "Evidencia académica eliminada exitosamente.")
+        return redirect('authentication:profile_update', pk=evidence.profile.pk)
+    return render(request, 'authentication/academic_evidence_confirm_delete.html', {'evidence': evidence})
+
+@login_required
+def profile_clear_curriculum(request, pk):
+    profile = get_object_or_404(Profiles, pk=pk)
+    if profile.user != request.user and not request.user.is_staff:
+        raise Http404("No encontrado")
+    if request.method == 'POST':
+        profile.curriculum_vitae.delete(save=False)
+        profile.curriculum_vitae = None
+        profile.save(update_fields=['curriculum_vitae'])
+        messages.success(request, "Hoja de vida eliminada exitosamente.")
+        return redirect('authentication:profile_update', pk=profile.pk)
+    return render(request, 'authentication/profile_clear_file_confirm.html', {
+        'profile': profile,
+        'file_type': 'Hoja de vida',
+        'file_field': 'curriculum_vitae'
+    })
+
+@login_required
+def profile_clear_image(request, pk):
+    profile = get_object_or_404(Profiles, pk=pk)
+    if profile.user != request.user and not request.user.is_staff:
+        raise Http404("No encontrado")
+    if request.method == 'POST':
+        profile.imagen.delete(save=False)
+        profile.imagen = 'profiles/default.jpg'
+        profile.save(update_fields=['imagen'])
+        messages.success(request, "Foto de perfil eliminada exitosamente.")
+        return redirect('authentication:profile_update', pk=profile.pk)
+    return render(request, 'authentication/profile_clear_file_confirm.html', {
+        'profile': profile,
+        'file_type': 'Foto de perfil',
+        'file_field': 'imagen'
+    })
+
+@login_required
 def profile_delete_view(request, pk):
     profile = get_object_or_404(Profiles, pk=pk)
     if request.method == 'POST':
