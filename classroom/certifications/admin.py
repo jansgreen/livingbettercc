@@ -11,8 +11,8 @@ class CertificateAdmin(admin.ModelAdmin):
 
 @admin.register(OnlineCertificateReport)
 class OnlineCertificateReportAdmin(admin.ModelAdmin):
-	list_display = ('course', 'issued_year', 'district', 'quantity')
-	search_fields = ('course__title', 'district')
-	list_filter = ('issued_year', 'district')
-	ordering = ('-issued_year', 'district')
+	list_display = ('course', 'issued_year', 'total_quantity', 'created_at')
+	search_fields = ('course__title', 'districts_list')
+	list_filter = ('issued_year', 'created_at')
+	ordering = ('-issued_year', 'course')
 

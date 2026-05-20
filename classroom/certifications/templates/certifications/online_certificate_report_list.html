@@ -8,8 +8,8 @@
       <tr>
         <th>Curso</th>
         <th>Año</th>
-        <th>Distrito/Regional</th>
-        <th>Cantidad</th>
+        <th>Cantidad Total</th>
+        <th>Distritos</th>
         <th>Acciones</th>
       </tr>
     </thead>
@@ -18,8 +18,8 @@
       <tr>
         <td>{{ report.course }}</td>
         <td>{{ report.issued_year }}</td>
-        <td>{{ report.district }}</td>
-        <td>{{ report.quantity }}</td>
+        <td>{{ report.total_quantity }}</td>
+        <td>{{ report.districts_list|truncatewords:10 }}</td>
         <td>
           <a href="{% url 'certifications:online_report_detail' report.pk %}" class="btn btn-info btn-sm">Ver</a>
           <a href="{% url 'certifications:online_report_update' report.pk %}" class="btn btn-warning btn-sm">Editar</a>

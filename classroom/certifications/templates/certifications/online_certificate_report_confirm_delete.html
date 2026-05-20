@@ -6,8 +6,8 @@
   <table class="table table-bordered">
     <tr><th>Curso</th><td>{{ report.course }}</td></tr>
     <tr><th>Año</th><td>{{ report.issued_year }}</td></tr>
-    <tr><th>Distrito/Regional</th><td>{{ report.district }}</td></tr>
-    <tr><th>Cantidad</th><td>{{ report.quantity }}</td></tr>
+    <tr><th>Cantidad Total</th><td>{{ report.total_quantity }}</td></tr>
+    <tr><th>Distritos/Regionales</th><td>{{ report.districts_list }}</td></tr>
   </table>
   <form method="post">
     {% csrf_token %}

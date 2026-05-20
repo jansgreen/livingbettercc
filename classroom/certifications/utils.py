@@ -169,6 +169,98 @@ def get_report_activity_grouped_for_tabs(*, limit_years: int = 6) -> Tuple[List[
 
     return tabs, dict(issues_by_cat)
 
+
+def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[List[Tuple[str, str]], Dict[str, List[Dict[str, Any]]]]:
+    """
+    Genera reportes de certificaciones online agrupadas por course + year.
+
+    Obtiene automáticamente datos de Certificate y los agrupa por:
+    - course_id + year
+    - Cuenta cantidad de certificados
+    - Extrae distritos de ScholarshipStudentInfo de usuarios
+
+    Combina con datos de OnlineCertificateReport para imagen/descripción.
+
+    Retorna formato similar a get_report_activity_grouped_for_tabs():
+      tabs: [(tab_id, tab_name)] - categoría única "ONLINE"
+      issues_by_cat: {tab_id: [dict reporte, ...]}
+    """
+    from classroom.certifications.models import OnlineCertificateReport
+    from django.db.models import Q, F, CharField, Value
+    from django.db.models.functions import Coalesce
+
+    current_year = timezone.now().year
+    min_year = current_year - max(0, limit_years - 1)
+
+    # Obtener certificados con info de distrito del usuario
+    cert_data = (
+        Certificate.objects
+        .filter(pending=False, issued_date__year__gte=min_year)
+        .select_related("course", "user__scholarship_info")
+        .annotate(
+            y=ExtractYear("issued_date"),
+            district=Coalesce(F("user__scholarship_info__district"), Value("Unknown"), output_field=CharField())
+        )
+        .values("course_id", "y", "district")
+        .annotate(count=Count("id"))
+        .order_by("course_id", "-y", "district")
+    )
+
+    # Agrupar por course_id + year para obtener lista de distritos y total
+    certs_by_course_year = defaultdict(lambda: {"districts": set(), "count": 0})
+
+    for row in cert_data:
+        key = (row["course_id"], row["y"])
+        certs_by_course_year[key]["districts"].add(str(row["district"]))
+        certs_by_course_year[key]["count"] += row["count"]
+
+    # Obtener cursos para acceso a títulos
+    from classroom.courses.models import Course
+    courses = {c.id: c for c in Course.objects.filter(id__in=set(k[0] for k in certs_by_course_year.keys()))}
+
+    # Obtener datos de OnlineCertificateReport para imagen/descripción
+    online_reports = {
+        (r.course_id, r.issued_year): r
+        for r in OnlineCertificateReport.objects.filter(issued_year__gte=min_year)
+    }
+
+    # Construir estructura de tabs (categoría única: ONLINE)
+    tabs = [("online", "ONLINE")]
+    issues_by_cat = {"online": []}
+
+    # Construir items de reporte
+    for (course_id, year), cert_info in sorted(certs_by_course_year.items(), key=lambda x: (-x[0][1], x[0][0])):
+        course = courses.get(course_id)
+        if not course:
+            continue
+
+        districts_str = ", ".join(sorted(cert_info["districts"]))
+        total_qty = cert_info["count"]
+
+        # Obtener datos editables de OnlineCertificateReport si existe
+        report = online_reports.get((course_id, year))
+        image = getattr(report, "image", None) if report else None
+        description = getattr(report, "description", "") if report else ""
+        updated_at = getattr(report, "updated_at", timezone.now()) if report else timezone.now()
+
+        issues_by_cat["online"].append({
+            "course": course,
+            "issued_date": date(year, 1, 1),
+            "district": districts_str,
+            "quantity": 0,  # Para presencial (no aplica para online)
+            "impact": total_qty,  # Cantidad online
+            "pct_total": None,  # No calcular porcentaje para online
+            "prev_year": year - 1 if year > min_year else min_year,
+            "desde_presencial_total": None,
+            "desde_online_total": None,
+            "image": image,
+            "note": description,
+            "updated_at": updated_at,
+        })
+
+    return tabs, dict(issues_by_cat)
+
+
 PASSING_SCORE = 70
 def _passed_quicktest(user, module) -> bool:
     """

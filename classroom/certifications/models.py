@@ -139,15 +139,17 @@ class OnlineCertificateReport(models.Model):
         verbose_name="año",
     )
 
-    district = models.CharField(
-        max_length=120,
-        db_index=True,
-        verbose_name="distrito / regional",
+    total_quantity = models.PositiveIntegerField(
+        default=0,
+        verbose_name="cantidad total de certificados online",
     )
 
-    quantity = models.PositiveIntegerField(
-        default=0,
-        verbose_name="cantidad certificada online",
+    districts_list = models.TextField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="distritos/regionales",
+        help_text="Lista de distritos separados por comas: 01, 05, 06, 07, 15, 11, 13, 16",
     )
 
     image = models.ImageField(
@@ -175,10 +177,10 @@ class OnlineCertificateReport(models.Model):
     )
 
     class Meta:
-        ordering = ("-issued_year", "district")
+        ordering = ("-issued_year", "course")
         constraints = [
             models.UniqueConstraint(
-                fields=["course", "issued_year", "district"],
+                fields=["course", "issued_year"],
                 name="unique_online_certificate_report",
             ),
         ]
@@ -186,4 +188,4 @@ class OnlineCertificateReport(models.Model):
         verbose_name_plural = "Reportes de Certificados Online"
 
     def __str__(self):
-        return f"{self.course} | {self.issued_year} | {self.district} | {self.quantity}"
+        return f"{self.course} | {self.issued_year} | {self.total_quantity}"

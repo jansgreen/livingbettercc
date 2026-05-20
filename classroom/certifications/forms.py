@@ -57,14 +57,16 @@ class BecadoCertificateRequestForm(forms.ModelForm):
 class OnlineCertificateReportForm(forms.ModelForm):
 	class Meta:
 		model = OnlineCertificateReport
-		fields = ["course", "issued_year", "district", "quantity", "image", "description"]
+		fields = ["course", "issued_year", "total_quantity", "districts_list", "image", "description"]
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.fields["course"].widget.attrs["class"] = "form-select"
 		self.fields["issued_year"].widget.attrs["class"] = "form-control"
-		self.fields["district"].widget.attrs["class"] = "form-control"
-		self.fields["quantity"].widget.attrs["class"] = "form-control"
+		self.fields["total_quantity"].widget.attrs["class"] = "form-control"
+		self.fields["districts_list"].widget.attrs["class"] = "form-control"
+		self.fields["districts_list"].widget.attrs["rows"] = "3"
+		self.fields["districts_list"].widget.attrs["placeholder"] = "Ej: 01, 05, 06, 07, 15, 11, 13, 16"
 		self.fields["image"].widget.attrs["class"] = "form-control"
 		self.fields["image"].widget.attrs["type"] = "file"
 		self.fields["description"].widget.attrs["class"] = "form-control"

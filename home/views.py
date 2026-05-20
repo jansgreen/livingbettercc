@@ -12,7 +12,7 @@ from gallery.models import Image
 from classroom.courses.models import Course
 from classroom.courses.models import CourseYearStat
 from classroom.certifications.models import Certificate
-from classroom.certifications.utils import get_report_activity_grouped_for_tabs
+from classroom.certifications.utils import get_report_activity_grouped_for_tabs, get_online_certificates_by_course_year
 from django.db.models.functions import ExtractYear
 from collections import OrderedDict
 from shop.cart import Cart
@@ -47,7 +47,14 @@ def home(request):
     # PRESENCIAL (reportes)
     tabs, issues_by_cat = get_report_activity_grouped_for_tabs()
 
-    # DIGITAL (certificados reales)
+    # ONLINE (certificados agrupados por course + year + distritos)
+    tabs_online, issues_online = get_online_certificates_by_course_year()
+
+    # Combinar tabs presenciales + online
+    all_tabs = tabs + tabs_online
+    all_issues_by_cat = {**issues_by_cat, **issues_online}
+
+    # DIGITAL (certificados reales - para referencia)
     online_total = Certificate.objects.count()
     online_by_year = (
         Certificate.objects
@@ -62,9 +69,9 @@ def home(request):
         "gallery": gallery,
         "posts": posts,
 
-        # Para estadistica_proyecto.html
-        "tabs": tabs,
-        "issues_by_cat": issues_by_cat,
+        # Para estadistica_proyecto.html (presencial + online combinado)
+        "tabs": all_tabs,
+        "issues_by_cat": all_issues_by_cat,
 
         # Impacto digital (si lo quieres mostrar)
         "online_total": online_total,
@@ -89,7 +96,12 @@ def quienes_somos(request):
         directive.public_biography = biography_obj.biography if biography_obj else (directive.biografia or "")
         _prepare_directive_card(directive)
 
+    # PRESENCIAL + ONLINE (combined reports)
     tabs, issues_by_cat = get_report_activity_grouped_for_tabs()
+    tabs_online, issues_online = get_online_certificates_by_course_year()
+
+    all_tabs = tabs + tabs_online
+    all_issues_by_cat = {**issues_by_cat, **issues_online}
 
     posts = category.posts.filter(status="published").order_by("-created_at")[:5] if category else None
 
@@ -98,8 +110,8 @@ def quienes_somos(request):
         "directives": directives,
 
         # Para estadistica_proyecto.html
-        "tabs": tabs,
-        "issues_by_cat": issues_by_cat,
+        "tabs": all_tabs,
+        "issues_by_cat": all_issues_by_cat,
     }
     return render(request, "quienes_somos.html", context)
 
