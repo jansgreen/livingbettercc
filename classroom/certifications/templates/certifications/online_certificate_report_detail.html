@@ -1,0 +1,21 @@
+{% extends 'dashboard.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Detalle del Reporte de Certificado Online</h2>
+  <table class="table table-bordered">
+    <tr><th>Curso</th><td>{{ report.course }}</td></tr>
+    <tr><th>Año</th><td>{{ report.issued_year }}</td></tr>
+    <tr><th>Distrito/Regional</th><td>{{ report.district }}</td></tr>
+    <tr><th>Cantidad</th><td>{{ report.quantity }}</td></tr>
+    {% if report.image %}
+    <tr><th>Imagen</th><td><img src="{{ report.image.url }}" alt="Reporte" style="max-width: 200px;"></td></tr>
+    {% endif %}
+    {% if report.description %}
+    <tr><th>Descripción</th><td>{{ report.description }}</td></tr>
+    {% endif %}
+  </table>
+  <a href="{% url 'certifications:online_report_update' report.pk %}" class="btn btn-warning">Editar</a>
+  <a href="{% url 'certifications:online_report_delete' report.pk %}" class="btn btn-danger">Eliminar</a>
+  <a href="{% url 'certifications:online_report_list' %}" class="btn btn-secondary">Volver a la lista</a>
+</div>
+{% endblock %}

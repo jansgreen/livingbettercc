@@ -1,5 +1,5 @@
 from django import forms
-from .models import Certificate, BecadoCertificateRequest
+from .models import Certificate, BecadoCertificateRequest, OnlineCertificateReport
 
 class CertificateForm(forms.ModelForm):
 	class Meta:
@@ -52,3 +52,20 @@ class BecadoCertificateRequestForm(forms.ModelForm):
 				field.widget.attrs["placeholder"] = "nombre@correo.com"
 			if name == "phone":
 				field.widget.attrs["placeholder"] = "809-000-0000"
+
+
+class OnlineCertificateReportForm(forms.ModelForm):
+	class Meta:
+		model = OnlineCertificateReport
+		fields = ["course", "issued_year", "district", "quantity", "image", "description"]
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.fields["course"].widget.attrs["class"] = "form-select"
+		self.fields["issued_year"].widget.attrs["class"] = "form-control"
+		self.fields["district"].widget.attrs["class"] = "form-control"
+		self.fields["quantity"].widget.attrs["class"] = "form-control"
+		self.fields["image"].widget.attrs["class"] = "form-control"
+		self.fields["image"].widget.attrs["type"] = "file"
+		self.fields["description"].widget.attrs["class"] = "form-control"
+		self.fields["description"].widget.attrs["rows"] = "4"

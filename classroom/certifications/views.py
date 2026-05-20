@@ -12,8 +12,8 @@ from django.conf import settings
 from django.views.decorators.http import require_POST
 from core.group_utils import has_group
 
-from .models import Certificate, BecadoCertificateRequest
-from .forms import CertificateForm, BecadoCertificateRequestForm
+from .models import Certificate, BecadoCertificateRequest, OnlineCertificateReport
+from .forms import CertificateForm, BecadoCertificateRequestForm, OnlineCertificateReportForm
 from authentication.models.profiles import Profiles
 from authentication.models.students import Students
 
@@ -322,3 +322,83 @@ class UserCertificateDetailByUUIDView(UserCertificateDetailView):
 
 # ---- In-person certificates (minimal stubs) ----
     # In-person views removed. ReportActivity is managed in the 'home' app.
+
+
+# ---- Online Certificate Reports CRUD ----
+
+class OnlineCertificateReportCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    model = OnlineCertificateReport
+    form_class = OnlineCertificateReportForm
+    template_name = "certifications/online_certificate_report_form.html"
+    success_url = reverse_lazy("certifications:online_report_list")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["mode"] = "create"
+        ctx["report"] = None
+        return ctx
+
+    def form_valid(self, form):
+        messages.success(self.request, "Reporte creado exitosamente.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, f"Error al crear el reporte: {form.errors}")
+        return super().form_invalid(form)
+
+
+class OnlineCertificateReportListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = OnlineCertificateReport
+    template_name = "certifications/online_certificate_report_list.html"
+    context_object_name = "reports"
+    paginate_by = 10
+
+    def get_queryset(self):
+        return OnlineCertificateReport.objects.select_related("course").order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["fields"] = ["course", "issued_year", "district", "quantity"]
+        return ctx
+
+
+class OnlineCertificateReportDetailView(DetailView):
+    model = OnlineCertificateReport
+    template_name = "certifications/online_certificate_report_detail.html"
+    context_object_name = "report"
+
+
+class OnlineCertificateReportUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
+    model = OnlineCertificateReport
+    form_class = OnlineCertificateReportForm
+    template_name = "certifications/online_certificate_report_form.html"
+    success_url = reverse_lazy("certifications:online_report_list")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["mode"] = "update"
+        ctx["report"] = self.object
+        return ctx
+
+    def form_valid(self, form):
+        messages.success(self.request, "Reporte actualizado exitosamente.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, f"Error al actualizar el reporte: {form.errors}")
+        return super().form_invalid(form)
+
+
+class OnlineCertificateReportDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = OnlineCertificateReport
+    template_name = "certifications/online_certificate_report_confirm_delete.html"
+    success_url = reverse_lazy("certifications:online_report_list")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["report"] = self.object
+        return ctx
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Reporte eliminado exitosamente.")
+        return super().delete(request, *args, **kwargs)

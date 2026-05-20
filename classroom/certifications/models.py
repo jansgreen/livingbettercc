@@ -10,6 +10,10 @@ from django.conf import settings
 from django.db import models, transaction
 from django.utils import timezone
 
+
+def current_year():
+    return timezone.now().year
+
 _SAFE_COMPONENT_RE: Final[re.Pattern[str]] = re.compile(r"[^A-Za-z0-9._-]+")
 
 
@@ -78,7 +82,6 @@ class Certificate(models.Model):
             self.certificate_number = self.cert_no
         super().save(*args, **kwargs)
 
-
 class BecadoCertificateRequest(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pendiente"
@@ -120,3 +123,67 @@ class BecadoCertificateRequest(models.Model):
 
     def __str__(self):
         return f"{self.full_name} | {self.course} | {self.status}"
+
+
+class OnlineCertificateReport(models.Model):
+    course = models.ForeignKey(
+        "courses.Course",
+        on_delete=models.CASCADE,
+        related_name="online_certificate_reports",
+        verbose_name="curso",
+    )
+
+    issued_year = models.PositiveIntegerField(
+        default=current_year,
+        db_index=True,
+        verbose_name="año",
+    )
+
+    district = models.CharField(
+        max_length=120,
+        db_index=True,
+        verbose_name="distrito / regional",
+    )
+
+    quantity = models.PositiveIntegerField(
+        default=0,
+        verbose_name="cantidad certificada online",
+    )
+
+    image = models.ImageField(
+        upload_to="certifications/online_reports/",
+        blank=True,
+        null=True,
+        verbose_name="imagen",
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="descripción",
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="creado",
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="actualizado",
+    )
+
+    class Meta:
+        ordering = ("-issued_year", "district")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["course", "issued_year", "district"],
+                name="unique_online_certificate_report",
+            ),
+        ]
+        verbose_name = "Reporte de Certificado Online"
+        verbose_name_plural = "Reportes de Certificados Online"
+
+    def __str__(self):
+        return f"{self.course} | {self.issued_year} | {self.district} | {self.quantity}"

@@ -35,4 +35,11 @@ urlpatterns = [
 
     # In-person certificates routes removed; using ReportActivity via home app.
 
+    # Online Certificate Reports CRUD
+    path('online-report/new/', views.OnlineCertificateReportCreateView.as_view(), name='online_report_create'),
+    path('online-report/', views.OnlineCertificateReportListView.as_view(), name='online_report_list'),
+    path('online-report/<int:pk>/', views.OnlineCertificateReportDetailView.as_view(), name='online_report_detail'),
+    path('online-report/<int:pk>/edit/', views.OnlineCertificateReportUpdateView.as_view(), name='online_report_update'),
+    path('online-report/<int:pk>/delete/', views.OnlineCertificateReportDeleteView.as_view(), name='online_report_delete'),
+
 ]
