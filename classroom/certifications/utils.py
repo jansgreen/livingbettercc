@@ -265,6 +265,8 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
             "image": image,
             "note": description,
             "updated_at": updated_at,
+            "report_id": report.id if report else None,  # ID para editar
+            "is_online": True,  # Indicador de que es online
         })
 
     return tabs, dict(issues_by_cat)
