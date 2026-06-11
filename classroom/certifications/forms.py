@@ -57,16 +57,45 @@ class BecadoCertificateRequestForm(forms.ModelForm):
 class OnlineCertificateReportForm(forms.ModelForm):
 	class Meta:
 		model = OnlineCertificateReport
-		fields = ["course", "issued_year", "total_quantity", "districts_list", "image", "description"]
+		fields = [
+			"course",
+			"issued_year",
+			"cycle_start_date",
+			"cycle_end_date",
+			"is_closed",
+			"sync_enabled",
+			"total_quantity",
+			"districts_list",
+			"regional_list",
+			"province_list",
+			"country_list",
+			"missing_location_count",
+			"image",
+			"description",
+		]
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.fields["course"].widget.attrs["class"] = "form-select"
 		self.fields["issued_year"].widget.attrs["class"] = "form-control"
+		self.fields["cycle_start_date"].widget.attrs["class"] = "form-control"
+		self.fields["cycle_start_date"].widget.attrs["type"] = "date"
+		self.fields["cycle_end_date"].widget.attrs["class"] = "form-control"
+		self.fields["cycle_end_date"].widget.attrs["type"] = "date"
+		self.fields["is_closed"].widget.attrs["class"] = "form-check-input"
+		self.fields["sync_enabled"].widget.attrs["class"] = "form-check-input"
 		self.fields["total_quantity"].widget.attrs["class"] = "form-control"
 		self.fields["districts_list"].widget.attrs["class"] = "form-control"
 		self.fields["districts_list"].widget.attrs["rows"] = "3"
 		self.fields["districts_list"].widget.attrs["placeholder"] = "Ej: 01, 05, 06, 07, 15, 11, 13, 16"
+		self.fields["regional_list"].widget.attrs["class"] = "form-control"
+		self.fields["regional_list"].widget.attrs["rows"] = "3"
+		self.fields["regional_list"].widget.attrs["placeholder"] = "Ej: Regional 01, Regional 05"
+		self.fields["province_list"].widget.attrs["class"] = "form-control"
+		self.fields["province_list"].widget.attrs["rows"] = "3"
+		self.fields["country_list"].widget.attrs["class"] = "form-control"
+		self.fields["country_list"].widget.attrs["rows"] = "2"
+		self.fields["missing_location_count"].widget.attrs["class"] = "form-control"
 		self.fields["image"].widget.attrs["class"] = "form-control"
 		self.fields["image"].widget.attrs["type"] = "file"
 		self.fields["description"].widget.attrs["class"] = "form-control"

@@ -375,7 +375,20 @@ class OnlineCertificateReportListView(LoginRequiredMixin, StaffRequiredMixin, Li
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["fields"] = ["course", "issued_year", "districts_list", "total_quantity"]
+        ctx["fields"] = [
+            "course",
+            "issued_year",
+            "cycle_start_date",
+            "cycle_end_date",
+            "is_closed",
+            "sync_enabled",
+            "districts_list",
+            "regional_list",
+            "province_list",
+            "country_list",
+            "total_quantity",
+            "missing_location_count",
+        ]
         ctx["selected_year"] = self.request.GET.get("year", "")
         ctx["available_years"] = (
             OnlineCertificateReport.objects.order_by("-issued_year")

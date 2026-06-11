@@ -191,6 +191,7 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
 
     current_year = timezone.now().year
     min_year = current_year - max(0, limit_years - 1)
+    return _get_online_certificates_by_course_year_v2(min_year=min_year)
 
     # Obtener certificados con info de distrito del usuario
     # Solo incluir certificados donde el usuario tiene scholarship_info con district válido
@@ -282,6 +283,128 @@ def get_online_certificates_by_course_year(*, limit_years: int = 6) -> Tuple[Lis
             "updated_at": updated_at,
             "report_id": report.id if report else None,  # ID para editar
             "is_online": True,  # Indicador de que es online
+        })
+
+    return tabs, dict(issues_by_cat)
+
+
+def _get_online_certificates_by_course_year_v2(*, min_year: int) -> Tuple[List[Tuple[str, str]], Dict[str, List[Dict[str, Any]]]]:
+    from authentication.models.profiles import ScholarshipStudentInfo
+    from classroom.certifications.models import OnlineCertificateReport
+    from django.db.models import F
+
+    country_labels = dict(ScholarshipStudentInfo.COUNTRY_CHOICES)
+    cert_data = (
+        Certificate.objects
+        .filter(pending=False, issued_date__year__gte=min_year)
+        .select_related("course", "user__scholarship_info")
+        .annotate(
+            y=ExtractYear("issued_date"),
+            district=F("user__scholarship_info__district"),
+            regional=F("user__scholarship_info__regional"),
+            province=F("user__scholarship_info__province"),
+            country=F("user__scholarship_info__country"),
+        )
+        .values("course_id", "y", "district", "regional", "province", "country")
+        .annotate(count=Count("id"))
+        .order_by("course_id", "-y", "district", "regional")
+    )
+
+    certs_by_course_year = defaultdict(
+        lambda: {
+            "districts": set(),
+            "regionals": set(),
+            "provinces": set(),
+            "countries": set(),
+            "count": 0,
+            "missing_location_count": 0,
+        }
+    )
+
+    for row in cert_data:
+        key = (row["course_id"], row["y"])
+        district_str = f"{int(row['district']):02d}" if row.get("district") else None
+        if district_str:
+            certs_by_course_year[key]["districts"].add(district_str)
+        if row.get("regional"):
+            certs_by_course_year[key]["regionals"].add(str(row["regional"]).strip())
+        if row.get("province"):
+            certs_by_course_year[key]["provinces"].add(str(row["province"]).strip())
+        if row.get("country"):
+            certs_by_course_year[key]["countries"].add(country_labels.get(row["country"], row["country"]))
+
+        certs_by_course_year[key]["count"] += row["count"]
+        if not row.get("district") or not row.get("regional"):
+            certs_by_course_year[key]["missing_location_count"] += row["count"]
+
+    for (course_id, year), cert_info in certs_by_course_year.items():
+        districts_str = ", ".join(sorted(cert_info["districts"]))
+        regionals_str = ", ".join(sorted(cert_info["regionals"]))
+        provinces_str = ", ".join(sorted(cert_info["provinces"]))
+        countries_str = ", ".join(sorted(cert_info["countries"]))
+
+        report, _created = OnlineCertificateReport.objects.get_or_create(
+            course_id=course_id,
+            issued_year=year,
+            defaults={
+                "total_quantity": cert_info["count"],
+                "districts_list": districts_str,
+                "regional_list": regionals_str,
+                "province_list": provinces_str,
+                "country_list": countries_str,
+                "missing_location_count": cert_info["missing_location_count"],
+            },
+        )
+
+        if report.sync_enabled and not report.is_closed:
+            report.total_quantity = cert_info["count"]
+            report.districts_list = districts_str
+            report.regional_list = regionals_str
+            report.province_list = provinces_str
+            report.country_list = countries_str
+            report.missing_location_count = cert_info["missing_location_count"]
+            report.save(update_fields=[
+                "total_quantity",
+                "districts_list",
+                "regional_list",
+                "province_list",
+                "country_list",
+                "missing_location_count",
+                "updated_at",
+            ])
+
+    reports = (
+        OnlineCertificateReport.objects
+        .select_related("course")
+        .filter(issued_year__gte=min_year)
+        .order_by("-issued_year", "course__title")
+    )
+
+    tabs = [("online", "ONLINE")]
+    issues_by_cat = {"online": []}
+    for report in reports:
+        issues_by_cat["online"].append({
+            "course": report.course,
+            "issued_date": date(report.issued_year, 1, 1),
+            "district": report.districts_list or "",
+            "regional": report.regional_list or "",
+            "province": report.province_list or "",
+            "country": report.country_list or "",
+            "quantity": 0,
+            "impact": report.total_quantity,
+            "pct_total": None,
+            "prev_year": report.issued_year - 1 if report.issued_year > min_year else min_year,
+            "desde_presencial_total": None,
+            "desde_online_total": None,
+            "image": report.image,
+            "note": report.description or "",
+            "updated_at": report.updated_at,
+            "report_id": report.id,
+            "is_online": True,
+            "is_closed": report.is_closed,
+            "cycle_start_date": report.cycle_start_date,
+            "cycle_end_date": report.cycle_end_date,
+            "missing_location_count": report.missing_location_count,
         })
 
     return tabs, dict(issues_by_cat)

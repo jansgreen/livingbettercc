@@ -2,17 +2,37 @@
 {% block content %}
 <div class="container mt-4">
   <h2>Detalle del Reporte de Certificado Online</h2>
-  <table class="table table-bordered">
+  <table class="table table-bordered align-middle">
     <tr><th>Curso</th><td>{{ report.course }}</td></tr>
-    <tr><th>Año</th><td>{{ report.issued_year }}</td></tr>
+    <tr><th>Ano</th><td>{{ report.issued_year }}</td></tr>
+    <tr>
+      <th>Ciclo</th>
+      <td>
+        {{ report.cycle_start_date|date:"d/m/Y"|default:"-" }} -
+        {{ report.cycle_end_date|date:"d/m/Y"|default:"-" }}
+      </td>
+    </tr>
+    <tr>
+      <th>Estado</th>
+      <td>
+        {% if report.is_closed %}
+          Cerrado{% if report.closed_at %} el {{ report.closed_at|date:"d/m/Y H:i" }}{% endif %}
+        {% else %}
+          Abierto
+        {% endif %}
+        {% if not report.sync_enabled %}<span class="badge bg-warning text-dark ms-2">Manual</span>{% endif %}
+      </td>
+    </tr>
     <tr><th>Cantidad Total</th><td>{{ report.total_quantity }}</td></tr>
-    <tr><th>Distritos/Regionales</th><td>{{ report.districts_list }}</td></tr>
+    <tr><th>Distritos</th><td>{{ report.districts_list|default:"Sin distritos" }}</td></tr>
+    <tr><th>Regionales</th><td>{{ report.regional_list|default:"Sin regionales" }}</td></tr>
+    <tr><th>Provincias</th><td>{{ report.province_list|default:"Sin provincias" }}</td></tr>
+    <tr><th>Paises</th><td>{{ report.country_list|default:"Sin paises" }}</td></tr>
+    <tr><th>Sin ubicacion completa</th><td>{{ report.missing_location_count }}</td></tr>
     {% if report.image %}
-    <tr><th>Imagen</th><td><img src="{{ report.image.url }}" alt="Reporte" style="max-width: 300px;"></td></tr>
+    <tr><th>Imagen</th><td><img src="{{ report.image.url }}" alt="Reporte" style="max-width: 360px;"></td></tr>
     {% endif %}
-    {% if report.description %}
-    <tr><th>Descripción</th><td>{{ report.description }}</td></tr>
-    {% endif %}
+    <tr><th>Descripcion</th><td>{{ report.description|default:"Sin descripcion" }}</td></tr>
     <tr><th>Creado</th><td>{{ report.created_at|date:"d/m/Y H:i" }}</td></tr>
     <tr><th>Actualizado</th><td>{{ report.updated_at|date:"d/m/Y H:i" }}</td></tr>
   </table>

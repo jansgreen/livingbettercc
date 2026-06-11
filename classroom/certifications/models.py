@@ -143,12 +143,47 @@ class OnlineCertificateReport(models.Model):
         verbose_name="cantidad total de certificados online",
     )
 
+    cycle_start_date = models.DateField(blank=True, null=True, verbose_name="inicio del ciclo")
+    cycle_end_date = models.DateField(blank=True, null=True, verbose_name="cierre del ciclo")
+    is_closed = models.BooleanField(default=False, db_index=True, verbose_name="ciclo cerrado")
+    closed_at = models.DateTimeField(blank=True, null=True, verbose_name="cerrado en")
+    sync_enabled = models.BooleanField(default=True, verbose_name="sincronizar con certificados")
+
     districts_list = models.TextField(
         blank=True,
         null=True,
         default=None,
         verbose_name="distritos/regionales",
         help_text="Lista de distritos separados por comas: 01, 05, 06, 07, 15, 11, 13, 16",
+    )
+
+    regional_list = models.TextField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="regionales",
+        help_text="Lista de regionales que participaron en el curso online.",
+    )
+
+    province_list = models.TextField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="provincias",
+        help_text="Lista de provincias que participaron en el curso online.",
+    )
+
+    country_list = models.TextField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name="paises",
+        help_text="Lista de paises que participaron en el curso online.",
+    )
+
+    missing_location_count = models.PositiveIntegerField(
+        default=0,
+        verbose_name="certificados sin ubicacion completa",
     )
 
     image = models.ImageField(
@@ -188,6 +223,13 @@ class OnlineCertificateReport(models.Model):
 
     def __str__(self):
         return f"{self.course} | {self.issued_year} | {self.total_quantity}"
+
+    def save(self, *args, **kwargs):
+        if self.is_closed and self.closed_at is None:
+            self.closed_at = timezone.now()
+        if not self.is_closed:
+            self.closed_at = None
+        super().save(*args, **kwargs)
 
     @property
     def missing_fields(self):
