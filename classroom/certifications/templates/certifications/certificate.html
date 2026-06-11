@@ -59,10 +59,11 @@
         <div class="line long"></div>
 
         <div class="program">
-          Por haber completado el programa de
+          Por haber completado el entrenamiento de 30 horas del proyecto "
           <span class="pname" id="programName">
             {% if course %}{{ course.title }}{% else %}{{ certificado.course.title }}{% endif %}
           </span>
+          "{% if cert_program_location_text %}, {{ cert_program_location_text }}{% endif %}, implementado por {{ cert_implementer|default:"LBCC" }}.
         </div>
 
         <div class="line medium"></div>
@@ -85,7 +86,7 @@
               <img src="{% static 'setting/firma1.png' %}" alt="Firma 1" />
             </div>
             <div class="sigLine"></div>
-            <div class="sigName" id="sig1Name">{{ cert_sig1_name|default:"THD, CASAC Jos&#233; Miguel N&#250;&#241;ez" }}</div>
+            <div class="sigName" id="sig1Name">{{ cert_sig1_name|default:"ThD, CASAC Jos&#233; Miguel N&#250;&#241;ez" }}</div>
             <div class="sigRole" id="sig1Role">{{ cert_sig1_role|default:"Presidente" }}</div>
           </div>
           <div class="sig">

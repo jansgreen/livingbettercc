@@ -307,13 +307,13 @@
   .sig{
     text-align:center;
     position:relative;
-    padding-top:34px;
+    padding-top:58px;
   }
   .sig .sigImage{
     width:100%;
-    height:54px;
+    height:86px;
     position:absolute;
-    top:-4px;
+    top:-24px;
     left:50%;
     transform:translateX(-50%);
     display:flex;
@@ -323,10 +323,21 @@
     z-index:2;
   }
   .sig .sigImage img{
-    max-height:54px;
-    max-width:100%;
+    max-height:86px;
+    max-width:112%;
     object-fit:contain;
-    opacity:.95;
+    opacity:1;
+    filter:
+      brightness(0)
+      saturate(100%)
+      invert(14%)
+      sepia(70%)
+      saturate(1800%)
+      hue-rotate(205deg)
+      brightness(90%)
+      contrast(115%)
+      drop-shadow(0 1px 0 rgba(255,255,255,.65))
+      drop-shadow(0 2px 2px rgba(15,35,70,.22));
   }
   .sigLine{
     height:1px;

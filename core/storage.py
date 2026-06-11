@@ -1,8 +1,17 @@
 import os
 
 from cloudinary_storage.storage import MediaCloudinaryStorage, RESOURCE_TYPES
-from storages.backends.gcloud import GoogleCloudStorage
-from google.cloud.exceptions import NotFound
+
+try:
+    from storages.backends.gcloud import GoogleCloudStorage
+    from google.cloud.exceptions import NotFound
+    HAS_DJANGO_STORAGES = True
+except ImportError:
+    GoogleCloudStorage = object
+    HAS_DJANGO_STORAGES = False
+
+    class NotFound(Exception):
+        pass
 
 
 class MixedMediaCloudinaryStorage(MediaCloudinaryStorage):
@@ -26,6 +35,11 @@ class SafeGoogleCloudStorage(GoogleCloudStorage):
     This prevents errors when Django's FileField tries to delete old files
     that don't exist in Google Cloud Storage.
     """
+
+    def __init__(self, *args, **kwargs):
+        if not HAS_DJANGO_STORAGES:
+            raise ImportError("django-storages is required when USE_GCS=true")
+        super().__init__(*args, **kwargs)
 
     def size(self, name):
         try:

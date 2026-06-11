@@ -98,7 +98,12 @@ class UserCertificateDetailView(LoginRequiredMixin, DetailView):
     # Si tu URL usa uuid: path("my/<uuid:uuid>/", UserCertificateDetailView.as_view(), ...)
     def get_object(self, queryset=None):
         uuid = self.kwargs.get("uuid")
-        cert = get_object_or_404(Certificate, uuid=uuid, user=self.request.user)
+        pk = self.kwargs.get("pk")
+        queryset = Certificate.objects.select_related("user", "course")
+        if uuid:
+            cert = get_object_or_404(queryset, uuid=uuid, user=self.request.user)
+        else:
+            cert = get_object_or_404(queryset, pk=pk, user=self.request.user)
         if cert.pending and not self.request.user.is_staff:
             raise Http404("No encontrado")
         return cert
@@ -112,6 +117,7 @@ class UserCertificateDetailView(LoginRequiredMixin, DetailView):
         user = ctx["certificate"].user
         ctx["student_name"] = (user.get_full_name() or user.username).strip()
         ctx["course_title"] = ctx["certificate"].course.title
+        ctx.update(_certificate_template_context(ctx["certificate"]))
         return ctx
 
 class SharedCertificateListView(LoginRequiredMixin, ListView):
@@ -152,7 +158,12 @@ def _certificate_template_context(cert):
     student_name = (cert.user.get_full_name() or cert.user.username).strip()
     scholarship_info = getattr(cert.user, "scholarship_info", None)
     cert_location_text = ""
+    cert_program_location_text = ""
     if scholarship_info and scholarship_info.is_complete():
+        cert_program_location_text = (
+            f"Regional {scholarship_info.regional}, "
+            f"Distrito {scholarship_info.district}"
+        )
         cert_location_text = (
             f"para la Regional {scholarship_info.regional}, "
             f"Distrito {scholarship_info.district}, "
@@ -171,12 +182,14 @@ def _certificate_template_context(cert):
         "cert_left_ref": getattr(settings, "CERT_LEFT_REF", None),
         "cert_right_ref": getattr(settings, "CERT_RIGHT_REF", None),
         "cert_brand": getattr(settings, "CERT_BRAND", None),
+        "cert_implementer": getattr(settings, "CERT_IMPLEMENTER", None),
         "cert_sig1_name": getattr(settings, "CERT_SIG1_NAME", None),
         "cert_sig1_role": getattr(settings, "CERT_SIG1_ROLE", None),
         "cert_sig2_name": getattr(settings, "CERT_SIG2_NAME", None),
         "cert_sig2_role": getattr(settings, "CERT_SIG2_ROLE", None),
         "cert_quote": getattr(settings, "CERT_QUOTE", None),
         "cert_location_text": cert_location_text,
+        "cert_program_location_text": cert_program_location_text,
     }
 
 def certificate_public_view(request, uuid):
