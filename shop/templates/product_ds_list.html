@@ -1,0 +1,161 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h1 class="h3 fw-bold text-primary mb-1">Dashboard de Productos</h1>
+      <p class="text-muted mb-0">Administra los productos, precios y fechas de emisión.</p>
+    </div>
+
+    <a href="{% url 'shop:product_create' %}" class="btn btn-primary shadow-sm">
+      <i class="bi bi-plus-circle me-1"></i> Nuevo producto
+    </a>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white border-0 py-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <h2 class="h5 fw-semibold mb-0">Lista de productos</h2>
+
+        <form method="get" class="d-flex" style="max-width: 360px;">
+          <input
+            type="text"
+            name="q"
+            class="form-control"
+            placeholder="Buscar producto..."
+            value="{{ search_query }}"
+          >
+          <button class="btn btn-outline-primary ms-2" type="submit">Buscar</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-4">ID</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Fecha de emisión</th>
+              <th>Estado</th>
+              <th class="text-end pe-4">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% if products %}
+              {% for product in products %}
+                <tr>
+                  <td class="ps-4 fw-semibold text-muted">#{{ product.id }}</td>
+
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      {% if product.image %}
+                        <img
+                          src="{{ product.image.url }}"
+                          alt="{{ product.name }}"
+                          class="rounded-3"
+                          style="width: 56px; height: 56px; object-fit: cover;"
+                        >
+                      {% else %}
+                        <div class="bg-light rounded-3 d-flex align-items-center justify-content-center"
+                             style="width: 56px; height: 56px;">
+                          <span class="text-muted small">N/A</span>
+                        </div>
+                      {% endif %}
+
+                      <div>
+                        <div class="fw-semibold text-dark">{{ product.name }}</div>
+                        <div class="text-muted small">
+                          {{ product.description|safe|striptags|truncatewords:12 }}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="fw-bold text-success">
+                      ${{ product.price|floatformat:2|intcomma }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {% if product.created_at %}
+                      {{ product.created_at|date:"d/m/Y" }}
+                    {% elif product.issue_date %}
+                      {{ product.issue_date|date:"d/m/Y" }}
+                    {% else %}
+                      <span class="text-muted">Sin fecha</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if product.is_active %}
+                      <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Activo</span>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Inactivo</span>
+                    {% endif %}
+                  </td>
+
+                  <td class="text-end pe-4">
+                    <div class="btn-group">
+                      <a href="{% url 'shop:product_update' product.id %}" class="btn btn-sm btn-outline-primary">
+                        Editar
+                      </a>
+                      <a href="{% url 'shop:product_delete' product.id %}" class="btn btn-sm btn-outline-danger">
+                        Eliminar
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="text-center py-5">
+                  <div class="text-muted">No hay productos registrados.</div>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if products.has_other_pages %}
+      <div class="card-footer bg-white border-0 py-3">
+        <nav aria-label="Paginación productos">
+          <ul class="pagination justify-content-center mb-0">
+            {% if products.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?q={{ search_query }}&page={{ products.previous_page_number }}">Anterior</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+            {% endif %}
+
+            {% for num in products.paginator.page_range %}
+              <li class="page-item {% if products.number == num %}active{% endif %}">
+                <a class="page-link" href="?q={{ search_query }}&page={{ num }}">{{ num }}</a>
+              </li>
+            {% endfor %}
+
+            {% if products.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?q={{ search_query }}&page={{ products.next_page_number }}">Siguiente</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

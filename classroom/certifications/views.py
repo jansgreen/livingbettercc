@@ -14,6 +14,7 @@ from core.group_utils import has_group
 
 from .models import Certificate, BecadoCertificateRequest, OnlineCertificateReport
 from .forms import CertificateForm, BecadoCertificateRequestForm, OnlineCertificateReportForm
+from .utils import get_online_certificates_by_course_year
 from authentication.models.profiles import Profiles
 from authentication.models.students import Students
 
@@ -178,14 +179,12 @@ def _certificate_template_context(cert):
         "cert_location_text": cert_location_text,
     }
 
-
 def certificate_public_view(request, uuid):
     cert = get_object_or_404(Certificate.objects.select_related("user", "course"), public_uuid=uuid)
     if cert.pending and not (request.user.is_authenticated and request.user.is_staff):
         raise Http404("No encontrado")
     ctx = _certificate_template_context(cert)
     return render(request, "certifications/certificate.html", ctx)
-
 
 def certificate_toggle_pending(request, uuid):
     if not (request.user.is_authenticated and request.user.is_staff):
@@ -195,7 +194,6 @@ def certificate_toggle_pending(request, uuid):
     cert.save(update_fields=["pending"])
     ctx = _certificate_template_context(cert)
     return render(request, "certifications/certificate.html", ctx)
-
 
 def claim_certificate(request, uuid):
     if not request.user.is_authenticated:
@@ -354,11 +352,23 @@ class OnlineCertificateReportListView(LoginRequiredMixin, StaffRequiredMixin, Li
     paginate_by = 10
 
     def get_queryset(self):
-        return OnlineCertificateReport.objects.select_related("course").order_by("-created_at")
+        # Sync course/year online rows from real certificates before listing CRUD data.
+        get_online_certificates_by_course_year(limit_years=6)
+        queryset = OnlineCertificateReport.objects.select_related("course").order_by("-issued_year", "course__title")
+        year = self.request.GET.get("year")
+        if year and year.isdigit():
+            queryset = queryset.filter(issued_year=int(year))
+        return queryset
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["fields"] = ["course", "issued_year", "district", "quantity"]
+        ctx["fields"] = ["course", "issued_year", "districts_list", "total_quantity"]
+        ctx["selected_year"] = self.request.GET.get("year", "")
+        ctx["available_years"] = (
+            OnlineCertificateReport.objects.order_by("-issued_year")
+            .values_list("issued_year", flat=True)
+            .distinct()
+        )
         return ctx
 
 

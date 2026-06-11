@@ -37,7 +37,7 @@ def obtener_menu_report_activity(request):
             {'nombre': 'Nuevo Reporte', 'url': _safe_url('report_create', '/reportes/nuevo/')},
             {'nombre': 'Lista de Reportes', 'url': _safe_url('report_list', '/reportes/lista/')},
             {'nombre': 'Nuevo Reporte Online', 'url': _safe_url('certifications:online_report_create', '/online-report/new/')},
-            {'nombre': 'Reportes Online', 'url': _safe_url('certifications:online_report_list', '/online-report/')},
+            {'nombre': 'Reporte Online', 'url': _safe_url('certifications:online_report_list', '/online-report/')},
         ])
     # Técnico: solo ver lista y detalle
 

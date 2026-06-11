@@ -124,7 +124,6 @@ class BecadoCertificateRequest(models.Model):
     def __str__(self):
         return f"{self.full_name} | {self.course} | {self.status}"
 
-
 class OnlineCertificateReport(models.Model):
     course = models.ForeignKey(
         "courses.Course",
@@ -189,3 +188,20 @@ class OnlineCertificateReport(models.Model):
 
     def __str__(self):
         return f"{self.course} | {self.issued_year} | {self.total_quantity}"
+
+    @property
+    def missing_fields(self):
+        missing = []
+        if not self.issued_year:
+            missing.append("año")
+        if not self.districts_list:
+            missing.append("distritos/regionales")
+        if not self.description:
+            missing.append("descripción")
+        if not self.image:
+            missing.append("imagen")
+        return missing
+
+    @property
+    def has_missing_fields(self):
+        return bool(self.missing_fields)

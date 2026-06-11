@@ -208,6 +208,7 @@ def report_create(request):
 
 @login_required
 def report_list(request):
+
     reports_qs = ReportActivity.objects.select_related('course').order_by('-created_at')
     page = request.GET.get('page', 1)
     per_page = 10  # Puedes ajustar este valor
@@ -228,6 +229,7 @@ def report_list(request):
 def report_detail(request, pk):
     report = get_object_or_404(ReportActivity, pk=pk)
     return render(request, 'activity/report_detail.html', {'report': report})
+
 @login_required
 def report_update(request, pk):
     report = get_object_or_404(ReportActivity, pk=pk)
@@ -262,6 +264,7 @@ def report_delete(request, pk):
     return render(request, 'activity/report_confirm_delete.html', context)
 
  # Report Activity Category CRUD
+
 @login_required
 def report_categories_create(request):
     if request.method == "POST":
@@ -276,6 +279,7 @@ def report_categories_create(request):
         form = ReportCategoriesForm()
     context = {'form': form}
     return render(request, 'activity/category_report_form.html', context)
+
 @login_required
 def report_categories_list(request):
     # Filtros
@@ -300,6 +304,7 @@ def report_categories_list(request):
         'search_query': search_query,
     }
     return render(request, 'activity/category_report_list.html', context)
+
 @login_required
 def report_categories_detail(request, pk):
     category = get_object_or_404(ReportCategories, pk=pk)
@@ -321,6 +326,7 @@ def report_categories_update(request, pk):
         form = ReportCategoriesForm(instance=category)
     context = {'form': form, 'category': category}
     return render(request, 'activity/category_report_form.html', context)
+
 @login_required
 def report_categories_delete(request, pk):
     category = get_object_or_404(ReportCategories, pk=pk)
@@ -330,3 +336,5 @@ def report_categories_delete(request, pk):
         return redirect('report_categories_list')
     context = {'category': category}
     return render(request, 'activity/category_report_confirm_delete.html', context)
+
+
