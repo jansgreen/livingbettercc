@@ -59,11 +59,11 @@
         <div class="line long"></div>
 
         <div class="program">
-          Por haber completado el entrenamiento de 30 horas del proyecto "
+          Por haber completado el entrenamiento de 30 horas del proyecto
           <span class="pname" id="programName">
-            {% if course %}{{ course.title }}{% else %}{{ certificado.course.title }}{% endif %}
+            "{% if course %}{{ course.title }}{% else %}{{ certificado.course.title }}{% endif %}".
           </span>
-          "{% if cert_program_location_text %}, {{ cert_program_location_text }}{% endif %}, implementado por {{ cert_implementer|default:"LBCC" }}.
+          {% if cert_program_location_text %} {{ cert_program_location_text }}, {% endif %} implementado por {{ cert_implementer|default:"LBCC" }}.
         </div>
 
         <div class="line medium"></div>
