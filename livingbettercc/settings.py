@@ -343,14 +343,13 @@ WHITENOISE_MANIFEST_STRICT = False
 # Cloudinary Storage si está habilitado actualizado con google cloud storage
 USE_CLOUDINARY = os.getenv("USE_CLOUDINARY", "false").lower() == "true"
 USE_GCS = os.getenv("USE_GCS", "false").lower() == "true"
+DEFAULT_GCS_CREDENTIALS_PATH = "/home/livingbettercc/spheric-wonder-449401-f5-a94a652cdc7b.json"
 
 if USE_GCS:
     INSTALLED_APPS.append('storages')
 
 if USE_GCS:
-    google_credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    if not google_credentials_path:
-        raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS is required when USE_GCS=true")
+    google_credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", DEFAULT_GCS_CREDENTIALS_PATH)
     GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
         google_credentials_path
     )
